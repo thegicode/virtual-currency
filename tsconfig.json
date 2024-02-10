@@ -1,0 +1,25 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "target": "es6", // 컴파일된 JavaScript의 대상 버전
+        "module": "ESNext", // 사용할 모듈 시스템 (예: commonjs, es6, amd 등)
+        "moduleResolution": "node", // 모듈의 해석 방법을 지정
+        "lib": ["ES6", "ESNext", "DOM"],
+        "strict": true, // 모든 strict type-checking 옵션을 활성화
+        "esModuleInterop": true, // CJS/AMD 모듈과의 ES6 모듈 간의 상호 운용성
+        "skipLibCheck": true, // 타입 선언 파일의 타입 검사를 건너뛰기
+        "forceConsistentCasingInFileNames": true, // 파일 이름의 대/소문자 일관성 강제
+        "outDir": "./dev/scripts", // 컴파일된 JavaScript 파일의 출력 디렉터리
+        "removeComments": true, // 컴파일된 JavaScript에서 주석 제거
+        "types": ["jest"],
+        "baseUrl": ".",
+        "paths": {
+            "@src/*": ["src/*"],
+            "@scripts/*": ["src/scripts/*"],
+            "@pages/*": ["src/scripts/pages/*"]
+        },
+        "sourceMap": true
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "__tests__"]
+}

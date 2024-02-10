@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../src/scripts/pages/second/Base.ts", "../../../src/scripts/pages/second/index.ts"],
+  "sourcesContent": ["export default class Base {\n    private readonly name;\n\n    constructor(name: string) {\n        this.name = name;\n    }\n\n    log() {\n        return this.name;\n    }\n}\n", "import Base from \"./Base\";\n\nconsole.log(\"Base\", Base);\n"],
+  "mappings": ";;;AAAA,MAAqB,OAArB,MAAyB;IAGrB,YAAY,MAAY;AACpB,WAAK,OAAO;IAChB;IAEA,MAAG;AACC,aAAO,KAAK;IAChB;;;;ACPJ,UAAQ,IAAI,QAAQ,IAAI;",
+  "names": []
+}

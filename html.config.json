@@ -1,0 +1,9 @@
+{
+    "caseSensitive": true,
+    "collapseInlineTagWhitespace": true,
+    "collapseWhitespace": true,
+    "noNewlinesBeforeTagClose": true,
+    "removeAttributeQuotes": true,
+    "removeComments": true,
+    "trimCustomFragments": true
+}

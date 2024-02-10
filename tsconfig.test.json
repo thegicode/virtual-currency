@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "noEmit": true,
+        "types": ["node", "jest"],
+        "baseUrl": ".",
+        "paths": {
+            "@src/*": ["src/*"],
+            "@scripts/*": ["src/scripts/*"],
+            "@pages/*": ["src/scripts/pages/*"]
+        }
+    },
+    "include": ["__tests__/**/*.ts"]
+    // "files": ["./app/type.d.ts"]
+}
