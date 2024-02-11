@@ -1,6 +1,6 @@
 "use strict";
 (() => {
-  // src/scripts/components/Nav.ts
+  // app/scripts/components/Nav.ts
   var Nav = class {
     constructor() {
       this.render();

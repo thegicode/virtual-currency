@@ -15,12 +15,12 @@
         // "types": ["jest"],
         "baseUrl": ".",
         "paths": {
-            "@src/*": ["src/*"],
-            "@scripts/*": ["src/scripts/*"],
-            "@pages/*": ["src/scripts/pages/*"]
+            "@app/*": ["app/*"],
+            "@scripts/*": ["app/scripts/*"],
+            "@pages/*": ["app/scripts/pages/*"]
         },
         "sourceMap": true
     },
-    "include": ["src/**/*.ts"],
+    "include": ["app/**/*.ts"],
     "exclude": ["node_modules", "test"]
 }

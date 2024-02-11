@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "sources": ["../../../src/scripts/components/Nav.ts", "../../../src/scripts/pages/order/Base.ts", "../../../src/scripts/pages/order/index.ts"],
+  "sources": ["../../../app/scripts/components/Nav.ts", "../../../app/scripts/pages/order/Base.ts", "../../../app/scripts/pages/order/index.ts"],
   "sourcesContent": ["export default class Nav {\n    constructor() {\n        this.render();\n    }\n\n    render() {\n        console.log(\"Nav render\");\n    }\n}\n", "import Nav from \"@scripts/components/Nav\";\n\nexport default class Base {\n    private readonly name;\n\n    constructor(name: string) {\n        this.name = name;\n    }\n\n    log() {\n        console.log(\"Nav\", Nav);\n        return this.name;\n    }\n}\n", "import Base from \"./Base\";\n\nconsole.log(\"Base\", Base);\n"],
   "mappings": ";;;AAAA,MAAqB,MAArB,MAAyB;AAAA,IACrB,cAAc;AACV,WAAK,OAAO;AAAA,IAChB;AAAA,IAEA,SAAS;AACL,cAAQ,IAAI,YAAY;AAAA,IAC5B;AAAA,EACJ;;;ACNA,MAAqB,OAArB,MAAyB;IAGrB,YAAY,MAAY;AACpB,WAAK,OAAO;IAChB;IAEA,MAAG;AACC,cAAQ,IAAI,OAAO,GAAG;AACtB,aAAO,KAAK;IAChB;;;;ACVJ,UAAQ,IAAI,QAAQ,IAAI;",
   "names": []

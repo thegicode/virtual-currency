@@ -5,9 +5,9 @@
         "types": ["node", "jest"],
         "baseUrl": ".",
         "paths": {
-            "@src/*": ["src/*"],
-            "@scripts/*": ["src/scripts/*"],
-            "@pages/*": ["src/scripts/pages/*"]
+            "@app/*": ["app/*"],
+            "@scripts/*": ["app/scripts/*"],
+            "@pages/*": ["app/scripts/pages/*"]
         }
     },
     "include": ["__tests__/**/*.ts"]
