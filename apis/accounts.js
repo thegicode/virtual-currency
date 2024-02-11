@@ -1,10 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const URL = require("../url");
-const TOKEN = require("..//token");
-
-getAccounts();
+const URL = require("../server/url");
+const TOKEN = require("../server/config/token");
 
 async function getAccounts() {
     const response = await fetch(URL.accounts, {
@@ -56,7 +54,7 @@ async function getAccounts() {
         });
 
     fs.writeFileSync(
-        path.resolve(`../../data/myMarkets.json`),
+        path.resolve(`../data/myMarkets.json`),
         JSON.stringify(myMarkets)
     );
 
@@ -64,3 +62,5 @@ async function getAccounts() {
 
     return result;
 }
+
+module.exports = { getAccounts };
