@@ -1,13 +1,16 @@
-const { isProduction, staticPath, port } = require("./config.js");
-const staicRoutes = require("./staticRoutes.js");
 const express = require("express");
 const app = express();
 
-console.log(isProduction, port);
+const { isProduction, staticPath, port } = require("./config/config");
+const setupApiEndpoints = require("../apis");
+const setupStaticHtmlRoutes = require("./setupStaticHtmlRoutes");
+
+console.log(isProduction, port, staticPath);
 
 app.use(express.static(staticPath));
 
-staicRoutes(app, staticPath);
+setupApiEndpoints(app);
+setupStaticHtmlRoutes(app, staticPath);
 
 app.listen(port, () => {
     console.log(`Start: http://localhost:${port}`);

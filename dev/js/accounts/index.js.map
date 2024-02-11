@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../src/scripts/pages/accounts/AppAccounts.ts", "../../../src/scripts/pages/accounts/index.ts"],
+  "sourcesContent": ["export default class AppAccounts extends HTMLElement {\n    constructor() {\n        super();\n    }\n\n    connectedCallback() {\n        console.log(\"AppAccounts\");\n\n        this.fetchData();\n    }\n\n    private async fetchData() {\n        try {\n            const result = await fetch(`/accounts`);\n            const data = await result.json();\n            this.render(data);\n        } catch (error) {\n            console.error(error);\n        }\n    }\n\n    private render(data: any) {\n        console.log(data);\n    }\n}\n", "import AppAccounts from \"./AppAccounts\";\n\ncustomElements.define(\"app-accounts\", AppAccounts);\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA,MAAqB,cAArB,cAAyC,YAAW;IAChD,cAAA;AACI,YAAK;IACT;IAEA,oBAAiB;AACb,cAAQ,IAAI,aAAa;AAEzB,WAAK,UAAS;IAClB;IAEc,YAAS;;AACnB,YAAI;AACA,gBAAM,SAAS,MAAM,MAAM,WAAW;AACtC,gBAAM,OAAO,MAAM,OAAO,KAAI;AAC9B,eAAK,OAAO,IAAI;iBACX,OAAO;AACZ,kBAAQ,MAAM,KAAK;;MAE3B,CAAC;;IAEO,OAAO,MAAS;AACpB,cAAQ,IAAI,IAAI;IACpB;;;;ACrBJ,iBAAe,OAAO,gBAAgB,WAAW;",
+  "names": []
+}
