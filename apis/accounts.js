@@ -10,14 +10,27 @@ async function accounts(req, res) {
         headers: { Authorization: TOKEN },
     });
 
-    const data = await response.json();
+    try {
+        const data = await response.json();
+        res.send(handleAccounts(data));
+    } catch (error) {
+        console.error(error);
+    }
+}
 
+function handleAccounts(data) {
     const myMarkets = [];
 
-    const result = data
-        .filter(
-            (account) => account.currency === "KRW" || account.avg_buy_price > 0
-        )
+    let accountKRW = {};
+
+    const accounts = data
+        .filter((account) => {
+            if (account.currency === "KRW" && account.unit_currency === "KRW") {
+                accountKRW = account;
+                return false;
+            }
+            return account.currency === "KRW" || account.avg_buy_price > 0;
+        })
         .map((account) => {
             const {
                 currency,
@@ -58,9 +71,7 @@ async function accounts(req, res) {
         JSON.stringify(myMarkets)
     );
 
-    console.log("result", result);
-
-    res.send(result);
+    return { accountKRW, accounts };
 }
 
 module.exports = accounts;
