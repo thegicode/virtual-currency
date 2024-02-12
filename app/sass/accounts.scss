@@ -6,16 +6,18 @@ body {
 }
 
 app-accounts {
+    --margin-side: 1rem;
+
     display: block;
     color: #666;
 
     h1 {
         margin: 0;
-        padding: 10px;
+        padding: var(--margin-side) var(--margin-side) 0;
     }
 
     .assets {
-        padding: 10px;
+        padding: var(--margin-side);
 
         h4 {
             margin: 0 0 10px;
@@ -24,16 +26,28 @@ app-accounts {
             margin: 7px 0;
         }
     }
+
     .accounts {
         list-style: none;
+        margin: 0;
         padding: 0;
 
         li {
-            padding: 10px;
+            padding: var(--margin-side);
             border-top: 1px solid #ddd;
 
-            h4 {
-                margin: 10px 0;
+            .name {
+                display: flex;
+                align-items: center;
+
+                h4 {
+                    margin: 0;
+                }
+
+                span {
+                    margin-left: 5px;
+                    font-size: 10px;
+                }
             }
 
             p {

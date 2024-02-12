@@ -47,12 +47,13 @@
         }
       });
     }
-    renderKRW(accountKRW) {
+    renderKRW(data) {
       const assetsElement = this.querySelector(".assets");
       const element = assetsElement.cloneNode(true);
+      const totalAsset = Number(data.balance) + Number(data.locked);
       let tp = `<h4>My Asset</h4>`;
-      tp += `<p>balance : ${this.roundToDecimalPlace(accountKRW.balance, 0).toLocaleString()} ${accountKRW.unit_currency}</p>`;
-      tp += `<p>locked: ${this.roundToDecimalPlace(accountKRW.locked, 0).toLocaleString()} ${accountKRW.unit_currency}</p>`;
+      tp += `<p>\uBCF4\uC720 ${data.unit_currency} : ${this.roundToDecimalPlace(totalAsset, 0).toLocaleString()}</p>`;
+      tp += `<p>locked ${data.unit_currency} : ${this.roundToDecimalPlace(data.locked, 0).toLocaleString()}</p>`;
       element.innerHTML = tp;
       assetsElement.replaceWith(element);
     }
@@ -64,12 +65,11 @@
     }
     createElement(data) {
       const element = document.createElement("li");
-      const name = `${data.currency}-${data.unit_currency}`;
-      let tp = `<h4>${name}</h4>`;
-      tp += `<p>buy_price: ${this.roundToDecimalPlace(data.buy_price, 0).toLocaleString()}</p>`;
-      tp += `<p>avg_buy_price: ${this.roundToDecimalPlace(data.avg_buy_price, 1).toLocaleString()}</p>`;
-      tp += `<p>volume: ${data.volume}</p>`;
-      tp += `<p>locked: ${data.locked}</p>`;
+      let tp = `<div class="name"><h4>${data.currency}</h4> <span>(${data.unit_currency})</span></div>`;
+      tp += `<p>\u2219  \uB9E4\uC218\uAE08\uC561: ${this.roundToDecimalPlace(data.buy_price, 0).toLocaleString()}</p>`;
+      tp += `<p>\u2219  \uB9E4\uC218\uD3C9\uADE0\uAC00: ${this.roundToDecimalPlace(data.avg_buy_price, 1).toLocaleString()}</p>`;
+      tp += `<p>\u2219  volume: ${data.volume}</p>`;
+      tp += `<p>\u2219  locked: ${data.locked}</p>`;
       element.innerHTML = tp;
       return element;
     }

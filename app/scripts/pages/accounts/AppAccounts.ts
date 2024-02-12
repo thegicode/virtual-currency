@@ -19,19 +19,22 @@ export default class AppAccounts extends HTMLElement {
         }
     }
 
-    private renderKRW(accountKRW: any) {
+    private renderKRW(data: any) {
         const assetsElement = this.querySelector(".assets") as HTMLElement;
         const element = assetsElement.cloneNode(true) as HTMLElement;
 
+        const totalAsset = Number(data.balance) + Number(data.locked);
+
         let tp = `<h4>My Asset</h4>`;
-        tp += `<p>balance : ${this.roundToDecimalPlace(
-            accountKRW.balance,
+        tp += `<p>보유 ${data.unit_currency} : ${this.roundToDecimalPlace(
+            totalAsset,
             0
-        ).toLocaleString()} ${accountKRW.unit_currency}</p>`;
-        tp += `<p>locked: ${this.roundToDecimalPlace(
-            accountKRW.locked,
+        ).toLocaleString()}</p>`;
+
+        tp += `<p>locked ${data.unit_currency} : ${this.roundToDecimalPlace(
+            data.locked,
             0
-        ).toLocaleString()} ${accountKRW.unit_currency}</p>`;
+        ).toLocaleString()}</p>`;
         element.innerHTML = tp;
         assetsElement.replaceWith(element);
     }
@@ -46,18 +49,17 @@ export default class AppAccounts extends HTMLElement {
 
     private createElement(data: any) {
         const element = document.createElement("li") as HTMLLIElement;
-        const name = `${data.currency}-${data.unit_currency}`;
-        let tp = `<h4>${name}</h4>`;
-        tp += `<p>buy_price: ${this.roundToDecimalPlace(
+        let tp = `<div class="name"><h4>${data.currency}</h4> <span>(${data.unit_currency})</span></div>`;
+        tp += `<p>∙  매수금액: ${this.roundToDecimalPlace(
             data.buy_price,
             0
         ).toLocaleString()}</p>`;
-        tp += `<p>avg_buy_price: ${this.roundToDecimalPlace(
+        tp += `<p>∙  매수평균가: ${this.roundToDecimalPlace(
             data.avg_buy_price,
             1
         ).toLocaleString()}</p>`;
-        tp += `<p>volume: ${data.volume}</p>`;
-        tp += `<p>locked: ${data.locked}</p>`;
+        tp += `<p>∙  volume: ${data.volume}</p>`;
+        tp += `<p>∙  locked: ${data.locked}</p>`;
         element.innerHTML = tp;
         return element;
     }
