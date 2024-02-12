@@ -1,6 +1,12 @@
 export default class AppAccounts extends HTMLElement {
+    private template: HTMLTemplateElement;
+
     constructor() {
         super();
+
+        this.template = this.querySelector(
+            "#accountItem"
+        ) as HTMLTemplateElement;
     }
 
     connectedCallback() {
@@ -27,9 +33,6 @@ export default class AppAccounts extends HTMLElement {
     }
 
     private transformData(accounts: any, tickerData: any) {
-        console.log(tickerData);
-        const { trade_price } = tickerData;
-
         const tickerNames = tickerData.map((t: any) => t.market);
 
         const result = accounts.map((aAccount: any, index: number) => {
@@ -119,11 +122,7 @@ export default class AppAccounts extends HTMLElement {
     }
 
     private createElement(aAccount: any) {
-        console.log("createElement", aAccount);
-        const template = this.querySelector(
-            "#accountsItem"
-        ) as HTMLTemplateElement;
-        const element = template?.content.firstElementChild?.cloneNode(
+        const element = this.template?.content.firstElementChild?.cloneNode(
             true
         ) as HTMLElement;
 
@@ -144,13 +143,13 @@ export default class AppAccounts extends HTMLElement {
 
         const profitElement = element.querySelector(".profit") as HTMLElement;
         profitElement.textContent = aAccount.profit;
+
+        (
+            element.querySelector(".profitRate") as HTMLElement
+        ).textContent = `${aAccount.profitRate.toFixed(2)}%`;
+
         (profitElement.closest("li") as HTMLElement).dataset.increase =
             isPlus.toString();
-
-        const profitRateElement = element.querySelector(
-            ".profitRate"
-        ) as HTMLElement;
-        profitRateElement.textContent = `${aAccount.profitRate.toFixed(2)}%`;
 
         return element;
     }

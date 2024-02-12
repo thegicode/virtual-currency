@@ -31,6 +31,7 @@
   var AppAccounts = class extends HTMLElement {
     constructor() {
       super();
+      this.template = this.querySelector("#accountItem");
     }
     connectedCallback() {
       this.fetch();
@@ -50,8 +51,6 @@
       });
     }
     transformData(accounts, tickerData) {
-      console.log(tickerData);
-      const { trade_price } = tickerData;
       const tickerNames = tickerData.map((t) => t.market);
       const result = accounts.map((aAccount, index) => {
         const { avg_buy_price, buy_price, currency, locked, unit_currency, volume } = aAccount;
@@ -112,10 +111,8 @@
       (_a = this.querySelector(".accounts")) === null || _a === void 0 ? void 0 : _a.appendChild(fragment);
     }
     createElement(aAccount) {
-      var _a;
-      console.log("createElement", aAccount);
-      const template = this.querySelector("#accountsItem");
-      const element = (_a = template === null || template === void 0 ? void 0 : template.content.firstElementChild) === null || _a === void 0 ? void 0 : _a.cloneNode(true);
+      var _a, _b;
+      const element = (_b = (_a = this.template) === null || _a === void 0 ? void 0 : _a.content.firstElementChild) === null || _b === void 0 ? void 0 : _b.cloneNode(true);
       element.querySelector(".currency").textContent = aAccount.currency;
       element.querySelector(".unitCurrency").textContent = aAccount.unitCurrency;
       element.querySelector(".buyPrice").textContent = aAccount.buyPrice;
@@ -124,9 +121,8 @@
       const isPlus = aAccount.profit > 0 ? true : false;
       const profitElement = element.querySelector(".profit");
       profitElement.textContent = aAccount.profit;
+      element.querySelector(".profitRate").textContent = `${aAccount.profitRate.toFixed(2)}%`;
       profitElement.closest("li").dataset.increase = isPlus.toString();
-      const profitRateElement = element.querySelector(".profitRate");
-      profitRateElement.textContent = `${aAccount.profitRate.toFixed(2)}%`;
       return element;
     }
     roundToDecimalPlace(amount, point) {
