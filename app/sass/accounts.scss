@@ -2,19 +2,43 @@ html,
 html,
 body {
     margin: 0;
+    font-size: 12px;
 }
 
 app-accounts {
     display: block;
-    padding: 0 10px;
+    color: #666;
+
+    h1 {
+        margin: 0;
+        padding: 10px;
+    }
+
+    .assets {
+        padding: 10px;
+
+        h4 {
+            margin: 0 0 10px;
+        }
+        p {
+            margin: 7px 0;
+        }
+    }
     .accounts {
         list-style: none;
         padding: 0;
-        font-size: 14px;
 
         li {
-            padding: 10px 0;
+            padding: 10px;
             border-top: 1px solid #ddd;
+
+            h4 {
+                margin: 10px 0;
+            }
+
+            p {
+                margin: 7px 0;
+            }
         }
     }
 }

@@ -4,6 +4,9 @@ const path = require("path");
 const URL = require("../server/config/URL");
 const TOKEN = require("../server/config/token");
 
+let accountsData = {};
+let accountsTime = null;
+
 async function accounts(req, res) {
     const response = await fetch(URL.accounts, {
         method: "GET",
@@ -12,15 +15,28 @@ async function accounts(req, res) {
 
     try {
         const data = await response.json();
-        res.send(handleAccounts(data));
+        if (!data) return;
+
+        // 1분 이상시 호출
+        if ((new Date().getTime() - accountsTime) / (1000 * 60) > 1) {
+            res.send(handleAccounts(data));
+        } else {
+            console.log("accountsData", accountsData);
+            res.send(accountsData);
+        }
+
+        accountsTime = new Date().getTime();
     } catch (error) {
         console.error(error);
     }
 }
 
 function handleAccounts(data) {
-    const myMarkets = [];
+    if (!data) return;
 
+    console.log("handleAccounts", accountsData);
+
+    const myMarkets = [];
     let accountKRW = {};
 
     const accounts = data
@@ -71,7 +87,9 @@ function handleAccounts(data) {
         JSON.stringify(myMarkets)
     );
 
-    return { accountKRW, accounts };
+    accountsData = { accountKRW, accounts };
+
+    return accountsData;
 }
 
 module.exports = accounts;

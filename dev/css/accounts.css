@@ -2,20 +2,39 @@ html,
 html,
 body {
   margin: 0;
+  font-size: 12px;
 }
 
 app-accounts {
   display: block;
-  padding: 0 10px;
+  color: #666;
+}
+app-accounts h1 {
+  margin: 0;
+  padding: 10px;
+}
+app-accounts .assets {
+  padding: 10px;
+}
+app-accounts .assets h4 {
+  margin: 0 0 10px;
+}
+app-accounts .assets p {
+  margin: 7px 0;
 }
 app-accounts .accounts {
   list-style: none;
   padding: 0;
-  font-size: 14px;
 }
 app-accounts .accounts li {
-  padding: 10px 0;
+  padding: 10px;
   border-top: 1px solid #ddd;
+}
+app-accounts .accounts li h4 {
+  margin: 10px 0;
+}
+app-accounts .accounts li p {
+  margin: 7px 0;
 }
 
 /*# sourceMappingURL=accounts.css.map */
