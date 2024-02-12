@@ -37,14 +37,24 @@ app-accounts .accounts li .name {
   align-items: center;
 }
 app-accounts .accounts li .name h4 {
-  margin: 0;
+  margin: 0 5px 0 0;
 }
 app-accounts .accounts li .name span {
-  margin-left: 5px;
   font-size: 10px;
 }
 app-accounts .accounts li p {
   margin: 7px 0;
+}
+app-accounts .accounts li p span {
+  margin-left: 5px;
+}
+app-accounts .accounts li[data-increase=true] .profit,
+app-accounts .accounts li[data-increase=true] .profitRate {
+  color: red;
+}
+app-accounts .accounts li[data-increase=false] .profit,
+app-accounts .accounts li[data-increase=false] .profitRate {
+  color: #3178ff;
 }
 
 /*# sourceMappingURL=accounts.css.map */

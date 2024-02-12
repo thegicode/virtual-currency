@@ -8,20 +8,19 @@ let accountsData = {};
 let accountsTime = null;
 
 async function accounts(req, res) {
-    const response = await fetch(URL.accounts, {
-        method: "GET",
-        headers: { Authorization: TOKEN },
-    });
-
     try {
+        const response = await fetch(URL.accounts, {
+            method: "GET",
+            headers: { Authorization: TOKEN },
+        });
+
         const data = await response.json();
-        if (!data) return;
 
         // 1분 이상시 호출
         if ((new Date().getTime() - accountsTime) / (1000 * 60) > 1) {
             res.send(handleAccounts(data));
         } else {
-            console.log("accountsData", accountsData);
+            // console.log("accountsData", accountsData);
             res.send(accountsData);
         }
 
@@ -34,15 +33,15 @@ async function accounts(req, res) {
 function handleAccounts(data) {
     if (!data) return;
 
-    console.log("handleAccounts", accountsData);
+    // console.log("handleAccounts", accountsData);
 
     const myMarkets = [];
-    let accountKRW = {};
+    let assets = {};
 
     const accounts = data
         .filter((account) => {
             if (account.currency === "KRW" && account.unit_currency === "KRW") {
-                accountKRW = account;
+                assets = account;
                 return false;
             }
             return account.currency === "KRW" || account.avg_buy_price > 0;
@@ -73,13 +72,6 @@ function handleAccounts(data) {
                 volume,
                 buy_price: volume * Number(avg_buy_price),
             };
-        })
-        .sort((a, b) => {
-            const aPrice = a.buy_price;
-            const bPrice = b.buy_price;
-
-            if (aPrice == aPrice) return 0;
-            return aPrice > bPrice ? -1 : 1;
         });
 
     fs.writeFileSync(
@@ -87,7 +79,7 @@ function handleAccounts(data) {
         JSON.stringify(myMarkets)
     );
 
-    accountsData = { accountKRW, accounts };
+    accountsData = { assets, accounts };
 
     return accountsData;
 }

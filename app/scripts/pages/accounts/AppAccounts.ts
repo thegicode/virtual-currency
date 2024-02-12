@@ -4,22 +4,93 @@ export default class AppAccounts extends HTMLElement {
     }
 
     connectedCallback() {
-        this.fetchData();
+        this.fetch();
     }
 
-    private async fetchData() {
+    private async fetch() {
         try {
-            const response = await fetch(`/accounts`);
-            const data = await response.json();
+            const accountsdata = await this.fetchAccounts();
+            const markets = accountsdata.accounts.map(
+                (d: any) => `${d.unit_currency}-${d.currency}`
+            );
+            const tickerData = await this.fetchTikcer(markets);
 
-            this.renderKRW(data.accountKRW);
-            this.render(data.accounts);
+            this.renderAssests(accountsdata.assets);
+            const result = await this.transformData(
+                accountsdata.accounts,
+                tickerData
+            );
+            this.render(result);
         } catch (error) {
             console.error(error);
         }
     }
 
-    private renderKRW(data: any) {
+    private transformData(accounts: any, tickerData: any) {
+        console.log(tickerData);
+        const { trade_price } = tickerData;
+
+        const tickerNames = tickerData.map((t: any) => t.market);
+
+        const result = accounts.map((aAccount: any, index: number) => {
+            const {
+                avg_buy_price,
+                buy_price,
+                currency,
+                locked,
+                unit_currency,
+                volume,
+            } = aAccount;
+
+            const marketName = `${aAccount.unit_currency}-${aAccount.currency}`;
+            const tickerIndex = tickerNames.indexOf(marketName);
+            const ticker = tickerData[tickerIndex];
+
+            const price1 = avg_buy_price * volume;
+            const price2 = ticker.trade_price * volume;
+            const profit = price2 - price1;
+            const profitRate = (profit / price1) * 100;
+
+            return {
+                currency: currency,
+                unitCurrency: unit_currency,
+                buyPrice: this.roundToDecimalPlace(
+                    buy_price,
+                    0
+                ).toLocaleString(),
+                avgBuyPrice: this.roundToDecimalPlace(
+                    avg_buy_price,
+                    1
+                ).toLocaleString(),
+                volume,
+                locked,
+                profit: Math.round(profit),
+                profitRate,
+            };
+        });
+
+        return result;
+    }
+
+    private async fetchAccounts() {
+        try {
+            const response = await fetch(`/accounts`);
+            return await response.json();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    private async fetchTikcer(markets: Array<string>) {
+        try {
+            const response = await fetch(`/ticker?markets=${markets}`);
+            return await response.json();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    private renderAssests(data: any) {
         const assetsElement = this.querySelector(".assets") as HTMLElement;
         const element = assetsElement.cloneNode(true) as HTMLElement;
 
@@ -44,23 +115,43 @@ export default class AppAccounts extends HTMLElement {
         data.map((data: any) => this.createElement(data)).forEach(
             (element: HTMLLIElement) => fragment.appendChild(element)
         );
-        this.querySelector("ul")?.appendChild(fragment);
+        this.querySelector(".accounts")?.appendChild(fragment);
     }
 
-    private createElement(data: any) {
-        const element = document.createElement("li") as HTMLLIElement;
-        let tp = `<div class="name"><h4>${data.currency}</h4> <span>(${data.unit_currency})</span></div>`;
-        tp += `<p>∙  매수금액: ${this.roundToDecimalPlace(
-            data.buy_price,
-            0
-        ).toLocaleString()}</p>`;
-        tp += `<p>∙  매수평균가: ${this.roundToDecimalPlace(
-            data.avg_buy_price,
-            1
-        ).toLocaleString()}</p>`;
-        tp += `<p>∙  volume: ${data.volume}</p>`;
-        tp += `<p>∙  locked: ${data.locked}</p>`;
-        element.innerHTML = tp;
+    private createElement(aAccount: any) {
+        console.log("createElement", aAccount);
+        const template = this.querySelector(
+            "#accountsItem"
+        ) as HTMLTemplateElement;
+        const element = template?.content.firstElementChild?.cloneNode(
+            true
+        ) as HTMLElement;
+
+        (element.querySelector(".currency") as HTMLElement).textContent =
+            aAccount.currency;
+        (element.querySelector(".unitCurrency") as HTMLElement).textContent =
+            aAccount.unitCurrency;
+        (element.querySelector(".buyPrice") as HTMLElement).textContent =
+            aAccount.buyPrice;
+        (element.querySelector(".avgBuyPrice") as HTMLElement).textContent =
+            aAccount.avgBuyPrice;
+        (element.querySelector(".volume") as HTMLElement).textContent =
+            aAccount.volume;
+        // (element.querySelector(".locked") as HTMLElement).textContent =
+        //     aAccount.locked;
+
+        const isPlus = aAccount.profit > 0 ? true : false;
+
+        const profitElement = element.querySelector(".profit") as HTMLElement;
+        profitElement.textContent = aAccount.profit;
+        (profitElement.closest("li") as HTMLElement).dataset.increase =
+            isPlus.toString();
+
+        const profitRateElement = element.querySelector(
+            ".profitRate"
+        ) as HTMLElement;
+        profitRateElement.textContent = `${aAccount.profitRate.toFixed(2)}%`;
+
         return element;
     }
 

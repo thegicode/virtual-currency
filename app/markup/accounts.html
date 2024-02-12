@@ -24,6 +24,19 @@
             <h1>Accounts</h1>
             <div class="assets"></div>
             <ul class="accounts"></ul>
+            <template id="accountsItem">
+                <li>
+                    <div class="name">
+                        <h4 class="currency"></h4>
+                        (<span class="unitCurrency"></span>)
+                    </div>
+                    <p>buyPrice: <span class="buyPrice"></span></p>
+                    <p>avgBuyPrice: <span class="avgBuyPrice"></span></p>
+                    <p>volume: <span class="volume"></span></p>
+                    <p>profit: <span class="profit"></span></p>
+                    <p>profitRate: <span class="profitRate"></span></p>
+                </li>
+            </template>
         </app-accounts>
     </body>
 </html>
