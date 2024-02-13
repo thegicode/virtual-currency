@@ -22,19 +22,29 @@
     <body>
         <app-accounts class="root">
             <h1>Accounts</h1>
-            <div class="assets"></div>
-            <ul class="accounts"></ul>
+            <div class="assets" data-loading="true">
+                <p>
+                    ∙ 보유 :
+                    <span class="totalAsset"></span>
+                </p>
+                <p>
+                    ∙ Locked :
+                    <span class="locked"></span>
+                </p>
+                <p>∙ Unit Currency : <span class="unit"></span></p>
+            </div>
+            <ul class="accounts" data-loading="true"></ul>
             <template id="accountItem">
                 <li>
                     <div class="name">
                         <h4 class="currency"></h4>
-                        (<span class="unitCurrency"></span>)
+                        <small>| <span class="unitCurrency"></span></small>
                     </div>
-                    <p>buyPrice: <span class="buyPrice"></span></p>
-                    <p>avgBuyPrice: <span class="avgBuyPrice"></span></p>
-                    <p>volume: <span class="volume"></span></p>
-                    <p>profit: <span class="profit"></span></p>
-                    <p>profitRate: <span class="profitRate"></span></p>
+                    <p>∙ buyPrice: <span class="buyPrice"></span></p>
+                    <p>∙ avgBuyPrice: <span class="avgBuyPrice"></span></p>
+                    <p>∙ volume: <span class="volume"></span></p>
+                    <p>∙ profit: <span class="profit"></span></p>
+                    <p>∙ profitRate: <span class="profitRate"></span></p>
                 </li>
             </template>
         </app-accounts>

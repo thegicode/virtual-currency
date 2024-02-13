@@ -7,114 +7,102 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import { cloneTemplate, updateElementsTextWithData, } from "@app/scripts/utils/helpers";
 export default class AppAccounts extends HTMLElement {
     constructor() {
         super();
         this.template = this.querySelector("#accountItem");
+        this.list = this.querySelector(".accounts");
     }
     connectedCallback() {
-        this.fetch();
+        this.loadAccountData();
     }
-    fetch() {
+    loadAccountData() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const accountsdata = yield this.fetchAccounts();
-                const markets = accountsdata.accounts.map((d) => `${d.unit_currency}-${d.currency}`);
-                const tickerData = yield this.fetchTikcer(markets);
-                this.renderAssests(accountsdata.assets);
-                const result = yield this.transformData(accountsdata.accounts, tickerData);
-                this.render(result);
+                const accountsResponse = yield this.fetchData(`/accounts`);
+                const markets = accountsResponse.accounts.map((anAccount) => `${anAccount.unit_currency}-${anAccount.currency}`);
+                const tickerResponse = yield this.fetchData(`/ticker?markets=${encodeURIComponent(markets)}`);
+                this.displayAssets(accountsResponse.assets);
+                const processedAccounts = yield this.processAccountsData(accountsResponse.accounts, tickerResponse);
+                this.renderAccountsList(processedAccounts);
             }
             catch (error) {
                 console.error(error);
             }
         });
     }
-    transformData(accounts, tickerData) {
-        const tickerNames = tickerData.map((t) => t.market);
-        const result = accounts.map((aAccount, index) => {
-            const { avg_buy_price, buy_price, currency, locked, unit_currency, volume, } = aAccount;
-            const marketName = `${aAccount.unit_currency}-${aAccount.currency}`;
-            const tickerIndex = tickerNames.indexOf(marketName);
-            const ticker = tickerData[tickerIndex];
-            const price1 = avg_buy_price * volume;
-            const price2 = ticker.trade_price * volume;
-            const profit = price2 - price1;
-            const profitRate = (profit / price1) * 100;
+    fetchData(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return yield response.json();
+        });
+    }
+    displayAssets(data) {
+        const element = this.querySelector(".assets");
+        const totalAsset = Number(data.balance) + Number(data.locked);
+        const contentData = {
+            totalAsset: this.roundToDecimalPlace(totalAsset, 0).toLocaleString(),
+            locked: this.roundToDecimalPlace(data.locked, 0).toLocaleString(),
+            unit: data.unit_currency,
+        };
+        updateElementsTextWithData(contentData, element);
+        delete element.dataset.loading;
+    }
+    processAccountsData(accounts, tickerData) {
+        function _handleData(account) {
+            const marketName = `${account.unit_currency}-${account.currency}`;
+            const ticker = tickerData.find((t) => t.market === marketName);
+            if (!ticker) {
+                console.error(`Ticker not found for market: ${marketName}`);
+                return null;
+            }
+            const priceAtBuy = account.avg_buy_price * account.volume;
+            const currentPrice = ticker.trade_price * account.volume;
+            const profit = currentPrice - priceAtBuy;
+            const profitRate = priceAtBuy > 0 ? (profit / priceAtBuy) * 100 : 0;
             return {
-                currency: currency,
-                unitCurrency: unit_currency,
-                buyPrice: this.roundToDecimalPlace(buy_price, 0).toLocaleString(),
-                avgBuyPrice: this.roundToDecimalPlace(avg_buy_price, 1).toLocaleString(),
-                volume,
-                locked,
-                profit: Math.round(profit),
+                currency: account.currency,
+                unitCurrency: account.unit_currency,
+                buyPrice: account.buy_price,
+                avgBuyPrice: account.avg_buy_price,
+                volume: account.volume,
+                locked: account.locked,
+                profit,
                 profitRate,
             };
-        });
-        return result;
+        }
+        return accounts
+            .map((account) => _handleData(account))
+            .filter((account) => account !== null);
     }
-    fetchAccounts() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const response = yield fetch(`/accounts`);
-                return yield response.json();
-            }
-            catch (error) {
-                console.error(error);
-            }
-        });
-    }
-    fetchTikcer(markets) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const response = yield fetch(`/ticker?markets=${markets}`);
-                return yield response.json();
-            }
-            catch (error) {
-                console.error(error);
-            }
-        });
-    }
-    renderAssests(data) {
-        const assetsElement = this.querySelector(".assets");
-        const element = assetsElement.cloneNode(true);
-        const totalAsset = Number(data.balance) + Number(data.locked);
-        let tp = `<h4>My Asset</h4>`;
-        tp += `<p>보유 ${data.unit_currency} : ${this.roundToDecimalPlace(totalAsset, 0).toLocaleString()}</p>`;
-        tp += `<p>locked ${data.unit_currency} : ${this.roundToDecimalPlace(data.locked, 0).toLocaleString()}</p>`;
-        element.innerHTML = tp;
-        assetsElement.replaceWith(element);
-    }
-    render(data) {
-        var _a;
+    renderAccountsList(data) {
         const fragment = new DocumentFragment();
         data.map((data) => this.createElement(data)).forEach((element) => fragment.appendChild(element));
-        (_a = this.querySelector(".accounts")) === null || _a === void 0 ? void 0 : _a.appendChild(fragment);
+        this.list.appendChild(fragment);
+        delete this.list.dataset.loading;
     }
-    createElement(aAccount) {
-        var _a, _b;
-        const element = (_b = (_a = this.template) === null || _a === void 0 ? void 0 : _a.content.firstElementChild) === null || _b === void 0 ? void 0 : _b.cloneNode(true);
-        element.querySelector(".currency").textContent =
-            aAccount.currency;
-        element.querySelector(".unitCurrency").textContent =
-            aAccount.unitCurrency;
-        element.querySelector(".buyPrice").textContent =
-            aAccount.buyPrice;
-        element.querySelector(".avgBuyPrice").textContent =
-            aAccount.avgBuyPrice;
-        element.querySelector(".volume").textContent =
-            aAccount.volume;
-        const isPlus = aAccount.profit > 0 ? true : false;
-        const profitElement = element.querySelector(".profit");
-        profitElement.textContent = aAccount.profit;
-        element.querySelector(".profitRate").textContent = `${aAccount.profitRate.toFixed(2)}%`;
-        profitElement.closest("li").dataset.increase =
-            isPlus.toString();
-        return element;
+    createElement(anAccount) {
+        const cloned = cloneTemplate(this.template);
+        const contentData = {
+            currency: anAccount.currency,
+            unitCurrency: anAccount.unitCurrency,
+            volume: anAccount.volume,
+            buyPrice: this.roundToDecimalPlace(anAccount.buyPrice, 0).toLocaleString(),
+            avgBuyPrice: this.roundToDecimalPlace(anAccount.avgBuyPrice, 1).toLocaleString(),
+            profit: Math.round(anAccount.profit).toLocaleString(),
+            profitRate: this.roundToDecimalPlace(anAccount.profitRate, 2) + "%",
+        };
+        updateElementsTextWithData(contentData, cloned);
+        const isIncrement = anAccount.profit > 0 ? true : false;
+        cloned.dataset.increase = isIncrement.toString();
+        return cloned;
     }
     roundToDecimalPlace(amount, point) {
-        const decimalPoint = point > 0 ? 10 * point : 1;
+        const decimalPoint = Math.pow(10, point);
         return Math.round(amount * decimalPoint) / decimalPoint;
     }
 }

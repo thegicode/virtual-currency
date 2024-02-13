@@ -7,6 +7,7 @@ body {
 
 app-accounts {
   --margin-side: 1rem;
+  --transition-duration: 1.5s;
   display: block;
   color: #666;
 }
@@ -16,21 +17,37 @@ app-accounts h1 {
 }
 app-accounts .assets {
   padding: var(--margin-side);
+  transition: all var(--transition-duration);
+}
+app-accounts .assets[data-loading=true] {
+  opacity: 0;
+}
+app-accounts .assets[data-loading=false] {
+  opacity: 1;
 }
 app-accounts .assets h4 {
   margin: 0 0 10px;
 }
 app-accounts .assets p {
-  margin: 7px 0;
+  margin: 5px 0;
+}
+app-accounts .assets span {
+  margin-left: 5px;
 }
 app-accounts .accounts {
   list-style: none;
   margin: 0;
   padding: 0;
+  opacity: 1;
+  transition: opacity var(--transition-duration);
+}
+app-accounts .accounts[data-loading=true] {
+  opacity: 0;
 }
 app-accounts .accounts li {
   padding: var(--margin-side);
   border-top: 1px solid #ddd;
+  opacity: 1;
 }
 app-accounts .accounts li .name {
   display: flex;
@@ -39,8 +56,8 @@ app-accounts .accounts li .name {
 app-accounts .accounts li .name h4 {
   margin: 0 5px 0 0;
 }
-app-accounts .accounts li .name span {
-  font-size: 10px;
+app-accounts .accounts li .name .unitCurrency {
+  margin-left: 5px;
 }
 app-accounts .accounts li p {
   margin: 7px 0;

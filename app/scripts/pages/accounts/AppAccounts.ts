@@ -1,5 +1,11 @@
+import {
+    cloneTemplate,
+    updateElementsTextWithData,
+} from "@app/scripts/utils/helpers";
+
 export default class AppAccounts extends HTMLElement {
     private template: HTMLTemplateElement;
+    private list: HTMLElement;
 
     constructor() {
         super();
@@ -7,155 +13,135 @@ export default class AppAccounts extends HTMLElement {
         this.template = this.querySelector(
             "#accountItem"
         ) as HTMLTemplateElement;
+        this.list = this.querySelector(".accounts") as HTMLElement;
     }
 
     connectedCallback() {
-        this.fetch();
+        this.loadAccountData();
     }
 
-    private async fetch() {
+    private async loadAccountData() {
         try {
-            const accountsdata = await this.fetchAccounts();
-            const markets = accountsdata.accounts.map(
-                (d: any) => `${d.unit_currency}-${d.currency}`
+            const accountsResponse = await this.fetchData(`/accounts`);
+
+            const markets = accountsResponse.accounts.map(
+                (anAccount: IAccount) =>
+                    `${anAccount.unit_currency}-${anAccount.currency}`
             );
-            const tickerData = await this.fetchTikcer(markets);
-
-            this.renderAssests(accountsdata.assets);
-            const result = await this.transformData(
-                accountsdata.accounts,
-                tickerData
+            const tickerResponse = await this.fetchData(
+                `/ticker?markets=${encodeURIComponent(markets)}`
             );
-            this.render(result);
+
+            this.displayAssets(accountsResponse.assets);
+
+            const processedAccounts = await this.processAccountsData(
+                accountsResponse.accounts,
+                tickerResponse
+            );
+
+            this.renderAccountsList(processedAccounts);
         } catch (error) {
             console.error(error);
         }
     }
 
-    private transformData(accounts: any, tickerData: any) {
-        const tickerNames = tickerData.map((t: any) => t.market);
-
-        const result = accounts.map((aAccount: any, index: number) => {
-            const {
-                avg_buy_price,
-                buy_price,
-                currency,
-                locked,
-                unit_currency,
-                volume,
-            } = aAccount;
-
-            const marketName = `${aAccount.unit_currency}-${aAccount.currency}`;
-            const tickerIndex = tickerNames.indexOf(marketName);
-            const ticker = tickerData[tickerIndex];
-
-            const price1 = avg_buy_price * volume;
-            const price2 = ticker.trade_price * volume;
-            const profit = price2 - price1;
-            const profitRate = (profit / price1) * 100;
-
-            return {
-                currency: currency,
-                unitCurrency: unit_currency,
-                buyPrice: this.roundToDecimalPlace(
-                    buy_price,
-                    0
-                ).toLocaleString(),
-                avgBuyPrice: this.roundToDecimalPlace(
-                    avg_buy_price,
-                    1
-                ).toLocaleString(),
-                volume,
-                locked,
-                profit: Math.round(profit),
-                profitRate,
-            };
-        });
-
-        return result;
-    }
-
-    private async fetchAccounts() {
-        try {
-            const response = await fetch(`/accounts`);
-            return await response.json();
-        } catch (error) {
-            console.error(error);
+    private async fetchData(url: string) {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        return await response.json();
     }
 
-    private async fetchTikcer(markets: Array<string>) {
-        try {
-            const response = await fetch(`/ticker?markets=${markets}`);
-            return await response.json();
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    private renderAssests(data: any) {
-        const assetsElement = this.querySelector(".assets") as HTMLElement;
-        const element = assetsElement.cloneNode(true) as HTMLElement;
+    private displayAssets(data: IAsset) {
+        const element = this.querySelector(".assets") as HTMLElement;
 
         const totalAsset = Number(data.balance) + Number(data.locked);
 
-        let tp = `<h4>My Asset</h4>`;
-        tp += `<p>보유 ${data.unit_currency} : ${this.roundToDecimalPlace(
-            totalAsset,
-            0
-        ).toLocaleString()}</p>`;
+        const contentData = {
+            totalAsset: this.roundToDecimalPlace(
+                totalAsset,
+                0
+            ).toLocaleString(),
+            locked: this.roundToDecimalPlace(data.locked, 0).toLocaleString(),
+            unit: data.unit_currency,
+        };
 
-        tp += `<p>locked ${data.unit_currency} : ${this.roundToDecimalPlace(
-            data.locked,
-            0
-        ).toLocaleString()}</p>`;
-        element.innerHTML = tp;
-        assetsElement.replaceWith(element);
+        updateElementsTextWithData(contentData, element);
+
+        delete element.dataset.loading;
     }
 
-    private render(data: any) {
+    private processAccountsData(accounts: IAccount[], tickerData: ITicker[]) {
+        function _handleData(account: IAccount) {
+            const marketName = `${account.unit_currency}-${account.currency}`;
+            const ticker = tickerData.find((t) => t.market === marketName);
+
+            if (!ticker) {
+                console.error(`Ticker not found for market: ${marketName}`);
+                return null;
+            }
+
+            const priceAtBuy = account.avg_buy_price * account.volume;
+            const currentPrice = ticker.trade_price * account.volume;
+            const profit = currentPrice - priceAtBuy;
+            const profitRate = priceAtBuy > 0 ? (profit / priceAtBuy) * 100 : 0;
+
+            return {
+                currency: account.currency,
+                unitCurrency: account.unit_currency,
+                buyPrice: account.buy_price,
+                avgBuyPrice: account.avg_buy_price,
+                volume: account.volume,
+                locked: account.locked,
+                profit,
+                profitRate,
+            };
+        }
+
+        return accounts
+            .map((account) => _handleData(account))
+            .filter((account) => account !== null) as IProcessedAccountData[];
+    }
+
+    private renderAccountsList(data: IProcessedAccountData[]) {
         const fragment = new DocumentFragment();
-        data.map((data: any) => this.createElement(data)).forEach(
-            (element: HTMLLIElement) => fragment.appendChild(element)
+        data.map((data) => this.createElement(data)).forEach((element) =>
+            fragment.appendChild(element)
         );
-        this.querySelector(".accounts")?.appendChild(fragment);
+        this.list.appendChild(fragment);
+        delete this.list.dataset.loading;
     }
 
-    private createElement(aAccount: any) {
-        const element = this.template?.content.firstElementChild?.cloneNode(
-            true
-        ) as HTMLElement;
+    private createElement(anAccount: IProcessedAccountData) {
+        const cloned = cloneTemplate<HTMLElement>(this.template);
 
-        (element.querySelector(".currency") as HTMLElement).textContent =
-            aAccount.currency;
-        (element.querySelector(".unitCurrency") as HTMLElement).textContent =
-            aAccount.unitCurrency;
-        (element.querySelector(".buyPrice") as HTMLElement).textContent =
-            aAccount.buyPrice;
-        (element.querySelector(".avgBuyPrice") as HTMLElement).textContent =
-            aAccount.avgBuyPrice;
-        (element.querySelector(".volume") as HTMLElement).textContent =
-            aAccount.volume;
-        // (element.querySelector(".locked") as HTMLElement).textContent =
-        //     aAccount.locked;
+        const contentData = {
+            currency: anAccount.currency,
+            unitCurrency: anAccount.unitCurrency,
+            volume: anAccount.volume,
+            buyPrice: this.roundToDecimalPlace(
+                anAccount.buyPrice,
+                0
+            ).toLocaleString(),
+            avgBuyPrice: this.roundToDecimalPlace(
+                anAccount.avgBuyPrice,
+                1
+            ).toLocaleString(),
+            profit: Math.round(anAccount.profit).toLocaleString(),
+            profitRate: this.roundToDecimalPlace(anAccount.profitRate, 2) + "%",
+        };
 
-        const isPlus = aAccount.profit > 0 ? true : false;
+        updateElementsTextWithData(contentData, cloned);
 
-        const profitElement = element.querySelector(".profit") as HTMLElement;
-        profitElement.textContent = aAccount.profit;
+        const isIncrement = anAccount.profit > 0 ? true : false;
+        cloned.dataset.increase = isIncrement.toString();
 
-        (
-            element.querySelector(".profitRate") as HTMLElement
-        ).textContent = `${aAccount.profitRate.toFixed(2)}%`;
-
-        (profitElement.closest("li") as HTMLElement).dataset.increase =
-            isPlus.toString();
-
-        return element;
+        return cloned;
     }
 
     private roundToDecimalPlace(amount: number, point: number) {
-        const decimalPoint = point > 0 ? 10 * point : 1;
+        const decimalPoint = Math.pow(10, point);
         return Math.round(amount * decimalPoint) / decimalPoint;
     }
 }
