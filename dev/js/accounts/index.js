@@ -47,7 +47,7 @@
     constructor() {
       super();
       this.template = this.querySelector("#accountItem");
-      this.list = this.querySelector(".accounts");
+      this.list = this.querySelector(".accountsList");
     }
     connectedCallback() {
       this.loadAccountData();
@@ -99,6 +99,7 @@
         const profit = currentPrice - priceAtBuy;
         const profitRate = priceAtBuy > 0 ? profit / priceAtBuy * 100 : 0;
         return {
+          market: marketName,
           currency: account.currency,
           unitCurrency: account.unit_currency,
           buyPrice: account.buy_price,
@@ -131,7 +132,14 @@
       updateElementsTextWithData(contentData, cloned);
       const isIncrement = anAccount.profit > 0 ? true : false;
       cloned.dataset.increase = isIncrement.toString();
+      this.ordersChance(anAccount.market);
       return cloned;
+    }
+    ordersChance(market) {
+      return __awaiter(this, void 0, void 0, function* () {
+        const response = yield this.fetchData(`/orders-chance?market=${market}`);
+        console.log("ordersChance", response);
+      });
     }
     roundToDecimalPlace(amount, point) {
       const decimalPoint = Math.pow(10, point);

@@ -35,42 +35,48 @@ app-accounts .assets span {
   margin-left: 5px;
 }
 app-accounts .accounts {
+  margin-top: 1rem;
+}
+app-accounts .accounts h2 {
+  margin: 5px var(--margin-side);
+}
+app-accounts .accountsList {
   list-style: none;
   margin: 0;
   padding: 0;
   opacity: 1;
   transition: opacity var(--transition-duration);
 }
-app-accounts .accounts[data-loading=true] {
+app-accounts .accountsList[data-loading=true] {
   opacity: 0;
 }
-app-accounts .accounts li {
+app-accounts .accountsList li {
   padding: var(--margin-side);
   border-top: 1px solid #ddd;
   opacity: 1;
 }
-app-accounts .accounts li .name {
+app-accounts .accountsList li .name {
   display: flex;
   align-items: center;
 }
-app-accounts .accounts li .name h4 {
+app-accounts .accountsList li .name h4 {
   margin: 0 5px 0 0;
 }
-app-accounts .accounts li .name .unitCurrency {
+app-accounts .accountsList li .name .unitCurrency {
   margin-left: 5px;
 }
-app-accounts .accounts li p {
+app-accounts .accountsList li p {
   margin: 7px 0;
 }
-app-accounts .accounts li p span {
+app-accounts .accountsList li p span {
   margin-left: 5px;
 }
-app-accounts .accounts li[data-increase=true] .profit,
-app-accounts .accounts li[data-increase=true] .profitRate {
+app-accounts .accountsList li[data-increase=true] .profit,
+app-accounts .accountsList li[data-increase=true] .profitRate {
   color: red;
 }
-app-accounts .accounts li[data-increase=false] .profit,
-app-accounts .accounts li[data-increase=false] .profitRate {
+app-accounts .accountsList li[data-increase=false] .profit,
+app-accounts .accountsList li[data-increase=false] .profitRate {
   color: #3178ff;
 }
 

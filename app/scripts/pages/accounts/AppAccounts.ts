@@ -13,7 +13,7 @@ export default class AppAccounts extends HTMLElement {
         this.template = this.querySelector(
             "#accountItem"
         ) as HTMLTemplateElement;
-        this.list = this.querySelector(".accounts") as HTMLElement;
+        this.list = this.querySelector(".accountsList") as HTMLElement;
     }
 
     connectedCallback() {
@@ -88,6 +88,7 @@ export default class AppAccounts extends HTMLElement {
             const profitRate = priceAtBuy > 0 ? (profit / priceAtBuy) * 100 : 0;
 
             return {
+                market: marketName,
                 currency: account.currency,
                 unitCurrency: account.unit_currency,
                 buyPrice: account.buy_price,
@@ -137,7 +138,17 @@ export default class AppAccounts extends HTMLElement {
         const isIncrement = anAccount.profit > 0 ? true : false;
         cloned.dataset.increase = isIncrement.toString();
 
+        // [TODO] orders-chance
+        this.ordersChance(anAccount.market);
+
         return cloned;
+    }
+
+    private async ordersChance(market: string) {
+        const response = await this.fetchData(
+            `/orders-chance?market=${market}`
+        );
+        console.log("ordersChance", response);
     }
 
     private roundToDecimalPlace(amount: number, point: number) {

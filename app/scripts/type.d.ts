@@ -23,6 +23,7 @@ interface IProcessedAccountData {
     avgBuyPrice: number;
     volume: number;
     locked: number;
+    market: string;
     profit: number;
     profitRate: number;
 }

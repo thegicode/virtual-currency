@@ -5,7 +5,6 @@
         <title>Accounts</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="robots" content="noindex, nofollow" />
         <link
             rel="shortcut icon"
             href="/assets/images/favicon.ico"
@@ -22,7 +21,8 @@
     <body>
         <app-accounts class="root">
             <h1>Accounts</h1>
-            <div class="assets" data-loading="true">
+            <section class="assets" data-loading="true">
+                <h2>내 보유자산</h2>
                 <p>
                     ∙ 보유 :
                     <span class="totalAsset"></span>
@@ -32,21 +32,25 @@
                     <span class="locked"></span>
                 </p>
                 <p>∙ Unit Currency : <span class="unit"></span></p>
-            </div>
-            <ul class="accounts" data-loading="true"></ul>
-            <template id="accountItem">
-                <li>
-                    <div class="name">
-                        <h4 class="currency"></h4>
-                        <small>| <span class="unitCurrency"></span></small>
-                    </div>
-                    <p>∙ buyPrice: <span class="buyPrice"></span></p>
-                    <p>∙ avgBuyPrice: <span class="avgBuyPrice"></span></p>
-                    <p>∙ volume: <span class="volume"></span></p>
-                    <p>∙ profit: <span class="profit"></span></p>
-                    <p>∙ profitRate: <span class="profitRate"></span></p>
-                </li>
-            </template>
+            </section>
+
+            <section class="accounts">
+                <h2>포트폴리오</h2>
+                <ul class="accountsList" data-loading="true"></ul>
+                <template id="accountItem">
+                    <li>
+                        <div class="name">
+                            <h4 class="currency"></h4>
+                            <small>| <span class="unitCurrency"></span></small>
+                        </div>
+                        <p>∙ buyPrice: <span class="buyPrice"></span></p>
+                        <p>∙ avgBuyPrice: <span class="avgBuyPrice"></span></p>
+                        <p>∙ volume: <span class="volume"></span></p>
+                        <p>∙ profit: <span class="profit"></span></p>
+                        <p>∙ profitRate: <span class="profitRate"></span></p>
+                    </li>
+                </template>
+            </section>
         </app-accounts>
     </body>
 </html>

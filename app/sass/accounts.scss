@@ -42,6 +42,13 @@ app-accounts {
     }
 
     .accounts {
+        margin-top: 1rem;
+        h2 {
+            margin: 5px var(--margin-side);
+        }
+    }
+
+    .accountsList {
         list-style: none;
         margin: 0;
         padding: 0;
