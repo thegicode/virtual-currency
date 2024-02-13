@@ -12,7 +12,6 @@ import AccountItem from "./AccountItem";
 export default class AppAccounts extends HTMLElement {
     constructor() {
         super();
-        this.template = this.querySelector("#accountItem");
         this.list = this.querySelector(".accountsList");
     }
     connectedCallback() {

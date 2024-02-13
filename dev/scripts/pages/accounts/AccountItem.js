@@ -6,9 +6,9 @@ export default class AccountItem extends HTMLElement {
         this.template = document.querySelector("#accountItem");
     }
     connectedCallback() {
-        this.create();
+        this.createElement();
     }
-    create() {
+    createElement() {
         const cloned = cloneTemplate(this.template);
         const contentData = {
             currency: this.data.currency,

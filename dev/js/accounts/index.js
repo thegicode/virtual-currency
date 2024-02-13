@@ -27,9 +27,9 @@
       this.template = document.querySelector("#accountItem");
     }
     connectedCallback() {
-      this.create();
+      this.createElement();
     }
-    create() {
+    createElement() {
       const cloned = cloneTemplate(this.template);
       const contentData = {
         currency: this.data.currency,
@@ -78,7 +78,6 @@
   var AppAccounts = class extends HTMLElement {
     constructor() {
       super();
-      this.template = this.querySelector("#accountItem");
       this.list = this.querySelector(".accountsList");
     }
     connectedCallback() {

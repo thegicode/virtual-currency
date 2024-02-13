@@ -19,10 +19,10 @@ export default class AccountItem extends HTMLElement {
     }
 
     connectedCallback() {
-        this.create();
+        this.createElement();
     }
 
-    public create() {
+    private createElement() {
         const cloned = cloneTemplate<HTMLElement>(this.template);
 
         const contentData = {

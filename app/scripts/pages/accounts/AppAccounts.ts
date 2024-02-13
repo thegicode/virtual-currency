@@ -1,26 +1,23 @@
 import {
-    cloneTemplate,
     roundToDecimalPlace,
     updateElementsTextWithData,
 } from "@app/scripts/utils/helpers";
+
 import AccountItem from "./AccountItem";
 
 export default class AppAccounts extends HTMLElement {
-    private template: HTMLTemplateElement;
     private list: HTMLElement;
 
     constructor() {
         super();
 
-        this.template = this.querySelector(
-            "#accountItem"
-        ) as HTMLTemplateElement;
         this.list = this.querySelector(".accountsList") as HTMLElement;
     }
 
     connectedCallback() {
         this.loadAccountData();
 
+        // ing...
         this.ordered();
     }
 
