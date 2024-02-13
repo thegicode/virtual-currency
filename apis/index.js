@@ -1,10 +1,10 @@
 const accounts = require("./accounts");
-const ordersChance = require("./ordersChance");
+const ordered = require("./ordered");
 const ticker = require("./ticker");
 
 const setupApiEndpoints = (app) => {
     app.get("/accounts", accounts);
-    app.get("/orders-chance", ordersChance);
+    app.get("/ordered", ordered);
     app.get("/ticker", ticker);
 };
 

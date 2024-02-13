@@ -1,17 +1,13 @@
 const uuidv4 = require("uuid").v4;
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const queryEncode = require("querystring").encode;
 
 const { ACCESS_KEY, SECRET_KEY } = require("../server/config/key");
 const URL = require("../server/config/URL");
 
-async function ordersChance(req, res) {
-    const body = {
-        market: "KRW-BTC",
-    };
-
-    const query = new URLSearchParams(body).toString();
-
+async function ordered(req, res) {
+    const query = queryEncode({ state: "wait" });
     const hash = crypto.createHash("sha512");
     const queryHash = hash.update(query, "utf-8").digest("hex");
 
@@ -26,11 +22,13 @@ async function ordersChance(req, res) {
 
     const options = {
         method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
     };
 
     try {
-        const response = await fetch(`${URL.orders_chance}?${query}`, options);
+        const response = await fetch(`${URL.orders}?${query}`, options);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -43,4 +41,4 @@ async function ordersChance(req, res) {
     }
 }
 
-module.exports = ordersChance;
+module.exports = ordered;

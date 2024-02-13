@@ -1,7 +1,9 @@
 import {
     cloneTemplate,
+    roundToDecimalPlace,
     updateElementsTextWithData,
 } from "@app/scripts/utils/helpers";
+import AccountItem from "./AccountItem";
 
 export default class AppAccounts extends HTMLElement {
     private template: HTMLTemplateElement;
@@ -18,6 +20,17 @@ export default class AppAccounts extends HTMLElement {
 
     connectedCallback() {
         this.loadAccountData();
+
+        this.ordered();
+    }
+
+    private async ordered() {
+        try {
+            const response = await this.fetchData(`/ordered`);
+            console.log("ordered", response);
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     private async loadAccountData() {
@@ -59,11 +72,8 @@ export default class AppAccounts extends HTMLElement {
         const totalAsset = Number(data.balance) + Number(data.locked);
 
         const contentData = {
-            totalAsset: this.roundToDecimalPlace(
-                totalAsset,
-                0
-            ).toLocaleString(),
-            locked: this.roundToDecimalPlace(data.locked, 0).toLocaleString(),
+            totalAsset: roundToDecimalPlace(totalAsset, 0).toLocaleString(),
+            locked: roundToDecimalPlace(data.locked, 0).toLocaleString(),
             unit: data.unit_currency,
         };
 
@@ -107,52 +117,13 @@ export default class AppAccounts extends HTMLElement {
 
     private renderAccountsList(data: IProcessedAccountData[]) {
         const fragment = new DocumentFragment();
-        data.map((data) => this.createElement(data)).forEach((element) =>
-            fragment.appendChild(element)
-        );
+
+        data.map((data) => new AccountItem(data)).forEach((accountItem) => {
+            fragment.appendChild(accountItem);
+        });
+
         this.list.appendChild(fragment);
+
         delete this.list.dataset.loading;
-    }
-
-    private createElement(anAccount: IProcessedAccountData) {
-        const cloned = cloneTemplate<HTMLElement>(this.template);
-
-        const contentData = {
-            currency: anAccount.currency,
-            unitCurrency: anAccount.unitCurrency,
-            volume: anAccount.volume,
-            buyPrice: this.roundToDecimalPlace(
-                anAccount.buyPrice,
-                0
-            ).toLocaleString(),
-            avgBuyPrice: this.roundToDecimalPlace(
-                anAccount.avgBuyPrice,
-                1
-            ).toLocaleString(),
-            profit: Math.round(anAccount.profit).toLocaleString(),
-            profitRate: this.roundToDecimalPlace(anAccount.profitRate, 2) + "%",
-        };
-
-        updateElementsTextWithData(contentData, cloned);
-
-        const isIncrement = anAccount.profit > 0 ? true : false;
-        cloned.dataset.increase = isIncrement.toString();
-
-        // [TODO] orders-chance
-        this.ordersChance(anAccount.market);
-
-        return cloned;
-    }
-
-    private async ordersChance(market: string) {
-        const response = await this.fetchData(
-            `/orders-chance?market=${market}`
-        );
-        console.log("ordersChance", response);
-    }
-
-    private roundToDecimalPlace(amount: number, point: number) {
-        const decimalPoint = Math.pow(10, point);
-        return Math.round(amount * decimalPoint) / decimalPoint;
     }
 }

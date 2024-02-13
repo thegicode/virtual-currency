@@ -11,4 +11,8 @@ export function updateElementsTextWithData(data, container) {
         element.textContent = String(value);
     });
 }
+export function roundToDecimalPlace(amount, point) {
+    const decimalPoint = Math.pow(10, point);
+    return Math.round(amount * decimalPoint) / decimalPoint;
+}
 //# sourceMappingURL=helpers.js.map

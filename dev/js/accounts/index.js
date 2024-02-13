@@ -14,6 +14,38 @@
       element.textContent = String(value);
     });
   }
+  function roundToDecimalPlace(amount, point) {
+    const decimalPoint = Math.pow(10, point);
+    return Math.round(amount * decimalPoint) / decimalPoint;
+  }
+
+  // dev/scripts/pages/accounts/AccountItem.js
+  var AccountItem = class extends HTMLElement {
+    constructor(data) {
+      super();
+      this.data = data;
+      this.template = document.querySelector("#accountItem");
+    }
+    connectedCallback() {
+      this.create();
+    }
+    create() {
+      const cloned = cloneTemplate(this.template);
+      const contentData = {
+        currency: this.data.currency,
+        unitCurrency: this.data.unitCurrency,
+        volume: this.data.volume,
+        buyPrice: roundToDecimalPlace(this.data.buyPrice, 0).toLocaleString(),
+        avgBuyPrice: roundToDecimalPlace(this.data.avgBuyPrice, 1).toLocaleString(),
+        profit: Math.round(this.data.profit).toLocaleString(),
+        profitRate: roundToDecimalPlace(this.data.profitRate, 2) + "%"
+      };
+      updateElementsTextWithData(contentData, cloned);
+      this.innerHTML = cloned.innerHTML;
+      const isIncrement = this.data.profit > 0 ? true : false;
+      this.dataset.increase = isIncrement.toString();
+    }
+  };
 
   // dev/scripts/pages/accounts/AppAccounts.js
   var __awaiter = function(thisArg, _arguments, P, generator) {
@@ -51,6 +83,17 @@
     }
     connectedCallback() {
       this.loadAccountData();
+      this.ordered();
+    }
+    ordered() {
+      return __awaiter(this, void 0, void 0, function* () {
+        try {
+          const response = yield this.fetchData(`/ordered`);
+          console.log("ordered", response);
+        } catch (error) {
+          console.error(error);
+        }
+      });
     }
     loadAccountData() {
       return __awaiter(this, void 0, void 0, function* () {
@@ -79,8 +122,8 @@
       const element = this.querySelector(".assets");
       const totalAsset = Number(data.balance) + Number(data.locked);
       const contentData = {
-        totalAsset: this.roundToDecimalPlace(totalAsset, 0).toLocaleString(),
-        locked: this.roundToDecimalPlace(data.locked, 0).toLocaleString(),
+        totalAsset: roundToDecimalPlace(totalAsset, 0).toLocaleString(),
+        locked: roundToDecimalPlace(data.locked, 0).toLocaleString(),
         unit: data.unit_currency
       };
       updateElementsTextWithData(contentData, element);
@@ -114,40 +157,16 @@
     }
     renderAccountsList(data) {
       const fragment = new DocumentFragment();
-      data.map((data2) => this.createElement(data2)).forEach((element) => fragment.appendChild(element));
+      data.map((data2) => new AccountItem(data2)).forEach((accountItem) => {
+        fragment.appendChild(accountItem);
+      });
       this.list.appendChild(fragment);
       delete this.list.dataset.loading;
-    }
-    createElement(anAccount) {
-      const cloned = cloneTemplate(this.template);
-      const contentData = {
-        currency: anAccount.currency,
-        unitCurrency: anAccount.unitCurrency,
-        volume: anAccount.volume,
-        buyPrice: this.roundToDecimalPlace(anAccount.buyPrice, 0).toLocaleString(),
-        avgBuyPrice: this.roundToDecimalPlace(anAccount.avgBuyPrice, 1).toLocaleString(),
-        profit: Math.round(anAccount.profit).toLocaleString(),
-        profitRate: this.roundToDecimalPlace(anAccount.profitRate, 2) + "%"
-      };
-      updateElementsTextWithData(contentData, cloned);
-      const isIncrement = anAccount.profit > 0 ? true : false;
-      cloned.dataset.increase = isIncrement.toString();
-      this.ordersChance(anAccount.market);
-      return cloned;
-    }
-    ordersChance(market) {
-      return __awaiter(this, void 0, void 0, function* () {
-        const response = yield this.fetchData(`/orders-chance?market=${market}`);
-        console.log("ordersChance", response);
-      });
-    }
-    roundToDecimalPlace(amount, point) {
-      const decimalPoint = Math.pow(10, point);
-      return Math.round(amount * decimalPoint) / decimalPoint;
     }
   };
 
   // dev/scripts/pages/accounts/index.js
   customElements.define("app-accounts", AppAccounts);
+  customElements.define("account-item", AccountItem);
 })();
 //# sourceMappingURL=index.js.map

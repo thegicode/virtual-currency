@@ -8,8 +8,9 @@ body {
 app-accounts {
   --margin-side: 1rem;
   --transition-duration: 1.5s;
+  --font-color: #666;
   display: block;
-  color: #666;
+  color: var(--font-color);
 }
 app-accounts h1 {
   margin: 0;
@@ -50,34 +51,51 @@ app-accounts .accountsList {
 app-accounts .accountsList[data-loading=true] {
   opacity: 0;
 }
-app-accounts .accountsList li {
+app-accounts account-item {
+  display: block;
   padding: var(--margin-side);
   border-top: 1px solid #ddd;
   opacity: 1;
 }
-app-accounts .accountsList li .name {
+app-accounts account-item .name {
   display: flex;
   align-items: center;
 }
-app-accounts .accountsList li .name h4 {
+app-accounts account-item .name h4 {
   margin: 0 5px 0 0;
 }
-app-accounts .accountsList li .name .unitCurrency {
+app-accounts account-item .name .unitCurrency {
   margin-left: 5px;
 }
-app-accounts .accountsList li p {
+app-accounts account-item p {
   margin: 7px 0;
 }
-app-accounts .accountsList li p span {
+app-accounts account-item p span {
   margin-left: 5px;
 }
-app-accounts .accountsList li[data-increase=true] .profit,
-app-accounts .accountsList li[data-increase=true] .profitRate {
+app-accounts account-item[data-increase=true] .profit,
+app-accounts account-item[data-increase=true] .profitRate {
   color: red;
 }
-app-accounts .accountsList li[data-increase=false] .profit,
-app-accounts .accountsList li[data-increase=false] .profitRate {
+app-accounts account-item[data-increase=false] .profit,
+app-accounts account-item[data-increase=false] .profitRate {
   color: #3178ff;
+}
+app-accounts account-item .actions {
+  margin-top: 10px;
+}
+app-accounts account-item .actions button {
+  width: 100%;
+  padding: 5px;
+  border-radius: 3px;
+  border: 1px solid #f1f1f1;
+  background-color: transparent;
+  font-size: 11px;
+  color: var(--font-color);
+  cursor: pointer;
+}
+app-accounts account-item .actions button:hover {
+  background-color: #f8f8f8;
 }
 
 /*# sourceMappingURL=accounts.css.map */

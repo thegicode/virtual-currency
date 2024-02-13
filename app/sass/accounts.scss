@@ -8,8 +8,10 @@ body {
 app-accounts {
     --margin-side: 1rem;
     --transition-duration: 1.5s;
+    --font-color: #666;
+
     display: block;
-    color: #666;
+    color: var(--font-color);
 
     h1 {
         margin: 0;
@@ -60,42 +62,60 @@ app-accounts {
         &[data-loading="true"] {
             opacity: 0;
         }
+    }
 
-        li {
-            padding: var(--margin-side);
-            border-top: 1px solid #ddd;
-            opacity: 1;
+    account-item {
+        display: block;
+        padding: var(--margin-side);
+        border-top: 1px solid #ddd;
+        opacity: 1;
 
-            .name {
-                display: flex;
-                align-items: center;
+        .name {
+            display: flex;
+            align-items: center;
 
-                h4 {
-                    margin: 0 5px 0 0;
-                }
-
-                .unitCurrency {
-                    margin-left: 5px;
-                }
+            h4 {
+                margin: 0 5px 0 0;
             }
 
-            p {
-                margin: 7px 0;
-                span {
-                    margin-left: 5px;
-                }
+            .unitCurrency {
+                margin-left: 5px;
             }
+        }
 
-            &[data-increase="true"] {
-                .profit,
-                .profitRate {
-                    color: red;
-                }
+        p {
+            margin: 7px 0;
+            span {
+                margin-left: 5px;
             }
-            &[data-increase="false"] {
-                .profit,
-                .profitRate {
-                    color: #3178ff;
+        }
+
+        &[data-increase="true"] {
+            .profit,
+            .profitRate {
+                color: red;
+            }
+        }
+        &[data-increase="false"] {
+            .profit,
+            .profitRate {
+                color: #3178ff;
+            }
+        }
+
+        .actions {
+            margin-top: 10px;
+            button {
+                width: 100%;
+                padding: 5px;
+                border-radius: 3px;
+                border: 1px solid #f1f1f1;
+                background-color: transparent;
+                font-size: 11px;
+                color: var(--font-color);
+                cursor: pointer;
+                &:hover {
+                    background-color: #f8f8f8;
                 }
             }
         }

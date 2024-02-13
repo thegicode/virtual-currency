@@ -14,3 +14,8 @@ export function updateElementsTextWithData<T>(data: T, container: HTMLElement) {
         element.textContent = String(value);
     });
 }
+
+export function roundToDecimalPlace(amount: number, point: number) {
+    const decimalPoint = Math.pow(10, point);
+    return Math.round(amount * decimalPoint) / decimalPoint;
+}

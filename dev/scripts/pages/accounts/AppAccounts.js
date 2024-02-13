@@ -7,7 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { cloneTemplate, updateElementsTextWithData, } from "@app/scripts/utils/helpers";
+import { roundToDecimalPlace, updateElementsTextWithData, } from "@app/scripts/utils/helpers";
+import AccountItem from "./AccountItem";
 export default class AppAccounts extends HTMLElement {
     constructor() {
         super();
@@ -16,6 +17,18 @@ export default class AppAccounts extends HTMLElement {
     }
     connectedCallback() {
         this.loadAccountData();
+        this.ordered();
+    }
+    ordered() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield this.fetchData(`/ordered`);
+                console.log("ordered", response);
+            }
+            catch (error) {
+                console.error(error);
+            }
+        });
     }
     loadAccountData() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -45,8 +58,8 @@ export default class AppAccounts extends HTMLElement {
         const element = this.querySelector(".assets");
         const totalAsset = Number(data.balance) + Number(data.locked);
         const contentData = {
-            totalAsset: this.roundToDecimalPlace(totalAsset, 0).toLocaleString(),
-            locked: this.roundToDecimalPlace(data.locked, 0).toLocaleString(),
+            totalAsset: roundToDecimalPlace(totalAsset, 0).toLocaleString(),
+            locked: roundToDecimalPlace(data.locked, 0).toLocaleString(),
             unit: data.unit_currency,
         };
         updateElementsTextWithData(contentData, element);
@@ -82,36 +95,11 @@ export default class AppAccounts extends HTMLElement {
     }
     renderAccountsList(data) {
         const fragment = new DocumentFragment();
-        data.map((data) => this.createElement(data)).forEach((element) => fragment.appendChild(element));
+        data.map((data) => new AccountItem(data)).forEach((accountItem) => {
+            fragment.appendChild(accountItem);
+        });
         this.list.appendChild(fragment);
         delete this.list.dataset.loading;
-    }
-    createElement(anAccount) {
-        const cloned = cloneTemplate(this.template);
-        const contentData = {
-            currency: anAccount.currency,
-            unitCurrency: anAccount.unitCurrency,
-            volume: anAccount.volume,
-            buyPrice: this.roundToDecimalPlace(anAccount.buyPrice, 0).toLocaleString(),
-            avgBuyPrice: this.roundToDecimalPlace(anAccount.avgBuyPrice, 1).toLocaleString(),
-            profit: Math.round(anAccount.profit).toLocaleString(),
-            profitRate: this.roundToDecimalPlace(anAccount.profitRate, 2) + "%",
-        };
-        updateElementsTextWithData(contentData, cloned);
-        const isIncrement = anAccount.profit > 0 ? true : false;
-        cloned.dataset.increase = isIncrement.toString();
-        this.ordersChance(anAccount.market);
-        return cloned;
-    }
-    ordersChance(market) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield this.fetchData(`/orders-chance?market=${market}`);
-            console.log("ordersChance", response);
-        });
-    }
-    roundToDecimalPlace(amount, point) {
-        const decimalPoint = Math.pow(10, point);
-        return Math.round(amount * decimalPoint) / decimalPoint;
     }
 }
 //# sourceMappingURL=AppAccounts.js.map

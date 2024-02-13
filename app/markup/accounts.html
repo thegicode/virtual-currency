@@ -36,9 +36,9 @@
 
             <section class="accounts">
                 <h2>포트폴리오</h2>
-                <ul class="accountsList" data-loading="true"></ul>
+                <div class="accountsList" data-loading="true"></div>
                 <template id="accountItem">
-                    <li>
+                    <account-item>
                         <div class="name">
                             <h4 class="currency"></h4>
                             <small>| <span class="unitCurrency"></span></small>
@@ -48,7 +48,10 @@
                         <p>∙ volume: <span class="volume"></span></p>
                         <p>∙ profit: <span class="profit"></span></p>
                         <p>∙ profitRate: <span class="profitRate"></span></p>
-                    </li>
+                        <div class="actions">
+                            <button class="orderedButton">주문내역</button>
+                        </div>
+                    </account-item>
                 </template>
             </section>
         </app-accounts>
