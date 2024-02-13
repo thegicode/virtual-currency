@@ -1,15 +1,12 @@
-html,
+@import "./_variables.scss";
+@import "./_base.scss";
+
 html,
 body {
-    margin: 0;
     font-size: 12px;
 }
 
 app-accounts {
-    --margin-side: 1rem;
-    --transition-duration: 1.5s;
-    --font-color: #666;
-
     display: block;
     color: var(--font-color);
 
@@ -70,6 +67,11 @@ app-accounts {
         border-top: 1px solid #ddd;
         opacity: 1;
 
+        &:hover {
+            border-color: yellowgreen;
+            background-color: #fcffef;
+        }
+
         .name {
             display: flex;
             align-items: center;
@@ -108,14 +110,10 @@ app-accounts {
             button {
                 width: 100%;
                 padding: 5px;
-                border-radius: 3px;
-                border: 1px solid #f1f1f1;
-                background-color: transparent;
                 font-size: 11px;
                 color: var(--font-color);
-                cursor: pointer;
                 &:hover {
-                    background-color: #f8f8f8;
+                    background-color: #fff;
                 }
             }
         }
