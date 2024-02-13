@@ -91,7 +91,7 @@
           }
           const data = yield response.json();
           if (data.uuid === this.data.uuid) {
-            this.dataset.cancel = "true";
+            this.remove();
           }
         } catch (error) {
           console.error("Error", error);
@@ -113,11 +113,14 @@
   var AccountItem = class extends HTMLElement {
     constructor(data) {
       super();
+      this.ordered = null;
       this.data = data;
       this.template = document.querySelector("#accountItem");
+      this.ordered = null;
     }
     connectedCallback() {
       this.createElement();
+      this.ordered = this.querySelector(".ordered");
       this.displayOrdered();
     }
     createElement() {
@@ -138,8 +141,9 @@
     }
     displayOrdered() {
       this.data.orderedData.map((data) => {
+        var _a;
         const orderedItem = new OrderedItem(data);
-        this.appendChild(orderedItem);
+        (_a = this.ordered) === null || _a === void 0 ? void 0 : _a.appendChild(orderedItem);
       });
     }
   };
@@ -176,10 +180,22 @@
     constructor() {
       super();
       this.list = this.querySelector(".accountsList");
+      this.orderedButton = this.querySelector(".orderedButton");
       this.markets = [];
+      this.onClickOrderedButton = this.onClickOrderedButton.bind(this);
     }
     connectedCallback() {
       this.loadAccountData();
+      this.orderedButton.addEventListener("click", this.onClickOrderedButton);
+    }
+    disconnectedCallback() {
+      this.orderedButton.removeEventListener("click", this.onClickOrderedButton);
+    }
+    onClickOrderedButton() {
+      const ordereds = document.querySelectorAll(".ordered");
+      ordereds.forEach((ordered) => {
+        ordered.hidden = !ordered.hidden;
+      });
     }
     loadAccountData() {
       return __awaiter2(this, void 0, void 0, function* () {
@@ -222,7 +238,7 @@
     }
     displayAssets(data) {
       const element = this.querySelector(".assets");
-      const totalAsset = Number(data.balance) + Number(data.locked);
+      const totalAsset = data.balance + data.locked;
       const contentData = {
         totalAsset: roundToDecimalPlace(totalAsset, 0).toLocaleString(),
         locked: roundToDecimalPlace(data.locked, 0).toLocaleString(),

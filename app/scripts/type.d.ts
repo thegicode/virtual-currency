@@ -9,9 +9,9 @@ interface IAccount {
 }
 
 interface IAsset {
-    avg_buy_price: string;
+    avg_buy_price: number;
     avg_buy_price_modified: boolean;
-    balance: string;
+    balance: number;
     currency: string;
     locked: number;
     unit_currency: string;

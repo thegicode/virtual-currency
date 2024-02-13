@@ -52,7 +52,7 @@ export default class OrderedItem extends HTMLElement {
                 }
                 const data = yield response.json();
                 if (data.uuid === this.data.uuid) {
-                    this.dataset.cancel = "true";
+                    this.remove();
                 }
             }
             catch (error) {

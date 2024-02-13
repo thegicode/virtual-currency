@@ -48,6 +48,19 @@ app-accounts {
         h2 {
             margin: 5px var(--margin-side);
         }
+
+        &-actions {
+            display: flex;
+            margin: 5px var(--margin-side);
+        }
+
+        .orderedButton {
+            // width: 100%;
+            margin-left: auto;
+            padding: 5px;
+            font-size: 11px;
+            color: var(--font-color);
+        }
     }
 
     .accountsList {
@@ -127,6 +140,10 @@ app-accounts {
         }
     }
 
+    // .ordered {
+
+    // }
+
     .orderedTitle {
         margin: 0;
         padding: 1rem var(--margin-side) 0;
@@ -135,7 +152,7 @@ app-accounts {
     ordered-item {
         display: block;
         position: relative;
-        padding: var(--margin-side);
+        margin: var(--margin-side);
         // border-bottom: 1px dashed #ddd;
 
         &[data-side="ask"] .side {

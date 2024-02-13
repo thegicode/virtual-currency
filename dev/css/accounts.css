@@ -60,6 +60,16 @@ app-accounts .accounts {
 app-accounts .accounts h2 {
   margin: 5px var(--margin-side);
 }
+app-accounts .accounts-actions {
+  display: flex;
+  margin: 5px var(--margin-side);
+}
+app-accounts .accounts .orderedButton {
+  margin-left: auto;
+  padding: 5px;
+  font-size: 11px;
+  color: var(--font-color);
+}
 app-accounts .accountsList {
   list-style: none;
   margin: 0;
@@ -125,7 +135,7 @@ app-accounts .orderedTitle {
 app-accounts ordered-item {
   display: block;
   position: relative;
-  padding: var(--margin-side);
+  margin: var(--margin-side);
 }
 app-accounts ordered-item[data-side=ask] .side {
   color: var(--blue-color);

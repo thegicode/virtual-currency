@@ -65,7 +65,8 @@ export default class OrderedItem extends HTMLElement {
             }
             const data = await response.json();
             if (data.uuid === this.data.uuid) {
-                this.dataset.cancel = "true";
+                // this.dataset.cancel = "true";
+                this.remove();
             }
         } catch (error) {
             console.error("Error", error);

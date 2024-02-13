@@ -36,7 +36,12 @@
 
             <section class="accounts">
                 <h2>포트폴리오</h2>
+                <div class="accounts-actions">
+                    <button type="button" class="orderedButton">주문내역</button>
+                </div>
+                
                 <div class="accountsList" data-loading="true"></div>
+
                 <template id="accountItem">
                     <account-item>
                         <div class="account-item">
@@ -50,7 +55,9 @@
                             <p>∙ 평가손익 : <span class="profit"></span></p>
                             <p>∙ 수익률 : <span class="profitRate"></span></p>
                         </div>
-                         <h4 class="orderedTitle">주문내역</h4>
+                        <div class="ordered">
+                            <h4 class="orderedTitle">주문내역</h4>
+                        </div>
                     </account-item>
                 </div>
                 </template>

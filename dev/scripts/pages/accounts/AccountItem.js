@@ -3,11 +3,14 @@ import OrderedItem from "./OrderedItem";
 export default class AccountItem extends HTMLElement {
     constructor(data) {
         super();
+        this.ordered = null;
         this.data = data;
         this.template = document.querySelector("#accountItem");
+        this.ordered = null;
     }
     connectedCallback() {
         this.createElement();
+        this.ordered = this.querySelector(".ordered");
         this.displayOrdered();
     }
     createElement() {
@@ -28,8 +31,9 @@ export default class AccountItem extends HTMLElement {
     }
     displayOrdered() {
         this.data.orderedData.map((data) => {
+            var _a;
             const orderedItem = new OrderedItem(data);
-            this.appendChild(orderedItem);
+            (_a = this.ordered) === null || _a === void 0 ? void 0 : _a.appendChild(orderedItem);
         });
     }
 }

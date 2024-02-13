@@ -9,64 +9,62 @@ let accountsTime = null;
 
 async function accounts(req, res) {
     try {
-        const response = await fetch(URL.accounts, {
-            method: "GET",
-            headers: { Authorization: TOKEN },
-        });
-
-        const data = await response.json();
-
         // 1분 이상시 호출
-        if ((new Date().getTime() - accountsTime) / (1000 * 60) > 1) {
-            res.send(handleAccounts(data));
+        if (
+            !accountsTime ||
+            (new Date().getTime() - accountsTime) / (1000 * 60) > 1
+        ) {
+            const response = await fetch(URL.accounts, {
+                method: "GET",
+                headers: { Authorization: TOKEN },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const processedData = handleAccounts(data);
+
+            console.log("processedData", processedData);
+
+            res.send(processedData);
+
+            accountsTime = new Date().getTime();
         } else {
-            console.log("storedAccounts", storedAccounts);
+            console.log("Using stored accounts data", storedAccounts);
             res.send(storedAccounts);
         }
 
         accountsTime = new Date().getTime();
     } catch (error) {
         console.error(error);
+        res.status(500).send("Internal Server Error");
     }
 }
 
 function handleAccounts(data) {
     if (!data) return;
 
-    let assets = {};
+    // 필터링과 매핑을 분리하여 가독성 향상
+    const krwAccounts = data.filter(
+        (account) =>
+            account.currency === "KRW" && account.unit_currency === "KRW"
+    );
 
-    let accounts = data
-        .filter((account) => {
-            if (account.currency === "KRW" && account.unit_currency === "KRW") {
-                assets = account;
-                return false;
-            }
-            return account.currency === "KRW" || account.avg_buy_price > 0;
-        })
-        .map((account) => {
-            const {
-                currency,
-                balance,
-                locked,
-                avg_buy_price,
-                avg_buy_price_modified,
-                unit_currency,
-            } = account;
-            const locked_number = Number(locked);
-            const volume = Number(balance) + locked_number;
+    let assets = krwAccounts[0];
+    assets = {
+        ...assets,
+        avg_buy_price: Number(assets.avg_buy_price),
+        balance: Number(assets.balance),
+        locked: Number(assets.locked),
+    };
 
-            return {
-                market: `${unit_currency}-${currency}`,
-                balance: Number(balance),
-                currency,
-                locked: locked_number,
-                avg_buy_price: Number(avg_buy_price),
-                avg_buy_price_modified,
-                unit_currency,
-                volume,
-                buy_price: volume * Number(avg_buy_price),
-            };
-        })
+    const accounts = data
+        .filter(
+            (account) => account.currency !== "KRW" && account.avg_buy_price > 0
+        )
+        .map(transformAccount)
         .sort((a, b) => b.buy_price - a.buy_price);
 
     const myMarkets = accounts.map((a) => a.market);
@@ -78,9 +76,20 @@ function handleAccounts(data) {
 
     storedAccounts = { assets, accounts };
 
-    console.log(assets, accounts);
-
     return { assets, accounts };
+}
+
+function transformAccount(account) {
+    const volume = Number(account.balance) + Number(account.locked);
+    return {
+        ...account,
+        market: `${account.unit_currency}-${account.currency}`,
+        balance: Number(account.balance),
+        locked: Number(account.locked),
+        avg_buy_price: Number(account.avg_buy_price),
+        volume,
+        buy_price: volume * Number(account.avg_buy_price),
+    };
 }
 
 module.exports = accounts;
