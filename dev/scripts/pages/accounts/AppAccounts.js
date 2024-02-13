@@ -7,36 +7,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { roundToDecimalPlace, updateElementsTextWithData, } from "@app/scripts/utils/helpers";
+import { roundToDecimalPlace, updateElementsTextWithData, } from "@scripts/utils/helpers";
 import AccountItem from "./AccountItem";
 export default class AppAccounts extends HTMLElement {
     constructor() {
         super();
         this.list = this.querySelector(".accountsList");
+        this.markets = [];
     }
     connectedCallback() {
         this.loadAccountData();
-        this.ordered();
-    }
-    ordered() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const response = yield this.fetchData(`/ordered`);
-                console.log("ordered", response);
-            }
-            catch (error) {
-                console.error(error);
-            }
-        });
     }
     loadAccountData() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const accountsResponse = yield this.fetchData(`/accounts`);
-                const markets = accountsResponse.accounts.map((anAccount) => `${anAccount.unit_currency}-${anAccount.currency}`);
-                const tickerResponse = yield this.fetchData(`/ticker?markets=${encodeURIComponent(markets)}`);
+                this.markets = accountsResponse.accounts.map((account) => `${account.unit_currency}-${account.currency}`);
+                const tickerResponse = yield this.fetchData(`/ticker?markets=${encodeURIComponent(this.markets.join(","))}`);
                 this.displayAssets(accountsResponse.assets);
-                const processedAccounts = yield this.processAccountsData(accountsResponse.accounts, tickerResponse);
+                const orderedResponse = yield this.fetchData(`/ordered`);
+                const orderedData = this.ordered(orderedResponse);
+                const processedAccounts = yield this.processAccountsData(accountsResponse.accounts, tickerResponse, orderedData);
                 this.renderAccountsList(processedAccounts);
             }
             catch (error) {
@@ -53,6 +44,21 @@ export default class AppAccounts extends HTMLElement {
             return yield response.json();
         });
     }
+    ordered(data) {
+        try {
+            let orderedData = {};
+            this.markets.map((market) => {
+                orderedData[market] = [];
+            });
+            data.map((order) => {
+                orderedData[order.market].push(order);
+            });
+            return orderedData;
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
     displayAssets(data) {
         const element = this.querySelector(".assets");
         const totalAsset = Number(data.balance) + Number(data.locked);
@@ -64,10 +70,11 @@ export default class AppAccounts extends HTMLElement {
         updateElementsTextWithData(contentData, element);
         delete element.dataset.loading;
     }
-    processAccountsData(accounts, tickerData) {
+    processAccountsData(accounts, tickerData, orderedObject) {
         function _handleData(account) {
             const marketName = `${account.unit_currency}-${account.currency}`;
             const ticker = tickerData.find((t) => t.market === marketName);
+            const orderedData = orderedObject[marketName];
             if (!ticker) {
                 console.error(`Ticker not found for market: ${marketName}`);
                 return null;
@@ -86,6 +93,7 @@ export default class AppAccounts extends HTMLElement {
                 locked: account.locked,
                 profit,
                 profitRate,
+                orderedData,
             };
         }
         return accounts

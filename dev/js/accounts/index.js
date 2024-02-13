@@ -19,6 +19,56 @@
     return Math.round(amount * decimalPoint) / decimalPoint;
   }
 
+  // dev/scripts/pages/accounts/OrderedItem.js
+  var OrderedItem = class extends HTMLElement {
+    constructor(data) {
+      super();
+      this.cancelButton = null;
+      this.data = data;
+      this.template = document.querySelector("#orderedItem");
+      this.cancelButton = null;
+      this.onCancel = this.onCancel.bind(this);
+    }
+    connectedCallback() {
+      var _a;
+      const cloned = this.createElement();
+      this.innerHTML = cloned.innerHTML;
+      this.dataset.side = this.data.side;
+      this.cancelButton = this.querySelector(".cancelButton");
+      (_a = this.cancelButton) === null || _a === void 0 ? void 0 : _a.addEventListener("click", this.onCancel);
+    }
+    disconnectedCallback() {
+      var _a;
+      (_a = this.cancelButton) === null || _a === void 0 ? void 0 : _a.removeEventListener("click", this.onCancel);
+    }
+    createElement() {
+      const cloned = cloneTemplate(this.template);
+      const contentData = {
+        created_at: this.formatDateTime(this.data.created_at),
+        price: this.data.price,
+        side: this.data.side === "bid" ? "\uB9E4\uC218" : "\uB9E4\uB3C4",
+        volume: this.data.volume
+      };
+      updateElementsTextWithData(contentData, cloned);
+      return cloned;
+    }
+    onCancel() {
+      if (!this.cancelButton)
+        return;
+      console.log("cancel");
+      this.cancelButton.disabled = true;
+    }
+    formatDateTime(dateTime) {
+      const date = new Date(dateTime);
+      const month = (date.getMonth() + 1).toString().padStart(2, "0");
+      const day = date.getDate().toString().padStart(2, "0");
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+      const seconds = date.getSeconds().toString().padStart(2, "0");
+      return `${month}.${day} ${hours}:${minutes}:${seconds}`;
+    }
+  };
+
   // dev/scripts/pages/accounts/AccountItem.js
   var AccountItem = class extends HTMLElement {
     constructor(data) {
@@ -28,6 +78,7 @@
     }
     connectedCallback() {
       this.createElement();
+      this.displayOrdered();
     }
     createElement() {
       const cloned = cloneTemplate(this.template);
@@ -44,6 +95,12 @@
       this.innerHTML = cloned.innerHTML;
       const isIncrement = this.data.profit > 0 ? true : false;
       this.dataset.increase = isIncrement.toString();
+    }
+    displayOrdered() {
+      this.data.orderedData.map((data) => {
+        const orderedItem = new OrderedItem(data);
+        this.appendChild(orderedItem);
+      });
     }
   };
 
@@ -79,29 +136,21 @@
     constructor() {
       super();
       this.list = this.querySelector(".accountsList");
+      this.markets = [];
     }
     connectedCallback() {
       this.loadAccountData();
-      this.ordered();
-    }
-    ordered() {
-      return __awaiter(this, void 0, void 0, function* () {
-        try {
-          const response = yield this.fetchData(`/ordered`);
-          console.log("ordered", response);
-        } catch (error) {
-          console.error(error);
-        }
-      });
     }
     loadAccountData() {
       return __awaiter(this, void 0, void 0, function* () {
         try {
           const accountsResponse = yield this.fetchData(`/accounts`);
-          const markets = accountsResponse.accounts.map((anAccount) => `${anAccount.unit_currency}-${anAccount.currency}`);
-          const tickerResponse = yield this.fetchData(`/ticker?markets=${encodeURIComponent(markets)}`);
+          this.markets = accountsResponse.accounts.map((account) => `${account.unit_currency}-${account.currency}`);
+          const tickerResponse = yield this.fetchData(`/ticker?markets=${encodeURIComponent(this.markets.join(","))}`);
           this.displayAssets(accountsResponse.assets);
-          const processedAccounts = yield this.processAccountsData(accountsResponse.accounts, tickerResponse);
+          const orderedResponse = yield this.fetchData(`/ordered`);
+          const orderedData = this.ordered(orderedResponse);
+          const processedAccounts = yield this.processAccountsData(accountsResponse.accounts, tickerResponse, orderedData);
           this.renderAccountsList(processedAccounts);
         } catch (error) {
           console.error(error);
@@ -117,6 +166,20 @@
         return yield response.json();
       });
     }
+    ordered(data) {
+      try {
+        let orderedData = {};
+        this.markets.map((market) => {
+          orderedData[market] = [];
+        });
+        data.map((order) => {
+          orderedData[order.market].push(order);
+        });
+        return orderedData;
+      } catch (error) {
+        console.error(error);
+      }
+    }
     displayAssets(data) {
       const element = this.querySelector(".assets");
       const totalAsset = Number(data.balance) + Number(data.locked);
@@ -128,10 +191,11 @@
       updateElementsTextWithData(contentData, element);
       delete element.dataset.loading;
     }
-    processAccountsData(accounts, tickerData) {
+    processAccountsData(accounts, tickerData, orderedObject) {
       function _handleData(account) {
         const marketName = `${account.unit_currency}-${account.currency}`;
         const ticker = tickerData.find((t) => t.market === marketName);
+        const orderedData = orderedObject[marketName];
         if (!ticker) {
           console.error(`Ticker not found for market: ${marketName}`);
           return null;
@@ -149,7 +213,8 @@
           volume: account.volume,
           locked: account.locked,
           profit,
-          profitRate
+          profitRate,
+          orderedData
         };
       }
       return accounts.map((account) => _handleData(account)).filter((account) => account !== null);
@@ -167,5 +232,6 @@
   // dev/scripts/pages/accounts/index.js
   customElements.define("app-accounts", AppAccounts);
   customElements.define("account-item", AccountItem);
+  customElements.define("ordered-item", OrderedItem);
 })();
 //# sourceMappingURL=index.js.map

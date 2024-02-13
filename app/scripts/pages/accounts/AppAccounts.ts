@@ -1,52 +1,51 @@
 import {
     roundToDecimalPlace,
     updateElementsTextWithData,
-} from "@app/scripts/utils/helpers";
+} from "@scripts/utils/helpers";
 
 import AccountItem from "./AccountItem";
 
 export default class AppAccounts extends HTMLElement {
+    private markets: string[];
     private list: HTMLElement;
 
     constructor() {
         super();
 
         this.list = this.querySelector(".accountsList") as HTMLElement;
+
+        this.markets = [];
     }
 
     connectedCallback() {
         this.loadAccountData();
-
-        // ing...
-        this.ordered();
-    }
-
-    private async ordered() {
-        try {
-            const response = await this.fetchData(`/ordered`);
-            console.log("ordered", response);
-        } catch (error) {
-            console.error(error);
-        }
     }
 
     private async loadAccountData() {
         try {
             const accountsResponse = await this.fetchData(`/accounts`);
 
-            const markets = accountsResponse.accounts.map(
-                (anAccount: IAccount) =>
-                    `${anAccount.unit_currency}-${anAccount.currency}`
+            this.markets = accountsResponse.accounts.map(
+                (account: IAccount) =>
+                    `${account.unit_currency}-${account.currency}`
             );
+
             const tickerResponse = await this.fetchData(
-                `/ticker?markets=${encodeURIComponent(markets)}`
+                `/ticker?markets=${encodeURIComponent(this.markets.join(","))}`
             );
 
             this.displayAssets(accountsResponse.assets);
 
+            const orderedResponse = await this.fetchData(`/ordered`);
+            const orderedData = this.ordered(orderedResponse) as Record<
+                string,
+                IOrdered[]
+            >;
+
             const processedAccounts = await this.processAccountsData(
                 accountsResponse.accounts,
-                tickerResponse
+                tickerResponse,
+                orderedData
             );
 
             this.renderAccountsList(processedAccounts);
@@ -61,6 +60,23 @@ export default class AppAccounts extends HTMLElement {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return await response.json();
+    }
+
+    private ordered(data: IOrdered[]) {
+        try {
+            let orderedData: { [key: string]: IOrdered[] } = {};
+            this.markets.map((market: string) => {
+                orderedData[market] = [];
+            });
+
+            data.map((order: IOrdered) => {
+                orderedData[order.market].push(order);
+            });
+
+            return orderedData;
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     private displayAssets(data: IAsset) {
@@ -79,10 +95,15 @@ export default class AppAccounts extends HTMLElement {
         delete element.dataset.loading;
     }
 
-    private processAccountsData(accounts: IAccount[], tickerData: ITicker[]) {
+    private processAccountsData(
+        accounts: IAccount[],
+        tickerData: ITicker[],
+        orderedObject: Record<string, IOrdered[]>
+    ) {
         function _handleData(account: IAccount) {
             const marketName = `${account.unit_currency}-${account.currency}`;
             const ticker = tickerData.find((t) => t.market === marketName);
+            const orderedData = orderedObject[marketName];
 
             if (!ticker) {
                 console.error(`Ticker not found for market: ${marketName}`);
@@ -104,6 +125,7 @@ export default class AppAccounts extends HTMLElement {
                 locked: account.locked,
                 profit,
                 profitRate,
+                orderedData,
             };
         }
 

@@ -7,6 +7,9 @@ body {
 }
 
 app-accounts {
+    --blue-color: #3178ff;
+    --red-color: red;
+
     display: block;
     color: var(--font-color);
 
@@ -76,7 +79,7 @@ app-accounts {
             display: flex;
             align-items: center;
 
-            h4 {
+            h3 {
                 margin: 0 5px 0 0;
             }
 
@@ -95,13 +98,13 @@ app-accounts {
         &[data-increase="true"] {
             .profit,
             .profitRate {
-                color: red;
+                color: var(--red-color);
             }
         }
         &[data-increase="false"] {
             .profit,
             .profitRate {
-                color: #3178ff;
+                color: var(--blue-color);
             }
         }
 
@@ -116,6 +119,21 @@ app-accounts {
                     background-color: #fff;
                 }
             }
+        }
+    }
+
+    .orderedTitle {
+        margin: 15px 0 5px;
+    }
+
+    ordered-item {
+        display: block;
+        padding: 5px 0;
+        &[data-side="ask"] .side {
+            color: var(--blue-color);
+        }
+        &[data-side="bid"] .side {
+            color: var(--red-color);
         }
     }
 }

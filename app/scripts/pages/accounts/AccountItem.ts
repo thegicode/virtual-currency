@@ -2,7 +2,8 @@ import {
     cloneTemplate,
     roundToDecimalPlace,
     updateElementsTextWithData,
-} from "@app/scripts/utils/helpers";
+} from "@scripts/utils/helpers";
+import OrderedItem from "./OrderedItem";
 
 export default class AccountItem extends HTMLElement {
     private data: IProcessedAccountData;
@@ -20,6 +21,7 @@ export default class AccountItem extends HTMLElement {
 
     connectedCallback() {
         this.createElement();
+        this.displayOrdered();
     }
 
     private createElement() {
@@ -50,5 +52,12 @@ export default class AccountItem extends HTMLElement {
 
         // [TODO] orders-chance
         // this.ordersChance(anAccount.market);
+    }
+
+    private displayOrdered() {
+        this.data.orderedData.map((data: IOrdered) => {
+            const orderedItem = new OrderedItem(data);
+            this.appendChild(orderedItem);
+        });
     }
 }

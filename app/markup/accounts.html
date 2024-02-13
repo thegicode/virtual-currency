@@ -40,7 +40,7 @@
                 <template id="accountItem">
                     <account-item>
                         <div class="name">
-                            <h4 class="currency"></h4>
+                            <h3 class="currency"></h3>
                             <small>| <span class="unitCurrency"></span></small>
                         </div>
                         <p>∙ 매수금액 : <span class="buyPrice"></span></p>
@@ -48,10 +48,25 @@
                         <p>∙ 보유수량 : <span class="volume"></span></p>
                         <p>∙ 평가손익 : <span class="profit"></span></p>
                         <p>∙ 수익률 : <span class="profitRate"></span></p>
-                        <div class="actions">
+                        <h4 class="orderedTitle">주문내역</h4>
+                        <!-- <div class="actions">
                             <button class="orderedButton">주문내역</button>
-                        </div>
+                        </div> -->
                     </account-item>
+                </template>
+
+                <template id="orderedItem">
+                    <ordered-item>
+                        <p>∙ 주문종류 : <span class="side"></span></p>
+                        <p>∙ 날짜 : <span class="created_at"></span></p>
+                        <p>∙ 주문가격 : <span class="price"></span></p>
+                        <p>∙ 주문수량 : <span class="volume"></span></p>
+                        <div class="actions">
+                            <button type="button" class="cancelButton">
+                                취소
+                            </button>
+                        </div>
+                    </ordered-item>
                 </template>
             </section>
         </app-accounts>

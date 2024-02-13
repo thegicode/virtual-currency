@@ -33,8 +33,21 @@ async function ordered(req, res) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(data);
-        res.send(data);
+        const result = data.map((aData) => {
+            return {
+                ...aData,
+                remaining_fee: Number(aData.remaining_fee),
+                remaining_volume: Number(aData.remaining_volume),
+                reserved_fee: Number(aData.reserved_fee),
+                volume: Number(aData.volume),
+                paid_fee: Number(aData.paid_fee),
+                locked: Number(aData.locked),
+                executed_volume: Number(aData.executed_volume),
+            };
+        });
+
+        console.log(result);
+        res.send(result);
     } catch (error) {
         console.error("Error:", error);
         res.status(500).send("Internal Server Error");

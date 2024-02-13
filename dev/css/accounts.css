@@ -25,6 +25,8 @@ body {
 }
 
 app-accounts {
+  --blue-color: #3178ff;
+  --red-color: red;
   display: block;
   color: var(--font-color);
 }
@@ -81,7 +83,7 @@ app-accounts account-item .name {
   display: flex;
   align-items: center;
 }
-app-accounts account-item .name h4 {
+app-accounts account-item .name h3 {
   margin: 0 5px 0 0;
 }
 app-accounts account-item .name .unitCurrency {
@@ -95,11 +97,11 @@ app-accounts account-item p span {
 }
 app-accounts account-item[data-increase=true] .profit,
 app-accounts account-item[data-increase=true] .profitRate {
-  color: red;
+  color: var(--red-color);
 }
 app-accounts account-item[data-increase=false] .profit,
 app-accounts account-item[data-increase=false] .profitRate {
-  color: #3178ff;
+  color: var(--blue-color);
 }
 app-accounts account-item .actions {
   margin-top: 10px;
@@ -112,6 +114,19 @@ app-accounts account-item .actions button {
 }
 app-accounts account-item .actions button:hover {
   background-color: #fff;
+}
+app-accounts .orderedTitle {
+  margin: 15px 0 5px;
+}
+app-accounts ordered-item {
+  display: block;
+  padding: 5px 0;
+}
+app-accounts ordered-item[data-side=ask] .side {
+  color: var(--blue-color);
+}
+app-accounts ordered-item[data-side=bid] .side {
+  color: var(--red-color);
 }
 
 /*# sourceMappingURL=accounts.css.map */

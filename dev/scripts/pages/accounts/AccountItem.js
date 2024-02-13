@@ -1,4 +1,5 @@
-import { cloneTemplate, roundToDecimalPlace, updateElementsTextWithData, } from "@app/scripts/utils/helpers";
+import { cloneTemplate, roundToDecimalPlace, updateElementsTextWithData, } from "@scripts/utils/helpers";
+import OrderedItem from "./OrderedItem";
 export default class AccountItem extends HTMLElement {
     constructor(data) {
         super();
@@ -7,6 +8,7 @@ export default class AccountItem extends HTMLElement {
     }
     connectedCallback() {
         this.createElement();
+        this.displayOrdered();
     }
     createElement() {
         const cloned = cloneTemplate(this.template);
@@ -23,6 +25,12 @@ export default class AccountItem extends HTMLElement {
         this.innerHTML = cloned.innerHTML;
         const isIncrement = this.data.profit > 0 ? true : false;
         this.dataset.increase = isIncrement.toString();
+    }
+    displayOrdered() {
+        this.data.orderedData.map((data) => {
+            const orderedItem = new OrderedItem(data);
+            this.appendChild(orderedItem);
+        });
     }
 }
 //# sourceMappingURL=AccountItem.js.map
