@@ -39,20 +39,20 @@
                 <div class="accountsList" data-loading="true"></div>
                 <template id="accountItem">
                     <account-item>
-                        <div class="name">
-                            <h3 class="currency"></h3>
-                            <small>| <span class="unitCurrency"></span></small>
+                        <div class="account-item">
+                            <div class="name">
+                                <h3 class="currency"></h3>
+                                <small>| <span class="unitCurrency"></span></small>
+                            </div>
+                            <p>∙ 매수금액 : <span class="buyPrice"></span></p>
+                            <p>∙ 매수평균가 : <span class="avgBuyPrice"></span></p>
+                            <p>∙ 보유수량 : <span class="volume"></span></p>
+                            <p>∙ 평가손익 : <span class="profit"></span></p>
+                            <p>∙ 수익률 : <span class="profitRate"></span></p>
                         </div>
-                        <p>∙ 매수금액 : <span class="buyPrice"></span></p>
-                        <p>∙ 매수평균가 : <span class="avgBuyPrice"></span></p>
-                        <p>∙ 보유수량 : <span class="volume"></span></p>
-                        <p>∙ 평가손익 : <span class="profit"></span></p>
-                        <p>∙ 수익률 : <span class="profitRate"></span></p>
-                        <h4 class="orderedTitle">주문내역</h4>
-                        <!-- <div class="actions">
-                            <button class="orderedButton">주문내역</button>
-                        </div> -->
+                         <h4 class="orderedTitle">주문내역</h4>
                     </account-item>
+                </div>
                 </template>
 
                 <template id="orderedItem">

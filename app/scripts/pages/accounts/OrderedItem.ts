@@ -54,10 +54,22 @@ export default class OrderedItem extends HTMLElement {
         return cloned;
     }
 
-    private onCancel() {
+    private async onCancel() {
         if (!this.cancelButton) return;
-        console.log("cancel");
         this.cancelButton.disabled = true;
+
+        try {
+            const response = await fetch(`/cancel?uuid=${this.data.uuid}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (data.uuid === this.data.uuid) {
+                this.dataset.cancel = "true";
+            }
+        } catch (error) {
+            console.error("Error", error);
+        }
     }
 
     private formatDateTime(dateTime: string) {

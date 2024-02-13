@@ -1,4 +1,5 @@
 interface IAccount {
+    market: string;
     avg_buy_price: number;
     buy_price: number;
     currency: string;

@@ -1,3 +1,4 @@
+@charset "UTF-8";
 body {
   --margin-side: 1rem;
   --transition-duration: 1.5s;
@@ -71,13 +72,15 @@ app-accounts .accountsList[data-loading=true] {
 }
 app-accounts account-item {
   display: block;
-  padding: var(--margin-side);
   border-top: 1px solid #ddd;
   opacity: 1;
 }
 app-accounts account-item:hover {
   border-color: yellowgreen;
-  background-color: #fcffef;
+}
+app-accounts account-item .account-item {
+  padding: var(--margin-side);
+  background-color: #f8f8f8;
 }
 app-accounts account-item .name {
   display: flex;
@@ -116,17 +119,34 @@ app-accounts account-item .actions button:hover {
   background-color: #fff;
 }
 app-accounts .orderedTitle {
-  margin: 15px 0 5px;
+  margin: 0;
+  padding: 1rem var(--margin-side) 0;
 }
 app-accounts ordered-item {
   display: block;
-  padding: 5px 0;
+  position: relative;
+  padding: var(--margin-side);
 }
 app-accounts ordered-item[data-side=ask] .side {
   color: var(--blue-color);
 }
 app-accounts ordered-item[data-side=bid] .side {
   color: var(--red-color);
+}
+app-accounts ordered-item[data-cancel=true]:after {
+  content: "취소되었습니다.";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 7px;
+  background-color: #00522c;
+  color: #c1c1c1;
+  opacity: 0.8;
 }
 
 /*# sourceMappingURL=accounts.css.map */

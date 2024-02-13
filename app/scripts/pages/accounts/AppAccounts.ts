@@ -26,8 +26,7 @@ export default class AppAccounts extends HTMLElement {
             const accountsResponse = await this.fetchData(`/accounts`);
 
             this.markets = accountsResponse.accounts.map(
-                (account: IAccount) =>
-                    `${account.unit_currency}-${account.currency}`
+                (account: IAccount) => account.market
             );
 
             const tickerResponse = await this.fetchData(
@@ -101,12 +100,11 @@ export default class AppAccounts extends HTMLElement {
         orderedObject: Record<string, IOrdered[]>
     ) {
         function _handleData(account: IAccount) {
-            const marketName = `${account.unit_currency}-${account.currency}`;
-            const ticker = tickerData.find((t) => t.market === marketName);
-            const orderedData = orderedObject[marketName];
+            const ticker = tickerData.find((t) => t.market === account.market);
+            const orderedData = orderedObject[account.market];
 
             if (!ticker) {
-                console.error(`Ticker not found for market: ${marketName}`);
+                console.error(`Ticker not found for market: ${account.market}`);
                 return null;
             }
 
@@ -116,7 +114,7 @@ export default class AppAccounts extends HTMLElement {
             const profitRate = priceAtBuy > 0 ? (profit / priceAtBuy) * 100 : 0;
 
             return {
-                market: marketName,
+                market: account.market,
                 currency: account.currency,
                 unitCurrency: account.unit_currency,
                 buyPrice: account.buy_price,

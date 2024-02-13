@@ -4,7 +4,7 @@ const path = require("path");
 const URL = require("../server/config/URL");
 const TOKEN = require("../server/config/token");
 
-let accountsData = {};
+let storedAccounts = {};
 let accountsTime = null;
 
 async function accounts(req, res) {
@@ -20,8 +20,8 @@ async function accounts(req, res) {
         if ((new Date().getTime() - accountsTime) / (1000 * 60) > 1) {
             res.send(handleAccounts(data));
         } else {
-            // console.log("accountsData", accountsData);
-            res.send(accountsData);
+            console.log("storedAccounts", storedAccounts);
+            res.send(storedAccounts);
         }
 
         accountsTime = new Date().getTime();
@@ -33,12 +33,9 @@ async function accounts(req, res) {
 function handleAccounts(data) {
     if (!data) return;
 
-    // console.log("handleAccounts", accountsData);
-
-    const myMarkets = [];
     let assets = {};
 
-    const accounts = data
+    let accounts = data
         .filter((account) => {
             if (account.currency === "KRW" && account.unit_currency === "KRW") {
                 assets = account;
@@ -58,11 +55,8 @@ function handleAccounts(data) {
             const locked_number = Number(locked);
             const volume = Number(balance) + locked_number;
 
-            if (currency !== "KRW") {
-                myMarkets.push(`${unit_currency}-${currency}`);
-            }
-
             return {
+                market: `${unit_currency}-${currency}`,
                 balance: Number(balance),
                 currency,
                 locked: locked_number,
@@ -72,16 +66,21 @@ function handleAccounts(data) {
                 volume,
                 buy_price: volume * Number(avg_buy_price),
             };
-        });
+        })
+        .sort((a, b) => b.buy_price - a.buy_price);
+
+    const myMarkets = accounts.map((a) => a.market);
 
     fs.writeFileSync(
         path.resolve(`./data/myMarkets.json`),
         JSON.stringify(myMarkets)
     );
 
-    accountsData = { assets, accounts };
+    storedAccounts = { assets, accounts };
 
-    return accountsData;
+    console.log(assets, accounts);
+
+    return { assets, accounts };
 }
 
 module.exports = accounts;
