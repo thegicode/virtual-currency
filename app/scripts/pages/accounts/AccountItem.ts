@@ -8,6 +8,7 @@ import OrderedItem from "./OrderedItem";
 export default class AccountItem extends HTMLElement {
     private data: IProcessedAccountData;
     private template: HTMLTemplateElement;
+    private orderedButton: HTMLButtonElement | null = null;
     private ordered: HTMLElement | null = null;
 
     constructor(data: IProcessedAccountData) {
@@ -19,15 +20,33 @@ export default class AccountItem extends HTMLElement {
             "#accountItem"
         ) as HTMLTemplateElement;
 
+        this.orderedButton = null;
         this.ordered = null;
+
+        this.handleOrdered = this.handleOrdered.bind(this);
     }
 
     connectedCallback() {
         this.createElement();
 
+        this.orderedButton = this.querySelector(
+            ".orderedButton"
+        ) as HTMLButtonElement;
+
         this.ordered = this.querySelector(".ordered") as HTMLElement;
 
         this.displayOrdered();
+
+        this.orderedButton?.addEventListener("click", this.handleOrdered);
+    }
+
+    disconnectedCallback() {
+        this.orderedButton?.removeEventListener("click", this.handleOrdered);
+    }
+
+    private handleOrdered() {
+        if (!this.ordered) return;
+        this.ordered.hidden = !this.ordered.hidden;
     }
 
     private createElement() {

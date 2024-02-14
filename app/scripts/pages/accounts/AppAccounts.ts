@@ -4,45 +4,24 @@ import {
 } from "@scripts/utils/helpers";
 
 import AccountItem from "./AccountItem";
-import OrderedItem from "./OrderedItem";
 
 export default class AppAccounts extends HTMLElement {
     private markets: string[];
     private list: HTMLElement;
-    private orderedButton: HTMLButtonElement;
 
     constructor() {
         super();
 
         this.list = this.querySelector(".accountsList") as HTMLElement;
-        this.orderedButton = this.querySelector(
-            ".orderedButton"
-        ) as HTMLButtonElement;
 
         this.markets = [];
-
-        this.onClickOrderedButton = this.onClickOrderedButton.bind(this);
     }
 
     connectedCallback() {
         this.loadAccountData();
-
-        this.orderedButton.addEventListener("click", this.onClickOrderedButton);
     }
 
-    disconnectedCallback() {
-        this.orderedButton.removeEventListener(
-            "click",
-            this.onClickOrderedButton
-        );
-    }
-
-    private onClickOrderedButton() {
-        const ordereds = document.querySelectorAll<HTMLElement>(".ordered");
-        ordereds.forEach((ordered) => {
-            ordered.hidden = !ordered.hidden;
-        });
-    }
+    disconnectedCallback() {}
 
     private async loadAccountData() {
         try {

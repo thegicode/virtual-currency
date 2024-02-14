@@ -113,15 +113,30 @@
   var AccountItem = class extends HTMLElement {
     constructor(data) {
       super();
+      this.orderedButton = null;
       this.ordered = null;
       this.data = data;
       this.template = document.querySelector("#accountItem");
+      this.orderedButton = null;
       this.ordered = null;
+      this.handleOrdered = this.handleOrdered.bind(this);
     }
     connectedCallback() {
+      var _a;
       this.createElement();
+      this.orderedButton = this.querySelector(".orderedButton");
       this.ordered = this.querySelector(".ordered");
       this.displayOrdered();
+      (_a = this.orderedButton) === null || _a === void 0 ? void 0 : _a.addEventListener("click", this.handleOrdered);
+    }
+    disconnectedCallback() {
+      var _a;
+      (_a = this.orderedButton) === null || _a === void 0 ? void 0 : _a.removeEventListener("click", this.handleOrdered);
+    }
+    handleOrdered() {
+      if (!this.ordered)
+        return;
+      this.ordered.hidden = !this.ordered.hidden;
     }
     createElement() {
       const cloned = cloneTemplate(this.template);
@@ -184,22 +199,12 @@
     constructor() {
       super();
       this.list = this.querySelector(".accountsList");
-      this.orderedButton = this.querySelector(".orderedButton");
       this.markets = [];
-      this.onClickOrderedButton = this.onClickOrderedButton.bind(this);
     }
     connectedCallback() {
       this.loadAccountData();
-      this.orderedButton.addEventListener("click", this.onClickOrderedButton);
     }
     disconnectedCallback() {
-      this.orderedButton.removeEventListener("click", this.onClickOrderedButton);
-    }
-    onClickOrderedButton() {
-      const ordereds = document.querySelectorAll(".ordered");
-      ordereds.forEach((ordered) => {
-        ordered.hidden = !ordered.hidden;
-      });
     }
     loadAccountData() {
       return __awaiter2(this, void 0, void 0, function* () {

@@ -53,14 +53,6 @@ app-accounts {
             display: flex;
             margin: 5px var(--margin-side);
         }
-
-        .orderedButton {
-            // width: 100%;
-            margin-left: auto;
-            padding: 5px;
-            font-size: 11px;
-            color: var(--font-color);
-        }
     }
 
     .accountsList {
@@ -79,37 +71,37 @@ app-accounts {
 
     account-item {
         display: block;
-        // padding: var(--margin-side);
         border-top: 1px solid #ddd;
         opacity: 1;
 
         &:hover {
-            border-color: yellowgreen;
-            // background-color: #fcffef;
+            border-color: #baddd2;
         }
 
         .account-item {
             padding: var(--margin-side);
-            background-color: #f8f8f8;
+            background-color: #f6fff9;
         }
 
-        .name {
+        header {
             display: flex;
-            align-items: center;
-
-            h3 {
-                margin: 0 5px 0 0;
+            justify-content: space-between;
+            .name {
+                display: flex;
+                align-items: center;
+                margin: 0;
+                .currency {
+                    margin: 0 5px 0 0;
+                }
+                .unitCurrency {
+                    margin-left: 5px;
+                }
             }
-
-            .unitCurrency {
-                margin-left: 5px;
-            }
-        }
-
-        p {
-            margin: 3px 0;
-            span {
-                margin-left: 5px;
+            .orderedButton {
+                margin-left: auto;
+                padding: 5px;
+                font-size: 11px;
+                color: var(--font-color);
             }
         }
 
@@ -131,25 +123,86 @@ app-accounts {
         display: flex;
         flex-wrap: wrap;
         padding-top: 7px;
+
         p {
+            display: flex;
             width: 50%;
+            margin: 3px 0;
+            span {
+                margin-left: auto;
+                margin-right: 10px;
+            }
         }
     }
 
     .account-actions {
         display: flex;
         justify-content: space-between;
+        gap: 3px;
         margin-top: 10px;
+
         button {
             flex: 1;
-            padding: 7px 0;
+            padding: 5px 0;
             border-radius: 3px;
-            background-color: #4e8977;
+            border-color: #d8edf0;
+            background-color: #e6f6f1;
             font-size: 12px;
-            color: #e7e7e7;
+            color: #629093;
             &:hover {
-                background-color: #437b6a;
-                color: #fff;
+                background-color: #eafff9;
+            }
+        }
+    }
+
+    .account-order {
+        position: relative;
+        fieldset {
+            position: absolute;
+            top: -1000rem;
+            visibility: hidden;
+        }
+        .order-inputs {
+            margin-top: 7px;
+            padding: 0 7px 7px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            border-style: dashed;
+        }
+
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 5px;
+            padding-top: 10px;
+        }
+
+        input[type="number"],
+        select {
+            flex: 1;
+            height: 25px;
+            box-sizing: border-box;
+            padding: 5px;
+            border: 1px solid #ddd;
+            font-size: 12px;
+            color: var(--font-color);
+        }
+
+        select[name="price-option"] {
+            flex: 0.5;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 3px;
+            padding-top: 7px;
+
+            button {
+                flex: 1;
+                padding: 5px;
+                font-size: 12px;
+                color: var(--font-color);
             }
         }
     }

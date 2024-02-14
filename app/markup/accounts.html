@@ -36,19 +36,19 @@
 
             <section class="accounts">
                 <h2>포트폴리오</h2>
-                <div class="accounts-actions">
-                    <button type="button" class="orderedButton">주문내역 Toggle</button>
-                </div>
                 
                 <div class="accountsList" data-loading="true"></div>
 
                 <template id="accountItem">
                     <account-item>
                         <div class="account-item">
-                            <div class="name">
-                                <h3 class="currency"></h3>
-                                <small>| <span class="unitCurrency"></span></small>
-                            </div>
+                            <header>
+                                <div class="name">
+                                    <h3 class="currency"></h3>
+                                    <small>| <span class="unitCurrency"></span> </small>
+                                </div>
+                                <button type="button" class="orderedButton">주문내역 Toggle</button>
+                            </header>
                             <div class="account-contents">
                                 <p>∙ 매수금액 : <span class="buyPrice"></span></p>
                                 <p>∙ 보유수량 : <span class="volume"></span></p>
@@ -60,6 +60,41 @@
                                 <button type="button">매수</button>
                                 <button type="button">매도</button>
                             </div>
+                            <account-order class="account-order">
+                                <form>
+                                    <fieldset>매수 주문</fieldset>
+                                    <div class="order-inputs">
+                                        <div class="order-row">
+                                            <label>
+                                                <input type="radio" name="amount-label" value="price" checked>
+                                                <span>주문총액</span>
+                                            </label>
+                                            <label>
+                                                <input type="radio" name="amount-label" value="amount">
+                                                <span>주문수량</span>
+                                            </label>
+                                            <input type="number" name="amount" min="0" placeholder="주문총액">
+                                        </div>
+                                        <div class="order-row">
+                                            <p>주문가격</p>
+                                            <input type="number" name="price" min="0" placeholder="가격">
+                                            <select name="price-option">
+                                                <option value="-5%">-5%</option>
+                                                <option value="-10%">-10%</option>
+                                                <option value="-20%">-20%</option>
+                                                <option value="-30%">-30%</option>
+                                            </select>
+                                        </div>
+                                        <div class="order-row">
+                                            <input type="number" name="total" min="0" placeholder="총액">
+                                        </div>
+                                    </div>
+                                    <div class="order-actions">
+                                        <button type="reset">초기화</button>
+                                        <button type="submit">매수</button>
+                                    </div>
+                                </form>
+                            </account-order>
                         </div>
                        
                         <div class="ordered">
@@ -84,7 +119,10 @@
                         </div>
                     </ordered-item>
                 </template>
+
             </section>
+
+          
         </app-accounts>
     </body>
 </html>

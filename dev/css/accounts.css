@@ -64,12 +64,6 @@ app-accounts .accounts-actions {
   display: flex;
   margin: 5px var(--margin-side);
 }
-app-accounts .accounts .orderedButton {
-  margin-left: auto;
-  padding: 5px;
-  font-size: 11px;
-  color: var(--font-color);
-}
 app-accounts .accountsList {
   list-style: none;
   margin: 0;
@@ -86,27 +80,32 @@ app-accounts account-item {
   opacity: 1;
 }
 app-accounts account-item:hover {
-  border-color: yellowgreen;
+  border-color: #baddd2;
 }
 app-accounts account-item .account-item {
   padding: var(--margin-side);
-  background-color: #f8f8f8;
+  background-color: #f6fff9;
 }
-app-accounts account-item .name {
+app-accounts account-item header {
+  display: flex;
+  justify-content: space-between;
+}
+app-accounts account-item header .name {
   display: flex;
   align-items: center;
+  margin: 0;
 }
-app-accounts account-item .name h3 {
+app-accounts account-item header .name .currency {
   margin: 0 5px 0 0;
 }
-app-accounts account-item .name .unitCurrency {
+app-accounts account-item header .name .unitCurrency {
   margin-left: 5px;
 }
-app-accounts account-item p {
-  margin: 3px 0;
-}
-app-accounts account-item p span {
-  margin-left: 5px;
+app-accounts account-item header .orderedButton {
+  margin-left: auto;
+  padding: 5px;
+  font-size: 11px;
+  color: var(--font-color);
 }
 app-accounts account-item[data-increase=true] .profit,
 app-accounts account-item[data-increase=true] .profitRate {
@@ -122,24 +121,77 @@ app-accounts .account-contents {
   padding-top: 7px;
 }
 app-accounts .account-contents p {
+  display: flex;
   width: 50%;
+  margin: 3px 0;
+}
+app-accounts .account-contents p span {
+  margin-left: auto;
+  margin-right: 10px;
 }
 app-accounts .account-actions {
   display: flex;
   justify-content: space-between;
+  gap: 3px;
   margin-top: 10px;
 }
 app-accounts .account-actions button {
   flex: 1;
-  padding: 7px 0;
+  padding: 5px 0;
   border-radius: 3px;
-  background-color: #4e8977;
+  border-color: #d8edf0;
+  background-color: #e6f6f1;
   font-size: 12px;
-  color: #e7e7e7;
+  color: #629093;
 }
 app-accounts .account-actions button:hover {
-  background-color: #437b6a;
-  color: #fff;
+  background-color: #eafff9;
+}
+app-accounts .account-order {
+  position: relative;
+}
+app-accounts .account-order fieldset {
+  position: absolute;
+  top: -1000rem;
+  visibility: hidden;
+}
+app-accounts .account-order .order-inputs {
+  margin-top: 7px;
+  padding: 0 7px 7px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  border-style: dashed;
+}
+app-accounts .account-order .order-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+  padding-top: 10px;
+}
+app-accounts .account-order input[type=number],
+app-accounts .account-order select {
+  flex: 1;
+  height: 25px;
+  box-sizing: border-box;
+  padding: 5px;
+  border: 1px solid #ddd;
+  font-size: 12px;
+  color: var(--font-color);
+}
+app-accounts .account-order select[name=price-option] {
+  flex: 0.5;
+}
+app-accounts .account-order .order-actions {
+  display: flex;
+  gap: 3px;
+  padding-top: 7px;
+}
+app-accounts .account-order .order-actions button {
+  flex: 1;
+  padding: 5px;
+  font-size: 12px;
+  color: var(--font-color);
 }
 app-accounts .orderedTitle {
   margin: 0;

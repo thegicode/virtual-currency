@@ -13,23 +13,12 @@ export default class AppAccounts extends HTMLElement {
     constructor() {
         super();
         this.list = this.querySelector(".accountsList");
-        this.orderedButton = this.querySelector(".orderedButton");
         this.markets = [];
-        this.onClickOrderedButton = this.onClickOrderedButton.bind(this);
     }
     connectedCallback() {
         this.loadAccountData();
-        this.orderedButton.addEventListener("click", this.onClickOrderedButton);
     }
-    disconnectedCallback() {
-        this.orderedButton.removeEventListener("click", this.onClickOrderedButton);
-    }
-    onClickOrderedButton() {
-        const ordereds = document.querySelectorAll(".ordered");
-        ordereds.forEach((ordered) => {
-            ordered.hidden = !ordered.hidden;
-        });
-    }
+    disconnectedCallback() { }
     loadAccountData() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
