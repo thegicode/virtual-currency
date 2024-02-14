@@ -37,13 +37,14 @@ async function ordered(req, res) {
         const result = data.map((aData) => {
             return {
                 ...aData,
+                executed_volume: Number(aData.executed_volume),
+                locked: Number(aData.locked),
+                paid_fee: Number(aData.paid_fee),
+                price: Number(aData.price),
                 remaining_fee: Number(aData.remaining_fee),
                 remaining_volume: Number(aData.remaining_volume),
                 reserved_fee: Number(aData.reserved_fee),
                 volume: Number(aData.volume),
-                paid_fee: Number(aData.paid_fee),
-                locked: Number(aData.locked),
-                executed_volume: Number(aData.executed_volume),
             };
         });
 

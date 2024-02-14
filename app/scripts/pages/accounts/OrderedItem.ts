@@ -39,12 +39,11 @@ export default class OrderedItem extends HTMLElement {
 
     private createElement() {
         const cloned = cloneTemplate<HTMLElement>(this.template);
-
         const contentData = {
             created_at: this.formatDateTime(this.data.created_at),
             // ord_type:
             //     this.data.ord_type === "limit" ? "지정가 주문" : "시장가 주문",
-            price: this.data.price,
+            price: this.data.price.toLocaleString(),
             side: this.data.side === "bid" ? "매수" : "매도",
             volume: this.data.volume,
         };

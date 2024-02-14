@@ -33,7 +33,7 @@ export default class OrderedItem extends HTMLElement {
         const cloned = cloneTemplate(this.template);
         const contentData = {
             created_at: this.formatDateTime(this.data.created_at),
-            price: this.data.price,
+            price: this.data.price.toLocaleString(),
             side: this.data.side === "bid" ? "매수" : "매도",
             volume: this.data.volume,
         };

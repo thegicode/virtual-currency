@@ -30,6 +30,10 @@ export default class AccountItem extends HTMLElement {
         this.dataset.increase = isIncrement.toString();
     }
     displayOrdered() {
+        if (this.ordered && this.data.orderedData.length === 0) {
+            this.ordered.hidden = true;
+            return;
+        }
         this.data.orderedData.map((data) => {
             var _a;
             const orderedItem = new OrderedItem(data);

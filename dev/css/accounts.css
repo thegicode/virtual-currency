@@ -103,7 +103,7 @@ app-accounts account-item .name .unitCurrency {
   margin-left: 5px;
 }
 app-accounts account-item p {
-  margin: 7px 0;
+  margin: 3px 0;
 }
 app-accounts account-item p span {
   margin-left: 5px;
@@ -116,17 +116,30 @@ app-accounts account-item[data-increase=false] .profit,
 app-accounts account-item[data-increase=false] .profitRate {
   color: var(--blue-color);
 }
-app-accounts account-item .actions {
+app-accounts .account-contents {
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 7px;
+}
+app-accounts .account-contents p {
+  width: 50%;
+}
+app-accounts .account-actions {
+  display: flex;
+  justify-content: space-between;
   margin-top: 10px;
 }
-app-accounts account-item .actions button {
-  width: 100%;
-  padding: 5px;
-  font-size: 11px;
-  color: var(--font-color);
+app-accounts .account-actions button {
+  flex: 1;
+  padding: 7px 0;
+  border-radius: 3px;
+  background-color: #4e8977;
+  font-size: 12px;
+  color: #e7e7e7;
 }
-app-accounts account-item .actions button:hover {
-  background-color: #fff;
+app-accounts .account-actions button:hover {
+  background-color: #437b6a;
+  color: #fff;
 }
 app-accounts .orderedTitle {
   margin: 0;
@@ -157,6 +170,26 @@ app-accounts ordered-item[data-cancel=true]:after {
   background-color: #00522c;
   color: #c1c1c1;
   opacity: 0.8;
+}
+app-accounts ordered-item .ordered-contents {
+  display: flex;
+  flex-wrap: wrap;
+}
+app-accounts ordered-item .ordered-contents p {
+  width: 50%;
+}
+app-accounts ordered-item .ordered-actions {
+  display: flex;
+  margin-top: 10px;
+}
+app-accounts ordered-item .ordered-actions button {
+  flex: 1;
+  padding: 5px;
+  font-size: 11px;
+  color: var(--font-color);
+}
+app-accounts ordered-item .ordered-actions button:hover {
+  background-color: #fff;
 }
 
 /*# sourceMappingURL=accounts.css.map */

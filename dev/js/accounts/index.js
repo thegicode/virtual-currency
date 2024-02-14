@@ -72,7 +72,7 @@
       const cloned = cloneTemplate(this.template);
       const contentData = {
         created_at: this.formatDateTime(this.data.created_at),
-        price: this.data.price,
+        price: this.data.price.toLocaleString(),
         side: this.data.side === "bid" ? "\uB9E4\uC218" : "\uB9E4\uB3C4",
         volume: this.data.volume
       };
@@ -140,6 +140,10 @@
       this.dataset.increase = isIncrement.toString();
     }
     displayOrdered() {
+      if (this.ordered && this.data.orderedData.length === 0) {
+        this.ordered.hidden = true;
+        return;
+      }
       this.data.orderedData.map((data) => {
         var _a;
         const orderedItem = new OrderedItem(data);

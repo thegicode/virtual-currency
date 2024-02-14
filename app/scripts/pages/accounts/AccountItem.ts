@@ -61,6 +61,11 @@ export default class AccountItem extends HTMLElement {
     }
 
     private displayOrdered() {
+        if (this.ordered && this.data.orderedData.length === 0) {
+            this.ordered.hidden = true;
+            return;
+        }
+
         this.data.orderedData.map((data: IOrdered) => {
             const orderedItem = new OrderedItem(data);
             this.ordered?.appendChild(orderedItem);
