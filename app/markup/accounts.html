@@ -39,7 +39,7 @@
                 
                 <div class="accountsList" data-loading="true"></div>
 
-                <template id="accountItem">
+                <template id="tp-accountItem">
                     <account-item>
                         <div class="account-item">
                             <header>
@@ -57,47 +57,11 @@
                                 <p>∙ 매수평균가 : <span class="avgBuyPrice"></span></p>
                             </div>
                             <div class="account-actions">
-                                <button type="button">매수</button>
+                                <button type="button" class="bidButton">매수</button>
                                 <button type="button">매도</button>
                             </div>
-                            <order-bid class="order-bid">
-                                <form>
-                                    <fieldset>매수 주문</fieldset>
-                                    <div class="order-inputs">
-                                        <div class="order-row">
-                                            <label>
-                                                <input type="radio" name="amount-label" value="price" checked>
-                                                <span>주문총액</span>
-                                            </label>
-                                            <label>
-                                                <input type="radio" name="amount-label" value="amount">
-                                                <span>주문수량</span>
-                                            </label>
-                                            <input type="number" name="amount" min="0" placeholder="주문총액">
-                                        </div>
-                                        <label class="order-row">
-                                            <span class="label">주문가격</span>
-                                            <input type="number" name="price" min="0" placeholder="가격">
-                                            <select name="price-option">
-                                                <option value="-5%">-5%</option>
-                                                <option value="-10%">-10%</option>
-                                                <option value="-20%">-20%</option>
-                                                <option value="-30%">-30%</option>
-                                            </select>
-                                        </label>
-                                        <label class="order-row">
-                                            <span class="label">주문총액</span>
-                                            <input type="number" name="total" min="0" placeholder="총액">
-                                        </label>
-                                    </div>
-                                    <div class="order-actions">
-                                        <button type="reset">초기화</button>
-                                        <button type="submit">매수</button>
-                                    </div>
-                                </form>
-                            </order-bid>
+                            <div id="orderBid"></div>
                         </div>
-                       
                         <div class="ordered">
                             <h4 class="orderedTitle">주문내역</h4>
                         </div>
@@ -105,7 +69,7 @@
                 </div>
                 </template>
 
-                <template id="orderedItem">
+                <template id="tp-orderedItem">
                     <ordered-item>
                         <div class="ordered-contents">
                             <p>∙ 주문종류 : <span class="side"></span></p>
@@ -119,6 +83,54 @@
                             </button>
                         </div>
                     </ordered-item>
+                </template>
+
+                <template id="tp-orderBid">
+                    <!-- <order-bid> -->
+                    <form>
+                        <fieldset>매수 주문</fieldset>
+                        <div class="order-inputs">
+                            <div class="order-row">
+                                <label>
+                                    <input type="radio" name="amount-label" value="price" checked>
+                                    <span>주문총액</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="amount-label" value="amount">
+                                    <span>주문수량</span>
+                                </label>
+                                <input type="number" name="amount" min="0" placeholder="주문총액">
+                            </div>
+                            <label class="order-row">
+                                <span class="label">주문가격</span>
+                                <input type="number" name="price" min="0" placeholder="가격">
+                               
+                                <select name="price-option">
+                                    <option value="-5%">-5%</option>
+                                    <option value="-10%">-10%</option>
+                                    <option value="-10%">-15%</option>
+                                    <option value="-20%">-20%</option>
+                                    <option value="-20%">-25%</option>
+                                    <option value="-30%">-30%</option>
+                                </select>
+                                <label>
+                                    <span>직접입력</span>
+                                    <input type="checkbox" name="check-price-manual">
+                                </label>
+                                <input type="number" name="price-percent" hidden>
+                            </label>
+                            <label class="order-row">
+                                <span class="label">주문총액</span>
+                                <input type="number" name="total" min="0" placeholder="총액">
+                            </label>
+                        </div>
+                        <div class="order-actions">
+                            <button type="submit">매수</button>
+                            <button type="reset">초기화</button>
+                            <button type="button" class="hideButton">x 가리기</button>
+                        </div>
+                    </form>
+                <!-- </order-bid> -->
                 </template>
 
             </section>

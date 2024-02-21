@@ -13,7 +13,7 @@ export default class OrderedItem extends HTMLElement {
         super();
         this.cancelButton = null;
         this.data = data;
-        this.template = document.querySelector("#orderedItem");
+        this.template = document.querySelector("#tp-orderedItem");
         this.cancelButton = null;
         this.onCancel = this.onCancel.bind(this);
     }

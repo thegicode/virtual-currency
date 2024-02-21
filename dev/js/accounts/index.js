@@ -19,6 +19,36 @@
     return Math.round(amount * decimalPoint) / decimalPoint;
   }
 
+  // dev/scripts/pages/accounts/OrderBid.js
+  var OrderBid = class extends HTMLElement {
+    constructor(button) {
+      super();
+      this.hideButton = null;
+      this.callButton = button;
+      this.template = document.querySelector("#tp-orderBid");
+      this.hideButton = null;
+      this.show = this.show.bind(this);
+      this.hide = this.hide.bind(this);
+    }
+    connectedCallback() {
+      this.render();
+      this.hideButton = this.querySelector(".hideButton");
+      this.hideButton.addEventListener("click", this.hide);
+    }
+    show() {
+      this.hidden = false;
+    }
+    hide() {
+      this.hidden = true;
+      if (this.callButton)
+        this.callButton.disabled = false;
+    }
+    render() {
+      const cloned = cloneTemplate(this.template);
+      this.appendChild(cloned);
+    }
+  };
+
   // dev/scripts/pages/accounts/OrderedItem.js
   var __awaiter = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
@@ -52,7 +82,7 @@
       super();
       this.cancelButton = null;
       this.data = data;
-      this.template = document.querySelector("#orderedItem");
+      this.template = document.querySelector("#tp-orderedItem");
       this.cancelButton = null;
       this.onCancel = this.onCancel.bind(this);
     }
@@ -115,28 +145,47 @@
       super();
       this.orderedButton = null;
       this.ordered = null;
+      this.bidButton = null;
+      this.orderBid = null;
       this.data = data;
-      this.template = document.querySelector("#accountItem");
+      this.template = document.querySelector("#tp-accountItem");
       this.orderedButton = null;
       this.ordered = null;
+      this.bidButton = null;
       this.handleOrdered = this.handleOrdered.bind(this);
+      this.handleOrderBid = this.handleOrderBid.bind(this);
     }
     connectedCallback() {
-      var _a;
+      var _a, _b;
       this.createElement();
       this.orderedButton = this.querySelector(".orderedButton");
       this.ordered = this.querySelector(".ordered");
+      this.bidButton = this.querySelector(".bidButton");
       this.displayOrdered();
       (_a = this.orderedButton) === null || _a === void 0 ? void 0 : _a.addEventListener("click", this.handleOrdered);
+      (_b = this.bidButton) === null || _b === void 0 ? void 0 : _b.addEventListener("click", this.handleOrderBid);
     }
     disconnectedCallback() {
-      var _a;
+      var _a, _b;
       (_a = this.orderedButton) === null || _a === void 0 ? void 0 : _a.removeEventListener("click", this.handleOrdered);
+      (_b = this.bidButton) === null || _b === void 0 ? void 0 : _b.removeEventListener("click", this.handleOrderBid);
     }
     handleOrdered() {
       if (!this.ordered)
         return;
       this.ordered.hidden = !this.ordered.hidden;
+    }
+    handleOrderBid() {
+      var _a;
+      if (!this.bidButton)
+        return;
+      if (this.orderBid) {
+        this.orderBid.show();
+        return;
+      }
+      this.orderBid = new OrderBid(this.bidButton);
+      (_a = this.querySelector("#orderBid")) === null || _a === void 0 ? void 0 : _a.replaceWith(this.orderBid);
+      this.bidButton.disabled = true;
     }
     createElement() {
       const cloned = cloneTemplate(this.template);
@@ -296,6 +345,7 @@
   // dev/scripts/pages/accounts/index.js
   customElements.define("app-accounts", AppAccounts);
   customElements.define("account-item", AccountItem);
+  customElements.define("order-bid", OrderBid);
   customElements.define("ordered-item", OrderedItem);
 })();
 //# sourceMappingURL=index.js.map

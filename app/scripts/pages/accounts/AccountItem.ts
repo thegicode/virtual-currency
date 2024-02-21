@@ -3,6 +3,7 @@ import {
     roundToDecimalPlace,
     updateElementsTextWithData,
 } from "@scripts/utils/helpers";
+import OrderBid from "./OrderBid";
 import OrderedItem from "./OrderedItem";
 
 export default class AccountItem extends HTMLElement {
@@ -10,6 +11,8 @@ export default class AccountItem extends HTMLElement {
     private template: HTMLTemplateElement;
     private orderedButton: HTMLButtonElement | null = null;
     private ordered: HTMLElement | null = null;
+    private bidButton: HTMLButtonElement | null = null;
+    private orderBid: OrderBid | null = null;
 
     constructor(data: IProcessedAccountData) {
         super();
@@ -17,13 +20,15 @@ export default class AccountItem extends HTMLElement {
         this.data = data;
 
         this.template = document.querySelector(
-            "#accountItem"
+            "#tp-accountItem"
         ) as HTMLTemplateElement;
 
         this.orderedButton = null;
         this.ordered = null;
+        this.bidButton = null;
 
         this.handleOrdered = this.handleOrdered.bind(this);
+        this.handleOrderBid = this.handleOrderBid.bind(this);
     }
 
     connectedCallback() {
@@ -32,21 +37,35 @@ export default class AccountItem extends HTMLElement {
         this.orderedButton = this.querySelector(
             ".orderedButton"
         ) as HTMLButtonElement;
-
         this.ordered = this.querySelector(".ordered") as HTMLElement;
+        this.bidButton = this.querySelector(".bidButton") as HTMLButtonElement;
 
         this.displayOrdered();
 
         this.orderedButton?.addEventListener("click", this.handleOrdered);
+        this.bidButton?.addEventListener("click", this.handleOrderBid);
     }
 
     disconnectedCallback() {
         this.orderedButton?.removeEventListener("click", this.handleOrdered);
+        this.bidButton?.removeEventListener("click", this.handleOrderBid);
     }
 
     private handleOrdered() {
         if (!this.ordered) return;
         this.ordered.hidden = !this.ordered.hidden;
+    }
+
+    private handleOrderBid() {
+        if (!this.bidButton) return;
+        if (this.orderBid) {
+            this.orderBid.show();
+            return;
+        }
+
+        this.orderBid = new OrderBid(this.bidButton);
+        this.querySelector("#orderBid")?.replaceWith(this.orderBid);
+        this.bidButton.disabled = true;
     }
 
     private createElement() {
