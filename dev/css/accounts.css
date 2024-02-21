@@ -3,6 +3,7 @@ body {
   --margin-side: 1rem;
   --transition-duration: 1.5s;
   --font-color: #666;
+  --border-color: #bfe3d4;
 }
 
 body {
@@ -74,68 +75,72 @@ app-accounts .accountsList {
 app-accounts .accountsList[data-loading=true] {
   opacity: 0;
 }
-app-accounts account-item {
+
+account-item {
   display: block;
-  border-top: 1px solid #ddd;
+  border-top: 2px solid var(--border-color);
   opacity: 1;
 }
-app-accounts account-item:hover {
+account-item:hover {
   border-color: #baddd2;
 }
-app-accounts account-item .account-item {
+account-item .account-item {
   padding: var(--margin-side);
   background-color: #f6fff9;
 }
-app-accounts account-item header {
+account-item header {
   display: flex;
   justify-content: space-between;
 }
-app-accounts account-item header .name {
+account-item header .name {
   display: flex;
   align-items: center;
   margin: 0;
 }
-app-accounts account-item header .name .currency {
+account-item header .name .currency {
   margin: 0 5px 0 0;
 }
-app-accounts account-item header .name .unitCurrency {
+account-item header .name .unitCurrency {
   margin-left: 5px;
 }
-app-accounts account-item header .orderedButton {
+account-item header .orderedButton {
   margin-left: auto;
-  padding: 5px;
+  padding: 5px 10px;
   font-size: 11px;
   color: var(--font-color);
 }
-app-accounts account-item[data-increase=true] .profit,
-app-accounts account-item[data-increase=true] .profitRate {
+account-item header .orderedButton:hover {
+  background-color: #fff;
+}
+account-item[data-increase=true] .profit,
+account-item[data-increase=true] .profitRate {
   color: var(--red-color);
 }
-app-accounts account-item[data-increase=false] .profit,
-app-accounts account-item[data-increase=false] .profitRate {
+account-item[data-increase=false] .profit,
+account-item[data-increase=false] .profitRate {
   color: var(--blue-color);
 }
-app-accounts .account-contents {
+account-item .account-contents {
   display: flex;
   flex-wrap: wrap;
   padding-top: 7px;
 }
-app-accounts .account-contents p {
+account-item .account-contents p {
   display: flex;
   width: 50%;
   margin: 3px 0;
 }
-app-accounts .account-contents p span {
+account-item .account-contents p span {
   margin-left: auto;
   margin-right: 10px;
 }
-app-accounts .account-actions {
+account-item .account-actions {
   display: flex;
   justify-content: space-between;
   gap: 3px;
   margin-top: 10px;
 }
-app-accounts .account-actions button {
+account-item .account-actions button {
   flex: 1;
   padding: 5px 0;
   border-radius: 3px;
@@ -144,71 +149,78 @@ app-accounts .account-actions button {
   font-size: 12px;
   color: #629093;
 }
-app-accounts .account-actions button:hover {
+account-item .account-actions button:hover {
   background-color: #eafff9;
 }
-app-accounts .account-order {
+
+order-bid {
   position: relative;
 }
-app-accounts .account-order fieldset {
+order-bid fieldset {
   position: absolute;
   top: -1000rem;
   visibility: hidden;
 }
-app-accounts .account-order .order-inputs {
+order-bid .order-inputs {
   margin-top: 7px;
   padding: 0 7px 7px;
   border-radius: 5px;
   border: 1px solid #ddd;
   border-style: dashed;
 }
-app-accounts .account-order .order-row {
+order-bid .order-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 5px;
+  gap: 7px;
   padding-top: 10px;
 }
-app-accounts .account-order input[type=number],
-app-accounts .account-order select {
+order-bid input[type=number],
+order-bid select {
   flex: 1;
   height: 25px;
   box-sizing: border-box;
   padding: 5px;
-  border: 1px solid #ddd;
+  border: 1px solid #e8eeef;
+  background-color: transparent;
   font-size: 12px;
   color: var(--font-color);
 }
-app-accounts .account-order select[name=price-option] {
+order-bid select[name=price-option] {
   flex: 0.5;
 }
-app-accounts .account-order .order-actions {
+order-bid .order-actions {
   display: flex;
   gap: 3px;
   padding-top: 7px;
 }
-app-accounts .account-order .order-actions button {
+order-bid .order-actions button {
   flex: 1;
   padding: 5px;
   font-size: 12px;
   color: var(--font-color);
 }
-app-accounts .orderedTitle {
+
+.ordered {
+  border-top: 1px dashed var(--border-color);
+}
+.ordered .orderedTitle {
   margin: 0;
   padding: 1rem var(--margin-side) 0;
 }
-app-accounts ordered-item {
+
+ordered-item {
   display: block;
   position: relative;
-  margin: var(--margin-side);
+  padding: var(--margin-side);
 }
-app-accounts ordered-item[data-side=ask] .side {
+ordered-item[data-side=ask] .side {
   color: var(--blue-color);
 }
-app-accounts ordered-item[data-side=bid] .side {
+ordered-item[data-side=bid] .side {
   color: var(--red-color);
 }
-app-accounts ordered-item[data-cancel=true]:after {
+ordered-item[data-cancel=true]:after {
   content: "취소되었습니다.";
   display: flex;
   align-items: center;
@@ -223,24 +235,28 @@ app-accounts ordered-item[data-cancel=true]:after {
   color: #c1c1c1;
   opacity: 0.8;
 }
-app-accounts ordered-item .ordered-contents {
+ordered-item .ordered-contents {
   display: flex;
   flex-wrap: wrap;
 }
-app-accounts ordered-item .ordered-contents p {
+ordered-item .ordered-contents p {
   width: 50%;
+  margin: 5px 0;
 }
-app-accounts ordered-item .ordered-actions {
+ordered-item .ordered-contents p span {
+  margin-left: 5px;
+}
+ordered-item .ordered-actions {
   display: flex;
   margin-top: 10px;
 }
-app-accounts ordered-item .ordered-actions button {
+ordered-item .ordered-actions button {
   flex: 1;
   padding: 5px;
   font-size: 11px;
   color: var(--font-color);
 }
-app-accounts ordered-item .ordered-actions button:hover {
+ordered-item .ordered-actions button:hover {
   background-color: #fff;
 }
 

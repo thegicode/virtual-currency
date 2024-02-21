@@ -22,11 +22,11 @@ export default class AppAccounts extends HTMLElement {
     loadAccountData() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const accountsResponse = yield this.fetchData(`/accounts`);
+                const accountsResponse = yield this.fetchData(`/fetchAccounts`);
                 this.markets = accountsResponse.accounts.map((account) => account.market);
-                const tickerResponse = yield this.fetchData(`/ticker?markets=${encodeURIComponent(this.markets.join(","))}`);
+                const tickerResponse = yield this.fetchData(`/fetchTickers?markets=${encodeURIComponent(this.markets.join(","))}`);
                 this.displayAssets(accountsResponse.assets);
-                const orderedResponse = yield this.fetchData(`/ordered`);
+                const orderedResponse = yield this.fetchData(`/fetchOrdered`);
                 const orderedData = this.ordered(orderedResponse);
                 const processedAccounts = yield this.processAccountsData(accountsResponse.accounts, tickerResponse, orderedData);
                 this.renderAccountsList(processedAccounts);

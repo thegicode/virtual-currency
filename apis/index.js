@@ -1,13 +1,13 @@
-const accounts = require("./accounts");
-const ordered = require("./ordered");
-const cancel = require("./cancel");
-const ticker = require("./ticker");
+const fetchAccounts = require("./accounts");
+const cancelOrder = require("./cancelOrder");
+const fetchOrdereds = require("./ordereds");
+const fetchTickers = require("./tickers");
 
 const setupApiEndpoints = (app) => {
-    app.get("/accounts", accounts);
-    app.get("/cancel", cancel);
-    app.get("/ordered", ordered);
-    app.get("/ticker", ticker);
+    app.get("/fetchAccounts", fetchAccounts);
+    app.get("/cancelOrder", cancelOrder);
+    app.get("/fetchOrdered", fetchOrdereds);
+    app.get("/fetchTickers", fetchTickers);
 };
 
 module.exports = setupApiEndpoints;

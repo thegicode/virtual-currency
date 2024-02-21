@@ -1,6 +1,6 @@
 const URL = require("../server/config/URL");
 
-async function ticker(req, res) {
+async function tickers(req, res) {
     const markets = req.query.markets.replace(/,/g, "%2C%20");
 
     try {
@@ -14,4 +14,4 @@ async function ticker(req, res) {
     }
 }
 
-module.exports = ticker;
+module.exports = tickers;

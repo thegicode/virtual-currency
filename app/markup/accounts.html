@@ -60,7 +60,7 @@
                                 <button type="button">매수</button>
                                 <button type="button">매도</button>
                             </div>
-                            <account-order class="account-order">
+                            <order-bid class="order-bid">
                                 <form>
                                     <fieldset>매수 주문</fieldset>
                                     <div class="order-inputs">
@@ -75,8 +75,8 @@
                                             </label>
                                             <input type="number" name="amount" min="0" placeholder="주문총액">
                                         </div>
-                                        <div class="order-row">
-                                            <p>주문가격</p>
+                                        <label class="order-row">
+                                            <span class="label">주문가격</span>
                                             <input type="number" name="price" min="0" placeholder="가격">
                                             <select name="price-option">
                                                 <option value="-5%">-5%</option>
@@ -84,17 +84,18 @@
                                                 <option value="-20%">-20%</option>
                                                 <option value="-30%">-30%</option>
                                             </select>
-                                        </div>
-                                        <div class="order-row">
+                                        </label>
+                                        <label class="order-row">
+                                            <span class="label">주문총액</span>
                                             <input type="number" name="total" min="0" placeholder="총액">
-                                        </div>
+                                        </label>
                                     </div>
                                     <div class="order-actions">
                                         <button type="reset">초기화</button>
                                         <button type="submit">매수</button>
                                     </div>
                                 </form>
-                            </account-order>
+                            </order-bid>
                         </div>
                        
                         <div class="ordered">

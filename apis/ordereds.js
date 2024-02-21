@@ -6,7 +6,7 @@ const queryEncode = require("querystring").encode;
 const { ACCESS_KEY, SECRET_KEY } = require("../server/config/key");
 const URL = require("../server/config/URL");
 
-async function ordered(req, res) {
+async function ordereds(req, res) {
     const query = queryEncode({ state: "wait" });
     const hash = crypto.createHash("sha512");
     const queryHash = hash.update(query, "utf-8").digest("hex");
@@ -55,4 +55,4 @@ async function ordered(req, res) {
     }
 }
 
-module.exports = ordered;
+module.exports = ordereds;

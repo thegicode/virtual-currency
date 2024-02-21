@@ -25,19 +25,21 @@ export default class AppAccounts extends HTMLElement {
 
     private async loadAccountData() {
         try {
-            const accountsResponse = await this.fetchData(`/accounts`);
+            const accountsResponse = await this.fetchData(`/fetchAccounts`);
 
             this.markets = accountsResponse.accounts.map(
                 (account: IAccount) => account.market
             );
 
             const tickerResponse = await this.fetchData(
-                `/ticker?markets=${encodeURIComponent(this.markets.join(","))}`
+                `/fetchTickers?markets=${encodeURIComponent(
+                    this.markets.join(",")
+                )}`
             );
 
             this.displayAssets(accountsResponse.assets);
 
-            const orderedResponse = await this.fetchData(`/ordered`);
+            const orderedResponse = await this.fetchData(`/fetchOrdered`);
             const orderedData = this.ordered(orderedResponse) as Record<
                 string,
                 IOrdered[]

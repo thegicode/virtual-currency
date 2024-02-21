@@ -46,7 +46,7 @@ export default class OrderedItem extends HTMLElement {
                 return;
             this.cancelButton.disabled = true;
             try {
-                const response = yield fetch(`/cancel?uuid=${this.data.uuid}`);
+                const response = yield fetch(`/cancelOrder?uuid=${this.data.uuid}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

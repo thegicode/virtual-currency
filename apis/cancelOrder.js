@@ -6,7 +6,7 @@ const queryEncode = require("querystring").encode;
 const { ACCESS_KEY, SECRET_KEY } = require("../server/config/key");
 const URL = require("../server/config/URL");
 
-async function cancel(req, res) {
+async function cancelOrder(req, res) {
     const body = {
         uuid: req.query.uuid,
     };
@@ -45,4 +45,4 @@ async function cancel(req, res) {
     }
 }
 
-module.exports = cancel;
+module.exports = cancelOrder;

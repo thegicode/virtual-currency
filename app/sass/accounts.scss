@@ -68,54 +68,58 @@ app-accounts {
             opacity: 0;
         }
     }
+}
 
-    account-item {
-        display: block;
-        border-top: 1px solid #ddd;
-        opacity: 1;
+account-item {
+    display: block;
+    border-top: 2px solid var(--border-color);
 
-        &:hover {
-            border-color: #baddd2;
-        }
+    opacity: 1;
 
-        .account-item {
-            padding: var(--margin-side);
-            background-color: #f6fff9;
-        }
+    &:hover {
+        border-color: #baddd2;
+    }
 
-        header {
+    .account-item {
+        padding: var(--margin-side);
+        background-color: #f6fff9;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        .name {
             display: flex;
-            justify-content: space-between;
-            .name {
-                display: flex;
-                align-items: center;
-                margin: 0;
-                .currency {
-                    margin: 0 5px 0 0;
-                }
-                .unitCurrency {
-                    margin-left: 5px;
-                }
+            align-items: center;
+            margin: 0;
+            .currency {
+                margin: 0 5px 0 0;
             }
-            .orderedButton {
-                margin-left: auto;
-                padding: 5px;
-                font-size: 11px;
-                color: var(--font-color);
+            .unitCurrency {
+                margin-left: 5px;
             }
         }
+        .orderedButton {
+            margin-left: auto;
+            padding: 5px 10px;
+            font-size: 11px;
+            color: var(--font-color);
+            &:hover {
+                background-color: #fff;
+            }
+        }
+    }
 
-        &[data-increase="true"] {
-            .profit,
-            .profitRate {
-                color: var(--red-color);
-            }
+    &[data-increase="true"] {
+        .profit,
+        .profitRate {
+            color: var(--red-color);
         }
-        &[data-increase="false"] {
-            .profit,
-            .profitRate {
-                color: var(--blue-color);
-            }
+    }
+    &[data-increase="false"] {
+        .profit,
+        .profitRate {
+            color: var(--blue-color);
         }
     }
 
@@ -154,118 +158,123 @@ app-accounts {
             }
         }
     }
+}
 
-    .account-order {
-        position: relative;
-        fieldset {
-            position: absolute;
-            top: -1000rem;
-            visibility: hidden;
-        }
-        .order-inputs {
-            margin-top: 7px;
-            padding: 0 7px 7px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            border-style: dashed;
-        }
+order-bid {
+    position: relative;
+    fieldset {
+        position: absolute;
+        top: -1000rem;
+        visibility: hidden;
+    }
+    .order-inputs {
+        margin-top: 7px;
+        padding: 0 7px 7px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        border-style: dashed;
+    }
 
-        .order-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 5px;
-            padding-top: 10px;
-        }
+    .order-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 7px;
+        padding-top: 10px;
+    }
 
-        input[type="number"],
-        select {
+    input[type="number"],
+    select {
+        flex: 1;
+        height: 25px;
+        box-sizing: border-box;
+        padding: 5px;
+        border: 1px solid #e8eeef;
+        background-color: transparent;
+        font-size: 12px;
+        color: var(--font-color);
+    }
+
+    select[name="price-option"] {
+        flex: 0.5;
+    }
+
+    .order-actions {
+        display: flex;
+        gap: 3px;
+        padding-top: 7px;
+
+        button {
             flex: 1;
-            height: 25px;
-            box-sizing: border-box;
             padding: 5px;
-            border: 1px solid #ddd;
             font-size: 12px;
             color: var(--font-color);
         }
-
-        select[name="price-option"] {
-            flex: 0.5;
-        }
-
-        .order-actions {
-            display: flex;
-            gap: 3px;
-            padding-top: 7px;
-
-            button {
-                flex: 1;
-                padding: 5px;
-                font-size: 12px;
-                color: var(--font-color);
-            }
-        }
     }
+}
 
-    // .ordered {
-
-    // }
+.ordered {
+    border-top: 1px dashed var(--border-color);
 
     .orderedTitle {
         margin: 0;
         padding: 1rem var(--margin-side) 0;
     }
+}
 
-    ordered-item {
-        display: block;
-        position: relative;
-        margin: var(--margin-side);
-        // border-bottom: 1px dashed #ddd;
+ordered-item {
+    display: block;
+    position: relative;
+    padding: var(--margin-side);
+    // border-bottom: 1px dashed #ddd;
 
-        &[data-side="ask"] .side {
-            color: var(--blue-color);
+    &[data-side="ask"] .side {
+        color: var(--blue-color);
+    }
+    &[data-side="bid"] .side {
+        color: var(--red-color);
+    }
+    &[data-cancel="true"] {
+        &:after {
+            content: "취소되었습니다.";
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            border-radius: 7px;
+            background-color: #00522c;
+            color: #c1c1c1;
+            opacity: 0.8;
         }
-        &[data-side="bid"] .side {
-            color: var(--red-color);
-        }
-        &[data-cancel="true"] {
-            &:after {
-                content: "취소되었습니다.";
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                position: absolute;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                left: 0;
-                border-radius: 7px;
-                background-color: #00522c;
-                color: #c1c1c1;
-                opacity: 0.8;
+    }
+
+    .ordered-contents {
+        display: flex;
+        flex-wrap: wrap;
+
+        p {
+            width: 50%;
+            margin: 5px 0;
+            span {
+                margin-left: 5px;
             }
         }
+    }
 
-        .ordered-contents {
-            display: flex;
-            flex-wrap: wrap;
-
-            p {
-                width: 50%;
-            }
-        }
-
-        .ordered-actions {
-            display: flex;
-            margin-top: 10px;
-            button {
-                flex: 1;
-                padding: 5px;
-                font-size: 11px;
-                color: var(--font-color);
-                &:hover {
-                    background-color: #fff;
-                }
+    .ordered-actions {
+        display: flex;
+        margin-top: 10px;
+        button {
+            flex: 1;
+            padding: 5px;
+            font-size: 11px;
+            color: var(--font-color);
+            &:hover {
+                background-color: #fff;
             }
         }
     }
