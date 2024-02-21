@@ -71,8 +71,11 @@ app-accounts {
 }
 
 account-item {
+    overflow: hidden;
     display: block;
-    border-top: 2px solid var(--border-color);
+    margin: 5px;
+    border-radius: 7px;
+    border: 2px solid var(--border-color);
 
     opacity: 1;
 
@@ -94,6 +97,11 @@ account-item {
             margin: 0;
             .currency {
                 margin: 0 5px 0 0;
+                font-size: 1.5rem;
+                color: #326fa1;
+            }
+            small {
+                color: #8f8f8f;
             }
             .unitCurrency {
                 margin-left: 5px;
@@ -141,17 +149,16 @@ account-item {
 
     .account-actions {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end;
         gap: 3px;
         margin-top: 10px;
 
         button {
-            flex: 1;
-            padding: 3px 0;
+            padding: 3px 7px;
             border-radius: 3px;
             border-color: #d8edf0;
             background-color: #e6f6f1;
-            font-size: 12px;
+            font-size: 11px;
             color: #629093;
             &:hover {
                 background-color: #eafff9;
@@ -162,25 +169,32 @@ account-item {
 
 order-bid {
     position: relative;
+
+    form {
+        display: block;
+        margin-top: 7px;
+        padding: 7px;
+        border-radius: 5px;
+        border: 1px inset #ddd;
+    }
+
     fieldset {
         position: absolute;
         top: -1000rem;
         visibility: hidden;
     }
     .order-inputs {
-        margin-top: 7px;
-        padding: 0 7px 7px;
-        border-radius: 5px;
-        border: 1px solid #ddd;
-        border-style: dashed;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        // padding: 0 5px 5px;
     }
 
     .order-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 7px;
-        padding-top: 10px;
+        gap: 5px;
     }
 
     input[type="number"],
@@ -199,6 +213,21 @@ order-bid {
         flex: 0.5;
     }
 
+    input[name="price-percent"] {
+        display: none;
+    }
+
+    input[name="check-price-manual"] {
+        &:checked {
+            & + select {
+                display: none;
+            }
+            & ~ input[name="price-percent"] {
+                display: block;
+            }
+        }
+    }
+
     .order-actions {
         display: flex;
         gap: 3px;
@@ -206,8 +235,8 @@ order-bid {
 
         button {
             flex: 1;
-            padding: 5px;
-            font-size: 12px;
+            padding: 3px;
+            font-size: 11px;
             color: var(--font-color);
         }
     }
@@ -267,10 +296,10 @@ ordered-item {
 
     .ordered-actions {
         display: flex;
+        justify-content: flex-end;
         margin-top: 10px;
         button {
-            flex: 1;
-            padding: 5px;
+            padding: 3px 7px;
             font-size: 11px;
             color: var(--font-color);
             &:hover {

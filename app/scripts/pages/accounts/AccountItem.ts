@@ -27,12 +27,12 @@ export default class AccountItem extends HTMLElement {
         this.ordered = null;
         this.bidButton = null;
 
-        this.handleOrdered = this.handleOrdered.bind(this);
+        this.handleOrdereds = this.handleOrdereds.bind(this);
         this.handleOrderBid = this.handleOrderBid.bind(this);
     }
 
     connectedCallback() {
-        this.createElement();
+        this.render();
 
         this.orderedButton = this.querySelector(
             ".orderedButton"
@@ -40,35 +40,18 @@ export default class AccountItem extends HTMLElement {
         this.ordered = this.querySelector(".ordered") as HTMLElement;
         this.bidButton = this.querySelector(".bidButton") as HTMLButtonElement;
 
-        this.displayOrdered();
+        this.renderOrdereds();
 
-        this.orderedButton?.addEventListener("click", this.handleOrdered);
+        this.orderedButton?.addEventListener("click", this.handleOrdereds);
         this.bidButton?.addEventListener("click", this.handleOrderBid);
     }
 
     disconnectedCallback() {
-        this.orderedButton?.removeEventListener("click", this.handleOrdered);
+        this.orderedButton?.removeEventListener("click", this.handleOrdereds);
         this.bidButton?.removeEventListener("click", this.handleOrderBid);
     }
 
-    private handleOrdered() {
-        if (!this.ordered) return;
-        this.ordered.hidden = !this.ordered.hidden;
-    }
-
-    private handleOrderBid() {
-        if (!this.bidButton) return;
-        if (this.orderBid) {
-            this.orderBid.show();
-            return;
-        }
-
-        this.orderBid = new OrderBid(this.bidButton);
-        this.querySelector("#orderBid")?.replaceWith(this.orderBid);
-        this.bidButton.disabled = true;
-    }
-
-    private createElement() {
+    private render() {
         const cloned = cloneTemplate<HTMLElement>(this.template);
 
         const contentData = {
@@ -98,15 +81,38 @@ export default class AccountItem extends HTMLElement {
         // this.ordersChance(anAccount.market);
     }
 
-    private displayOrdered() {
+    // Ordereds
+    private renderOrdereds() {
         if (this.ordered && this.data.orderedData.length === 0) {
             this.ordered.hidden = true;
             return;
         }
-
         this.data.orderedData.map((data: IOrdered) => {
             const orderedItem = new OrderedItem(data);
             this.ordered?.appendChild(orderedItem);
         });
+    }
+    private handleOrdereds() {
+        if (!this.ordered) return;
+        this.ordered.hidden = !this.ordered.hidden;
+    }
+
+    // OrderBid
+    private handleOrderBid() {
+        if (this.orderBid) {
+            this.orderBid.show();
+            return;
+        }
+
+        this.orderBid = new OrderBid(this);
+        this.querySelector("#orderBid")?.replaceWith(this.orderBid);
+    }
+    public showOrderBid() {
+        if (!this.bidButton) return;
+        this.bidButton.disabled = true;
+    }
+    public hideOrderBid() {
+        if (!this.bidButton) return;
+        this.bidButton.disabled = false;
     }
 }

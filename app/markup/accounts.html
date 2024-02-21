@@ -91,36 +91,31 @@
                         <fieldset>매수 주문</fieldset>
                         <div class="order-inputs">
                             <div class="order-row">
-                                <label>
+                                <!-- <label>
                                     <input type="radio" name="amount-label" value="price" checked>
                                     <span>주문총액</span>
-                                </label>
+                                </label> 
                                 <label>
                                     <input type="radio" name="amount-label" value="amount">
                                     <span>주문수량</span>
-                                </label>
+                                </label> -->
                                 <input type="number" name="amount" min="0" placeholder="주문총액">
                             </div>
                             <label class="order-row">
-                                <span class="label">주문가격</span>
+                                <!-- <span class="label">주문가격</span> -->
                                 <input type="number" name="price" min="0" placeholder="가격">
                                
+                                <label for="check-price">직접입력</label>
+                                <input type="checkbox" name="check-price-manual" id="check-price">
                                 <select name="price-option">
                                     <option value="-5%">-5%</option>
                                     <option value="-10%">-10%</option>
-                                    <option value="-10%">-15%</option>
                                     <option value="-20%">-20%</option>
-                                    <option value="-20%">-25%</option>
-                                    <option value="-30%">-30%</option>
                                 </select>
-                                <label>
-                                    <span>직접입력</span>
-                                    <input type="checkbox" name="check-price-manual">
-                                </label>
-                                <input type="number" name="price-percent" hidden>
+                                <input type="number" name="price-percent" placeholder="%">
                             </label>
                             <label class="order-row">
-                                <span class="label">주문총액</span>
+                                <!-- <span class="label">총액</span> -->
                                 <input type="number" name="total" min="0" placeholder="총액">
                             </label>
                         </div>

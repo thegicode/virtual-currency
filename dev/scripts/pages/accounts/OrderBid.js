@@ -1,9 +1,9 @@
 import { cloneTemplate } from "@app/scripts/utils/helpers";
 export default class OrderBid extends HTMLElement {
-    constructor(button) {
+    constructor(parent) {
         super();
         this.hideButton = null;
-        this.callButton = button;
+        this.parent = parent;
         this.template = document.querySelector("#tp-orderBid");
         this.hideButton = null;
         this.show = this.show.bind(this);
@@ -14,17 +14,18 @@ export default class OrderBid extends HTMLElement {
         this.hideButton = this.querySelector(".hideButton");
         this.hideButton.addEventListener("click", this.hide);
     }
-    show() {
-        this.hidden = false;
-    }
-    hide() {
-        this.hidden = true;
-        if (this.callButton)
-            this.callButton.disabled = false;
-    }
     render() {
         const cloned = cloneTemplate(this.template);
         this.appendChild(cloned);
+        this.show();
+    }
+    show() {
+        this.hidden = false;
+        this.parent.showOrderBid();
+    }
+    hide() {
+        this.hidden = true;
+        this.parent.hideOrderBid();
     }
 }
 //# sourceMappingURL=OrderBid.js.map

@@ -2,14 +2,14 @@ import { cloneTemplate } from "@app/scripts/utils/helpers";
 import AccountItem from "./AccountItem";
 
 export default class OrderBid extends HTMLElement {
+    private parent: AccountItem;
     private template: HTMLTemplateElement;
-    private callButton: HTMLButtonElement;
     private hideButton: HTMLButtonElement | null = null;
 
-    constructor(button: HTMLButtonElement) {
+    constructor(parent: AccountItem) {
         super();
 
-        this.callButton = button as HTMLButtonElement;
+        this.parent = parent as AccountItem;
 
         this.template = document.querySelector(
             "#tp-orderBid"
@@ -31,17 +31,19 @@ export default class OrderBid extends HTMLElement {
         this.hideButton.addEventListener("click", this.hide);
     }
 
+    private render() {
+        const cloned = cloneTemplate(this.template);
+        this.appendChild(cloned);
+        this.show();
+    }
+
     public show() {
         this.hidden = false;
+        this.parent.showOrderBid();
     }
 
     private hide() {
         this.hidden = true;
-        if (this.callButton) this.callButton.disabled = false;
-    }
-
-    private render() {
-        const cloned = cloneTemplate(this.template);
-        this.appendChild(cloned);
+        this.parent.hideOrderBid();
     }
 }
