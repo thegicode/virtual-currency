@@ -31,6 +31,10 @@ export default class AccountItem extends HTMLElement {
         this.handleOrderBid = this.handleOrderBid.bind(this);
     }
 
+    get avgBuyPrice() {
+        return this.data.avgBuyPrice;
+    }
+
     connectedCallback() {
         this.render();
 

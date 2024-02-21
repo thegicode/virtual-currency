@@ -139,7 +139,7 @@ export default class AppAccounts extends HTMLElement {
     private renderAccountsList(data: IProcessedAccountData[]) {
         const fragment = new DocumentFragment();
 
-        data.map((data) => new AccountItem(data)).forEach((accountItem) => {
+        data.map((aData) => new AccountItem(aData)).forEach((accountItem) => {
             fragment.appendChild(accountItem);
         });
 

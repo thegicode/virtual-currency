@@ -173,9 +173,8 @@ order-bid {
     form {
         display: block;
         margin-top: 7px;
-        padding: 7px;
+        padding: 7px 0;
         border-radius: 5px;
-        border: 1px inset #ddd;
     }
 
     fieldset {
@@ -197,6 +196,7 @@ order-bid {
         gap: 5px;
     }
 
+    input[type="text"],
     input[type="number"],
     select {
         flex: 1;
@@ -213,16 +213,16 @@ order-bid {
         flex: 0.5;
     }
 
-    input[name="price-percent"] {
+    input[name="price-manual"] {
         display: none;
     }
 
     input[name="check-price-manual"] {
         &:checked {
-            & + select {
+            & ~ select {
                 display: none;
             }
-            & ~ input[name="price-percent"] {
+            & ~ input[name="price-manual"] {
                 display: block;
             }
         }
@@ -230,12 +230,12 @@ order-bid {
 
     .order-actions {
         display: flex;
+        justify-content: flex-end;
         gap: 3px;
-        padding-top: 7px;
+        padding-top: 5px;
 
         button {
-            flex: 1;
-            padding: 3px;
+            padding: 3px 7px;
             font-size: 11px;
             color: var(--font-color);
         }
