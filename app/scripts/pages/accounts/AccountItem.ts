@@ -153,12 +153,10 @@ export default class AccountItem extends HTMLElement {
     }
     public showOrderAsk() {
         if (!this.askButton) return;
-        // this.askButton.disabled = true;
         this.askButton.textContent = "매도 가리기";
     }
     public hideOrderAsk() {
         if (!this.askButton) return;
-        // this.askButton.disabled = false;
         this.askButton.textContent = "매도";
     }
 }

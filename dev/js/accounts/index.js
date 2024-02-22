@@ -109,7 +109,7 @@
     }
   };
 
-  // dev/scripts/pages/accounts/OrderBid.js
+  // dev/scripts/pages/accounts/OrderBase.js
   var __awaiter2 = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
@@ -137,70 +137,41 @@
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
-  var OrderBid = class extends HTMLElement {
-    constructor(parent) {
+  var OrderBase = class extends HTMLElement {
+    constructor(accountItem) {
       super();
-      this.form = null;
-      this.amountInput = null;
-      this.priceInput = null;
+      this.formElement = null;
+      this.template = null;
       this.priceRadios = null;
       this.priceManual = null;
-      this.orderData = {
-        amountPrice: 0,
-        price: 0
-      };
-      this.parent = parent;
-      this.template = document.querySelector("#tp-orderBid");
-      this.show = this.show.bind(this);
-      this.hide = this.hide.bind(this);
-      this.onSubmit = this.onSubmit.bind(this);
-      this.onReset = this.onReset.bind(this);
-      this.onInputAmount = this.onInputAmount.bind(this);
+      this.priceInput = null;
+      this.orderPrice = 0;
+      this.accountItem = accountItem;
       this.onChangepriceRadios = this.onChangepriceRadios.bind(this);
       this.onInputPriceManual = this.onInputPriceManual.bind(this);
       this.onInputPrice = this.onInputPrice.bind(this);
     }
     connectedCallback() {
+      var _a, _b;
       this.render();
-      this.form = this.querySelector("form");
-      this.amountInput = this.querySelector("input[name=amount]");
-      this.priceInput = this.querySelector("input[name=price]");
+      this.formElement = this.querySelector("form");
       this.priceRadios = this.querySelectorAll("input[name=price-option]");
       this.priceManual = this.querySelector("input[name=price-option-manual]");
-      this.form.addEventListener("submit", this.onSubmit);
-      this.form.addEventListener("reset", this.onReset);
-      this.amountInput.addEventListener("input", this.onInputAmount);
+      this.priceInput = this.querySelector("input[name=price]");
       this.priceRadios.forEach((radio) => {
         radio.addEventListener("change", this.onChangepriceRadios);
       });
-      this.priceManual.addEventListener("input", this.onInputPriceManual);
-      this.priceInput.addEventListener("input", this.onInputPrice);
+      (_a = this.priceManual) === null || _a === void 0 ? void 0 : _a.addEventListener("input", this.onInputPriceManual);
+      (_b = this.priceInput) === null || _b === void 0 ? void 0 : _b.addEventListener("input", this.onInputPrice);
     }
     render() {
+      if (!this.template)
+        return;
       const cloned = cloneTemplate(this.template);
       this.appendChild(cloned);
-      this.show();
     }
-    show() {
-      this.hidden = false;
-      this.parent.showOrderBid();
-    }
-    hide() {
-      this.hidden = true;
-      this.parent.hideOrderBid();
-    }
-    onSubmit(event) {
-      var _a;
+    fetchData(searchParams) {
       return __awaiter2(this, void 0, void 0, function* () {
-        event.preventDefault();
-        const volume = this.orderData.amountPrice && this.orderData.price ? (this.orderData.amountPrice / this.orderData.price).toString() : "0";
-        const searchParams = new URLSearchParams({
-          market: this.parent.market,
-          side: "bid",
-          volume,
-          price: (_a = this.orderData.price.toString()) !== null && _a !== void 0 ? _a : "",
-          ord_type: "limit"
-        });
         const response = yield fetch(`/fetchOrders?${searchParams}`);
         const data = yield response.json();
         this.renderOrderItem(data);
@@ -208,21 +179,10 @@
     }
     renderOrderItem(data) {
       const orderItem = new OrderedItem(data);
-      if (this.parent.orderedElement) {
-        const firstChild = this.parent.orderedElement.querySelector("ordered-item");
-        this.parent.orderedElement.insertBefore(orderItem, firstChild);
+      if (this.accountItem.orderedElement) {
+        const firstChild = this.accountItem.orderedElement.querySelector("ordered-item");
+        this.accountItem.orderedElement.insertBefore(orderItem, firstChild);
       }
-    }
-    onReset() {
-      this.orderData.amountPrice = 0;
-      this.orderData.price = 0;
-      console.log(this.orderData);
-    }
-    onInputAmount(event) {
-      const target = event.target;
-      const validateValue = target.value.replace(/[^0-9.-]+/g, "");
-      this.orderData.amountPrice = Number(validateValue);
-      target.value = this.orderData.amountPrice.toLocaleString();
     }
     onChangepriceRadios(event) {
       const target = event.target;
@@ -235,137 +195,135 @@
       this.calculatePrice(-parseInt(target.value));
     }
     calculatePrice(aPercent) {
-      const value = this.parent.avgBuyPrice * aPercent * 0.01;
-      this.setPrice(this.parent.avgBuyPrice + value);
+      const value = this.accountItem.avgBuyPrice * aPercent * 0.01;
+      this.setPrice(this.accountItem.avgBuyPrice + value);
     }
     onInputPrice(event) {
       const target = event.target;
-      const validateValue = target.value.replace(/[^0-9.-]+/g, "");
+      const validateValue = this.validateInputNumber(target.value);
       this.setPrice(parseInt(validateValue));
     }
     setPrice(price) {
       if (!this.priceInput)
         return;
-      this.orderData.price = Math.round(price);
-      this.priceInput.value = this.orderData.price.toLocaleString();
+      this.orderPrice = Math.round(price);
+      this.priceInput.value = this.orderPrice.toLocaleString();
+    }
+    validateInputNumber(value) {
+      return value.replace(/[^0-9.-]+/g, "");
+    }
+  };
+
+  // dev/scripts/pages/accounts/OrderBid.js
+  var OrderBid = class extends OrderBase {
+    constructor(parent) {
+      super(parent);
+      this.amountInput = null;
+      this.orderAmountPrice = 0;
+      this.template = document.querySelector("#tp-orderBid");
+      this.show = this.show.bind(this);
+      this.hide = this.hide.bind(this);
+      this.onSubmit = this.onSubmit.bind(this);
+      this.onReset = this.onReset.bind(this);
+      this.onInputAmount = this.onInputAmount.bind(this);
+    }
+    connectedCallback() {
+      var _a, _b;
+      super.connectedCallback();
+      this.show();
+      this.amountInput = this.querySelector("input[name=amount]");
+      (_a = this.formElement) === null || _a === void 0 ? void 0 : _a.addEventListener("submit", this.onSubmit);
+      (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.addEventListener("reset", this.onReset);
+      this.amountInput.addEventListener("input", this.onInputAmount);
+    }
+    show() {
+      this.hidden = false;
+      this.accountItem.showOrderBid();
+    }
+    hide() {
+      this.hidden = true;
+      this.accountItem.hideOrderBid();
+    }
+    onSubmit(event) {
+      var _a;
+      event.preventDefault();
+      const volume = this.orderAmountPrice && this.orderPrice ? (this.orderAmountPrice / this.orderPrice).toString() : "0";
+      const searchParams = new URLSearchParams({
+        market: this.accountItem.market,
+        side: "bid",
+        volume,
+        price: (_a = this.orderPrice.toString()) !== null && _a !== void 0 ? _a : "",
+        ord_type: "limit"
+      });
+      this.fetchData(searchParams);
+    }
+    onReset() {
+      this.orderAmountPrice = 0;
+      this.orderPrice = 0;
+      console.log(this.orderAmountPrice, this.orderPrice);
+    }
+    onInputAmount(event) {
+      const target = event.target;
+      const validateValue = this.validateInputNumber(target.value);
+      this.orderAmountPrice = parseInt(validateValue);
+      target.value = this.orderAmountPrice.toLocaleString();
     }
   };
 
   // dev/scripts/pages/accounts/OrderAsk.js
-  var __awaiter3 = function(thisArg, _arguments, P, generator) {
-    function adopt(value) {
-      return value instanceof P ? value : new P(function(resolve) {
-        resolve(value);
-      });
-    }
-    return new (P || (P = Promise))(function(resolve, reject) {
-      function fulfilled(value) {
-        try {
-          step(generator.next(value));
-        } catch (e) {
-          reject(e);
-        }
-      }
-      function rejected(value) {
-        try {
-          step(generator["throw"](value));
-        } catch (e) {
-          reject(e);
-        }
-      }
-      function step(result) {
-        result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-      }
-      step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-  };
-  var OrderAsk = class extends HTMLElement {
+  var OrderAsk = class extends OrderBase {
     constructor(parent) {
-      super();
-      this.form = null;
-      this.volumeInput = null;
-      this.priceInput = null;
+      super(parent);
       this.volumeRadios = null;
-      this.priceRadios = null;
       this.volumeManual = null;
-      this.priceManual = null;
-      this.orderData = {
-        volume: 0,
-        price: 0
-      };
-      this.parent = parent;
+      this.volumeInput = null;
+      this.orderVolume = 0;
       this.template = document.querySelector("#tp-orderAsk");
       this.show = this.show.bind(this);
       this.hide = this.hide.bind(this);
       this.onSubmit = this.onSubmit.bind(this);
       this.onReset = this.onReset.bind(this);
       this.onChangeVolumeRadios = this.onChangeVolumeRadios.bind(this);
-      this.onChangePriceRadios = this.onChangePriceRadios.bind(this);
       this.onInputVolumeManual = this.onInputVolumeManual.bind(this);
-      this.onInputPriceManual = this.onInputPriceManual.bind(this);
-      this.onInputPrice = this.onInputPrice.bind(this);
     }
     connectedCallback() {
-      this.render();
-      this.form = this.querySelector("form");
+      var _a, _b;
+      super.connectedCallback();
+      this.show();
       this.volumeInput = this.querySelector("input[name=volume]");
-      this.priceInput = this.querySelector("input[name=price]");
       this.volumeRadios = this.querySelectorAll("input[name=volume-option]");
-      this.priceRadios = this.querySelectorAll("input[name=price-option]");
       this.volumeManual = this.querySelector("input[name=volume-option-manual]");
-      this.priceManual = this.querySelector("input[name=price-option-manual]");
-      this.form.addEventListener("submit", this.onSubmit);
-      this.form.addEventListener("reset", this.onReset);
+      (_a = this.formElement) === null || _a === void 0 ? void 0 : _a.addEventListener("submit", this.onSubmit);
+      (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.addEventListener("reset", this.onReset);
       this.volumeRadios.forEach((radio) => {
         radio.addEventListener("change", this.onChangeVolumeRadios);
       });
       this.volumeManual.addEventListener("input", this.onInputVolumeManual);
-      this.priceRadios.forEach((radio) => {
-        radio.addEventListener("change", this.onChangePriceRadios);
-      });
-      this.priceManual.addEventListener("input", this.onInputPriceManual);
-      this.priceInput.addEventListener("input", this.onInputPrice);
-    }
-    render() {
-      const cloned = cloneTemplate(this.template);
-      this.appendChild(cloned);
-      this.show();
     }
     show() {
       this.hidden = false;
-      this.parent.showOrderAsk();
+      this.accountItem.showOrderAsk();
     }
     hide() {
       this.hidden = true;
-      this.parent.hideOrderAsk();
+      this.accountItem.hideOrderAsk();
     }
     onSubmit(event) {
       var _a;
-      return __awaiter3(this, void 0, void 0, function* () {
-        event.preventDefault();
-        const searchParams = new URLSearchParams({
-          market: this.parent.market,
-          side: "ask",
-          volume: this.orderData.volume.toString(),
-          price: (_a = this.orderData.price.toString()) !== null && _a !== void 0 ? _a : "",
-          ord_type: "limit"
-        });
-        const response = yield fetch(`/fetchOrders?${searchParams}`);
-        const data = yield response.json();
-        this.renderOrderItem(data);
+      event.preventDefault();
+      const searchParams = new URLSearchParams({
+        market: this.accountItem.market,
+        side: "ask",
+        volume: this.orderVolume.toString(),
+        price: (_a = this.orderPrice.toString()) !== null && _a !== void 0 ? _a : "",
+        ord_type: "limit"
       });
-    }
-    renderOrderItem(data) {
-      const orderItem = new OrderedItem(data);
-      if (this.parent.orderedElement) {
-        const firstChild = this.parent.orderedElement.querySelector("ordered-item");
-        this.parent.orderedElement.insertBefore(orderItem, firstChild);
-      }
+      this.fetchData(searchParams);
     }
     onReset() {
-      this.orderData.volume = 0;
-      this.orderData.price = 0;
-      console.log(this.orderData);
+      this.orderVolume = 0;
+      this.orderPrice = 0;
+      console.log(this.orderVolume, this.orderPrice);
     }
     onChangeVolumeRadios(event) {
       const target = event.target;
@@ -380,33 +338,8 @@
     calculateVolume(aPercent) {
       if (!this.volumeInput)
         return;
-      this.orderData.volume = this.parent.volume * aPercent / 100;
-      this.volumeInput.value = this.orderData.volume.toString();
-    }
-    onChangePriceRadios(event) {
-      const target = event.target;
-      if (target.value === "manual")
-        return;
-      this.calculatePrice(parseInt(target.value));
-    }
-    onInputPriceManual(event) {
-      const target = event.target;
-      this.calculatePrice(parseInt(target.value));
-    }
-    calculatePrice(aPercent) {
-      const value = this.parent.avgBuyPrice * aPercent * 0.01;
-      this.setPrice(this.parent.avgBuyPrice + value);
-    }
-    onInputPrice(event) {
-      const target = event.target;
-      const validateValue = target.value.replace(/[^0-9.-]+/g, "");
-      this.setPrice(parseInt(validateValue));
-    }
-    setPrice(price) {
-      if (!this.priceInput)
-        return;
-      this.orderData.price = Math.round(price);
-      this.priceInput.value = this.orderData.price.toLocaleString();
+      this.orderVolume = this.accountItem.volume * aPercent / 100;
+      this.volumeInput.value = this.orderVolume.toString();
     }
   };
 
@@ -539,7 +472,7 @@
   };
 
   // dev/scripts/pages/accounts/AppAccounts.js
-  var __awaiter4 = function(thisArg, _arguments, P, generator) {
+  var __awaiter3 = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
         resolve(value);
@@ -578,7 +511,7 @@
     disconnectedCallback() {
     }
     loadAccountData() {
-      return __awaiter4(this, void 0, void 0, function* () {
+      return __awaiter3(this, void 0, void 0, function* () {
         try {
           const accountsResponse = yield this.fetchData(`/fetchAccounts`);
           this.markets = accountsResponse.accounts.map((account) => account.market);
@@ -594,7 +527,7 @@
       });
     }
     fetchData(url) {
-      return __awaiter4(this, void 0, void 0, function* () {
+      return __awaiter3(this, void 0, void 0, function* () {
         const response = yield fetch(url);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
