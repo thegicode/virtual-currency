@@ -1,12 +1,5 @@
 @charset "UTF-8";
 body {
-  --margin-side: 1rem;
-  --transition-duration: 1.5s;
-  --font-color: #666;
-  --border-color: #bfe3d4;
-}
-
-body {
   margin: 0;
 }
 
@@ -21,62 +14,11 @@ button:disabled {
   opacity: 0.5;
 }
 
-html,
 body {
-  font-size: 12px;
-}
-
-app-accounts {
-  --blue-color: #3178ff;
-  --red-color: red;
-  display: block;
-  color: var(--font-color);
-}
-app-accounts h1 {
-  margin: 0;
-  padding: var(--margin-side) var(--margin-side) 0;
-}
-app-accounts .assets {
-  padding: var(--margin-side);
-  transition: all var(--transition-duration);
-}
-app-accounts .assets[data-loading=true] {
-  opacity: 0;
-}
-app-accounts .assets[data-loading=false] {
-  opacity: 1;
-}
-app-accounts .assets h2 {
-  margin: 0 0 10px;
-}
-app-accounts .assets h4 {
-  margin: 0 0 10px;
-}
-app-accounts .assets p {
-  margin: 5px 0;
-}
-app-accounts .assets span {
-  margin-left: 5px;
-}
-app-accounts .accounts {
-  margin-top: 1rem;
-}
-app-accounts .accounts h2 {
-  margin: 5px var(--margin-side);
-}
-app-accounts .accounts-actions {
-  display: flex;
-  margin: 5px var(--margin-side);
-}
-app-accounts .accountsList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  opacity: 1;
-  transition: opacity var(--transition-duration);
-}
-app-accounts .accountsList[data-loading=true] {
-  opacity: 0;
+  --margin-side: 1rem;
+  --transition-duration: 1.5s;
+  --font-color: #666;
+  --border-color: #bfe3d4;
 }
 
 account-item {
@@ -236,17 +178,6 @@ order-bid .order-actions button {
   color: var(--font-color);
 }
 
-.ordered {
-  padding: 1rem 0;
-  border-top: 1px dashed var(--border-color);
-}
-.ordered .orderedTitle {
-  margin: 0;
-  padding: 0 var(--margin-side) 5px;
-  font-size: 1.1rem;
-  color: #7f7f7f;
-}
-
 ordered-item {
   display: block;
   position: relative;
@@ -295,6 +226,75 @@ ordered-item .ordered-actions button {
 }
 ordered-item .ordered-actions button:hover {
   background-color: #fff;
+}
+
+html,
+body {
+  font-size: 12px;
+}
+
+app-accounts {
+  --blue-color: #3178ff;
+  --red-color: red;
+  display: block;
+  color: var(--font-color);
+}
+app-accounts h1 {
+  margin: 0;
+  padding: var(--margin-side) var(--margin-side) 0;
+}
+app-accounts .assets {
+  padding: var(--margin-side);
+  transition: all var(--transition-duration);
+}
+app-accounts .assets[data-loading=true] {
+  opacity: 0;
+}
+app-accounts .assets[data-loading=false] {
+  opacity: 1;
+}
+app-accounts .assets h2 {
+  margin: 0 0 10px;
+}
+app-accounts .assets h4 {
+  margin: 0 0 10px;
+}
+app-accounts .assets p {
+  margin: 5px 0;
+}
+app-accounts .assets span {
+  margin-left: 5px;
+}
+app-accounts .accounts {
+  margin-top: 1rem;
+}
+app-accounts .accounts h2 {
+  margin: 5px var(--margin-side);
+}
+app-accounts .accounts-actions {
+  display: flex;
+  margin: 5px var(--margin-side);
+}
+app-accounts .accountsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  opacity: 1;
+  transition: opacity var(--transition-duration);
+}
+app-accounts .accountsList[data-loading=true] {
+  opacity: 0;
+}
+
+.ordered {
+  padding: 1rem 0;
+  border-top: 1px dashed var(--border-color);
+}
+.ordered .orderedTitle {
+  margin: 0;
+  padding: 0 var(--margin-side) 5px;
+  font-size: 1.1rem;
+  color: #7f7f7f;
 }
 
 /*# sourceMappingURL=accounts.css.map */

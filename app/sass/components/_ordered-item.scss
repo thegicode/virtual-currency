@@ -1,0 +1,55 @@
+ordered-item {
+    display: block;
+    position: relative;
+    padding: 3px var(--margin-side) 0;
+
+    &[data-side="ask"] .side {
+        color: var(--blue-color);
+    }
+    &[data-side="bid"] .side {
+        color: var(--red-color);
+    }
+    &[data-cancel="true"] {
+        &:after {
+            content: "취소되었습니다.";
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            border-radius: 7px;
+            background-color: #00522c;
+            color: #c1c1c1;
+            opacity: 0.8;
+        }
+    }
+
+    .ordered-contents {
+        display: flex;
+        flex-wrap: wrap;
+
+        p {
+            width: 50%;
+            margin: 3px 0;
+            span {
+                margin-left: 5px;
+            }
+        }
+    }
+
+    .ordered-actions {
+        display: flex;
+        justify-content: flex-end;
+        button {
+            padding: 3px 7px;
+            font-size: 11px;
+            color: var(--font-color);
+            &:hover {
+                background-color: #fff;
+            }
+        }
+    }
+}

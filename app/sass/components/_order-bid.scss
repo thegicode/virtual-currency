@@ -1,0 +1,83 @@
+order-bid {
+    position: relative;
+
+    form {
+        display: block;
+        margin-top: 7px;
+        padding: 7px 0;
+        border-radius: 5px;
+    }
+
+    fieldset {
+        position: absolute;
+        top: -1000rem;
+        visibility: hidden;
+    }
+    .order-contents {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .order-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 5px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+        flex: 1;
+        height: 25px;
+        box-sizing: border-box;
+        padding: 5px;
+        border: 1px solid #e8eeef;
+        background-color: transparent;
+        font-size: 12px;
+        color: var(--font-color);
+    }
+
+    .order-price {
+        &-options {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+
+            label {
+                display: flex;
+                align-items: center;
+                gap: 3px;
+            }
+
+            input[name="price-option-manual"] {
+                width: 70px;
+                margin-left: 3px;
+                pointer-events: none;
+            }
+
+            input[name="price-option"] {
+                &:checked ~ input {
+                    pointer-events: initial;
+                }
+            }
+        }
+
+        input[name="price"] {
+            width: 100%;
+        }
+    }
+
+    .order-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 3px;
+        padding-top: 5px;
+
+        button {
+            padding: 3px 7px;
+            font-size: 11px;
+            color: var(--font-color);
+        }
+    }
+}

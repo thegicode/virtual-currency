@@ -1,0 +1,100 @@
+account-item {
+    overflow: hidden;
+    display: block;
+    position: relative;
+    margin: 5px;
+    border-radius: 7px;
+    border: 2px solid var(--border-color);
+
+    opacity: 1;
+
+    &:hover {
+        border-color: #baddd2;
+    }
+
+    .account-item {
+        padding: var(--margin-side);
+        background-color: #f6fff9;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        .name {
+            display: flex;
+            align-items: center;
+            margin: 0;
+            .currency {
+                margin: 0 5px 0 0;
+                font-size: 1.5rem;
+                color: #326fa1;
+            }
+            small {
+                color: #8f8f8f;
+            }
+            .unitCurrency {
+                margin-left: 5px;
+            }
+        }
+        .orderedButton {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin-left: auto;
+            padding: 5px 10px;
+            font-size: 11px;
+            color: var(--font-color);
+            &:hover {
+                background-color: #fff;
+            }
+        }
+    }
+
+    &[data-increase="true"] {
+        .profit,
+        .profitRate {
+            color: var(--red-color);
+        }
+    }
+    &[data-increase="false"] {
+        .profit,
+        .profitRate {
+            color: var(--blue-color);
+        }
+    }
+
+    .account-contents {
+        display: flex;
+        flex-wrap: wrap;
+        padding-top: 7px;
+
+        p {
+            display: flex;
+            width: 50%;
+            margin: 3px 0;
+            span {
+                margin-left: auto;
+                margin-right: 10px;
+            }
+        }
+    }
+
+    .account-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 3px;
+        margin-top: 10px;
+
+        button {
+            padding: 3px 7px;
+            border-radius: 3px;
+            border-color: #d8edf0;
+            background-color: #e6f6f1;
+            font-size: 11px;
+            color: var(--font-color);
+            &:hover {
+                background-color: #fff;
+            }
+        }
+    }
+}
