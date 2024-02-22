@@ -1,4 +1,5 @@
-order-bid {
+order-bid,
+order-ask {
     position: relative;
 
     form {
@@ -38,7 +39,8 @@ order-bid {
         color: var(--font-color);
     }
 
-    .order-price {
+    .order-price,
+    .order-amount {
         &-options {
             display: flex;
             justify-content: space-between;
@@ -50,16 +52,18 @@ order-bid {
                 gap: 3px;
             }
 
-            input[name="price-option-manual"] {
-                width: 70px;
-                margin-left: 3px;
-                pointer-events: none;
-            }
-
-            input[name="price-option"] {
+            input[name="price-option"],
+            input[name="amount-option"] {
                 &:checked ~ input {
                     pointer-events: initial;
                 }
+            }
+
+            input[name="price-option-manual"],
+            input[name="amount-option-manual"] {
+                width: 70px;
+                margin-left: 3px;
+                pointer-events: none;
             }
         }
 
@@ -79,5 +83,11 @@ order-bid {
             font-size: 11px;
             color: var(--font-color);
         }
+    }
+}
+
+order-ask {
+    input[name="amount"] {
+        width: 100%;
     }
 }

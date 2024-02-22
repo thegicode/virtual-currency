@@ -58,9 +58,10 @@
                             </div>
                             <div class="account-actions">
                                 <button type="button" class="bidButton">매수</button>
-                                <button type="button">매도</button>
+                                <button type="button" class="askButton">매도</button>
                             </div>
                             <div id="orderBid"></div>
+                            <div id="orderAsk"></div>
                         </div>
                         <div class="ordered">
                             <h4 class="orderedTitle">주문내역</h4>
@@ -120,7 +121,6 @@
                         <div class="order-actions">
                             <button type="submit">매수</button>
                             <button type="reset">초기화</button>
-                            <button type="button" class="hideButton">x 가리기</button>
                         </div>
                     </form>
                 </template>
@@ -128,30 +128,57 @@
                 <template id="tp-orderAsk">
                     <form>
                         <fieldset>매도 주문</fieldset>
-                        <div class="order-inputs">
-                            <div class="order-row">
-                                <input type="text" name="amount" min="0" placeholder="주문총액" required>
+                        <div class="order-contents">
+                            <div class="order-amount">
+                                <div class="order-amount-options">
+                                    <label>
+                                        <input type="radio" name="amount-option" value="25">
+                                        <span>25%</span>
+                                    </label> 
+                                    <label>
+                                        <input type="radio" name="amount-option" value="50">
+                                        <span>50%</span>
+                                    </label> 
+                                    <label>
+                                        <input type="radio" name="amount-option" value="100">
+                                        <span>100%</span>
+                                    </label> 
+                                    <label>
+                                        <input type="radio" name="amount-option" value="manual">
+                                        <span>직접 입력</span>
+                                        <input type="number" name="amount-option-manual">
+                                        <span>%</span>
+                                    </label>
+                                </div>
+                                <input type="number" name="amount" min="0" placeholder="수량" readonly required>
                             </div>
-                            <label class="order-row">
-                                <input type="text" name="price" min="0" placeholder="가격" required>
-                               
-                                <label for="check-price">직접입력</label>
-                                <input type="checkbox" name="check-price-manual">
-                                <span>-</span>
-                                <select name="price-option">
-                                    <option>percent</option>
-                                    <option value="-5">5</option>
-                                    <option value="-10">10</option>
-                                    <option value="-20">20</option>
-                                </select>
-                                <input type="number" name="price-manual">
-                                <span>%</span>
-                            </label>
+                            <div class="order-price">
+                                <div class="order-price-options">
+                                    <label>
+                                        <input type="radio" name="price-option" value="5">
+                                        <span>5%</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="price-option" value="10">
+                                        <span>10%</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="price-option" value="20">
+                                        <span>20%</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="price-option" value="manual">
+                                        <span>직접 입력</span>
+                                        <input type="number" name="price-option-manual">
+                                        <span>%</span>
+                                    </label>
+                                </div>
+                                <input type="text" name="price" min="0" title="가격" placeholder="가격" required>
+                            </div>
                         </div>
                         <div class="order-actions">
-                            <button type="submit">매수</button>
+                            <button type="submit">매도</button>
                             <button type="reset">초기화</button>
-                            <button type="button" class="hideButton">x 가리기</button>
                         </div>
                     </form>
                 </template>

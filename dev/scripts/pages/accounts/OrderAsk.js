@@ -9,42 +9,52 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { cloneTemplate } from "@app/scripts/utils/helpers";
 import OrderedItem from "./OrderedItem";
-export default class OrderBid extends HTMLElement {
+export default class OrderAsk extends HTMLElement {
     constructor(parent) {
         super();
         this.form = null;
         this.amountInput = null;
         this.priceInput = null;
+        this.amountRadios = null;
         this.priceRadios = null;
+        this.amountManual = null;
         this.priceManual = null;
         this.orderData = {
-            amountPrice: 0,
+            volume: 0,
             price: 0,
         };
         this.parent = parent;
-        this.template = document.querySelector("#tp-orderBid");
+        this.template = document.querySelector("#tp-orderAsk");
         this.show = this.show.bind(this);
         this.hide = this.hide.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onReset = this.onReset.bind(this);
-        this.onInputAmount = this.onInputAmount.bind(this);
-        this.onChangepriceRadios = this.onChangepriceRadios.bind(this);
+        this.onChangeAmountRadios = this.onChangeAmountRadios.bind(this);
+        this.onChangePriceRadios = this.onChangePriceRadios.bind(this);
+        this.onInputAmountManual = this.onInputAmountManual.bind(this);
         this.onInputPriceManual = this.onInputPriceManual.bind(this);
+        this.onPriceInput = this.onPriceInput.bind(this);
     }
     connectedCallback() {
         this.render();
         this.form = this.querySelector("form");
         this.amountInput = this.querySelector("input[name=amount]");
         this.priceInput = this.querySelector("input[name=price]");
+        this.amountRadios = this.querySelectorAll("input[name=amount-option]");
         this.priceRadios = this.querySelectorAll("input[name=price-option]");
+        this.amountManual = this.querySelector("input[name=amount-option-manual]");
         this.priceManual = this.querySelector("input[name=price-option-manual]");
         this.form.addEventListener("submit", this.onSubmit);
         this.form.addEventListener("reset", this.onReset);
-        this.amountInput.addEventListener("input", this.onInputAmount);
+        this.amountRadios.forEach((radio) => {
+            radio.addEventListener("change", this.onChangeAmountRadios);
+        });
+        this.amountManual.addEventListener("input", this.onInputAmountManual);
         this.priceRadios.forEach((radio) => {
-            radio.addEventListener("change", this.onChangepriceRadios);
+            radio.addEventListener("change", this.onChangePriceRadios);
         });
         this.priceManual.addEventListener("input", this.onInputPriceManual);
+        this.priceInput.addEventListener("input", this.onPriceInput);
     }
     render() {
         const cloned = cloneTemplate(this.template);
@@ -53,23 +63,20 @@ export default class OrderBid extends HTMLElement {
     }
     show() {
         this.hidden = false;
-        this.parent.showOrderBid();
+        this.parent.showOrderAsk();
     }
     hide() {
         this.hidden = true;
-        this.parent.hideOrderBid();
+        this.parent.hideOrderAsk();
     }
     onSubmit(event) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const volume = this.orderData.amountPrice && this.orderData.price
-                ? (this.orderData.amountPrice / this.orderData.price).toString()
-                : "0";
             const searchParams = new URLSearchParams({
                 market: this.parent.market,
-                side: "bid",
-                volume,
+                side: "ask",
+                volume: this.orderData.volume.toString(),
                 price: (_a = this.orderData.price.toString()) !== null && _a !== void 0 ? _a : "",
                 ord_type: "limit",
             });
@@ -86,17 +93,27 @@ export default class OrderBid extends HTMLElement {
         }
     }
     onReset() {
-        this.orderData.amountPrice = 0;
+        this.orderData.volume = 0;
         this.orderData.price = 0;
         console.log(this.orderData);
     }
-    onInputAmount(event) {
+    onChangeAmountRadios(event) {
         const target = event.target;
-        const validateValue = target.value.replace(/[^0-9.-]+/g, "");
-        this.orderData.amountPrice = Number(validateValue);
-        target.value = this.orderData.amountPrice.toLocaleString();
+        if (target.value === "manual")
+            return;
+        this.calculateVolume(parseInt(target.value));
     }
-    onChangepriceRadios(event) {
+    onInputAmountManual(event) {
+        const target = event.target;
+        this.calculateVolume(parseInt(target.value));
+    }
+    calculateVolume(aPercent) {
+        if (!this.amountInput)
+            return;
+        this.orderData.volume = (this.parent.volume * aPercent) / 100;
+        this.amountInput.value = this.orderData.volume.toString();
+    }
+    onChangePriceRadios(event) {
         const target = event.target;
         if (target.value === "manual")
             return;
@@ -104,14 +121,21 @@ export default class OrderBid extends HTMLElement {
     }
     onInputPriceManual(event) {
         const target = event.target;
-        this.calculatePrice(-parseInt(target.value));
+        this.calculatePrice(parseInt(target.value));
     }
     calculatePrice(aPercent) {
+        const value = this.parent.avgBuyPrice * aPercent * 0.01;
+        this.setPrice(this.parent.avgBuyPrice + value);
+    }
+    onPriceInput(event) {
+        const target = event.target;
+        this.setPrice(parseInt(target.value));
+    }
+    setPrice(price) {
         if (!this.priceInput)
             return;
-        const value = this.parent.avgBuyPrice * aPercent * 0.01;
-        this.orderData.price = Math.round(this.parent.avgBuyPrice + value);
+        this.orderData.price = Math.round(price);
         this.priceInput.value = this.orderData.price.toLocaleString();
     }
 }
-//# sourceMappingURL=OrderBid.js.map
+//# sourceMappingURL=OrderAsk.js.map

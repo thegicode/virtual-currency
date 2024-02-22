@@ -145,7 +145,6 @@
       this.priceInput = null;
       this.priceRadios = null;
       this.priceManual = null;
-      this.hideButton = null;
       this.orderData = {
         amountPrice: 0,
         price: 0
@@ -167,7 +166,6 @@
       this.priceInput = this.querySelector("input[name=price]");
       this.priceRadios = this.querySelectorAll("input[name=price-option]");
       this.priceManual = this.querySelector("input[name=price-option-manual]");
-      this.hideButton = this.querySelector(".hideButton");
       this.form.addEventListener("submit", this.onSubmit);
       this.form.addEventListener("reset", this.onReset);
       this.amountInput.addEventListener("input", this.onInputAmount);
@@ -175,7 +173,6 @@
         radio.addEventListener("change", this.onChangepriceRadios);
       });
       this.priceManual.addEventListener("input", this.onInputPriceManual);
-      this.hideButton.addEventListener("click", this.hide);
     }
     render() {
       const cloned = cloneTemplate(this.template);
@@ -194,13 +191,12 @@
       var _a;
       return __awaiter2(this, void 0, void 0, function* () {
         event.preventDefault();
-        const price = Math.round(this.orderData.price || 0);
-        const volume = this.orderData.amountPrice && this.orderData.price ? (this.orderData.amountPrice / price).toString() : "0";
+        const volume = this.orderData.amountPrice && this.orderData.price ? (this.orderData.amountPrice / this.orderData.price).toString() : "0";
         const searchParams = new URLSearchParams({
           market: this.parent.market,
           side: "bid",
           volume,
-          price: (_a = price.toString()) !== null && _a !== void 0 ? _a : "",
+          price: (_a = this.orderData.price.toString()) !== null && _a !== void 0 ? _a : "",
           ord_type: "limit"
         });
         const response = yield fetch(`/fetchOrders?${searchParams}`);
@@ -240,7 +236,165 @@
       if (!this.priceInput)
         return;
       const value = this.parent.avgBuyPrice * aPercent * 0.01;
-      this.orderData.price = this.parent.avgBuyPrice + value;
+      this.orderData.price = Math.round(this.parent.avgBuyPrice + value);
+      this.priceInput.value = this.orderData.price.toLocaleString();
+    }
+  };
+
+  // dev/scripts/pages/accounts/OrderAsk.js
+  var __awaiter3 = function(thisArg, _arguments, P, generator) {
+    function adopt(value) {
+      return value instanceof P ? value : new P(function(resolve) {
+        resolve(value);
+      });
+    }
+    return new (P || (P = Promise))(function(resolve, reject) {
+      function fulfilled(value) {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function rejected(value) {
+        try {
+          step(generator["throw"](value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function step(result) {
+        result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+      }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+  };
+  var OrderAsk = class extends HTMLElement {
+    constructor(parent) {
+      super();
+      this.form = null;
+      this.amountInput = null;
+      this.priceInput = null;
+      this.amountRadios = null;
+      this.priceRadios = null;
+      this.amountManual = null;
+      this.priceManual = null;
+      this.orderData = {
+        volume: 0,
+        price: 0
+      };
+      this.parent = parent;
+      this.template = document.querySelector("#tp-orderAsk");
+      this.show = this.show.bind(this);
+      this.hide = this.hide.bind(this);
+      this.onSubmit = this.onSubmit.bind(this);
+      this.onReset = this.onReset.bind(this);
+      this.onChangeAmountRadios = this.onChangeAmountRadios.bind(this);
+      this.onChangePriceRadios = this.onChangePriceRadios.bind(this);
+      this.onInputAmountManual = this.onInputAmountManual.bind(this);
+      this.onInputPriceManual = this.onInputPriceManual.bind(this);
+      this.onPriceInput = this.onPriceInput.bind(this);
+    }
+    connectedCallback() {
+      this.render();
+      this.form = this.querySelector("form");
+      this.amountInput = this.querySelector("input[name=amount]");
+      this.priceInput = this.querySelector("input[name=price]");
+      this.amountRadios = this.querySelectorAll("input[name=amount-option]");
+      this.priceRadios = this.querySelectorAll("input[name=price-option]");
+      this.amountManual = this.querySelector("input[name=amount-option-manual]");
+      this.priceManual = this.querySelector("input[name=price-option-manual]");
+      this.form.addEventListener("submit", this.onSubmit);
+      this.form.addEventListener("reset", this.onReset);
+      this.amountRadios.forEach((radio) => {
+        radio.addEventListener("change", this.onChangeAmountRadios);
+      });
+      this.amountManual.addEventListener("input", this.onInputAmountManual);
+      this.priceRadios.forEach((radio) => {
+        radio.addEventListener("change", this.onChangePriceRadios);
+      });
+      this.priceManual.addEventListener("input", this.onInputPriceManual);
+      this.priceInput.addEventListener("input", this.onPriceInput);
+    }
+    render() {
+      const cloned = cloneTemplate(this.template);
+      this.appendChild(cloned);
+      this.show();
+    }
+    show() {
+      this.hidden = false;
+      this.parent.showOrderAsk();
+    }
+    hide() {
+      this.hidden = true;
+      this.parent.hideOrderAsk();
+    }
+    onSubmit(event) {
+      var _a;
+      return __awaiter3(this, void 0, void 0, function* () {
+        event.preventDefault();
+        const searchParams = new URLSearchParams({
+          market: this.parent.market,
+          side: "ask",
+          volume: this.orderData.volume.toString(),
+          price: (_a = this.orderData.price.toString()) !== null && _a !== void 0 ? _a : "",
+          ord_type: "limit"
+        });
+        const response = yield fetch(`/fetchOrders?${searchParams}`);
+        const data = yield response.json();
+        this.renderOrderItem(data);
+      });
+    }
+    renderOrderItem(data) {
+      const orderItem = new OrderedItem(data);
+      if (this.parent.orderedElement) {
+        const firstChild = this.parent.orderedElement.querySelector("ordered-item");
+        this.parent.orderedElement.insertBefore(orderItem, firstChild);
+      }
+    }
+    onReset() {
+      this.orderData.volume = 0;
+      this.orderData.price = 0;
+      console.log(this.orderData);
+    }
+    onChangeAmountRadios(event) {
+      const target = event.target;
+      if (target.value === "manual")
+        return;
+      this.calculateVolume(parseInt(target.value));
+    }
+    onInputAmountManual(event) {
+      const target = event.target;
+      this.calculateVolume(parseInt(target.value));
+    }
+    calculateVolume(aPercent) {
+      if (!this.amountInput)
+        return;
+      this.orderData.volume = this.parent.volume * aPercent / 100;
+      this.amountInput.value = this.orderData.volume.toString();
+    }
+    onChangePriceRadios(event) {
+      const target = event.target;
+      if (target.value === "manual")
+        return;
+      this.calculatePrice(parseInt(target.value));
+    }
+    onInputPriceManual(event) {
+      const target = event.target;
+      this.calculatePrice(parseInt(target.value));
+    }
+    calculatePrice(aPercent) {
+      const value = this.parent.avgBuyPrice * aPercent * 0.01;
+      this.setPrice(this.parent.avgBuyPrice + value);
+    }
+    onPriceInput(event) {
+      const target = event.target;
+      this.setPrice(parseInt(target.value));
+    }
+    setPrice(price) {
+      if (!this.priceInput)
+        return;
+      this.orderData.price = Math.round(price);
       this.priceInput.value = this.orderData.price.toLocaleString();
     }
   };
@@ -252,14 +406,18 @@
       this.orderedButton = null;
       this.ordered = null;
       this.bidButton = null;
+      this.askButton = null;
       this.orderBid = null;
+      this.orderAsk = null;
       this.data = data;
       this.template = document.querySelector("#tp-accountItem");
       this.orderedButton = null;
       this.ordered = null;
       this.bidButton = null;
+      this.askButton = null;
       this.handleOrdereds = this.handleOrdereds.bind(this);
       this.handleOrderBid = this.handleOrderBid.bind(this);
+      this.handleOrderAsk = this.handleOrderAsk.bind(this);
     }
     get market() {
       return this.data.market;
@@ -267,23 +425,29 @@
     get avgBuyPrice() {
       return this.data.avgBuyPrice;
     }
+    get volume() {
+      return this.data.volume;
+    }
     get orderedElement() {
       return this.ordered;
     }
     connectedCallback() {
-      var _a, _b;
+      var _a, _b, _c;
       this.render();
       this.orderedButton = this.querySelector(".orderedButton");
       this.ordered = this.querySelector(".ordered");
       this.bidButton = this.querySelector(".bidButton");
+      this.askButton = this.querySelector(".askButton");
       this.renderOrdereds();
       (_a = this.orderedButton) === null || _a === void 0 ? void 0 : _a.addEventListener("click", this.handleOrdereds);
       (_b = this.bidButton) === null || _b === void 0 ? void 0 : _b.addEventListener("click", this.handleOrderBid);
+      (_c = this.askButton) === null || _c === void 0 ? void 0 : _c.addEventListener("click", this.handleOrderAsk);
     }
     disconnectedCallback() {
-      var _a, _b;
+      var _a, _b, _c;
       (_a = this.orderedButton) === null || _a === void 0 ? void 0 : _a.removeEventListener("click", this.handleOrdereds);
       (_b = this.bidButton) === null || _b === void 0 ? void 0 : _b.removeEventListener("click", this.handleOrderBid);
+      (_c = this.askButton) === null || _c === void 0 ? void 0 : _c.removeEventListener("click", this.handleOrderAsk);
     }
     render() {
       const cloned = cloneTemplate(this.template);
@@ -320,7 +484,10 @@
     handleOrderBid() {
       var _a;
       if (this.orderBid) {
-        this.orderBid.show();
+        if (this.orderBid.hidden)
+          this.orderBid.show();
+        else
+          this.orderBid.hide();
         return;
       }
       this.orderBid = new OrderBid(this);
@@ -329,17 +496,39 @@
     showOrderBid() {
       if (!this.bidButton)
         return;
-      this.bidButton.disabled = true;
+      this.bidButton.textContent = "\uB9E4\uC218 \uAC00\uB9AC\uAE30";
     }
     hideOrderBid() {
       if (!this.bidButton)
         return;
-      this.bidButton.disabled = false;
+      this.bidButton.textContent = "\uB9E4\uC218";
+    }
+    handleOrderAsk() {
+      var _a;
+      if (this.orderAsk) {
+        if (this.orderAsk.hidden)
+          this.orderAsk.show();
+        else
+          this.orderAsk.hide();
+        return;
+      }
+      this.orderAsk = new OrderAsk(this);
+      (_a = this.querySelector("#orderAsk")) === null || _a === void 0 ? void 0 : _a.replaceWith(this.orderAsk);
+    }
+    showOrderAsk() {
+      if (!this.askButton)
+        return;
+      this.askButton.textContent = "\uB9E4\uB3C4 \uAC00\uB9AC\uAE30";
+    }
+    hideOrderAsk() {
+      if (!this.askButton)
+        return;
+      this.askButton.textContent = "\uB9E4\uB3C4";
     }
   };
 
   // dev/scripts/pages/accounts/AppAccounts.js
-  var __awaiter3 = function(thisArg, _arguments, P, generator) {
+  var __awaiter4 = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
         resolve(value);
@@ -378,7 +567,7 @@
     disconnectedCallback() {
     }
     loadAccountData() {
-      return __awaiter3(this, void 0, void 0, function* () {
+      return __awaiter4(this, void 0, void 0, function* () {
         try {
           const accountsResponse = yield this.fetchData(`/fetchAccounts`);
           this.markets = accountsResponse.accounts.map((account) => account.market);
@@ -394,7 +583,7 @@
       });
     }
     fetchData(url) {
-      return __awaiter3(this, void 0, void 0, function* () {
+      return __awaiter4(this, void 0, void 0, function* () {
         const response = yield fetch(url);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -468,6 +657,7 @@
   customElements.define("app-accounts", AppAccounts);
   customElements.define("account-item", AccountItem);
   customElements.define("order-bid", OrderBid);
+  customElements.define("order-ask", OrderAsk);
   customElements.define("ordered-item", OrderedItem);
 })();
 //# sourceMappingURL=index.js.map

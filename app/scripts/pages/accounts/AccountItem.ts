@@ -4,6 +4,7 @@ import {
     updateElementsTextWithData,
 } from "@scripts/utils/helpers";
 import OrderBid from "./OrderBid";
+import OrderAsk from "./OrderAsk";
 import OrderedItem from "./OrderedItem";
 
 export default class AccountItem extends HTMLElement {
@@ -12,7 +13,9 @@ export default class AccountItem extends HTMLElement {
     private orderedButton: HTMLButtonElement | null = null;
     private ordered: HTMLElement | null = null;
     private bidButton: HTMLButtonElement | null = null;
+    private askButton: HTMLButtonElement | null = null;
     private orderBid: OrderBid | null = null;
+    private orderAsk: OrderAsk | null = null;
 
     constructor(data: IProcessedAccountData) {
         super();
@@ -26,9 +29,11 @@ export default class AccountItem extends HTMLElement {
         this.orderedButton = null;
         this.ordered = null;
         this.bidButton = null;
+        this.askButton = null;
 
         this.handleOrdereds = this.handleOrdereds.bind(this);
         this.handleOrderBid = this.handleOrderBid.bind(this);
+        this.handleOrderAsk = this.handleOrderAsk.bind(this);
     }
 
     get market() {
@@ -37,6 +42,10 @@ export default class AccountItem extends HTMLElement {
 
     get avgBuyPrice() {
         return this.data.avgBuyPrice;
+    }
+
+    get volume() {
+        return this.data.volume;
     }
 
     get orderedElement() {
@@ -51,16 +60,19 @@ export default class AccountItem extends HTMLElement {
         ) as HTMLButtonElement;
         this.ordered = this.querySelector(".ordered") as HTMLElement;
         this.bidButton = this.querySelector(".bidButton") as HTMLButtonElement;
+        this.askButton = this.querySelector(".askButton") as HTMLButtonElement;
 
         this.renderOrdereds();
 
         this.orderedButton?.addEventListener("click", this.handleOrdereds);
         this.bidButton?.addEventListener("click", this.handleOrderBid);
+        this.askButton?.addEventListener("click", this.handleOrderAsk);
     }
 
     disconnectedCallback() {
         this.orderedButton?.removeEventListener("click", this.handleOrdereds);
         this.bidButton?.removeEventListener("click", this.handleOrderBid);
+        this.askButton?.removeEventListener("click", this.handleOrderAsk);
     }
 
     private render() {
@@ -112,7 +124,8 @@ export default class AccountItem extends HTMLElement {
     // OrderBid
     private handleOrderBid() {
         if (this.orderBid) {
-            this.orderBid.show();
+            if (this.orderBid.hidden) this.orderBid.show();
+            else this.orderBid.hide();
             return;
         }
 
@@ -121,10 +134,31 @@ export default class AccountItem extends HTMLElement {
     }
     public showOrderBid() {
         if (!this.bidButton) return;
-        this.bidButton.disabled = true;
+        this.bidButton.textContent = "매수 가리기";
     }
     public hideOrderBid() {
         if (!this.bidButton) return;
-        this.bidButton.disabled = false;
+        this.bidButton.textContent = "매수";
+    }
+
+    // OrderAsk
+    private handleOrderAsk() {
+        if (this.orderAsk) {
+            if (this.orderAsk.hidden) this.orderAsk.show();
+            else this.orderAsk.hide();
+            return;
+        }
+        this.orderAsk = new OrderAsk(this);
+        this.querySelector("#orderAsk")?.replaceWith(this.orderAsk);
+    }
+    public showOrderAsk() {
+        if (!this.askButton) return;
+        // this.askButton.disabled = true;
+        this.askButton.textContent = "매도 가리기";
+    }
+    public hideOrderAsk() {
+        if (!this.askButton) return;
+        // this.askButton.disabled = false;
+        this.askButton.textContent = "매도";
     }
 }
