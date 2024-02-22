@@ -34,6 +34,7 @@ export default class OrderBid extends HTMLElement {
         this.onInputAmount = this.onInputAmount.bind(this);
         this.onChangepriceRadios = this.onChangepriceRadios.bind(this);
         this.onInputPriceManual = this.onInputPriceManual.bind(this);
+        this.onInputPrice = this.onInputPrice.bind(this);
     }
 
     connectedCallback() {
@@ -61,6 +62,7 @@ export default class OrderBid extends HTMLElement {
             radio.addEventListener("change", this.onChangepriceRadios);
         });
         this.priceManual.addEventListener("input", this.onInputPriceManual);
+        this.priceInput.addEventListener("input", this.onInputPrice);
     }
 
     private render() {
@@ -135,10 +137,20 @@ export default class OrderBid extends HTMLElement {
     }
 
     private calculatePrice(aPercent: number) {
-        if (!this.priceInput) return;
-
         const value = this.parent.avgBuyPrice * aPercent * 0.01;
-        this.orderData.price = Math.round(this.parent.avgBuyPrice + value);
+        this.setPrice(this.parent.avgBuyPrice + value);
+    }
+
+    private onInputPrice(event: Event) {
+        const target = event.target as HTMLInputElement;
+        const validateValue = target.value.replace(/[^0-9.-]+/g, "");
+
+        this.setPrice(parseInt(validateValue));
+    }
+
+    private setPrice(price: number) {
+        if (!this.priceInput) return;
+        this.orderData.price = Math.round(price);
         this.priceInput.value = this.orderData.price.toLocaleString();
     }
 }

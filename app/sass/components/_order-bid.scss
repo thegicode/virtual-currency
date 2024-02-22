@@ -9,11 +9,11 @@ order-ask {
         border-radius: 5px;
     }
 
-    fieldset {
-        position: absolute;
-        top: -1000rem;
-        visibility: hidden;
+    legend {
+        padding-bottom: 7px;
+        font-weight: bold;
     }
+
     .order-contents {
         display: flex;
         flex-direction: column;
@@ -40,7 +40,7 @@ order-ask {
     }
 
     .order-price,
-    .order-amount {
+    .order-volume {
         &-options {
             display: flex;
             justify-content: space-between;
@@ -87,7 +87,7 @@ order-ask {
 }
 
 order-ask {
-    input[name="amount"] {
+    input[name="volume"] {
         width: 100%;
     }
 }

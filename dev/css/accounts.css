@@ -120,11 +120,10 @@ order-ask form {
   padding: 7px 0;
   border-radius: 5px;
 }
-order-bid fieldset,
-order-ask fieldset {
-  position: absolute;
-  top: -1000rem;
-  visibility: hidden;
+order-bid legend,
+order-ask legend {
+  padding-bottom: 7px;
+  font-weight: bold;
 }
 order-bid .order-contents,
 order-ask .order-contents {
@@ -153,47 +152,47 @@ order-ask input[type=number] {
   color: var(--font-color);
 }
 order-bid .order-price-options,
-order-bid .order-amount-options,
+order-bid .order-volume-options,
 order-ask .order-price-options,
-order-ask .order-amount-options {
+order-ask .order-volume-options {
   display: flex;
   justify-content: space-between;
   margin-bottom: 5px;
 }
 order-bid .order-price-options label,
-order-bid .order-amount-options label,
+order-bid .order-volume-options label,
 order-ask .order-price-options label,
-order-ask .order-amount-options label {
+order-ask .order-volume-options label {
   display: flex;
   align-items: center;
   gap: 3px;
 }
 order-bid .order-price-options input[name=price-option]:checked ~ input,
 order-bid .order-price-options input[name=amount-option]:checked ~ input,
-order-bid .order-amount-options input[name=price-option]:checked ~ input,
-order-bid .order-amount-options input[name=amount-option]:checked ~ input,
+order-bid .order-volume-options input[name=price-option]:checked ~ input,
+order-bid .order-volume-options input[name=amount-option]:checked ~ input,
 order-ask .order-price-options input[name=price-option]:checked ~ input,
 order-ask .order-price-options input[name=amount-option]:checked ~ input,
-order-ask .order-amount-options input[name=price-option]:checked ~ input,
-order-ask .order-amount-options input[name=amount-option]:checked ~ input {
+order-ask .order-volume-options input[name=price-option]:checked ~ input,
+order-ask .order-volume-options input[name=amount-option]:checked ~ input {
   pointer-events: initial;
 }
 order-bid .order-price-options input[name=price-option-manual],
 order-bid .order-price-options input[name=amount-option-manual],
-order-bid .order-amount-options input[name=price-option-manual],
-order-bid .order-amount-options input[name=amount-option-manual],
+order-bid .order-volume-options input[name=price-option-manual],
+order-bid .order-volume-options input[name=amount-option-manual],
 order-ask .order-price-options input[name=price-option-manual],
 order-ask .order-price-options input[name=amount-option-manual],
-order-ask .order-amount-options input[name=price-option-manual],
-order-ask .order-amount-options input[name=amount-option-manual] {
+order-ask .order-volume-options input[name=price-option-manual],
+order-ask .order-volume-options input[name=amount-option-manual] {
   width: 70px;
   margin-left: 3px;
   pointer-events: none;
 }
 order-bid .order-price input[name=price],
-order-bid .order-amount input[name=price],
+order-bid .order-volume input[name=price],
 order-ask .order-price input[name=price],
-order-ask .order-amount input[name=price] {
+order-ask .order-volume input[name=price] {
   width: 100%;
 }
 order-bid .order-actions,
@@ -210,7 +209,7 @@ order-ask .order-actions button {
   color: var(--font-color);
 }
 
-order-ask input[name=amount] {
+order-ask input[name=volume] {
   width: 100%;
 }
 

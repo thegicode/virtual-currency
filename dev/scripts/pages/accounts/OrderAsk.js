@@ -13,11 +13,11 @@ export default class OrderAsk extends HTMLElement {
     constructor(parent) {
         super();
         this.form = null;
-        this.amountInput = null;
+        this.volumeInput = null;
         this.priceInput = null;
-        this.amountRadios = null;
+        this.volumeRadios = null;
         this.priceRadios = null;
-        this.amountManual = null;
+        this.volumeManual = null;
         this.priceManual = null;
         this.orderData = {
             volume: 0,
@@ -29,32 +29,32 @@ export default class OrderAsk extends HTMLElement {
         this.hide = this.hide.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onReset = this.onReset.bind(this);
-        this.onChangeAmountRadios = this.onChangeAmountRadios.bind(this);
+        this.onChangeVolumeRadios = this.onChangeVolumeRadios.bind(this);
         this.onChangePriceRadios = this.onChangePriceRadios.bind(this);
-        this.onInputAmountManual = this.onInputAmountManual.bind(this);
+        this.onInputVolumeManual = this.onInputVolumeManual.bind(this);
         this.onInputPriceManual = this.onInputPriceManual.bind(this);
-        this.onPriceInput = this.onPriceInput.bind(this);
+        this.onInputPrice = this.onInputPrice.bind(this);
     }
     connectedCallback() {
         this.render();
         this.form = this.querySelector("form");
-        this.amountInput = this.querySelector("input[name=amount]");
+        this.volumeInput = this.querySelector("input[name=volume]");
         this.priceInput = this.querySelector("input[name=price]");
-        this.amountRadios = this.querySelectorAll("input[name=amount-option]");
+        this.volumeRadios = this.querySelectorAll("input[name=volume-option]");
         this.priceRadios = this.querySelectorAll("input[name=price-option]");
-        this.amountManual = this.querySelector("input[name=amount-option-manual]");
+        this.volumeManual = this.querySelector("input[name=volume-option-manual]");
         this.priceManual = this.querySelector("input[name=price-option-manual]");
         this.form.addEventListener("submit", this.onSubmit);
         this.form.addEventListener("reset", this.onReset);
-        this.amountRadios.forEach((radio) => {
-            radio.addEventListener("change", this.onChangeAmountRadios);
+        this.volumeRadios.forEach((radio) => {
+            radio.addEventListener("change", this.onChangeVolumeRadios);
         });
-        this.amountManual.addEventListener("input", this.onInputAmountManual);
+        this.volumeManual.addEventListener("input", this.onInputVolumeManual);
         this.priceRadios.forEach((radio) => {
             radio.addEventListener("change", this.onChangePriceRadios);
         });
         this.priceManual.addEventListener("input", this.onInputPriceManual);
-        this.priceInput.addEventListener("input", this.onPriceInput);
+        this.priceInput.addEventListener("input", this.onInputPrice);
     }
     render() {
         const cloned = cloneTemplate(this.template);
@@ -97,21 +97,21 @@ export default class OrderAsk extends HTMLElement {
         this.orderData.price = 0;
         console.log(this.orderData);
     }
-    onChangeAmountRadios(event) {
+    onChangeVolumeRadios(event) {
         const target = event.target;
         if (target.value === "manual")
             return;
         this.calculateVolume(parseInt(target.value));
     }
-    onInputAmountManual(event) {
+    onInputVolumeManual(event) {
         const target = event.target;
         this.calculateVolume(parseInt(target.value));
     }
     calculateVolume(aPercent) {
-        if (!this.amountInput)
+        if (!this.volumeInput)
             return;
         this.orderData.volume = (this.parent.volume * aPercent) / 100;
-        this.amountInput.value = this.orderData.volume.toString();
+        this.volumeInput.value = this.orderData.volume.toString();
     }
     onChangePriceRadios(event) {
         const target = event.target;
@@ -127,9 +127,10 @@ export default class OrderAsk extends HTMLElement {
         const value = this.parent.avgBuyPrice * aPercent * 0.01;
         this.setPrice(this.parent.avgBuyPrice + value);
     }
-    onPriceInput(event) {
+    onInputPrice(event) {
         const target = event.target;
-        this.setPrice(parseInt(target.value));
+        const validateValue = target.value.replace(/[^0-9.-]+/g, "");
+        this.setPrice(parseInt(validateValue));
     }
     setPrice(price) {
         if (!this.priceInput)

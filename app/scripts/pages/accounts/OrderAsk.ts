@@ -6,11 +6,11 @@ export default class OrderAsk extends HTMLElement {
     private parent: AccountItem;
     private template: HTMLTemplateElement;
     private form: HTMLFormElement | null = null;
-    private amountInput: HTMLInputElement | null = null;
+    private volumeInput: HTMLInputElement | null = null;
     private priceInput: HTMLInputElement | null = null;
-    private amountRadios: any | null = null;
+    private volumeRadios: any | null = null;
     private priceRadios: any | null = null;
-    private amountManual: HTMLInputElement | null = null;
+    private volumeManual: HTMLInputElement | null = null;
     private priceManual: HTMLInputElement | null = null;
     private orderData: {
         volume: number;
@@ -33,11 +33,11 @@ export default class OrderAsk extends HTMLElement {
         this.hide = this.hide.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onReset = this.onReset.bind(this);
-        this.onChangeAmountRadios = this.onChangeAmountRadios.bind(this);
+        this.onChangeVolumeRadios = this.onChangeVolumeRadios.bind(this);
         this.onChangePriceRadios = this.onChangePriceRadios.bind(this);
-        this.onInputAmountManual = this.onInputAmountManual.bind(this);
+        this.onInputVolumeManual = this.onInputVolumeManual.bind(this);
         this.onInputPriceManual = this.onInputPriceManual.bind(this);
-        this.onPriceInput = this.onPriceInput.bind(this);
+        this.onInputPrice = this.onInputPrice.bind(this);
     }
 
     connectedCallback() {
@@ -45,22 +45,22 @@ export default class OrderAsk extends HTMLElement {
 
         this.form = this.querySelector("form") as HTMLFormElement;
 
-        this.amountInput = this.querySelector(
-            "input[name=amount]"
+        this.volumeInput = this.querySelector(
+            "input[name=volume]"
         ) as HTMLInputElement;
         this.priceInput = this.querySelector(
             "input[name=price]"
         ) as HTMLInputElement;
 
-        this.amountRadios = this.querySelectorAll<HTMLInputElement>(
-            "input[name=amount-option]"
+        this.volumeRadios = this.querySelectorAll<HTMLInputElement>(
+            "input[name=volume-option]"
         );
         this.priceRadios = this.querySelectorAll<HTMLInputElement>(
             "input[name=price-option]"
         );
 
-        this.amountManual = this.querySelector(
-            "input[name=amount-option-manual]"
+        this.volumeManual = this.querySelector(
+            "input[name=volume-option-manual]"
         ) as HTMLInputElement;
         this.priceManual = this.querySelector(
             "input[name=price-option-manual]"
@@ -69,17 +69,17 @@ export default class OrderAsk extends HTMLElement {
         this.form.addEventListener("submit", this.onSubmit);
         this.form.addEventListener("reset", this.onReset);
 
-        this.amountRadios.forEach((radio: HTMLInputElement) => {
-            radio.addEventListener("change", this.onChangeAmountRadios);
+        this.volumeRadios.forEach((radio: HTMLInputElement) => {
+            radio.addEventListener("change", this.onChangeVolumeRadios);
         });
-        this.amountManual.addEventListener("input", this.onInputAmountManual);
+        this.volumeManual.addEventListener("input", this.onInputVolumeManual);
 
         this.priceRadios.forEach((radio: HTMLInputElement) => {
             radio.addEventListener("change", this.onChangePriceRadios);
         });
         this.priceManual.addEventListener("input", this.onInputPriceManual);
 
-        this.priceInput.addEventListener("input", this.onPriceInput);
+        this.priceInput.addEventListener("input", this.onInputPrice);
     }
 
     private render() {
@@ -131,19 +131,19 @@ export default class OrderAsk extends HTMLElement {
     }
 
     // volume
-    private onChangeAmountRadios(event: Event) {
+    private onChangeVolumeRadios(event: Event) {
         const target = event.target as HTMLInputElement;
         if (target.value === "manual") return;
         this.calculateVolume(parseInt(target.value));
     }
-    private onInputAmountManual(event: Event) {
+    private onInputVolumeManual(event: Event) {
         const target = event.target as HTMLInputElement;
         this.calculateVolume(parseInt(target.value));
     }
     private calculateVolume(aPercent: number) {
-        if (!this.amountInput) return;
+        if (!this.volumeInput) return;
         this.orderData.volume = (this.parent.volume * aPercent) / 100;
-        this.amountInput.value = this.orderData.volume.toString();
+        this.volumeInput.value = this.orderData.volume.toString();
     }
 
     // price
@@ -160,9 +160,10 @@ export default class OrderAsk extends HTMLElement {
         const value = this.parent.avgBuyPrice * aPercent * 0.01;
         this.setPrice(this.parent.avgBuyPrice + value);
     }
-    private onPriceInput(event: Event) {
+    private onInputPrice(event: Event) {
         const target = event.target as HTMLInputElement;
-        this.setPrice(parseInt(target.value));
+        const validateValue = target.value.replace(/[^0-9.-]+/g, "");
+        this.setPrice(parseInt(validateValue));
     }
     private setPrice(price: number) {
         if (!this.priceInput) return;

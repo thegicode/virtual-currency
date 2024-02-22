@@ -30,6 +30,7 @@ export default class OrderBid extends HTMLElement {
         this.onInputAmount = this.onInputAmount.bind(this);
         this.onChangepriceRadios = this.onChangepriceRadios.bind(this);
         this.onInputPriceManual = this.onInputPriceManual.bind(this);
+        this.onInputPrice = this.onInputPrice.bind(this);
     }
     connectedCallback() {
         this.render();
@@ -45,6 +46,7 @@ export default class OrderBid extends HTMLElement {
             radio.addEventListener("change", this.onChangepriceRadios);
         });
         this.priceManual.addEventListener("input", this.onInputPriceManual);
+        this.priceInput.addEventListener("input", this.onInputPrice);
     }
     render() {
         const cloned = cloneTemplate(this.template);
@@ -107,10 +109,18 @@ export default class OrderBid extends HTMLElement {
         this.calculatePrice(-parseInt(target.value));
     }
     calculatePrice(aPercent) {
+        const value = this.parent.avgBuyPrice * aPercent * 0.01;
+        this.setPrice(this.parent.avgBuyPrice + value);
+    }
+    onInputPrice(event) {
+        const target = event.target;
+        const validateValue = target.value.replace(/[^0-9.-]+/g, "");
+        this.setPrice(parseInt(validateValue));
+    }
+    setPrice(price) {
         if (!this.priceInput)
             return;
-        const value = this.parent.avgBuyPrice * aPercent * 0.01;
-        this.orderData.price = Math.round(this.parent.avgBuyPrice + value);
+        this.orderData.price = Math.round(price);
         this.priceInput.value = this.orderData.price.toLocaleString();
     }
 }
