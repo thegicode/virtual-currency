@@ -1,5 +1,6 @@
 import { cloneTemplate } from "@app/scripts/utils/helpers";
 import AccountItem from "./AccountItem";
+import OrderedItem from "./OrderedItem";
 
 export default class OrderBid extends HTMLElement {
     private parent: AccountItem;
@@ -7,15 +8,15 @@ export default class OrderBid extends HTMLElement {
     private form: HTMLFormElement | null = null;
     private amountInput: HTMLInputElement | null = null;
     private priceInput: HTMLInputElement | null = null;
-    private priceSelect: HTMLSelectElement | null = null;
+    private priceRadios: any | null = null;
     private priceManual: HTMLInputElement | null = null;
     private hideButton: HTMLButtonElement | null = null;
-    private formData: {
-        amount: number | null;
-        price: number | null;
+    private orderData: {
+        amountPrice: number;
+        price: number;
     } = {
-        amount: null,
-        price: null,
+        amountPrice: 0,
+        price: 0,
     };
 
     constructor(parent: AccountItem) {
@@ -29,10 +30,10 @@ export default class OrderBid extends HTMLElement {
 
         this.show = this.show.bind(this);
         this.hide = this.hide.bind(this);
-        this.onChangePriceSelect = this.onChangePriceSelect.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onReset = this.onReset.bind(this);
         this.onInputAmount = this.onInputAmount.bind(this);
+        this.onChangepriceRadios = this.onChangepriceRadios.bind(this);
         this.onInputPriceManual = this.onInputPriceManual.bind(this);
     }
 
@@ -47,11 +48,11 @@ export default class OrderBid extends HTMLElement {
         this.priceInput = this.querySelector(
             "input[name=price]"
         ) as HTMLInputElement;
-        this.priceSelect = this.querySelector(
-            "select[name=price-option]"
-        ) as HTMLSelectElement;
+        this.priceRadios = this.querySelectorAll<HTMLInputElement>(
+            "input[name=price-option]"
+        );
         this.priceManual = this.querySelector(
-            "input[name=price-manual]"
+            "input[name=price-option-manual]"
         ) as HTMLInputElement;
 
         this.hideButton = this.querySelector(
@@ -61,7 +62,9 @@ export default class OrderBid extends HTMLElement {
         this.form.addEventListener("submit", this.onSubmit);
         this.form.addEventListener("reset", this.onReset);
         this.amountInput.addEventListener("input", this.onInputAmount);
-        this.priceSelect.addEventListener("change", this.onChangePriceSelect);
+        this.priceRadios.forEach((radio: HTMLInputElement) => {
+            radio.addEventListener("change", this.onChangepriceRadios);
+        });
         this.priceManual.addEventListener("input", this.onInputPriceManual);
         this.hideButton.addEventListener("click", this.hide);
     }
@@ -82,28 +85,55 @@ export default class OrderBid extends HTMLElement {
         this.parent.hideOrderBid();
     }
 
-    private onSubmit(event: Event) {
+    private async onSubmit(event: Event) {
         event.preventDefault();
-        console.log(this.formData);
+
+        const price = Math.round(this.orderData.price || 0);
+
+        const volume =
+            this.orderData.amountPrice && this.orderData.price
+                ? (this.orderData.amountPrice / price).toString()
+                : "0";
+
+        const searchParams = new URLSearchParams({
+            market: this.parent.market,
+            side: "bid",
+            volume,
+            price: price.toString() ?? "",
+            ord_type: "limit",
+        });
+
+        const response = await fetch(`/fetchOrders?${searchParams}`);
+        const data = await response.json();
+
+        this.renderOrderItem(data);
+    }
+
+    private renderOrderItem(data: IOrdered) {
+        const orderItem = new OrderedItem(data);
+        if (this.parent.orderedElement) {
+            const firstChild =
+                this.parent.orderedElement.querySelector("ordered-item");
+            this.parent.orderedElement.insertBefore(orderItem, firstChild);
+        }
     }
 
     private onReset() {
-        this.formData.amount = null;
-        this.formData.price = null;
-        console.log(this.formData);
+        this.orderData.amountPrice = 0;
+        this.orderData.price = 0;
+        console.log(this.orderData);
     }
 
     private onInputAmount(event: Event) {
         const target = event.target as HTMLInputElement;
         const validateValue = target.value.replace(/[^0-9.-]+/g, "");
-        this.formData.amount = Number(validateValue);
-        target.value = this.formData.amount.toLocaleString();
+        this.orderData.amountPrice = Number(validateValue);
+        target.value = this.orderData.amountPrice.toLocaleString();
     }
 
-    private onChangePriceSelect(event: Event) {
-        if (!this.priceInput) return;
-
-        const target = event.target as HTMLSelectElement;
+    private onChangepriceRadios(event: Event) {
+        const target = event.target as HTMLInputElement;
+        if (target.value === "manual") return;
         this.calculatePrice(parseInt(target.value));
     }
 
@@ -116,7 +146,7 @@ export default class OrderBid extends HTMLElement {
         if (!this.priceInput) return;
 
         const value = this.parent.avgBuyPrice * aPercent * 0.01;
-        this.formData.price = this.parent.avgBuyPrice + value;
-        this.priceInput.value = this.formData.price.toLocaleString();
+        this.orderData.price = this.parent.avgBuyPrice + value;
+        this.priceInput.value = this.orderData.price.toLocaleString();
     }
 }

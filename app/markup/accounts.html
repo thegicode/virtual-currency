@@ -86,23 +86,55 @@
                 </template>
 
                 <template id="tp-orderBid">
-                    <!-- <order-bid> -->
                     <form>
                         <fieldset>매수 주문</fieldset>
                         <div class="order-inputs">
                             <div class="order-row">
-                                <!-- <label>
-                                    <input type="radio" name="amount-label" value="price" checked>
-                                    <span>주문총액</span>
-                                </label> 
-                                <label>
-                                    <input type="radio" name="amount-label" value="amount">
-                                    <span>주문수량</span>
-                                </label> -->
+                                <input type="text" name="amount" min="0" placeholder="주문총액" title="주문총액" required>
+                            </div>
+                            <div class="order-price">
+                                <div class="order-price-options">
+                                    <label>
+                                        <input type="radio" name="price-option" value="-5">
+                                        <span>-5%</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="price-option" value="-10">
+                                        <span>-10%</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="price-option" value="-20">
+                                        <span>-20%</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="price-option" value="manual">
+                                        <span>직접 입력</span>
+                                        <span>-</span>
+                                        <input type="number" name="price-option-manual">
+                                        <span>%</span>
+                                    </label>
+                                </div>
+
+                                <input type="text" name="price" min="0" title="가격" placeholder="가격" required>
+
+                            </div>
+                        </div>
+                        <div class="order-actions">
+                            <button type="submit">매수</button>
+                            <button type="reset">초기화</button>
+                            <button type="button" class="hideButton">x 가리기</button>
+                        </div>
+                    </form>
+                </template>
+
+                <template id="tp-orderAsk">
+                    <form>
+                        <fieldset>매도 주문</fieldset>
+                        <div class="order-inputs">
+                            <div class="order-row">
                                 <input type="text" name="amount" min="0" placeholder="주문총액" required>
                             </div>
                             <label class="order-row">
-                                <!-- <span class="label">주문가격</span> -->
                                 <input type="text" name="price" min="0" placeholder="가격" required>
                                
                                 <label for="check-price">직접입력</label>
@@ -117,9 +149,6 @@
                                 <input type="number" name="price-manual">
                                 <span>%</span>
                             </label>
-                            <!-- <label class="order-row">
-                                <input type="number" name="total" min="0" placeholder="총액">
-                            </label> -->
                         </div>
                         <div class="order-actions">
                             <button type="submit">매수</button>
@@ -127,7 +156,6 @@
                             <button type="button" class="hideButton">x 가리기</button>
                         </div>
                     </form>
-                <!-- </order-bid> -->
                 </template>
 
             </section>

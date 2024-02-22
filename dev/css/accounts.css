@@ -46,6 +46,9 @@ app-accounts .assets[data-loading=true] {
 app-accounts .assets[data-loading=false] {
   opacity: 1;
 }
+app-accounts .assets h2 {
+  margin: 0 0 10px;
+}
 app-accounts .assets h4 {
   margin: 0 0 10px;
 }
@@ -79,6 +82,7 @@ app-accounts .accountsList[data-loading=true] {
 account-item {
   overflow: hidden;
   display: block;
+  position: relative;
   margin: 5px;
   border-radius: 7px;
   border: 2px solid var(--border-color);
@@ -112,6 +116,9 @@ account-item header .name .unitCurrency {
   margin-left: 5px;
 }
 account-item header .orderedButton {
+  position: absolute;
+  top: 0;
+  right: 0;
   margin-left: auto;
   padding: 5px 10px;
   font-size: 11px;
@@ -154,10 +161,10 @@ account-item .account-actions button {
   border-color: #d8edf0;
   background-color: #e6f6f1;
   font-size: 11px;
-  color: #629093;
+  color: var(--font-color);
 }
 account-item .account-actions button:hover {
-  background-color: #eafff9;
+  background-color: #fff;
 }
 
 order-bid {
@@ -186,8 +193,7 @@ order-bid .order-row {
   gap: 5px;
 }
 order-bid input[type=text],
-order-bid input[type=number],
-order-bid select {
+order-bid input[type=number] {
   flex: 1;
   height: 25px;
   box-sizing: border-box;
@@ -197,17 +203,26 @@ order-bid select {
   font-size: 12px;
   color: var(--font-color);
 }
-order-bid select[name=price-option] {
-  flex: 0.5;
+order-bid .order-price-options {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
 }
-order-bid input[name=price-manual] {
-  display: none;
+order-bid .order-price-options label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
-order-bid input[name=check-price-manual]:checked ~ select {
-  display: none;
+order-bid .order-price-options input[name=price-option-manual] {
+  width: 70px;
+  margin-left: 3px;
+  pointer-events: none;
 }
-order-bid input[name=check-price-manual]:checked ~ input[name=price-manual] {
-  display: block;
+order-bid .order-price-options input[name=price-option]:checked ~ input {
+  pointer-events: initial;
+}
+order-bid .order-price input[name=price] {
+  width: 100%;
 }
 order-bid .order-actions {
   display: flex;
@@ -227,6 +242,8 @@ order-bid .order-actions button {
 .ordered .orderedTitle {
   margin: 0;
   padding: 1rem var(--margin-side) 0;
+  font-size: 1.1rem;
+  color: #7f7f7f;
 }
 
 ordered-item {
@@ -261,7 +278,7 @@ ordered-item .ordered-contents {
 }
 ordered-item .ordered-contents p {
   width: 50%;
-  margin: 5px 0;
+  margin: 3px 0;
 }
 ordered-item .ordered-contents p span {
   margin-left: 5px;
@@ -269,7 +286,6 @@ ordered-item .ordered-contents p span {
 ordered-item .ordered-actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: 10px;
 }
 ordered-item .ordered-actions button {
   padding: 3px 7px;
