@@ -181,7 +181,7 @@ order-bid fieldset {
   top: -1000rem;
   visibility: hidden;
 }
-order-bid .order-inputs {
+order-bid .order-contents {
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -237,11 +237,12 @@ order-bid .order-actions button {
 }
 
 .ordered {
+  padding: 1rem 0;
   border-top: 1px dashed var(--border-color);
 }
 .ordered .orderedTitle {
   margin: 0;
-  padding: 1rem var(--margin-side) 0;
+  padding: 0 var(--margin-side) 5px;
   font-size: 1.1rem;
   color: #7f7f7f;
 }
@@ -249,7 +250,7 @@ order-bid .order-actions button {
 ordered-item {
   display: block;
   position: relative;
-  padding: var(--margin-side);
+  padding: 3px var(--margin-side) 0;
 }
 ordered-item[data-side=ask] .side {
   color: var(--blue-color);

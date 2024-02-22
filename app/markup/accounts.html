@@ -88,10 +88,10 @@
                 <template id="tp-orderBid">
                     <form>
                         <fieldset>매수 주문</fieldset>
-                        <div class="order-inputs">
-                            <div class="order-row">
-                                <input type="text" name="amount" min="0" placeholder="주문총액" title="주문총액" required>
-                            </div>
+                        <div class="order-contents">
+                            <label class="order-row">
+                                <input type="text" name="amount" min="0" placeholder="주문총액" required>
+                            </label>
                             <div class="order-price">
                                 <div class="order-price-options">
                                     <label>
@@ -114,9 +114,7 @@
                                         <span>%</span>
                                     </label>
                                 </div>
-
                                 <input type="text" name="price" min="0" title="가격" placeholder="가격" required>
-
                             </div>
                         </div>
                         <div class="order-actions">

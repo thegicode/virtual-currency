@@ -190,11 +190,10 @@ order-bid {
         top: -1000rem;
         visibility: hidden;
     }
-    .order-inputs {
+    .order-contents {
         display: flex;
         flex-direction: column;
         gap: 5px;
-        // padding: 0 5px 5px;
     }
 
     .order-row {
@@ -261,11 +260,12 @@ order-bid {
 }
 
 .ordered {
+    padding: 1rem 0;
     border-top: 1px dashed var(--border-color);
 
     .orderedTitle {
         margin: 0;
-        padding: 1rem var(--margin-side) 0;
+        padding: 0 var(--margin-side) 5px;
         font-size: 1.1rem;
         color: #7f7f7f;
     }
@@ -274,8 +274,7 @@ order-bid {
 ordered-item {
     display: block;
     position: relative;
-    padding: var(--margin-side);
-    // border-bottom: 1px dashed #ddd;
+    padding: 3px var(--margin-side) 0;
 
     &[data-side="ask"] .side {
         color: var(--blue-color);
