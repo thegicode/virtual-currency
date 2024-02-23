@@ -17,6 +17,7 @@ export default class OrderBase extends HTMLElement {
         this.priceRadios = null;
         this.priceManual = null;
         this.priceInput = null;
+        this.memoElement = null;
         this.orderPrice = 0;
         this.accountItem = accountItem;
         this.onChangepriceRadios = this.onChangepriceRadios.bind(this);
@@ -30,6 +31,7 @@ export default class OrderBase extends HTMLElement {
         this.priceRadios = this.querySelectorAll("input[name=price-option]");
         this.priceManual = this.querySelector("input[name=price-option-manual]");
         this.priceInput = this.querySelector("input[name=price]");
+        this.memoElement = this.querySelector(".memo");
         this.priceRadios.forEach((radio) => {
             radio.addEventListener("change", this.onChangepriceRadios);
         });

@@ -5,7 +5,6 @@ export default class OrderAsk extends OrderBase {
     private volumeRadios: NodeListOf<HTMLInputElement> | null = null;
     private volumeManual: HTMLInputElement | null = null;
     private volumeInput: HTMLInputElement | null = null;
-    private memoElement: HTMLElement | null = null;
     private orderVolume: number = 0;
 
     constructor(parent: AccountItem) {
@@ -38,8 +37,6 @@ export default class OrderAsk extends OrderBase {
         this.volumeManual = this.querySelector(
             "input[name=volume-option-manual]"
         ) as HTMLInputElement;
-
-        this.memoElement = this.querySelector(".memo") as HTMLElement;
 
         this.formElement?.addEventListener("submit", this.onSubmit);
         this.formElement?.addEventListener("reset", this.onReset);
@@ -75,9 +72,9 @@ export default class OrderAsk extends OrderBase {
         const isBidPossible = this.checkOrder(orderChanceData);
 
         if (isBidPossible) this.fetchData(searchParams);
-        else {
-            if (this.memoElement) this.memoElement.textContent = "매도 실패";
-        }
+        else if (this.memoElement) this.memoElement.textContent = "매도 실패";
+
+        this.formElement?.reset();
     }
 
     private checkOrder(chanceData: any) {

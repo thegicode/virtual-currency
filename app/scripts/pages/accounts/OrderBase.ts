@@ -10,6 +10,7 @@ export default class OrderBase extends HTMLElement {
     protected priceRadios: NodeListOf<HTMLInputElement> | null = null;
     protected priceManual: HTMLInputElement | null = null;
     protected priceInput: HTMLInputElement | null = null;
+    protected memoElement: HTMLElement | null = null;
 
     protected orderPrice: number = 0;
 
@@ -35,6 +36,7 @@ export default class OrderBase extends HTMLElement {
             "input[name=price-option-manual]"
         );
         this.priceInput = this.querySelector("input[name=price]");
+        this.memoElement = this.querySelector(".memo") as HTMLElement;
 
         this.priceRadios.forEach((radio: HTMLInputElement) => {
             radio.addEventListener("change", this.onChangepriceRadios);

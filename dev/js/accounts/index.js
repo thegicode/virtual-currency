@@ -145,6 +145,7 @@
       this.priceRadios = null;
       this.priceManual = null;
       this.priceInput = null;
+      this.memoElement = null;
       this.orderPrice = 0;
       this.accountItem = accountItem;
       this.onChangepriceRadios = this.onChangepriceRadios.bind(this);
@@ -158,6 +159,7 @@
       this.priceRadios = this.querySelectorAll("input[name=price-option]");
       this.priceManual = this.querySelector("input[name=price-option-manual]");
       this.priceInput = this.querySelector("input[name=price]");
+      this.memoElement = this.querySelector(".memo");
       this.priceRadios.forEach((radio) => {
         radio.addEventListener("change", this.onChangepriceRadios);
       });
@@ -278,7 +280,7 @@
       this.accountItem.hideOrderBid();
     }
     onSubmit(event) {
-      var _a;
+      var _a, _b;
       return __awaiter3(this, void 0, void 0, function* () {
         event.preventDefault();
         if (!this.orderAmountPrice || !this.orderPrice)
@@ -295,6 +297,9 @@
         const isBidPossible = this.checkOrder(orderChanceData, volume);
         if (isBidPossible)
           yield this.fetchData(searchParams);
+        else if (this.memoElement)
+          this.memoElement.textContent = "\uB9E4\uC218 \uC2E4\uD328";
+        (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.reset();
       });
     }
     checkOrder(chanceData, volume) {
@@ -351,7 +356,6 @@
       this.volumeRadios = null;
       this.volumeManual = null;
       this.volumeInput = null;
-      this.memoElement = null;
       this.orderVolume = 0;
       this.template = document.querySelector("#tp-orderAsk");
       this.show = this.show.bind(this);
@@ -368,7 +372,6 @@
       this.volumeInput = this.querySelector("input[name=volume]");
       this.volumeRadios = this.querySelectorAll("input[name=volume-option]");
       this.volumeManual = this.querySelector("input[name=volume-option-manual]");
-      this.memoElement = this.querySelector(".memo");
       (_a = this.formElement) === null || _a === void 0 ? void 0 : _a.addEventListener("submit", this.onSubmit);
       (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.addEventListener("reset", this.onReset);
       this.volumeRadios.forEach((radio) => {
@@ -385,7 +388,7 @@
       this.accountItem.hideOrderAsk();
     }
     onSubmit(event) {
-      var _a;
+      var _a, _b;
       return __awaiter4(this, void 0, void 0, function* () {
         event.preventDefault();
         const searchParams = new URLSearchParams({
@@ -399,10 +402,9 @@
         const isBidPossible = this.checkOrder(orderChanceData);
         if (isBidPossible)
           this.fetchData(searchParams);
-        else {
-          if (this.memoElement)
-            this.memoElement.textContent = "\uB9E4\uB3C4 \uC2E4\uD328";
-        }
+        else if (this.memoElement)
+          this.memoElement.textContent = "\uB9E4\uB3C4 \uC2E4\uD328";
+        (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.reset();
       });
     }
     checkOrder(chanceData) {

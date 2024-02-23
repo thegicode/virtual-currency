@@ -38,7 +38,7 @@ export default class OrderBid extends OrderBase {
         this.accountItem.hideOrderBid();
     }
     onSubmit(event) {
-        var _a;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             if (!this.orderAmountPrice || !this.orderPrice)
@@ -55,6 +55,9 @@ export default class OrderBid extends OrderBase {
             const isBidPossible = this.checkOrder(orderChanceData, volume);
             if (isBidPossible)
                 yield this.fetchData(searchParams);
+            else if (this.memoElement)
+                this.memoElement.textContent = "매수 실패";
+            (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.reset();
         });
     }
     checkOrder(chanceData, volume) {

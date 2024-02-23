@@ -63,6 +63,9 @@ export default class OrderBid extends OrderBase {
         const isBidPossible = this.checkOrder(orderChanceData, volume);
 
         if (isBidPossible) await this.fetchData(searchParams);
+        else if (this.memoElement) this.memoElement.textContent = "매수 실패";
+
+        this.formElement?.reset();
     }
 
     private checkOrder(chanceData: any, volume: number) {

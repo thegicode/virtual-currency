@@ -14,7 +14,6 @@ export default class OrderAsk extends OrderBase {
         this.volumeRadios = null;
         this.volumeManual = null;
         this.volumeInput = null;
-        this.memoElement = null;
         this.orderVolume = 0;
         this.template = document.querySelector("#tp-orderAsk");
         this.show = this.show.bind(this);
@@ -31,7 +30,6 @@ export default class OrderAsk extends OrderBase {
         this.volumeInput = this.querySelector("input[name=volume]");
         this.volumeRadios = this.querySelectorAll("input[name=volume-option]");
         this.volumeManual = this.querySelector("input[name=volume-option-manual]");
-        this.memoElement = this.querySelector(".memo");
         (_a = this.formElement) === null || _a === void 0 ? void 0 : _a.addEventListener("submit", this.onSubmit);
         (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.addEventListener("reset", this.onReset);
         this.volumeRadios.forEach((radio) => {
@@ -48,7 +46,7 @@ export default class OrderAsk extends OrderBase {
         this.accountItem.hideOrderAsk();
     }
     onSubmit(event) {
-        var _a;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             const searchParams = new URLSearchParams({
@@ -62,10 +60,9 @@ export default class OrderAsk extends OrderBase {
             const isBidPossible = this.checkOrder(orderChanceData);
             if (isBidPossible)
                 this.fetchData(searchParams);
-            else {
-                if (this.memoElement)
-                    this.memoElement.textContent = "매도 실패";
-            }
+            else if (this.memoElement)
+                this.memoElement.textContent = "매도 실패";
+            (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.reset();
         });
     }
     checkOrder(chanceData) {
