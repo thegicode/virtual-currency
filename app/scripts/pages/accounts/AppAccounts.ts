@@ -50,7 +50,12 @@ export default class AppAccounts extends HTMLElement {
                 formatOrders
             );
 
-            this.renderAssets(accountsResponse);
+            const profitPrices = processedAccounts.map(
+                (account) => account.profit
+            );
+            const profits = profitPrices.reduce((a, b) => a + b, 0);
+
+            this.renderAssets(accountsResponse, profits);
             this.renderAccounts(processedAccounts);
         } catch (error) {
             console.error(error);
@@ -65,7 +70,10 @@ export default class AppAccounts extends HTMLElement {
         return await response.json();
     }
 
-    private renderAssets({ assets, accounts }: IAccountsProps) {
+    private renderAssets(
+        { assets, accounts }: IAccountsProps,
+        profits: number
+    ) {
         const element = this.querySelector(".assets") as HTMLElement;
 
         const buyPrices = accounts.map((account: any) => account.buy_price);
@@ -73,18 +81,32 @@ export default class AppAccounts extends HTMLElement {
             (a: number, b: number) => a + b,
             0
         );
+        const profitRate = (profits / totalBuyPrice) * 100;
 
         const contentData = {
-            totalAsset: roundToDecimalPlace(
-                assets.balance + assets.locked + totalBuyPrice,
+            asset: roundToDecimalPlace(
+                assets.balance + assets.locked,
                 0
             ).toLocaleString(),
-            locked: roundToDecimalPlace(assets.locked, 0).toLocaleString(),
             unit: assets.unit_currency,
-            buyPrice: totalBuyPrice.toLocaleString(),
+            totalAsset: roundToDecimalPlace(
+                assets.balance + assets.locked + totalBuyPrice + profits,
+                0
+            ).toLocaleString(),
+            buyPrice: roundToDecimalPlace(totalBuyPrice, 0).toLocaleString(),
+            buyPriceReal: roundToDecimalPlace(
+                totalBuyPrice + profits,
+                0
+            ).toLocaleString(),
+            profits: roundToDecimalPlace(profits, 0).toLocaleString(),
+            profitRate: `${roundToDecimalPlace(profitRate, 2)}%`,
+            locked: roundToDecimalPlace(assets.locked, 0).toLocaleString(),
         };
 
         updateElementsTextWithData(contentData, element);
+
+        if (profits > 0) element.dataset.increase = "true";
+        if (profits < 0) element.dataset.increase = "false";
 
         delete element.dataset.loading;
     }
@@ -120,7 +142,7 @@ export default class AppAccounts extends HTMLElement {
         tickerData: ITicker[],
         orderedObject: Record<string, IOrdered[]>
     ) {
-        function _handleData(account: IAccount) {
+        function _formatData(account: IAccount) {
             const ticker = tickerData.find((t) => t.market === account.market);
             const orderedData = orderedObject[account.market];
 
@@ -150,7 +172,7 @@ export default class AppAccounts extends HTMLElement {
         }
 
         return accounts
-            .map((account) => _handleData(account))
+            .map((account) => _formatData(account))
             .filter((account) => account !== null) as IProcessedAccountData[];
     }
 

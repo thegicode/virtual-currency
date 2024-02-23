@@ -30,7 +30,9 @@ export default class AppAccounts extends HTMLElement {
                 const tickerResponse = yield this.fetchData(`/fetchTickers?markets=${encodeURIComponent(this.markets.join(","))}`);
                 const formatOrders = this.formatOrderedData(orderedResponse);
                 const processedAccounts = yield this.processAccountsData(accountsResponse.accounts, tickerResponse, formatOrders);
-                this.renderAssets(accountsResponse);
+                const profitPrices = processedAccounts.map((account) => account.profit);
+                const profits = profitPrices.reduce((a, b) => a + b, 0);
+                this.renderAssets(accountsResponse, profits);
                 this.renderAccounts(processedAccounts);
             }
             catch (error) {
@@ -47,17 +49,26 @@ export default class AppAccounts extends HTMLElement {
             return yield response.json();
         });
     }
-    renderAssets({ assets, accounts }) {
+    renderAssets({ assets, accounts }, profits) {
         const element = this.querySelector(".assets");
         const buyPrices = accounts.map((account) => account.buy_price);
         const totalBuyPrice = buyPrices.reduce((a, b) => a + b, 0);
+        const profitRate = (profits / totalBuyPrice) * 100;
         const contentData = {
-            totalAsset: roundToDecimalPlace(assets.balance + assets.locked + totalBuyPrice, 0).toLocaleString(),
-            locked: roundToDecimalPlace(assets.locked, 0).toLocaleString(),
+            asset: roundToDecimalPlace(assets.balance + assets.locked, 0).toLocaleString(),
             unit: assets.unit_currency,
-            buyPrice: totalBuyPrice.toLocaleString(),
+            totalAsset: roundToDecimalPlace(assets.balance + assets.locked + totalBuyPrice + profits, 0).toLocaleString(),
+            buyPrice: roundToDecimalPlace(totalBuyPrice, 0).toLocaleString(),
+            buyPriceReal: roundToDecimalPlace(totalBuyPrice + profits, 0).toLocaleString(),
+            profits: roundToDecimalPlace(profits, 0).toLocaleString(),
+            profitRate: `${roundToDecimalPlace(profitRate, 2)}%`,
+            locked: roundToDecimalPlace(assets.locked, 0).toLocaleString(),
         };
         updateElementsTextWithData(contentData, element);
+        if (profits > 0)
+            element.dataset.increase = "true";
+        if (profits < 0)
+            element.dataset.increase = "false";
         delete element.dataset.loading;
     }
     formatOrderedData(data) {
@@ -81,7 +92,7 @@ export default class AppAccounts extends HTMLElement {
         }
     }
     processAccountsData(accounts, tickerData, orderedObject) {
-        function _handleData(account) {
+        function _formatData(account) {
             const ticker = tickerData.find((t) => t.market === account.market);
             const orderedData = orderedObject[account.market];
             if (!ticker) {
@@ -107,7 +118,7 @@ export default class AppAccounts extends HTMLElement {
             };
         }
         return accounts
-            .map((account) => _handleData(account))
+            .map((account) => _formatData(account))
             .filter((account) => account !== null);
     }
     renderAccounts(data) {

@@ -34,20 +34,43 @@ app-accounts {
             opacity: 1;
         }
 
+        &[data-increase="true"] {
+            .profits,
+            .profitRate {
+                color: var(--red-color);
+            }
+        }
+        &[data-increase="false"] {
+            .profits,
+            .profitRate {
+                color: var(--blue-color);
+            }
+        }
+
         h2 {
             margin: 0 0 10px;
         }
 
-        h4 {
-            margin: 0 0 10px;
+        .asset,
+        .totalAsset {
+            font-size: 14px;
         }
+    }
 
+    .assets-contents {
+        display: flex;
+        flex-wrap: wrap;
         p {
+            display: flex;
+            box-sizing: border-box;
+            width: 50%;
             margin: 5px 0;
+            padding-right: 3%;
         }
 
-        span {
-            margin-left: 5px;
+        strong {
+            margin-left: auto;
+            color: #6b62cf;
         }
     }
 

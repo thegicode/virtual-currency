@@ -289,17 +289,35 @@ app-accounts .assets[data-loading=true] {
 app-accounts .assets[data-loading=false] {
   opacity: 1;
 }
+app-accounts .assets[data-increase=true] .profits,
+app-accounts .assets[data-increase=true] .profitRate {
+  color: var(--red-color);
+}
+app-accounts .assets[data-increase=false] .profits,
+app-accounts .assets[data-increase=false] .profitRate {
+  color: var(--blue-color);
+}
 app-accounts .assets h2 {
   margin: 0 0 10px;
 }
-app-accounts .assets h4 {
-  margin: 0 0 10px;
+app-accounts .assets .asset,
+app-accounts .assets .totalAsset {
+  font-size: 14px;
 }
-app-accounts .assets p {
+app-accounts .assets-contents {
+  display: flex;
+  flex-wrap: wrap;
+}
+app-accounts .assets-contents p {
+  display: flex;
+  box-sizing: border-box;
+  width: 50%;
   margin: 5px 0;
+  padding-right: 3%;
 }
-app-accounts .assets span {
-  margin-left: 5px;
+app-accounts .assets-contents strong {
+  margin-left: auto;
+  color: #6b62cf;
 }
 app-accounts .accounts {
   margin-top: 1rem;
