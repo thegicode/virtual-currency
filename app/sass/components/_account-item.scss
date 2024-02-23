@@ -72,7 +72,8 @@ account-item {
             display: flex;
             width: 50%;
             margin: 3px 0;
-            span {
+            span,
+            strong {
                 margin-left: auto;
                 margin-right: 10px;
             }

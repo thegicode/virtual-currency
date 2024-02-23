@@ -87,7 +87,8 @@ account-item .account-contents p {
   width: 50%;
   margin: 3px 0;
 }
-account-item .account-contents p span {
+account-item .account-contents p span,
+account-item .account-contents p strong {
   margin-left: auto;
   margin-right: 10px;
 }
