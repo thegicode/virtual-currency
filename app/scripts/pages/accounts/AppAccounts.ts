@@ -18,14 +18,17 @@ export default class AppAccounts extends HTMLElement {
     }
 
     connectedCallback() {
-        this.loadAccountData();
+        this.loadAssetsAndAccounts();
     }
 
     disconnectedCallback() {}
 
-    private async loadAccountData() {
+    private async loadAssetsAndAccounts() {
         try {
-            const accountsResponse = await this.fetchData(`/fetchAccounts`);
+            const [accountsResponse, orderedResponse] = await Promise.all([
+                this.fetchData(`/fetchAccounts`),
+                this.fetchData(`/fetchOrdered`),
+            ]);
 
             this.markets = accountsResponse.accounts.map(
                 (account: IAccount) => account.market
@@ -37,21 +40,18 @@ export default class AppAccounts extends HTMLElement {
                 )}`
             );
 
-            this.displayAssets(accountsResponse.assets);
-
-            const orderedResponse = await this.fetchData(`/fetchOrdered`);
-            const orderedData = this.ordered(orderedResponse) as Record<
-                string,
-                IOrdered[]
-            >;
+            const formatOrders = this.formatOrderedData(
+                orderedResponse
+            ) as TOrdredData;
 
             const processedAccounts = await this.processAccountsData(
                 accountsResponse.accounts,
                 tickerResponse,
-                orderedData
+                formatOrders
             );
 
-            this.renderAccountsList(processedAccounts);
+            this.renderAssets(accountsResponse);
+            this.renderAccounts(processedAccounts);
         } catch (error) {
             console.error(error);
         }
@@ -65,37 +65,54 @@ export default class AppAccounts extends HTMLElement {
         return await response.json();
     }
 
-    private ordered(data: IOrdered[]) {
-        try {
-            let orderedData: { [key: string]: IOrdered[] } = {};
-            this.markets.map((market: string) => {
-                orderedData[market] = [];
-            });
-
-            data.map((order: IOrdered) => {
-                orderedData[order.market].push(order);
-            });
-
-            return orderedData;
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    private displayAssets(data: IAsset) {
+    private renderAssets({ assets, accounts }: IAccountsProps) {
         const element = this.querySelector(".assets") as HTMLElement;
 
-        const totalAsset = data.balance + data.locked;
+        const buyPrices = accounts.map((account: any) => account.buy_price);
+        const totalBuyPrice = buyPrices.reduce(
+            (a: number, b: number) => a + b,
+            0
+        );
 
         const contentData = {
-            totalAsset: roundToDecimalPlace(totalAsset, 0).toLocaleString(),
-            locked: roundToDecimalPlace(data.locked, 0).toLocaleString(),
-            unit: data.unit_currency,
+            totalAsset: roundToDecimalPlace(
+                assets.balance + assets.locked + totalBuyPrice,
+                0
+            ).toLocaleString(),
+            locked: roundToDecimalPlace(assets.locked, 0).toLocaleString(),
+            unit: assets.unit_currency,
+            buyPrice: totalBuyPrice.toLocaleString(),
         };
 
         updateElementsTextWithData(contentData, element);
 
         delete element.dataset.loading;
+    }
+
+    private formatOrderedData(data: IOrdered[]) {
+        try {
+            let formatOrders: TOrdredData = {};
+
+            // markets 배열에 있는 각 market에 대해 빈 배열을 할당
+            this.markets.forEach((market) => {
+                formatOrders[market] = [];
+            });
+
+            // 주어진 data 배열을 순회하면서 formatOrders 객체를 채움
+            data.forEach((order) => {
+                // 해당 market이 formatOrders 객체에 존재하면, order 객체를 배열에 추가
+                if (formatOrders[order.market]) {
+                    formatOrders[order.market].push(order);
+                } else {
+                    // 만약 이 market에 해당하는 배열이 아직 없으면, 이를 생성
+                    formatOrders[order.market] = [order];
+                }
+            });
+
+            return formatOrders;
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     private processAccountsData(
@@ -137,7 +154,7 @@ export default class AppAccounts extends HTMLElement {
             .filter((account) => account !== null) as IProcessedAccountData[];
     }
 
-    private renderAccountsList(data: IProcessedAccountData[]) {
+    private renderAccounts(data: IProcessedAccountData[]) {
         const fragment = new DocumentFragment();
 
         data.map((aData) => new AccountItem(aData)).forEach((accountItem) => {

@@ -24,9 +24,10 @@ async function accounts(req, res) {
             }
 
             const data = await response.json();
+            // console.log("account", data);
             const processedData = handleAccounts(data);
 
-            console.log("processedData", processedData);
+            // console.log("processedData", processedData);
 
             res.send(processedData);
 

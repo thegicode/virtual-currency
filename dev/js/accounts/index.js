@@ -602,21 +602,23 @@
       this.markets = [];
     }
     connectedCallback() {
-      this.loadAccountData();
+      this.loadAssetsAndAccounts();
     }
     disconnectedCallback() {
     }
-    loadAccountData() {
+    loadAssetsAndAccounts() {
       return __awaiter5(this, void 0, void 0, function* () {
         try {
-          const accountsResponse = yield this.fetchData(`/fetchAccounts`);
+          const [accountsResponse, orderedResponse] = yield Promise.all([
+            this.fetchData(`/fetchAccounts`),
+            this.fetchData(`/fetchOrdered`)
+          ]);
           this.markets = accountsResponse.accounts.map((account) => account.market);
           const tickerResponse = yield this.fetchData(`/fetchTickers?markets=${encodeURIComponent(this.markets.join(","))}`);
-          this.displayAssets(accountsResponse.assets);
-          const orderedResponse = yield this.fetchData(`/fetchOrdered`);
-          const orderedData = this.ordered(orderedResponse);
-          const processedAccounts = yield this.processAccountsData(accountsResponse.accounts, tickerResponse, orderedData);
-          this.renderAccountsList(processedAccounts);
+          const formatOrders = this.formatOrderedData(orderedResponse);
+          const processedAccounts = yield this.processAccountsData(accountsResponse.accounts, tickerResponse, formatOrders);
+          this.renderAssets(accountsResponse);
+          this.renderAccounts(processedAccounts);
         } catch (error) {
           console.error(error);
         }
@@ -631,30 +633,36 @@
         return yield response.json();
       });
     }
-    ordered(data) {
-      try {
-        let orderedData = {};
-        this.markets.map((market) => {
-          orderedData[market] = [];
-        });
-        data.map((order) => {
-          orderedData[order.market].push(order);
-        });
-        return orderedData;
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    displayAssets(data) {
+    renderAssets({ assets, accounts }) {
       const element = this.querySelector(".assets");
-      const totalAsset = data.balance + data.locked;
+      const buyPrices = accounts.map((account) => account.buy_price);
+      const totalBuyPrice = buyPrices.reduce((a, b) => a + b, 0);
       const contentData = {
-        totalAsset: roundToDecimalPlace(totalAsset, 0).toLocaleString(),
-        locked: roundToDecimalPlace(data.locked, 0).toLocaleString(),
-        unit: data.unit_currency
+        totalAsset: roundToDecimalPlace(assets.balance + assets.locked + totalBuyPrice, 0).toLocaleString(),
+        locked: roundToDecimalPlace(assets.locked, 0).toLocaleString(),
+        unit: assets.unit_currency,
+        buyPrice: totalBuyPrice.toLocaleString()
       };
       updateElementsTextWithData(contentData, element);
       delete element.dataset.loading;
+    }
+    formatOrderedData(data) {
+      try {
+        let formatOrders = {};
+        this.markets.forEach((market) => {
+          formatOrders[market] = [];
+        });
+        data.forEach((order) => {
+          if (formatOrders[order.market]) {
+            formatOrders[order.market].push(order);
+          } else {
+            formatOrders[order.market] = [order];
+          }
+        });
+        return formatOrders;
+      } catch (error) {
+        console.error(error);
+      }
     }
     processAccountsData(accounts, tickerData, orderedObject) {
       function _handleData(account) {
@@ -684,7 +692,7 @@
       }
       return accounts.map((account) => _handleData(account)).filter((account) => account !== null);
     }
-    renderAccountsList(data) {
+    renderAccounts(data) {
       const fragment = new DocumentFragment();
       data.map((aData) => new AccountItem(aData)).forEach((accountItem) => {
         fragment.appendChild(accountItem);

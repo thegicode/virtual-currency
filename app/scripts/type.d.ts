@@ -8,6 +8,11 @@ interface IAccount {
     volume: number;
 }
 
+interface IAccountsProps {
+    assets: IAsset;
+    accounts: IAccount[];
+}
+
 interface IAsset {
     avg_buy_price: number;
     avg_buy_price_modified: boolean;
@@ -54,3 +59,5 @@ interface ITicker {
     market: string;
     trade_price: number;
 }
+
+type TOrdredData = Record<string, IOrdered[]>;
