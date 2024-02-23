@@ -88,10 +88,11 @@ export default class AccountItem extends HTMLElement {
             ).toLocaleString(),
             avgBuyPrice: roundToDecimalPlace(
                 this.data.avgBuyPrice,
-                1
+                0
             ).toLocaleString(),
             profit: Math.round(this.data.profit).toLocaleString(),
             profitRate: roundToDecimalPlace(this.data.profitRate, 2) + "%",
+            tradePrice: this.data.tradePrice.toLocaleString(),
         };
 
         updateElementsTextWithData(contentData, cloned);

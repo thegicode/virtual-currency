@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import OrderBase from "./OrderBase";
 export default class OrderBid extends OrderBase {
     constructor(parent) {
@@ -30,18 +39,33 @@ export default class OrderBid extends OrderBase {
     }
     onSubmit(event) {
         var _a;
-        event.preventDefault();
-        const volume = this.orderAmountPrice && this.orderPrice
-            ? (this.orderAmountPrice / this.orderPrice).toString()
-            : "0";
-        const searchParams = new URLSearchParams({
-            market: this.accountItem.market,
-            side: "bid",
-            volume,
-            price: (_a = this.orderPrice.toString()) !== null && _a !== void 0 ? _a : "",
-            ord_type: "limit",
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            if (!this.orderAmountPrice || !this.orderPrice)
+                return;
+            const volume = this.orderAmountPrice / this.orderPrice;
+            const searchParams = new URLSearchParams({
+                market: this.accountItem.market,
+                side: "bid",
+                volume: volume.toString(),
+                price: (_a = this.orderPrice.toString()) !== null && _a !== void 0 ? _a : "",
+                ord_type: "limit",
+            });
+            const orderChanceData = yield this.getOrderChance();
+            const isBidPossible = this.checkOrder(orderChanceData, volume);
+            if (isBidPossible)
+                yield this.fetchData(searchParams);
         });
-        this.fetchData(searchParams);
+    }
+    checkOrder(chanceData, volume) {
+        const totalPrice = this.orderPrice * volume;
+        if (chanceData.market.state === "active" &&
+            chanceData.market.bid.min_total < totalPrice &&
+            chanceData.market.max_total > totalPrice &&
+            Number(chanceData.bid_account.balance) > volume) {
+            return true;
+        }
+        return false;
     }
     onReset() {
         this.orderAmountPrice = 0;

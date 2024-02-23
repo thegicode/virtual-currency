@@ -5,6 +5,7 @@ export default class OrderAsk extends OrderBase {
     private volumeRadios: NodeListOf<HTMLInputElement> | null = null;
     private volumeManual: HTMLInputElement | null = null;
     private volumeInput: HTMLInputElement | null = null;
+    private memoElement: HTMLElement | null = null;
     private orderVolume: number = 0;
 
     constructor(parent: AccountItem) {
@@ -38,6 +39,8 @@ export default class OrderAsk extends OrderBase {
             "input[name=volume-option-manual]"
         ) as HTMLInputElement;
 
+        this.memoElement = this.querySelector(".memo") as HTMLElement;
+
         this.formElement?.addEventListener("submit", this.onSubmit);
         this.formElement?.addEventListener("reset", this.onReset);
 
@@ -57,7 +60,7 @@ export default class OrderAsk extends OrderBase {
         this.accountItem.hideOrderAsk();
     }
 
-    private onSubmit(event: Event) {
+    private async onSubmit(event: Event) {
         event.preventDefault();
 
         const searchParams = new URLSearchParams({
@@ -68,7 +71,31 @@ export default class OrderAsk extends OrderBase {
             ord_type: "limit",
         });
 
-        this.fetchData(searchParams);
+        const orderChanceData = await this.getOrderChance();
+        const isBidPossible = this.checkOrder(orderChanceData);
+
+        if (isBidPossible) this.fetchData(searchParams);
+        else {
+            if (this.memoElement) this.memoElement.textContent = "매도 실패";
+        }
+    }
+
+    private checkOrder(chanceData: any) {
+        const totalPrice = this.orderPrice * this.orderVolume;
+        const possibleVolume =
+            Number(chanceData.ask_account.balance) -
+            Number(chanceData.ask_account.locked);
+
+        if (
+            chanceData.market.state === "active" &&
+            chanceData.market.ask.min_total < totalPrice &&
+            chanceData.market.max_total > totalPrice &&
+            possibleVolume >= this.orderVolume
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     private onReset() {

@@ -53,6 +53,8 @@ export default class OrderBase extends HTMLElement {
         const response = await fetch(`/fetchOrders?${searchParams}`);
         const data = await response.json();
 
+        // console.log("fetchData", data);
+
         this.renderOrderItem(data);
     }
 
@@ -63,6 +65,14 @@ export default class OrderBase extends HTMLElement {
                 this.accountItem.orderedElement.querySelector("ordered-item");
             this.accountItem.orderedElement.insertBefore(orderItem, firstChild);
         }
+    }
+
+    // chance
+    protected async getOrderChance() {
+        const response = await fetch(
+            `/fetchChance?market=${this.accountItem.market}`
+        );
+        return await response.json();
     }
 
     // price
@@ -99,3 +109,56 @@ export default class OrderBase extends HTMLElement {
         return value.replace(/[^0-9.-]+/g, "");
     }
 }
+
+/* 
+{
+    "bid_fee": "0.0005",
+    "ask_fee": "0.0005",
+    "maker_bid_fee": "0.0005",
+    "maker_ask_fee": "0.0005",
+    "market": {
+        "id": "KRW-SBD",
+        "name": "SBD/KRW",
+        "order_types": [
+            "limit"
+        ],
+        "order_sides": [
+            "ask",
+            "bid"
+        ],
+        "bid_types": [
+            "limit",
+            "price"
+        ],
+        "ask_types": [
+            "limit",
+            "market"
+        ],
+        "bid": {
+            "currency": "KRW",
+            "min_total": "5000"
+        },
+        "ask": {
+            "currency": "SBD",
+            "min_total": "5000"
+        },
+        "max_total": "1000000000",
+        "state": "active"
+    },
+    "bid_account": {
+        "currency": "KRW",
+        "balance": "1609989.37213439",
+        "locked": "90045.71761545",
+        "avg_buy_price": "0",
+        "avg_buy_price_modified": true,
+        "unit_currency": "KRW"
+    },
+    "ask_account": {
+        "currency": "SBD",
+        "balance": "0",
+        "locked": "7.48648155",
+        "avg_buy_price": "5342.96380811",
+        "avg_buy_price_modified": false,
+        "unit_currency": "KRW"
+    }
+} */

@@ -94,6 +94,7 @@ export default class AppAccounts extends HTMLElement {
                 profit,
                 profitRate,
                 orderedData,
+                tradePrice: ticker.trade_price,
             };
         }
         return accounts

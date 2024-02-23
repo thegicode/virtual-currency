@@ -46,6 +46,7 @@ interface IProcessedAccountData {
     market: string;
     profit: number;
     profitRate: number;
+    tradePrice: number;
     orderedData: IOrdered[];
 }
 

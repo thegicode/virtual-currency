@@ -58,9 +58,10 @@ export default class AccountItem extends HTMLElement {
             unitCurrency: this.data.unitCurrency,
             volume: this.data.volume,
             buyPrice: roundToDecimalPlace(this.data.buyPrice, 0).toLocaleString(),
-            avgBuyPrice: roundToDecimalPlace(this.data.avgBuyPrice, 1).toLocaleString(),
+            avgBuyPrice: roundToDecimalPlace(this.data.avgBuyPrice, 0).toLocaleString(),
             profit: Math.round(this.data.profit).toLocaleString(),
             profitRate: roundToDecimalPlace(this.data.profitRate, 2) + "%",
+            tradePrice: this.data.tradePrice.toLocaleString(),
         };
         updateElementsTextWithData(contentData, cloned);
         this.innerHTML = cloned.innerHTML;

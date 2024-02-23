@@ -56,6 +56,12 @@ export default class OrderBase extends HTMLElement {
             this.accountItem.orderedElement.insertBefore(orderItem, firstChild);
         }
     }
+    getOrderChance() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield fetch(`/fetchChance?market=${this.accountItem.market}`);
+            return yield response.json();
+        });
+    }
     onChangepriceRadios(event) {
         const target = event.target;
         if (target.value === "manual")

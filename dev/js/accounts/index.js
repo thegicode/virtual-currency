@@ -184,6 +184,12 @@
         this.accountItem.orderedElement.insertBefore(orderItem, firstChild);
       }
     }
+    getOrderChance() {
+      return __awaiter2(this, void 0, void 0, function* () {
+        const response = yield fetch(`/fetchChance?market=${this.accountItem.market}`);
+        return yield response.json();
+      });
+    }
     onChangepriceRadios(event) {
       const target = event.target;
       if (target.value === "manual")
@@ -215,6 +221,33 @@
   };
 
   // dev/scripts/pages/accounts/OrderBid.js
+  var __awaiter3 = function(thisArg, _arguments, P, generator) {
+    function adopt(value) {
+      return value instanceof P ? value : new P(function(resolve) {
+        resolve(value);
+      });
+    }
+    return new (P || (P = Promise))(function(resolve, reject) {
+      function fulfilled(value) {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function rejected(value) {
+        try {
+          step(generator["throw"](value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function step(result) {
+        result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+      }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+  };
   var OrderBid = class extends OrderBase {
     constructor(parent) {
       super(parent);
@@ -246,16 +279,30 @@
     }
     onSubmit(event) {
       var _a;
-      event.preventDefault();
-      const volume = this.orderAmountPrice && this.orderPrice ? (this.orderAmountPrice / this.orderPrice).toString() : "0";
-      const searchParams = new URLSearchParams({
-        market: this.accountItem.market,
-        side: "bid",
-        volume,
-        price: (_a = this.orderPrice.toString()) !== null && _a !== void 0 ? _a : "",
-        ord_type: "limit"
+      return __awaiter3(this, void 0, void 0, function* () {
+        event.preventDefault();
+        if (!this.orderAmountPrice || !this.orderPrice)
+          return;
+        const volume = this.orderAmountPrice / this.orderPrice;
+        const searchParams = new URLSearchParams({
+          market: this.accountItem.market,
+          side: "bid",
+          volume: volume.toString(),
+          price: (_a = this.orderPrice.toString()) !== null && _a !== void 0 ? _a : "",
+          ord_type: "limit"
+        });
+        const orderChanceData = yield this.getOrderChance();
+        const isBidPossible = this.checkOrder(orderChanceData, volume);
+        if (isBidPossible)
+          yield this.fetchData(searchParams);
       });
-      this.fetchData(searchParams);
+    }
+    checkOrder(chanceData, volume) {
+      const totalPrice = this.orderPrice * volume;
+      if (chanceData.market.state === "active" && chanceData.market.bid.min_total < totalPrice && chanceData.market.max_total > totalPrice && Number(chanceData.bid_account.balance) > volume) {
+        return true;
+      }
+      return false;
     }
     onReset() {
       this.orderAmountPrice = 0;
@@ -271,12 +318,40 @@
   };
 
   // dev/scripts/pages/accounts/OrderAsk.js
+  var __awaiter4 = function(thisArg, _arguments, P, generator) {
+    function adopt(value) {
+      return value instanceof P ? value : new P(function(resolve) {
+        resolve(value);
+      });
+    }
+    return new (P || (P = Promise))(function(resolve, reject) {
+      function fulfilled(value) {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function rejected(value) {
+        try {
+          step(generator["throw"](value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function step(result) {
+        result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+      }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+  };
   var OrderAsk = class extends OrderBase {
     constructor(parent) {
       super(parent);
       this.volumeRadios = null;
       this.volumeManual = null;
       this.volumeInput = null;
+      this.memoElement = null;
       this.orderVolume = 0;
       this.template = document.querySelector("#tp-orderAsk");
       this.show = this.show.bind(this);
@@ -293,6 +368,7 @@
       this.volumeInput = this.querySelector("input[name=volume]");
       this.volumeRadios = this.querySelectorAll("input[name=volume-option]");
       this.volumeManual = this.querySelector("input[name=volume-option-manual]");
+      this.memoElement = this.querySelector(".memo");
       (_a = this.formElement) === null || _a === void 0 ? void 0 : _a.addEventListener("submit", this.onSubmit);
       (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.addEventListener("reset", this.onReset);
       this.volumeRadios.forEach((radio) => {
@@ -310,15 +386,32 @@
     }
     onSubmit(event) {
       var _a;
-      event.preventDefault();
-      const searchParams = new URLSearchParams({
-        market: this.accountItem.market,
-        side: "ask",
-        volume: this.orderVolume.toString(),
-        price: (_a = this.orderPrice.toString()) !== null && _a !== void 0 ? _a : "",
-        ord_type: "limit"
+      return __awaiter4(this, void 0, void 0, function* () {
+        event.preventDefault();
+        const searchParams = new URLSearchParams({
+          market: this.accountItem.market,
+          side: "ask",
+          volume: this.orderVolume.toString(),
+          price: (_a = this.orderPrice.toString()) !== null && _a !== void 0 ? _a : "",
+          ord_type: "limit"
+        });
+        const orderChanceData = yield this.getOrderChance();
+        const isBidPossible = this.checkOrder(orderChanceData);
+        if (isBidPossible)
+          this.fetchData(searchParams);
+        else {
+          if (this.memoElement)
+            this.memoElement.textContent = "\uB9E4\uB3C4 \uC2E4\uD328";
+        }
       });
-      this.fetchData(searchParams);
+    }
+    checkOrder(chanceData) {
+      const totalPrice = this.orderPrice * this.orderVolume;
+      const possibleVolume = Number(chanceData.ask_account.balance) - Number(chanceData.ask_account.locked);
+      if (chanceData.market.state === "active" && chanceData.market.ask.min_total < totalPrice && chanceData.market.max_total > totalPrice && possibleVolume >= this.orderVolume) {
+        return true;
+      }
+      return false;
     }
     onReset() {
       this.orderVolume = 0;
@@ -400,9 +493,10 @@
         unitCurrency: this.data.unitCurrency,
         volume: this.data.volume,
         buyPrice: roundToDecimalPlace(this.data.buyPrice, 0).toLocaleString(),
-        avgBuyPrice: roundToDecimalPlace(this.data.avgBuyPrice, 1).toLocaleString(),
+        avgBuyPrice: roundToDecimalPlace(this.data.avgBuyPrice, 0).toLocaleString(),
         profit: Math.round(this.data.profit).toLocaleString(),
-        profitRate: roundToDecimalPlace(this.data.profitRate, 2) + "%"
+        profitRate: roundToDecimalPlace(this.data.profitRate, 2) + "%",
+        tradePrice: this.data.tradePrice.toLocaleString()
       };
       updateElementsTextWithData(contentData, cloned);
       this.innerHTML = cloned.innerHTML;
@@ -472,7 +566,7 @@
   };
 
   // dev/scripts/pages/accounts/AppAccounts.js
-  var __awaiter3 = function(thisArg, _arguments, P, generator) {
+  var __awaiter5 = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
         resolve(value);
@@ -511,7 +605,7 @@
     disconnectedCallback() {
     }
     loadAccountData() {
-      return __awaiter3(this, void 0, void 0, function* () {
+      return __awaiter5(this, void 0, void 0, function* () {
         try {
           const accountsResponse = yield this.fetchData(`/fetchAccounts`);
           this.markets = accountsResponse.accounts.map((account) => account.market);
@@ -527,7 +621,7 @@
       });
     }
     fetchData(url) {
-      return __awaiter3(this, void 0, void 0, function* () {
+      return __awaiter5(this, void 0, void 0, function* () {
         const response = yield fetch(url);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -582,7 +676,8 @@
           locked: account.locked,
           profit,
           profitRate,
-          orderedData
+          orderedData,
+          tradePrice: ticker.trade_price
         };
       }
       return accounts.map((account) => _handleData(account)).filter((account) => account !== null);

@@ -1,12 +1,12 @@
 # Virtual Currency
 
-# npm scripts
+## npm scripts
 
     - npm start
     - npm run build
     - npm test
 
-# directory
+## directory
 
     - server : app server(development | production)
     - app : 소스
@@ -14,6 +14,10 @@
     - static : 운영 빌드
     - __tests__ : 테스트
 
-# URL
+## URL
 
 -   http://localhost:1111/accounts
+
+## ToDo
+
+-   auto order

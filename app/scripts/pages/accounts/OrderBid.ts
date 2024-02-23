@@ -45,23 +45,51 @@ export default class OrderBid extends OrderBase {
         this.accountItem.hideOrderBid();
     }
 
-    private onSubmit(event: Event) {
+    private async onSubmit(event: Event) {
         event.preventDefault();
+        if (!this.orderAmountPrice || !this.orderPrice) return;
 
-        const volume =
-            this.orderAmountPrice && this.orderPrice
-                ? (this.orderAmountPrice / this.orderPrice).toString()
-                : "0";
+        const volume = this.orderAmountPrice / this.orderPrice;
 
         const searchParams = new URLSearchParams({
             market: this.accountItem.market,
             side: "bid",
-            volume,
+            volume: volume.toString(),
             price: this.orderPrice.toString() ?? "",
             ord_type: "limit",
         });
 
-        this.fetchData(searchParams);
+        const orderChanceData = await this.getOrderChance();
+        const isBidPossible = this.checkOrder(orderChanceData, volume);
+
+        if (isBidPossible) await this.fetchData(searchParams);
+    }
+
+    private checkOrder(chanceData: any, volume: number) {
+        const totalPrice = this.orderPrice * volume;
+        if (
+            chanceData.market.state === "active" &&
+            chanceData.market.bid.min_total < totalPrice &&
+            chanceData.market.max_total > totalPrice &&
+            Number(chanceData.bid_account.balance) > volume
+        ) {
+            return true;
+        }
+
+        return false;
+
+        // 매수 수수료 비율 : bid_fee
+        // 매수 주문 지원 방식 : market.bid_types
+        // 화폐를 의미하는 영문 대문자 코드 : marekt.bid.currency
+        // 최소 매도/매수 금액 : market.bid.min_total
+        // 최대 매도/매수 금액 : market.max_total
+        // 마켓 운영 상태 : market.state
+        // 화폐를 의미하는 영문 대문자 코드 : bid_account.currency
+        // 주문가능 금액/수량 : bid_account.balance
+        // 주문 중 묶여있는 금액/수량 : bid_account.locked
+        // 매수평균가: bid_account.avg_buy_price
+        // 매수평균가 수정 여부 : bid_account.avg_buy_price_modified
+        // 평단가 기준 화폐 : bid_account.unit_currency
     }
 
     private onReset() {
