@@ -98,16 +98,21 @@ account-item .account-actions {
   gap: 3px;
   margin-top: 10px;
 }
-account-item .account-actions button {
+account-item .account-actions button,
+account-item .account-actions a {
   padding: 3px 7px;
   border-radius: 3px;
-  border-color: #d8edf0;
+  border: 1px solid #d8edf0;
   background-color: #e6f6f1;
   font-size: 11px;
   color: var(--font-color);
 }
-account-item .account-actions button:hover {
+account-item .account-actions button:hover,
+account-item .account-actions a:hover {
   background-color: #fff;
+}
+account-item .account-actions a {
+  text-decoration: none;
 }
 
 order-bid,

@@ -486,6 +486,8 @@
         tradePrice: this.data.tradePrice.toLocaleString()
       };
       updateElementsTextWithData(contentData, cloned);
+      const upbitAnchor = cloned.querySelector(".upbit");
+      upbitAnchor.href = `https://upbit.com/exchange?code=CRIX.UPBIT.${this.data.market}`;
       this.innerHTML = cloned.innerHTML;
       const isIncrement = this.data.profit > 0 ? true : false;
       this.dataset.increase = isIncrement.toString();

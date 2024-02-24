@@ -86,16 +86,21 @@ account-item {
         gap: 3px;
         margin-top: 10px;
 
-        button {
+        button,
+        a {
             padding: 3px 7px;
             border-radius: 3px;
-            border-color: #d8edf0;
+            border: 1px solid #d8edf0;
             background-color: #e6f6f1;
             font-size: 11px;
             color: var(--font-color);
             &:hover {
                 background-color: #fff;
             }
+        }
+
+        a {
+            text-decoration: none;
         }
     }
 }

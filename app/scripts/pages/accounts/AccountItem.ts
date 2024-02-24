@@ -97,6 +97,9 @@ export default class AccountItem extends HTMLElement {
 
         updateElementsTextWithData(contentData, cloned);
 
+        const upbitAnchor = cloned.querySelector(".upbit") as HTMLAnchorElement;
+        upbitAnchor.href = `https://upbit.com/exchange?code=CRIX.UPBIT.${this.data.market}`;
+
         this.innerHTML = cloned.innerHTML;
 
         const isIncrement = this.data.profit > 0 ? true : false;

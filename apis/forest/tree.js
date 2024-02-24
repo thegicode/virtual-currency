@@ -42,9 +42,6 @@ async function buyOrder(account, market) {
     const bidRate = account.buy_price > 100000 ? 0.1 : 0.05;
     const bidOrderPrice = Math.round(account.avg_buy_price * (1 - bidRate));
 
-    console.log("bidRate", bidRate);
-    console.log("bidOrderPrice", bidOrderPrice);
-
     try {
         const bidOrdersRes = await orders({
             market,
