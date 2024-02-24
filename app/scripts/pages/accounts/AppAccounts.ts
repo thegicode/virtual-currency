@@ -40,14 +40,10 @@ export default class AppAccounts extends HTMLElement {
                 )}`
             );
 
-            const formatOrders = this.formatOrderedData(
-                orderedResponse
-            ) as TOrdredData;
-
             const processedAccounts = await this.processAccountsData(
                 accountsResponse.accounts,
                 tickerResponse,
-                formatOrders
+                orderedResponse
             );
 
             const profitPrices = processedAccounts.map(
@@ -109,32 +105,6 @@ export default class AppAccounts extends HTMLElement {
         if (profits < 0) element.dataset.increase = "false";
 
         delete element.dataset.loading;
-    }
-
-    private formatOrderedData(data: IOrdered[]) {
-        try {
-            let formatOrders: TOrdredData = {};
-
-            // markets 배열에 있는 각 market에 대해 빈 배열을 할당
-            this.markets.forEach((market) => {
-                formatOrders[market] = [];
-            });
-
-            // 주어진 data 배열을 순회하면서 formatOrders 객체를 채움
-            data.forEach((order) => {
-                // 해당 market이 formatOrders 객체에 존재하면, order 객체를 배열에 추가
-                if (formatOrders[order.market]) {
-                    formatOrders[order.market].push(order);
-                } else {
-                    // 만약 이 market에 해당하는 배열이 아직 없으면, 이를 생성
-                    formatOrders[order.market] = [order];
-                }
-            });
-
-            return formatOrders;
-        } catch (error) {
-            console.error(error);
-        }
     }
 
     private processAccountsData(

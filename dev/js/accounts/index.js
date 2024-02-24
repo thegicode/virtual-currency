@@ -615,8 +615,7 @@
           ]);
           this.markets = accountsResponse.accounts.map((account) => account.market);
           const tickerResponse = yield this.fetchData(`/fetchTickers?markets=${encodeURIComponent(this.markets.join(","))}`);
-          const formatOrders = this.formatOrderedData(orderedResponse);
-          const processedAccounts = yield this.processAccountsData(accountsResponse.accounts, tickerResponse, formatOrders);
+          const processedAccounts = yield this.processAccountsData(accountsResponse.accounts, tickerResponse, orderedResponse);
           const profitPrices = processedAccounts.map((account) => account.profit);
           const profits = profitPrices.reduce((a, b) => a + b, 0);
           this.renderAssets(accountsResponse, profits);
@@ -656,24 +655,6 @@
       if (profits < 0)
         element.dataset.increase = "false";
       delete element.dataset.loading;
-    }
-    formatOrderedData(data) {
-      try {
-        let formatOrders = {};
-        this.markets.forEach((market) => {
-          formatOrders[market] = [];
-        });
-        data.forEach((order) => {
-          if (formatOrders[order.market]) {
-            formatOrders[order.market].push(order);
-          } else {
-            formatOrders[order.market] = [order];
-          }
-        });
-        return formatOrders;
-      } catch (error) {
-        console.error(error);
-      }
     }
     processAccountsData(accounts, tickerData, orderedObject) {
       function _formatData(account) {

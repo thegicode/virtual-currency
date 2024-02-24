@@ -6,6 +6,33 @@ const queryEncode = require("querystring").encode;
 const { ACCESS_KEY, SECRET_KEY } = require("../server/config/key");
 const URL = require("../server/config/URL");
 
+function transformData(orders) {
+    const grouped = {};
+
+    orders.forEach((aOrder) => {
+        const { market } = aOrder;
+        if (!grouped[market]) {
+            grouped[market] = [];
+        }
+
+        const aData = {
+            ...aOrder,
+            executed_volume: Number(aOrder.executed_volume),
+            locked: Number(aOrder.locked),
+            paid_fee: Number(aOrder.paid_fee),
+            price: Number(aOrder.price),
+            remaining_fee: Number(aOrder.remaining_fee),
+            remaining_volume: Number(aOrder.remaining_volume),
+            reserved_fee: Number(aOrder.reserved_fee),
+            volume: Number(aOrder.volume),
+        };
+
+        grouped[market].push(aData);
+    });
+
+    return grouped;
+}
+
 async function ordereds(req, res) {
     const query = queryEncode({ state: "wait" });
     const hash = crypto.createHash("sha512");
@@ -32,21 +59,9 @@ async function ordereds(req, res) {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        const orders = await response.json();
 
-        const data = await response.json();
-        const result = data.map((aData) => {
-            return {
-                ...aData,
-                executed_volume: Number(aData.executed_volume),
-                locked: Number(aData.locked),
-                paid_fee: Number(aData.paid_fee),
-                price: Number(aData.price),
-                remaining_fee: Number(aData.remaining_fee),
-                remaining_volume: Number(aData.remaining_volume),
-                reserved_fee: Number(aData.reserved_fee),
-                volume: Number(aData.volume),
-            };
-        });
+        const result = transformData(orders);
 
         res.send(result);
     } catch (error) {
