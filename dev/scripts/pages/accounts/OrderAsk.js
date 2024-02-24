@@ -56,8 +56,7 @@ export default class OrderAsk extends OrderBase {
                 price: (_a = this.orderPrice.toString()) !== null && _a !== void 0 ? _a : "",
                 ord_type: "limit",
             });
-            const orderChanceData = yield this.getOrderChance();
-            const isBidPossible = this.checkOrder(orderChanceData);
+            const isBidPossible = yield this.checkOrder();
             if (isBidPossible)
                 this.fetchData(searchParams);
             else if (this.memoElement)
@@ -65,17 +64,20 @@ export default class OrderAsk extends OrderBase {
             (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.reset();
         });
     }
-    checkOrder(chanceData) {
-        const totalPrice = this.orderPrice * this.orderVolume;
-        const possibleVolume = Number(chanceData.ask_account.balance) -
-            Number(chanceData.ask_account.locked);
-        if (chanceData.market.state === "active" &&
-            chanceData.market.ask.min_total < totalPrice &&
-            chanceData.market.max_total > totalPrice &&
-            possibleVolume >= this.orderVolume) {
-            return true;
-        }
-        return false;
+    checkOrder() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const chanceData = yield this.getOrderChance();
+            const totalPrice = this.orderPrice * this.orderVolume;
+            const possibleVolume = Number(chanceData.ask_account.balance) -
+                Number(chanceData.ask_account.locked);
+            if (chanceData.market.state === "active" &&
+                chanceData.market.ask.min_total < totalPrice &&
+                chanceData.market.max_total > totalPrice &&
+                possibleVolume >= this.orderVolume) {
+                return true;
+            }
+            return false;
+        });
     }
     onReset() {
         this.orderVolume = 0;

@@ -68,8 +68,7 @@ export default class OrderAsk extends OrderBase {
             ord_type: "limit",
         });
 
-        const orderChanceData = await this.getOrderChance();
-        const isBidPossible = this.checkOrder(orderChanceData);
+        const isBidPossible = await this.checkOrder();
 
         if (isBidPossible) this.fetchData(searchParams);
         else if (this.memoElement) this.memoElement.textContent = "매도 실패";
@@ -77,7 +76,8 @@ export default class OrderAsk extends OrderBase {
         this.formElement?.reset();
     }
 
-    private checkOrder(chanceData: any) {
+    private async checkOrder() {
+        const chanceData = await this.getOrderChance();
         const totalPrice = this.orderPrice * this.orderVolume;
         const possibleVolume =
             Number(chanceData.ask_account.balance) -

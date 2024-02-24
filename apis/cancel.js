@@ -6,11 +6,6 @@ const queryEncode = require("querystring").encode;
 const { ACCESS_KEY, SECRET_KEY } = require("../server/config/key");
 const URL = require("../server/config/URL");
 
-async function fetchCancel(req, res) {
-    const canceled = await cancel(req.query.uuid);
-    res.send(canceled);
-}
-
 async function cancel(uuid) {
     const body = {
         uuid,
@@ -42,11 +37,18 @@ async function cancel(uuid) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        return response;
+        const data = await response.json();
+
+        return data;
     } catch (error) {
         console.error("Error:", error);
         res.status(500).send("Internal Server Error");
     }
+}
+
+async function fetchCancel(req, res) {
+    const canceled = await cancel(req.query.uuid);
+    res.send(canceled);
 }
 
 module.exports = { fetchCancel, cancel };

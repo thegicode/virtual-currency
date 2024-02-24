@@ -5,9 +5,9 @@ const jwt = require("jsonwebtoken");
 const { ACCESS_KEY, SECRET_KEY } = require("../server/config/key");
 const URL = require("../server/config/URL");
 
-module.exports = async function chacne(req, res) {
+async function chance(market) {
     const body = {
-        market: req.query.market,
+        market,
     };
 
     const query = new URLSearchParams(body).toString();
@@ -36,9 +36,17 @@ module.exports = async function chacne(req, res) {
 
         const data = await response.json();
         console.log(data);
-        res.send(data);
+
+        return data;
     } catch (error) {
         console.error("Error:", error);
         res.status(500).send("Internal Server Error");
     }
-};
+}
+
+async function fetchChance(req, res) {
+    const result = await chance(req.query.market);
+    res.send(result);
+}
+
+module.exports = { fetchChance, chance };

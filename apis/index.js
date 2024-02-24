@@ -3,7 +3,7 @@ const { fetchCancel } = require("./cancel");
 const fetchOrdereds = require("./ordereds");
 const fetchTickers = require("./tickers");
 const fetchOrders = require("./orders");
-const fetchChance = require("./chance");
+const { fetchChance } = require("./chance");
 
 const setupApiEndpoints = (app) => {
     app.get("/fetchAccounts", fetchAccounts);

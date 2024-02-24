@@ -59,8 +59,7 @@ export default class OrderBid extends OrderBase {
             ord_type: "limit",
         });
 
-        const orderChanceData = await this.getOrderChance();
-        const isBidPossible = this.checkOrder(orderChanceData, volume);
+        const isBidPossible = await this.checkOrder(volume);
 
         if (isBidPossible) await this.fetchData(searchParams);
         else if (this.memoElement) this.memoElement.textContent = "매수 실패";
@@ -68,13 +67,14 @@ export default class OrderBid extends OrderBase {
         this.formElement?.reset();
     }
 
-    private checkOrder(chanceData: any, volume: number) {
+    private async checkOrder(volume: number) {
+        const orderChanceData = await this.getOrderChance();
         const totalPrice = this.orderPrice * volume;
         if (
-            chanceData.market.state === "active" &&
-            chanceData.market.bid.min_total < totalPrice &&
-            chanceData.market.max_total > totalPrice &&
-            Number(chanceData.bid_account.balance) > volume
+            orderChanceData.market.state === "active" &&
+            orderChanceData.market.bid.min_total < totalPrice &&
+            orderChanceData.market.max_total > totalPrice &&
+            Number(orderChanceData.bid_account.balance) > volume
         ) {
             return true;
         }

@@ -51,8 +51,7 @@ export default class OrderBid extends OrderBase {
                 price: (_a = this.orderPrice.toString()) !== null && _a !== void 0 ? _a : "",
                 ord_type: "limit",
             });
-            const orderChanceData = yield this.getOrderChance();
-            const isBidPossible = this.checkOrder(orderChanceData, volume);
+            const isBidPossible = yield this.checkOrder(volume);
             if (isBidPossible)
                 yield this.fetchData(searchParams);
             else if (this.memoElement)
@@ -60,15 +59,18 @@ export default class OrderBid extends OrderBase {
             (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.reset();
         });
     }
-    checkOrder(chanceData, volume) {
-        const totalPrice = this.orderPrice * volume;
-        if (chanceData.market.state === "active" &&
-            chanceData.market.bid.min_total < totalPrice &&
-            chanceData.market.max_total > totalPrice &&
-            Number(chanceData.bid_account.balance) > volume) {
-            return true;
-        }
-        return false;
+    checkOrder(volume) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const orderChanceData = yield this.getOrderChance();
+            const totalPrice = this.orderPrice * volume;
+            if (orderChanceData.market.state === "active" &&
+                orderChanceData.market.bid.min_total < totalPrice &&
+                orderChanceData.market.max_total > totalPrice &&
+                Number(orderChanceData.bid_account.balance) > volume) {
+                return true;
+            }
+            return false;
+        });
     }
     onReset() {
         this.orderAmountPrice = 0;
