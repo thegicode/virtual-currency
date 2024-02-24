@@ -7,7 +7,12 @@ const TOKEN = require("../server/config/token");
 let storedAccounts = {};
 let accountsTime = null;
 
-async function accounts(req, res) {
+async function fetchAccounts(req, res) {
+    const response = await accounts();
+    res.send(response);
+}
+
+async function accounts() {
     try {
         // 1분 이상시 호출
         if (
@@ -24,48 +29,42 @@ async function accounts(req, res) {
             }
 
             const data = await response.json();
-            // console.log("account", data);
-            const processedData = handleAccounts(data);
-
-            // console.log("processedData", processedData);
-
-            res.send(processedData);
 
             accountsTime = new Date().getTime();
+
+            return transformData(data);
         } else {
             console.log("Using stored accounts data", storedAccounts);
-            res.send(storedAccounts);
+            return storedAccounts;
         }
 
-        accountsTime = new Date().getTime();
+        // accountsTime = new Date().getTime();
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Internal Server Error");
+        console.error(error.name, error.message);
+        res.status(500).send(`${error.name}, ${error.message}`);
     }
 }
 
-function handleAccounts(data) {
+function transformData(data) {
     if (!data) return;
 
-    // 필터링과 매핑을 분리하여 가독성 향상
-    const krwAccounts = data.filter(
+    const assetsFirst = data.filter(
         (account) =>
             account.currency === "KRW" && account.unit_currency === "KRW"
-    );
+    )[0];
 
-    let assets = krwAccounts[0];
-    assets = {
-        ...assets,
-        avg_buy_price: Number(assets.avg_buy_price),
-        balance: Number(assets.balance),
-        locked: Number(assets.locked),
+    const assets = {
+        ...assetsFirst,
+        avg_buy_price: Number(assetsFirst.avg_buy_price),
+        balance: Number(assetsFirst.balance),
+        locked: Number(assetsFirst.locked),
     };
 
     const accounts = data
         .filter(
             (account) => account.currency !== "KRW" && account.avg_buy_price > 0
         )
-        .map(transformAccount)
+        .map(enrichAccount)
         .sort((a, b) => b.buy_price - a.buy_price);
 
     const myMarkets = accounts.map((a) => a.market);
@@ -80,7 +79,7 @@ function handleAccounts(data) {
     return { assets, accounts };
 }
 
-function transformAccount(account) {
+function enrichAccount(account) {
     const volume = Number(account.balance) + Number(account.locked);
     return {
         ...account,
@@ -93,4 +92,4 @@ function transformAccount(account) {
     };
 }
 
-module.exports = accounts;
+module.exports = { fetchAccounts, accounts };

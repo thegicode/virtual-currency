@@ -6,47 +6,21 @@ const { ACCESS_KEY, SECRET_KEY } = require("../server/config/key");
 const URL = require("../server/config/URL");
 const { chance } = require("./chance");
 
-async function checkChance(query) {
-    const response = await chance(query.market);
-    const totalPrice = parseInt(query.price) * parseInt(query.volume);
-
-    if (query.side === "bid") {
-        if (
-            response.market.state !== "active" &&
-            response.market.bid.min_total > totalPrice &&
-            response.market.max_total < totalPrice &&
-            Number(response.bid_account.balance) < query.volume
-        )
-            return false;
-    }
-
-    if (query.side === "ask") {
-        const possibleVolume =
-            Number(response.ask_account.balance) -
-            Number(response.ask_account.locked);
-
-        if (
-            response.market.state !== "active" &&
-            response.market.ask.min_total > totalPrice &&
-            response.market.max_total < totalPrice &&
-            possibleVolume < this.orderVolume
-        )
-            return false;
-    }
-
-    return true;
+async function fetchOrders(req, res) {
+    const response = await orders(req.query);
+    res.send(response);
 }
 
-async function orders(req, res) {
+async function orders(params) {
     const body = {
-        market: req.query.market,
-        side: req.query.side,
-        volume: req.query.volume,
-        price: req.query.price,
-        ord_type: req.query.ord_type,
+        market: params.market,
+        side: params.side,
+        volume: params.volume,
+        price: params.price,
+        ord_type: params.ord_type,
     };
 
-    if (!(await checkChance(req.query))) return;
+    if (!(await checkChance(params))) return;
 
     const query = new URLSearchParams(body).toString();
     const hash = crypto.createHash("sha512");
@@ -87,11 +61,43 @@ async function orders(req, res) {
             reserved_fee: Number(data.reserved_fee),
             volume: Number(data.volume),
         };
-        res.send(result);
+
+        return result;
     } catch (error) {
         console.error("Error:", error);
-        res.status(500).send("Internal Server Error");
+        // res.status(500).send("Internal Server Error");
     }
 }
 
-module.exports = orders;
+async function checkChance(params) {
+    const response = await chance(params.market);
+    const totalPrice = parseInt(params.price) * parseInt(params.volume);
+
+    if (params.side === "bid") {
+        if (
+            response.market.state !== "active" &&
+            response.market.bid.min_total > totalPrice &&
+            response.market.max_total < totalPrice &&
+            Number(response.bid_account.balance) < params.volume
+        )
+            return false;
+    }
+
+    if (params.side === "ask") {
+        const possibleVolume =
+            Number(response.ask_account.balance) -
+            Number(response.ask_account.locked);
+
+        if (
+            response.market.state !== "active" &&
+            response.market.ask.min_total > totalPrice &&
+            response.market.max_total < totalPrice &&
+            possibleVolume < this.orderVolume
+        )
+            return false;
+    }
+
+    return true;
+}
+
+module.exports = { orders, fetchOrders };
