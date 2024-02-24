@@ -11,69 +11,79 @@ const { orders } = require("../orders");
  */
 
 module.exports = async function tree() {
-    // markets
     const myMarkets = await loadMyMarkets();
-    // console.log("myMarkets", myMarkets);
-
-    // ordereds
     const orderedsData = await ordereds();
-    // console.log("getOrdereds", orderedsData);
 
-    // get changed market
-    const changedMarket = Object.keys(orderedsData).filter((market) => {
-        if (orderedsData[market].length !== 2) {
-            return market;
-        }
-    });
-    // console.log("changedMarket", changedMarket);
+    const changedMarkets = Object.keys(orderedsData).filter(
+        (market) => orderedsData[market].length !== 2
+    );
 
-    // remain order cancel
     // 마켓별로 2개의 예약내역이 없으면 모두 취소하고 매수, 매도 주문
-    changedMarket.forEach(async (market) => {
+    for (const market of changedMarkets) {
         // 주문 취소
-        const remainOrdereds = orderedsData[market];
-        remainOrdereds.forEach(async (order) => {
-            cancel(order.uuid);
-        });
+        await cancelMarketOrders(orderedsData[market]);
 
-        // get Accounts
+        // 계좌 정보 가져오기
         const accountsRes = await accounts();
-        const { accounts: accountsData } = accountsRes;
-
-        const account = accountsData.filter(
-            (account) => account.market === market
-        )[0];
-
-        // 매수 주문
-        const bidRate = account.buy_price > 100000 ? 0.1 : 0.05;
-        const bidOrderPrice = Math.round(
-            account.avg_buy_price - account.avg_buy_price * bidRate
+        const account = accountsRes.accounts.find(
+            (acc) => acc.market === market
         );
-        const bidParams = {
+
+        if (account) {
+            // 매수 주문
+            buyOrder(account, market);
+            // 매도 주문
+            sellOrder(account, market);
+        }
+    }
+};
+
+async function buyOrder(account, market) {
+    const bidRate = account.buy_price > 100000 ? 0.1 : 0.05;
+    const bidOrderPrice = Math.round(account.avg_buy_price * (1 - bidRate));
+
+    console.log("bidRate", bidRate);
+    console.log("bidOrderPrice", bidOrderPrice);
+
+    try {
+        const bidOrdersRes = await orders({
             market,
             side: "bid",
             price: bidOrderPrice.toString(),
             volume: (account.buy_price / bidOrderPrice).toString(),
             ord_type: "limit",
-        };
-        const bidOrdersRes = await orders(bidParams);
-        console.log("매수 ", bidOrdersRes);
+        });
+        console.log("매수 주문 완료:", bidOrdersRes);
+    } catch (error) {
+        console.error("Error buy order:", error);
+    }
+}
 
-        // 매도 주문
-        const askOrderPrice = Math.round(
-            account.avg_buy_price + account.avg_buy_price * 0.1
-        );
-        const askParams = {
+async function sellOrder(account, market) {
+    const askOrderPrice = Math.round(account.avg_buy_price * 1.1);
+    try {
+        const askOrdersRes = await orders({
             market,
             side: "ask",
             price: askOrderPrice.toString(),
             volume: account.volume.toString(),
             ord_type: "limit",
-        };
-        const askOrdersRes = await orders(askParams);
-        console.log("매도 ", askOrdersRes);
-    });
-};
+        });
+        console.log("매도 주문 완료:", askOrdersRes);
+    } catch (error) {
+        console.error("Error sell order:", error);
+    }
+}
+
+async function cancelMarketOrders(orders) {
+    for (const order of orders) {
+        try {
+            await cancel(order.uuid);
+        } catch (error) {
+            console.error("Error cancelling order:", error);
+        }
+    }
+}
 
 // { account
 //     currency: 'SBD',
