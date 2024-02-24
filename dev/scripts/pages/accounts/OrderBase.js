@@ -47,8 +47,14 @@ export default class OrderBase extends HTMLElement {
     fetchData(searchParams) {
         return __awaiter(this, void 0, void 0, function* () {
             const response = yield fetch(`/fetchOrders?${searchParams}`);
+            if (!response.ok) {
+                if (this.memoElement)
+                    this.memoElement.textContent = `Fail Order: status ${response.status}`;
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const data = yield response.json();
             this.renderOrderItem(data);
+            return data;
         });
     }
     renderOrderItem(data) {

@@ -175,8 +175,14 @@
     fetchData(searchParams) {
       return __awaiter2(this, void 0, void 0, function* () {
         const response = yield fetch(`/fetchOrders?${searchParams}`);
+        if (!response.ok) {
+          if (this.memoElement)
+            this.memoElement.textContent = `Fail Order: status ${response.status}`;
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = yield response.json();
         this.renderOrderItem(data);
+        return data;
       });
     }
     renderOrderItem(data) {
@@ -298,22 +304,8 @@
           price: (_a = this.orderPrice.toString()) !== null && _a !== void 0 ? _a : "",
           ord_type: "limit"
         });
-        const isBidPossible = yield this.checkOrder(volume);
-        if (isBidPossible)
-          yield this.fetchData(searchParams);
-        else if (this.memoElement)
-          this.memoElement.textContent = "\uB9E4\uC218 \uC2E4\uD328";
+        this.fetchData(searchParams);
         (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.reset();
-      });
-    }
-    checkOrder(volume) {
-      return __awaiter3(this, void 0, void 0, function* () {
-        const orderChanceData = yield this.getOrderChance();
-        const totalPrice = this.orderPrice * volume;
-        if (orderChanceData.market.state === "active" && orderChanceData.market.bid.min_total < totalPrice && orderChanceData.market.max_total > totalPrice && Number(orderChanceData.bid_account.balance) > volume) {
-          return true;
-        }
-        return false;
       });
     }
     onReset() {
@@ -405,23 +397,8 @@
           price: (_a = this.orderPrice.toString()) !== null && _a !== void 0 ? _a : "",
           ord_type: "limit"
         });
-        const isBidPossible = yield this.checkOrder();
-        if (isBidPossible)
-          this.fetchData(searchParams);
-        else if (this.memoElement)
-          this.memoElement.textContent = "\uB9E4\uB3C4 \uC2E4\uD328";
+        this.fetchData(searchParams);
         (_b = this.formElement) === null || _b === void 0 ? void 0 : _b.reset();
-      });
-    }
-    checkOrder() {
-      return __awaiter4(this, void 0, void 0, function* () {
-        const chanceData = yield this.getOrderChance();
-        const totalPrice = this.orderPrice * this.orderVolume;
-        const possibleVolume = Number(chanceData.ask_account.balance) - Number(chanceData.ask_account.locked);
-        if (chanceData.market.state === "active" && chanceData.market.ask.min_total < totalPrice && chanceData.market.max_total > totalPrice && possibleVolume >= this.orderVolume) {
-          return true;
-        }
-        return false;
       });
     }
     onReset() {

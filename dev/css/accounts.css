@@ -209,6 +209,11 @@ order-ask .order-actions button {
   font-size: 11px;
   color: var(--font-color);
 }
+order-bid .memo,
+order-ask .memo {
+  font-weight: bold;
+  color: var(--red-color);
+}
 
 order-ask input[name=volume] {
   width: 100%;

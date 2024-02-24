@@ -68,31 +68,9 @@ export default class OrderAsk extends OrderBase {
             ord_type: "limit",
         });
 
-        const isBidPossible = await this.checkOrder();
-
-        if (isBidPossible) this.fetchData(searchParams);
-        else if (this.memoElement) this.memoElement.textContent = "매도 실패";
+        this.fetchData(searchParams);
 
         this.formElement?.reset();
-    }
-
-    private async checkOrder() {
-        const chanceData = await this.getOrderChance();
-        const totalPrice = this.orderPrice * this.orderVolume;
-        const possibleVolume =
-            Number(chanceData.ask_account.balance) -
-            Number(chanceData.ask_account.locked);
-
-        if (
-            chanceData.market.state === "active" &&
-            chanceData.market.ask.min_total < totalPrice &&
-            chanceData.market.max_total > totalPrice &&
-            possibleVolume >= this.orderVolume
-        ) {
-            return true;
-        }
-
-        return false;
     }
 
     private onReset() {

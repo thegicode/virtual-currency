@@ -59,40 +59,9 @@ export default class OrderBid extends OrderBase {
             ord_type: "limit",
         });
 
-        const isBidPossible = await this.checkOrder(volume);
-
-        if (isBidPossible) await this.fetchData(searchParams);
-        else if (this.memoElement) this.memoElement.textContent = "매수 실패";
+        this.fetchData(searchParams);
 
         this.formElement?.reset();
-    }
-
-    private async checkOrder(volume: number) {
-        const orderChanceData = await this.getOrderChance();
-        const totalPrice = this.orderPrice * volume;
-        if (
-            orderChanceData.market.state === "active" &&
-            orderChanceData.market.bid.min_total < totalPrice &&
-            orderChanceData.market.max_total > totalPrice &&
-            Number(orderChanceData.bid_account.balance) > volume
-        ) {
-            return true;
-        }
-
-        return false;
-
-        // 매수 수수료 비율 : bid_fee
-        // 매수 주문 지원 방식 : market.bid_types
-        // 화폐를 의미하는 영문 대문자 코드 : marekt.bid.currency
-        // 최소 매도/매수 금액 : market.bid.min_total
-        // 최대 매도/매수 금액 : market.max_total
-        // 마켓 운영 상태 : market.state
-        // 화폐를 의미하는 영문 대문자 코드 : bid_account.currency
-        // 주문가능 금액/수량 : bid_account.balance
-        // 주문 중 묶여있는 금액/수량 : bid_account.locked
-        // 매수평균가: bid_account.avg_buy_price
-        // 매수평균가 수정 여부 : bid_account.avg_buy_price_modified
-        // 평단가 기준 화폐 : bid_account.unit_currency
     }
 
     private onReset() {

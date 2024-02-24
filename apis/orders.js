@@ -4,6 +4,38 @@ const jwt = require("jsonwebtoken");
 
 const { ACCESS_KEY, SECRET_KEY } = require("../server/config/key");
 const URL = require("../server/config/URL");
+const { chance } = require("./chance");
+
+async function checkChance(query) {
+    const response = await chance(query.market);
+    const totalPrice = parseInt(query.price) * parseInt(query.volume);
+
+    if (query.side === "bid") {
+        if (
+            response.market.state !== "active" &&
+            response.market.bid.min_total > totalPrice &&
+            response.market.max_total < totalPrice &&
+            Number(response.bid_account.balance) < query.volume
+        )
+            return false;
+    }
+
+    if (query.side === "ask") {
+        const possibleVolume =
+            Number(response.ask_account.balance) -
+            Number(response.ask_account.locked);
+
+        if (
+            response.market.state !== "active" &&
+            response.market.ask.min_total > totalPrice &&
+            response.market.max_total < totalPrice &&
+            possibleVolume < this.orderVolume
+        )
+            return false;
+    }
+
+    return true;
+}
 
 async function orders(req, res) {
     const body = {
@@ -13,6 +45,8 @@ async function orders(req, res) {
         price: req.query.price,
         ord_type: req.query.ord_type,
     };
+
+    if (!(await checkChance(req.query))) return;
 
     const query = new URLSearchParams(body).toString();
     const hash = crypto.createHash("sha512");

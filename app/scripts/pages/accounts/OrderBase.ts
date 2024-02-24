@@ -53,11 +53,14 @@ export default class OrderBase extends HTMLElement {
 
     protected async fetchData(searchParams: URLSearchParams) {
         const response = await fetch(`/fetchOrders?${searchParams}`);
+        if (!response.ok) {
+            if (this.memoElement)
+                this.memoElement.textContent = `Fail Order: status ${response.status}`;
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
-
-        // console.log("fetchData", data);
-
         this.renderOrderItem(data);
+        return data;
     }
 
     protected renderOrderItem(data: IOrdered) {
