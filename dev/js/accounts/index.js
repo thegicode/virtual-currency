@@ -181,9 +181,14 @@
     }
     renderOrderItem(data) {
       const orderItem = new OrderedItem(data);
-      if (this.accountItem.orderedElement) {
-        const firstChild = this.accountItem.orderedElement.querySelector("ordered-item");
+      if (!this.accountItem.orderedElement)
+        return;
+      const firstChild = this.accountItem.orderedElement.querySelector("ordered-item");
+      if (firstChild) {
         this.accountItem.orderedElement.insertBefore(orderItem, firstChild);
+      } else {
+        this.accountItem.orderedElement.appendChild(orderItem);
+        this.accountItem.orderedElement.hidden = false;
       }
     }
     getOrderChance() {
@@ -418,7 +423,6 @@
     onReset() {
       this.orderVolume = 0;
       this.orderPrice = 0;
-      console.log(this.orderVolume, this.orderPrice);
     }
     onChangeVolumeRadios(event) {
       const target = event.target;
@@ -506,7 +510,7 @@
       this.dataset.increase = isIncrement.toString();
     }
     renderOrdereds() {
-      if (this.ordered && this.data.orderedData.length === 0) {
+      if (this.ordered && !this.data.orderedData) {
         this.ordered.hidden = true;
         return;
       }
@@ -611,7 +615,7 @@
         try {
           const [accountsResponse, orderedResponse] = yield Promise.all([
             this.fetchData(`/fetchAccounts`),
-            this.fetchData(`/fetchOrdered`)
+            this.fetchData(`/fetchOrdereds`)
           ]);
           this.markets = accountsResponse.accounts.map((account) => account.market);
           const tickerResponse = yield this.fetchData(`/fetchTickers?markets=${encodeURIComponent(this.markets.join(","))}`);

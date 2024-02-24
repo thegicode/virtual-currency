@@ -27,7 +27,7 @@ export default class AppAccounts extends HTMLElement {
         try {
             const [accountsResponse, orderedResponse] = await Promise.all([
                 this.fetchData(`/fetchAccounts`),
-                this.fetchData(`/fetchOrdered`),
+                this.fetchData(`/fetchOrdereds`),
             ]);
 
             this.markets = accountsResponse.accounts.map(

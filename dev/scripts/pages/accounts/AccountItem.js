@@ -69,7 +69,7 @@ export default class AccountItem extends HTMLElement {
         this.dataset.increase = isIncrement.toString();
     }
     renderOrdereds() {
-        if (this.ordered && this.data.orderedData.length === 0) {
+        if (this.ordered && !this.data.orderedData) {
             this.ordered.hidden = true;
             return;
         }

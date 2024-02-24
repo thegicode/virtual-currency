@@ -24,7 +24,7 @@ export default class AppAccounts extends HTMLElement {
             try {
                 const [accountsResponse, orderedResponse] = yield Promise.all([
                     this.fetchData(`/fetchAccounts`),
-                    this.fetchData(`/fetchOrdered`),
+                    this.fetchData(`/fetchOrdereds`),
                 ]);
                 this.markets = accountsResponse.accounts.map((account) => account.market);
                 const tickerResponse = yield this.fetchData(`/fetchTickers?markets=${encodeURIComponent(this.markets.join(","))}`);

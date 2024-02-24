@@ -63,7 +63,8 @@ async function ordereds(req, res) {
 
         const result = transformData(orders);
 
-        res.send(result);
+        if (res) res.send(result);
+        else return result;
     } catch (error) {
         console.error("Error:", error);
         res.status(500).send("Internal Server Error");

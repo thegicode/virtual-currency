@@ -108,7 +108,7 @@ export default class AccountItem extends HTMLElement {
 
     // Ordereds
     private renderOrdereds() {
-        if (this.ordered && this.data.orderedData.length === 0) {
+        if (this.ordered && !this.data.orderedData) {
             this.ordered.hidden = true;
             return;
         }

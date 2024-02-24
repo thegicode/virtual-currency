@@ -62,10 +62,16 @@ export default class OrderBase extends HTMLElement {
 
     protected renderOrderItem(data: IOrdered) {
         const orderItem = new OrderedItem(data);
-        if (this.accountItem.orderedElement) {
-            const firstChild =
-                this.accountItem.orderedElement.querySelector("ordered-item");
+        if (!this.accountItem.orderedElement) return;
+
+        const firstChild =
+            this.accountItem.orderedElement.querySelector("ordered-item");
+
+        if (firstChild) {
             this.accountItem.orderedElement.insertBefore(orderItem, firstChild);
+        } else {
+            this.accountItem.orderedElement.appendChild(orderItem);
+            this.accountItem.orderedElement.hidden = false;
         }
     }
 

@@ -80,7 +80,6 @@ export default class OrderAsk extends OrderBase {
     onReset() {
         this.orderVolume = 0;
         this.orderPrice = 0;
-        console.log(this.orderVolume, this.orderPrice);
     }
     onChangeVolumeRadios(event) {
         const target = event.target;

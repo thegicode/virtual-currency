@@ -98,7 +98,7 @@ export default class OrderAsk extends OrderBase {
     private onReset() {
         this.orderVolume = 0;
         this.orderPrice = 0;
-        console.log(this.orderVolume, this.orderPrice);
+        // console.log(this.orderVolume, this.orderPrice);
     }
 
     // volume
