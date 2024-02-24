@@ -1,5 +1,5 @@
 const fetchAccounts = require("./accounts");
-const cancelOrder = require("./cancelOrder");
+const fetchCancel = require("./cancel");
 const fetchOrdereds = require("./ordereds");
 const fetchTickers = require("./tickers");
 const fetchOrders = require("./orders");
@@ -7,7 +7,7 @@ const fetchChance = require("./chance");
 
 const setupApiEndpoints = (app) => {
     app.get("/fetchAccounts", fetchAccounts);
-    app.get("/cancelOrder", cancelOrder);
+    app.get("/fetchCancel", fetchCancel);
     app.get("/fetchOrdered", fetchOrdereds);
     app.get("/fetchTickers", fetchTickers);
     app.get("/fetchOrders", fetchOrders);

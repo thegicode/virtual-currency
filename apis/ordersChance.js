@@ -11,7 +11,6 @@ async function ordersChance(req, res) {
     };
 
     const query = new URLSearchParams(body).toString();
-
     const hash = crypto.createHash("sha512");
     const queryHash = hash.update(query, "utf-8").digest("hex");
 

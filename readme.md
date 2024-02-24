@@ -21,3 +21,5 @@
 ## ToDo
 
 -   auto order
+-   markup 컴포넌트별 분리
+-   assets 컴포넌트 분리
