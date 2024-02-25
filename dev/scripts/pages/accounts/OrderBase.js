@@ -20,6 +20,7 @@ export default class OrderBase extends HTMLElement {
         this.memoElement = null;
         this.orderPrice = 0;
         this.accountItem = accountItem;
+        this.market = accountItem.market;
         this.onChangepriceRadios = this.onChangepriceRadios.bind(this);
         this.onInputPriceManual = this.onInputPriceManual.bind(this);
         this.onInputPrice = this.onInputPrice.bind(this);
@@ -53,6 +54,12 @@ export default class OrderBase extends HTMLElement {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = yield response.json();
+            if (data.error) {
+                if (this.memoElement)
+                    this.memoElement.textContent = data.error.message;
+                console.log(data.error);
+                return;
+            }
             this.renderOrderItem(data);
             return data;
         });
@@ -69,12 +76,6 @@ export default class OrderBase extends HTMLElement {
             this.accountItem.orderedElement.appendChild(orderItem);
             this.accountItem.orderedElement.hidden = false;
         }
-    }
-    getOrderChance() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch(`/fetchChance?market=${this.accountItem.market}`);
-            return yield response.json();
-        });
     }
     onChangepriceRadios(event) {
         const target = event.target;
@@ -98,11 +99,19 @@ export default class OrderBase extends HTMLElement {
     setPrice(price) {
         if (!this.priceInput)
             return;
-        this.orderPrice = Math.round(price);
+        this.orderPrice = this.transformPrice(price);
         this.priceInput.value = this.orderPrice.toLocaleString();
     }
     validateInputNumber(value) {
         return value.replace(/[^0-9.-]+/g, "");
+    }
+    transformPrice(price) {
+        const roundUnits = {
+            "KRW-BTC": 1000,
+            "KRW-BCH": 50,
+        };
+        const roundUnit = roundUnits[this.market] || 1;
+        return Math.round(price / roundUnit) * roundUnit;
     }
 }
 //# sourceMappingURL=OrderBase.js.map

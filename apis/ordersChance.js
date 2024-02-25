@@ -34,7 +34,7 @@ async function ordersChance(req, res) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         res.send(data);
     } catch (error) {
         console.error("Error:", error);

@@ -8,7 +8,7 @@ const tree = require("./tree");
 let index = 0;
 
 tree();
-console.log("tree", index);
+console.log("tree", index, new Date());
 
 leafs();
 
@@ -16,6 +16,6 @@ function leafs() {
     setInterval(() => {
         tree();
         index++;
-        console.log("tree", index);
-    }, 100000);
+        console.log("tree", index, new Date());
+    }, 300000);
 }

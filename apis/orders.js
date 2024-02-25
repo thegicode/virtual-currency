@@ -1,5 +1,6 @@
 const uuidv4 = require("uuid").v4;
 const crypto = require("crypto");
+const { fsync } = require("fs");
 const jwt = require("jsonwebtoken");
 
 const { ACCESS_KEY, SECRET_KEY } = require("../server/config/key");
@@ -46,9 +47,6 @@ async function orders(params) {
 
     try {
         const resonse = await fetch(URL.orders, options);
-        if (!resonse.ok) {
-            throw new Error(`HTTP error! status: ${resonse.status}`);
-        }
         const data = await resonse.json();
         const result = {
             ...data,
@@ -70,28 +68,29 @@ async function orders(params) {
 }
 
 async function checkChance(params) {
-    const response = await chance(params.market);
+    const chanceResponse = await chance(params.market);
+
     const totalPrice = parseInt(params.price) * parseInt(params.volume);
 
     if (params.side === "bid") {
         if (
-            response.market.state !== "active" &&
-            response.market.bid.min_total > totalPrice &&
-            response.market.max_total < totalPrice &&
-            Number(response.bid_account.balance) < params.volume
+            chanceResponse.market.state !== "active" &&
+            chanceResponse.market.bid.min_total > totalPrice &&
+            chanceResponse.market.max_total < totalPrice &&
+            Number(chanceResponse.bid_account.balance) < params.volume
         )
             return false;
     }
 
     if (params.side === "ask") {
         const possibleVolume =
-            Number(response.ask_account.balance) -
-            Number(response.ask_account.locked);
+            Number(chanceResponse.ask_account.balance) -
+            Number(chanceResponse.ask_account.locked);
 
         if (
-            response.market.state !== "active" &&
-            response.market.ask.min_total > totalPrice &&
-            response.market.max_total < totalPrice &&
+            chanceResponse.market.state !== "active" &&
+            chanceResponse.market.ask.min_total > totalPrice &&
+            chanceResponse.market.max_total < totalPrice &&
             possibleVolume < this.orderVolume
         )
             return false;

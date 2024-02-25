@@ -4,6 +4,7 @@ import OrderedItem from "./OrderedItem";
 
 export default class OrderBase extends HTMLElement {
     protected accountItem: AccountItem;
+    protected market: string;
     protected formElement: HTMLFormElement | null = null;
     protected template: HTMLTemplateElement | null = null;
 
@@ -18,6 +19,7 @@ export default class OrderBase extends HTMLElement {
         super();
 
         this.accountItem = accountItem;
+        this.market = accountItem.market;
 
         this.onChangepriceRadios = this.onChangepriceRadios.bind(this);
         this.onInputPriceManual = this.onInputPriceManual.bind(this);
@@ -45,7 +47,7 @@ export default class OrderBase extends HTMLElement {
         this.priceInput?.addEventListener("input", this.onInputPrice);
     }
 
-    protected render() {
+    private render() {
         if (!this.template) return;
         const cloned = cloneTemplate(this.template);
         this.appendChild(cloned);
@@ -59,11 +61,19 @@ export default class OrderBase extends HTMLElement {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+
+        if (data.error) {
+            if (this.memoElement)
+                this.memoElement.textContent = data.error.message;
+            console.log(data.error);
+            return;
+        }
+
         this.renderOrderItem(data);
         return data;
     }
 
-    protected renderOrderItem(data: IOrdered) {
+    private renderOrderItem(data: IOrdered) {
         const orderItem = new OrderedItem(data);
         if (!this.accountItem.orderedElement) return;
 
@@ -79,44 +89,53 @@ export default class OrderBase extends HTMLElement {
     }
 
     // chance
-    protected async getOrderChance() {
-        const response = await fetch(
-            `/fetchChance?market=${this.accountItem.market}`
-        );
-        return await response.json();
-    }
+    // private async getOrderChance() {
+    //     const response = await fetch(`/fetchChance?market=${this.market}`);
+    //     return await response.json();
+    // }
 
     // price
-    protected onChangepriceRadios(event: Event) {
+    private onChangepriceRadios(event: Event) {
         const target = event.target as HTMLInputElement;
         if (target.value === "manual") return;
         this.calculatePrice(parseInt(target.value));
     }
 
-    protected onInputPriceManual(event: Event) {
+    private onInputPriceManual(event: Event) {
         const target = event.target as HTMLInputElement;
         this.calculatePrice(-parseInt(target.value));
     }
 
-    protected calculatePrice(aPercent: number) {
+    private calculatePrice(aPercent: number) {
         const value = this.accountItem.avgBuyPrice * aPercent * 0.01;
         this.setPrice(this.accountItem.avgBuyPrice + value);
     }
 
-    protected onInputPrice(event: Event) {
+    private onInputPrice(event: Event) {
         const target = event.target as HTMLInputElement;
         const validateValue = this.validateInputNumber(target.value);
 
         this.setPrice(parseInt(validateValue));
     }
 
-    protected setPrice(price: number) {
+    private setPrice(price: number) {
         if (!this.priceInput) return;
-        this.orderPrice = Math.round(price);
+
+        this.orderPrice = this.transformPrice(price);
         this.priceInput.value = this.orderPrice.toLocaleString();
     }
 
     protected validateInputNumber(value: string) {
         return value.replace(/[^0-9.-]+/g, "");
+    }
+
+    private transformPrice(price: number) {
+        const roundUnits: { [key: string]: number } = {
+            "KRW-BTC": 1000,
+            "KRW-BCH": 50,
+        };
+
+        const roundUnit = roundUnits[this.market as string] || 1;
+        return Math.round(price / roundUnit) * roundUnit;
     }
 }
