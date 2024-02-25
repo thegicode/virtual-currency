@@ -1,6 +1,5 @@
 const uuidv4 = require("uuid").v4;
 const crypto = require("crypto");
-const { fsync } = require("fs");
 const jwt = require("jsonwebtoken");
 
 const { ACCESS_KEY, SECRET_KEY } = require("../server/config/key");
@@ -68,15 +67,55 @@ async function orders(params) {
 }
 
 async function checkChance(params) {
-    const chanceResponse = await chance(params.market);
+    let chanceResponse;
+    try {
+        chanceResponse = await chance(params.market);
+    } catch (error) {
+        console.error("Error fetching market chance:", error);
+        return false; // API 호출 실패 시 거래 불가능으로 처리
+    }
 
-    const totalPrice = parseInt(params.price) * parseInt(params.volume);
+    const totalPrice = Number(params.price) * Number(params.volume || 1);
 
-    if (params.side === "bid") {
+    if (chanceResponse.market.state !== "active") {
+        return false;
+    }
+
+    const isBid = params.side === "bid";
+    const isAsk = params.side === "ask";
+    const isLImit = params.ord_type === "limit";
+
+    const bidLimitCondition =
+        isBid &&
+        isLImit &&
+        Number(chanceResponse.bid_account.balance) < Number(params.volume);
+
+    const askCondition =
+        isAsk &&
+        Number(chanceResponse.ask_account.balance) -
+            Number(chanceResponse.ask_account.locked) <
+            Number(params.volume);
+
+    // Total Price 범위 확인 (min_total과 max_total 조건은 서로 상충될 수 있으므로 로직 검토 필요)
+    const isTotalPriceOutOfRange =
+        chanceResponse.market.bid.min_total > totalPrice ||
+        chanceResponse.market.max_total < totalPrice;
+
+    if (bidLimitCondition || askCondition || isTotalPriceOutOfRange) {
+        return false;
+    }
+
+    return true;
+
+    /* if (params.side === "bid") {
         if (
-            chanceResponse.market.state !== "active" &&
             chanceResponse.market.bid.min_total > totalPrice &&
-            chanceResponse.market.max_total < totalPrice &&
+            chanceResponse.market.max_total < totalPrice
+        )
+            return false;
+
+        if (
+            params.ord_type === "limit" &&
             Number(chanceResponse.bid_account.balance) < params.volume
         )
             return false;
@@ -88,7 +127,6 @@ async function checkChance(params) {
             Number(chanceResponse.ask_account.locked);
 
         if (
-            chanceResponse.market.state !== "active" &&
             chanceResponse.market.ask.min_total > totalPrice &&
             chanceResponse.market.max_total < totalPrice &&
             possibleVolume < this.orderVolume
@@ -96,7 +134,7 @@ async function checkChance(params) {
             return false;
     }
 
-    return true;
+    return true; */
 }
 
 module.exports = { orders, fetchOrders };

@@ -4,6 +4,8 @@ const path = require("path");
 const URL = require("../server/config/URL");
 const TOKEN = require("../server/config/token");
 
+const loadMyMarkets = require("./helpers/loadMyMarkets");
+
 let storedAccounts = {};
 let accountsTime = null;
 
@@ -30,15 +32,22 @@ async function accounts() {
 
             const data = await response.json();
 
+            const { assets, accounts } = transformData(data);
+
+            storedAccounts = { assets, accounts };
+
+            setMyMarkets(accounts);
+
             accountsTime = new Date().getTime();
 
-            return transformData(data);
+            return {
+                assets,
+                accounts,
+            };
         } else {
             console.log("Using stored accounts data", storedAccounts);
             return storedAccounts;
         }
-
-        // accountsTime = new Date().getTime();
     } catch (error) {
         console.error(error.name, error.message);
         res.status(500).send(`${error.name}, ${error.message}`);
@@ -67,16 +76,21 @@ function transformData(data) {
         .map(enrichAccount)
         .sort((a, b) => b.buy_price - a.buy_price);
 
-    const myMarkets = accounts.map((a) => a.market);
+    return { assets, accounts };
+}
+
+async function setMyMarkets(accounts) {
+    const myMarkets = (await loadMyMarkets()) || [];
+    const marketSet = new Set(myMarkets);
+
+    accounts.forEach((anAccount) => {
+        marketSet.add(anAccount.market);
+    });
 
     fs.writeFileSync(
         path.resolve(`./data/myMarkets.json`),
-        JSON.stringify(myMarkets)
+        JSON.stringify(Array.from(marketSet))
     );
-
-    storedAccounts = { assets, accounts };
-
-    return { assets, accounts };
 }
 
 function enrichAccount(account) {
