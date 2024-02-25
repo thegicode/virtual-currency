@@ -5,17 +5,19 @@ const tree = require("./tree");
     1. market별 30분마다 매수, 매도 상황 확인
  */
 
-let index = 0;
+module.exports = function leafs() {
+    let index = 0;
 
-tree();
-console.log("tree", index, new Date());
+    tree();
+    console.log("tree", index, new Date());
 
-leafs();
+    treeTimer();
 
-function leafs() {
-    setInterval(() => {
-        tree();
-        index++;
-        console.log("tree", index, new Date());
-    }, 300000);
-}
+    function treeTimer() {
+        setInterval(() => {
+            tree();
+            index++;
+            console.log("tree", index, new Date());
+        }, 1800000);
+    }
+};
