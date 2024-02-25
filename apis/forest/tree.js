@@ -24,11 +24,16 @@ async function buyOrder(account, market) {
     const bidRate = Math.min(0.1, Math.ceil(account.buy_price / 10000) * 0.01);
     const bidOrderPrice = Math.round(account.avg_buy_price * (1 - bidRate));
 
+    const buyPrice = Math.round(account.buy_price / 10000) * 10000; // 10000원 단위로 끝나지 않는 가격인 경우
+    const filledBuyPrice = Math.round(
+        buyPrice + (buyPrice - account.buy_price)
+    ); // 비워진 금액 채워서
+
     const params = {
         market,
         side: "bid",
         price: transformPrice(market, bidOrderPrice).toString(),
-        volume: (account.buy_price / bidOrderPrice).toFixed(8),
+        volume: (filledBuyPrice / bidOrderPrice).toFixed(8),
         ord_type: "limit",
     };
 
