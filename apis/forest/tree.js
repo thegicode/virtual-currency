@@ -21,13 +21,13 @@ async function cancelMarketOrders(orders) {
 }
 
 async function buyOrder(account, market) {
-    const bidRate = Math.min(0.1, Math.ceil(account.buy_price / 10000) * 0.01);
-    const bidOrderPrice = Math.round(account.avg_buy_price * (1 - bidRate));
+    const bidRate = Math.min(0.1, Math.ceil(account.buy_price / 10000) * 0.01); // 최대 10%
+    const bidOrderPrice = Math.round(account.avg_buy_price * (1 - bidRate)); // 매수할 가격
 
     const buyPrice = Math.round(account.buy_price / 10000) * 10000; // 10000원 단위로 끝나지 않는 가격인 경우
     const filledBuyPrice = Math.round(
         buyPrice + (buyPrice - account.buy_price)
-    ); // 비워진 금액 채워서
+    ); // 샀던 금액 만큼 구매, 비워진 금액 채워서
 
     const params = {
         market,
@@ -46,7 +46,9 @@ async function buyOrder(account, market) {
 }
 
 async function sellOrder(account, market) {
-    let askOrderPrice = Math.round(account.avg_buy_price * 1.1);
+    // const askRate = account.buy_price > 50000 ? 0.1 : 0.05;
+    const askRate = 0.1; // 10%
+    let askOrderPrice = Math.round(account.avg_buy_price * (1 + askRate));
 
     const params = {
         market,
@@ -67,7 +69,6 @@ async function buyOrderFirst(market) {
     const params = {
         market,
         side: "bid",
-        volume: null,
         price: 10000,
         ord_type: "price",
     };

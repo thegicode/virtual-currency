@@ -15,10 +15,13 @@ async function orders(params) {
     const body = {
         market: params.market,
         side: params.side,
-        volume: params.volume,
         price: params.price,
         ord_type: params.ord_type,
     };
+
+    if (params.volume) {
+        body.volume = params.volume;
+    }
 
     if (!(await checkChance(params))) return;
 

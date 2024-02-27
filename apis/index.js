@@ -11,7 +11,7 @@ const setupApiEndpoints = (app) => {
     app.get("/fetchOrdereds", fetchOrdereds);
     app.get("/fetchTickers", fetchTickers);
     app.get("/fetchOrders", fetchOrders);
-    app.get("/fetchChance", fetchChance);
+    // app.get("/fetchChance", fetchChance);
     app.get("/leafs", leafs);
 };
 
