@@ -21,7 +21,7 @@ async function cancelMarketOrders(orders) {
 }
 
 async function buyOrder(account, market) {
-    const bidRate = Math.min(0.1, Math.ceil(account.buy_price / 10000) * 0.01); // 최대 10%
+    const bidRate = Math.min(0.2, Math.ceil(account.buy_price / 10000) * 0.01); // 최대 20%
     const bidOrderPrice = Math.round(account.avg_buy_price * (1 - bidRate)); // 매수할 가격
 
     const buyPrice = Math.round(account.buy_price / 10000) * 10000; // 10000원 단위로 끝나지 않는 가격인 경우
