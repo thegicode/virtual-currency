@@ -1,18 +1,23 @@
-const { fetchAccounts } = require("./accounts");
-const { fetchCancel } = require("./cancel");
-const fetchOrdereds = require("./ordereds");
+const { fetchAccounts, accounts } = require("./accounts");
+const { fetchCancel, cancel } = require("./cancel");
+const { fetchChance, chance } = require("./chance");
+const { orders, fetchOrders } = require("./orders");
+const ordereds = require("./ordereds");
+const ordersChance = require("./ordersChance");
 const fetchTickers = require("./tickers");
-const { fetchOrders } = require("./orders");
-const leafs = require("./forest/leafs");
+const loadMyMarkets = require("./loadMyMarkets");
 
-const setupApiEndpoints = (app) => {
-    app.get("/fetchAccounts", fetchAccounts);
-    app.get("/fetchCancel", fetchCancel);
-    app.get("/fetchOrdereds", fetchOrdereds);
-    app.get("/fetchTickers", fetchTickers);
-    app.get("/fetchOrders", fetchOrders);
-    // app.get("/fetchChance", fetchChance);
-    app.get("/leafs", leafs);
+module.exports = {
+    fetchAccounts,
+    accounts,
+    fetchCancel,
+    cancel,
+    fetchChance,
+    chance,
+    ordereds,
+    orders,
+    fetchOrders,
+    ordersChance,
+    fetchTickers,
+    loadMyMarkets,
 };
-
-module.exports = setupApiEndpoints;

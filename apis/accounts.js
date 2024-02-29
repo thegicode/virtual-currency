@@ -4,7 +4,7 @@ const path = require("path");
 const URL = require("../server/config/URL");
 const TOKEN = require("../server/config/token");
 
-const loadMyMarkets = require("./helpers/loadMyMarkets");
+const loadMyMarkets = require("./loadMyMarkets");
 
 let storedAccounts = {};
 let accountsTime = null;
