@@ -50,7 +50,8 @@ async function accounts() {
         }
     } catch (error) {
         console.error(error.name, error.message);
-        res.status(500).send(`${error.name}, ${error.message}`);
+        return error;
+        // res.status(500).send(`${error.name}, ${error.message}`);
     }
 }
 

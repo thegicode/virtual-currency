@@ -310,10 +310,6 @@ app-accounts .assets[data-increase=false] .profitRate {
 app-accounts .assets h2 {
   margin: 0 0 10px;
 }
-app-accounts .assets .asset,
-app-accounts .assets .totalAsset {
-  font-size: 14px;
-}
 app-accounts .assets-contents {
   display: flex;
   flex-wrap: wrap;
@@ -327,7 +323,7 @@ app-accounts .assets-contents p {
 }
 app-accounts .assets-contents strong {
   margin-left: auto;
-  color: #6b62cf;
+  color: #5e53e1;
 }
 app-accounts .accounts {
   margin-top: 1rem;

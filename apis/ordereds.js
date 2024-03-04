@@ -66,7 +66,7 @@ async function ordereds(req, res) {
         if (res) res.send(result);
         else return result;
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Error:", error.name, error.message);
         res.status(500).send("Internal Server Error");
     }
 }

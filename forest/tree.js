@@ -6,7 +6,7 @@ const {
     loadMyMarkets,
 } = require("../apis");
 
-const willDeleteMarkets = ["KRW-BCH", "KRW-XRP"];
+const ignoreMarkets = ["KRW-BTC", "KRW-ETH"];
 
 /*  market별 매수, 매도 발생 시(market의 매수, 매도가 없는 경우)
     1. 모든 주문 취소 
@@ -26,13 +26,12 @@ async function cancelMarketOrders(orders) {
 
 async function buyOrder(account) {
     // const bidRate = Math.min(0.2, Math.ceil(account.buy_price / 10000) * 0.01); // 최대 20%
-    const bidRate = Math.round(account.buy_price / 10000) * 0.01; // 하락하는 금액만큼 증가
+    const bidRate = Math.round(account.buy_price / 10000) * 0.01; // 하락하는 금액만큼 하락률 증가
     const bidOrderPrice = Math.round(account.avg_buy_price * (1 - bidRate)); // 매수할 가격
-
     const buyPrice = Math.round(account.buy_price / 10000) * 10000; // 10000원 단위로 끝나지 않는 가격인 경우
     const filledBuyPrice = Math.round(
         buyPrice + (buyPrice - account.buy_price)
-    ); // 샀던 금액 만큼 구매, 비워진 금액 채워서
+    ); // 샀던 금액 만큼 구매, 비워진 금액 채워서(예, 10123)
 
     const params = {
         market: account.market,
@@ -52,9 +51,9 @@ async function buyOrder(account) {
 
 async function sellOrder(account) {
     let askRate = 0.1; // 10%
-    if (willDeleteMarkets.includes(account.market)) {
-        askRate = account.buy_price > 50000 ? 0.1 : 0.05;
-    }
+    // if (marketsPart2.includes(account.market)) {
+    //     askRate = account.buy_price > 50000 ? 0.1 : 0.05;
+    // }
 
     const askOrderPrice = Math.round(account.avg_buy_price * (1 + askRate));
 
@@ -65,6 +64,7 @@ async function sellOrder(account) {
         volume: account.volume.toString(),
         ord_type: "limit",
     };
+
     try {
         const askOrdersRes = await orders(params);
         console.log("매도 주문 :", account.market, askOrdersRes);
@@ -93,10 +93,7 @@ async function buyOrderFirst(market) {
 // 첫 거래
 async function firstTransaction(marketName) {
     const response = await buyOrderFirst(marketName);
-
-    console.log("firstTransaction", response);
-    if (!response.uuid) return;
-
+    if (!response) return;
     await buyOrder(response);
     await sellOrder(response);
 }
@@ -127,6 +124,8 @@ module.exports = async function tree() {
 
     // 마켓별로 2개의 예약내역이 없으면 모두 취소하고 매수, 매도 주문
     for (const marketName of myMarkets) {
+        if (ignoreMarkets.includes(marketName)) return;
+
         const orderedMarket = orderedsData[marketName];
 
         const isOnlyOrder = orderedMarket && orderedMarket.length === 1;
@@ -142,7 +141,7 @@ module.exports = async function tree() {
                 (acc) => acc.market === marketName
             );
 
-            if (willDeleteMarkets.includes(account)) return;
+            // if (willDeleteMarkets.includes(account)) return;
 
             if (account) {
                 await buyOrder(account); // 매수 주문
