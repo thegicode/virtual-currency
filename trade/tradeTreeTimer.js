@@ -1,24 +1,19 @@
 const tradeTree = require("./tradeTree");
 const { formatTime } = require("./orderUtils");
 
-/*
-    자동 체크
-    1. market별 30분마다 매수, 매도 상황 확인
- */
-
 module.exports = function tradeTreeTimer() {
-    let index = 0;
+    let cycleCount = 0;
 
-    tradeTree();
-    console.log("tradeTree", index, formatTime(new Date()));
+    // 초기 실행
+    executeTradeCycle();
 
-    treeTimer();
+    // 주기적 실행
+    const intervalId = setInterval(executeTradeCycle, 1800000); // 30분 간격
 
-    function treeTimer() {
-        setInterval(() => {
-            tradeTree();
-            index++;
-            console.log("tradeTree", index, formatTime(new Date()));
-        }, 1800000);
+    // 매수, 매도 상황을 확인하고 실행하는 함수
+    function executeTradeCycle() {
+        tradeTree();
+        console.log(`tradeTree cycle ${cycleCount}`, formatTime(new Date()));
+        cycleCount++;
     }
 };
