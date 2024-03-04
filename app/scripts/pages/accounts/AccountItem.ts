@@ -16,6 +16,7 @@ export default class AccountItem extends HTMLElement {
     private askButton: HTMLButtonElement | null = null;
     private orderBid: OrderBid | null = null;
     private orderAsk: OrderAsk | null = null;
+    private _decimalCount: number | null = null;
 
     constructor(data: IProcessedAccountData) {
         super();
@@ -52,6 +53,10 @@ export default class AccountItem extends HTMLElement {
         return this.ordered;
     }
 
+    get decimalCount() {
+        return this._decimalCount;
+    }
+
     connectedCallback() {
         this.render();
 
@@ -78,21 +83,21 @@ export default class AccountItem extends HTMLElement {
     private render() {
         const cloned = cloneTemplate<HTMLElement>(this.template);
 
+        this._decimalCount = this.countDecimalPlaces(this.data.tradePrice);
+
         const contentData = {
             currency: this.data.currency,
             unitCurrency: this.data.unitCurrency,
             volume: this.data.volume,
-            buyPrice: roundToDecimalPlace(
-                this.data.buyPrice,
-                0
-            ).toLocaleString(),
-            avgBuyPrice: roundToDecimalPlace(
-                this.data.avgBuyPrice,
-                0
+            buyPrice: Math.round(this.data.buyPrice).toLocaleString(),
+            avgBuyPrice: Number(
+                this.data.avgBuyPrice.toFixed(this._decimalCount)
             ).toLocaleString(),
             profit: Math.round(this.data.profit).toLocaleString(),
-            profitRate: roundToDecimalPlace(this.data.profitRate, 2) + "%",
-            tradePrice: this.data.tradePrice.toLocaleString(),
+            profitRate: this.data.profitRate.toFixed(2) + "%",
+            tradePrice: Number(
+                this.data.tradePrice.toFixed(this._decimalCount)
+            ).toLocaleString(),
         };
 
         updateElementsTextWithData(contentData, cloned);
@@ -162,5 +167,12 @@ export default class AccountItem extends HTMLElement {
     public hideOrderAsk() {
         if (!this.askButton) return;
         this.askButton.textContent = "매도";
+    }
+
+    countDecimalPlaces(price: number) {
+        if (!isNaN(price) && Math.floor(price) !== price) {
+            return price.toString().split(".")[1].length;
+        }
+        return 0;
     }
 }

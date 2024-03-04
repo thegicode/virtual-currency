@@ -108,10 +108,18 @@ export default class OrderBase extends HTMLElement {
     transformPrice(price) {
         const roundUnits = {
             "KRW-BTC": 1000,
+            "KRW-ETH": 1000,
             "KRW-BCH": 50,
         };
+        const decimalCount = this.accountItem.decimalCount || 0;
         const roundUnit = roundUnits[this.market] || 1;
-        return Math.round(price / roundUnit) * roundUnit;
+        if (decimalCount > 0) {
+            const roundedPrice = price / roundUnit;
+            return parseFloat(roundedPrice.toFixed(decimalCount));
+        }
+        else {
+            return Math.round(price / roundUnit) * roundUnit;
+        }
     }
 }
 //# sourceMappingURL=OrderBase.js.map

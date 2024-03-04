@@ -122,6 +122,7 @@ export default class OrderBase extends HTMLElement {
         if (!this.priceInput) return;
 
         this.orderPrice = this.transformPrice(price);
+
         this.priceInput.value = this.orderPrice.toLocaleString();
     }
 
@@ -132,10 +133,18 @@ export default class OrderBase extends HTMLElement {
     private transformPrice(price: number) {
         const roundUnits: { [key: string]: number } = {
             "KRW-BTC": 1000,
+            "KRW-ETH": 1000,
             "KRW-BCH": 50,
         };
 
+        const decimalCount = this.accountItem.decimalCount || 0;
         const roundUnit = roundUnits[this.market as string] || 1;
-        return Math.round(price / roundUnit) * roundUnit;
+
+        if (decimalCount > 0) {
+            const roundedPrice = price / roundUnit;
+            return parseFloat(roundedPrice.toFixed(decimalCount));
+        } else {
+            return Math.round(price / roundUnit) * roundUnit;
+        }
     }
 }

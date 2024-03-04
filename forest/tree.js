@@ -27,7 +27,8 @@ async function cancelMarketOrders(orders) {
 async function buyOrder(account) {
     // const bidRate = Math.min(0.2, Math.ceil(account.buy_price / 10000) * 0.01); // 최대 20%
     const bidRate = Math.round(account.buy_price / 10000) * 0.01; // 하락하는 금액만큼 하락률 증가
-    const bidOrderPrice = Math.round(account.avg_buy_price * (1 - bidRate)); // 매수할 가격
+    const bidOrderPrice = account.avg_buy_price * (1 - bidRate);
+
     const buyPrice = Math.round(account.buy_price / 10000) * 10000; // 10000원 단위로 끝나지 않는 가격인 경우
     const filledBuyPrice = Math.round(
         buyPrice + (buyPrice - account.buy_price)
@@ -50,12 +51,12 @@ async function buyOrder(account) {
 }
 
 async function sellOrder(account) {
-    let askRate = 0.1; // 10%
+    const askRate = 0.1; // 10%
     // if (marketsPart2.includes(account.market)) {
     //     askRate = account.buy_price > 50000 ? 0.1 : 0.05;
     // }
 
-    const askOrderPrice = Math.round(account.avg_buy_price * (1 + askRate));
+    const askOrderPrice = account.avg_buy_price * (1 + askRate);
 
     const params = {
         market: account.market,
@@ -106,7 +107,13 @@ function transformPrice(market, price) {
     };
 
     const roundUnit = roundUnits[market] || 1;
-    return Math.round(price / roundUnit) * roundUnit;
+
+    const result =
+        price > 1000
+            ? Math.round(price / roundUnit) * roundUnit
+            : price.toFixed(1);
+
+    return result;
 }
 
 module.exports = async function tree() {
@@ -124,7 +131,7 @@ module.exports = async function tree() {
 
     // 마켓별로 2개의 예약내역이 없으면 모두 취소하고 매수, 매도 주문
     for (const marketName of myMarkets) {
-        if (ignoreMarkets.includes(marketName)) return;
+        if (ignoreMarkets.includes(marketName)) continue;
 
         const orderedMarket = orderedsData[marketName];
 

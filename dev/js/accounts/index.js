@@ -235,10 +235,17 @@
     transformPrice(price) {
       const roundUnits = {
         "KRW-BTC": 1e3,
+        "KRW-ETH": 1e3,
         "KRW-BCH": 50
       };
+      const decimalCount = this.accountItem.decimalCount || 0;
       const roundUnit = roundUnits[this.market] || 1;
-      return Math.round(price / roundUnit) * roundUnit;
+      if (decimalCount > 0) {
+        const roundedPrice = price / roundUnit;
+        return parseFloat(roundedPrice.toFixed(decimalCount));
+      } else {
+        return Math.round(price / roundUnit) * roundUnit;
+      }
     }
   };
 
@@ -442,6 +449,7 @@
       this.askButton = null;
       this.orderBid = null;
       this.orderAsk = null;
+      this._decimalCount = null;
       this.data = data;
       this.template = document.querySelector("#tp-accountItem");
       this.orderedButton = null;
@@ -464,6 +472,9 @@
     get orderedElement() {
       return this.ordered;
     }
+    get decimalCount() {
+      return this._decimalCount;
+    }
     connectedCallback() {
       var _a, _b, _c;
       this.render();
@@ -484,15 +495,16 @@
     }
     render() {
       const cloned = cloneTemplate(this.template);
+      this._decimalCount = this.countDecimalPlaces(this.data.tradePrice);
       const contentData = {
         currency: this.data.currency,
         unitCurrency: this.data.unitCurrency,
         volume: this.data.volume,
-        buyPrice: roundToDecimalPlace(this.data.buyPrice, 0).toLocaleString(),
-        avgBuyPrice: roundToDecimalPlace(this.data.avgBuyPrice, 0).toLocaleString(),
+        buyPrice: Math.round(this.data.buyPrice).toLocaleString(),
+        avgBuyPrice: Number(this.data.avgBuyPrice.toFixed(this._decimalCount)).toLocaleString(),
         profit: Math.round(this.data.profit).toLocaleString(),
-        profitRate: roundToDecimalPlace(this.data.profitRate, 2) + "%",
-        tradePrice: this.data.tradePrice.toLocaleString()
+        profitRate: this.data.profitRate.toFixed(2) + "%",
+        tradePrice: Number(this.data.tradePrice.toFixed(this._decimalCount)).toLocaleString()
       };
       updateElementsTextWithData(contentData, cloned);
       const upbitAnchor = cloned.querySelector(".upbit");
@@ -560,6 +572,12 @@
       if (!this.askButton)
         return;
       this.askButton.textContent = "\uB9E4\uB3C4";
+    }
+    countDecimalPlaces(price) {
+      if (!isNaN(price) && Math.floor(price) !== price) {
+        return price.toString().split(".")[1].length;
+      }
+      return 0;
     }
   };
 
