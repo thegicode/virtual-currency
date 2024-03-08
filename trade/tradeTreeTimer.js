@@ -12,8 +12,8 @@ module.exports = function tradeTreeTimer() {
 
     // 매수, 매도 상황을 확인하고 실행하는 함수
     function executeTradeCycle() {
-        tradeTree();
         console.log(`tradeTree cycle ${cycleCount}`, formatTime(new Date()));
+        tradeTree();
         cycleCount++;
     }
 };

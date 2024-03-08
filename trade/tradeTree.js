@@ -2,7 +2,7 @@ const { accounts, orders, ordereds, loadMyMarkets } = require("../apis");
 
 const { buyOrder, sellOrder, cancelMarketOrders } = require("./orderUtils");
 
-const ignoreMarkets = ["KRW-BTC", "KRW-ETH"];
+const ignoreMarkets = ["KRW-BTC"];
 
 /*  market별 매수, 매도 발생 시(market의 매수, 매도가 없는 경우)
     1. 모든 주문 취소 

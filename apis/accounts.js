@@ -26,11 +26,14 @@ async function accounts() {
                 headers: { Authorization: TOKEN },
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
             const data = await response.json();
+
+            if (!response.ok) {
+                console.error("apis/accounts.js : ", data.error);
+                throw new Error(
+                    `HTTP error! status: ${response.status}, statusText: ${response.statusText}`
+                );
+            }
 
             const { assets, accounts } = transformData(data);
 
