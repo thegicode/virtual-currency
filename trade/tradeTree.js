@@ -43,6 +43,10 @@ async function processMarketOrders(marketName, orderedsData, accountsRes) {
         if (account) {
             const bidPrice = getBidPrice(account);
             const askPrice = getAskPrice(account);
+
+            console.log("bidPrice", bidPrice);
+            console.log("askPrice", askPrice);
+
             await buyOrder(account, bidPrice); // 매수 주문
             await sellOrder(account, askPrice); // 매도 주문
         } else {

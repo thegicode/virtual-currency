@@ -4,7 +4,8 @@ async function buyOrder(account, { bidPrice, buyPrice }) {
     const params = {
         market: account.market,
         side: "bid",
-        price: transformPrice(account.market, bidPrice).toString(),
+        price: setOrderPrice(bidPrice).toString(),
+        // price: transformPrice(account.market, bidPrice).toString(),
         volume: (buyPrice / bidPrice).toFixed(8),
         ord_type: "limit",
     };
@@ -21,7 +22,8 @@ async function sellOrder(account, askOrderPrice) {
     const params = {
         market: account.market,
         side: "ask",
-        price: transformPrice(account.market, askOrderPrice).toString(),
+        price: setOrderPrice(askOrderPrice).toString(),
+        // price: transformPrice(account.market, askOrderPrice).toString(),
         volume: account.volume.toString(),
         ord_type: "limit",
     };
@@ -44,22 +46,47 @@ async function cancelMarketOrders(orders) {
     }
 }
 
-function transformPrice(market, price) {
-    const roundUnits = {
-        "KRW-BTC": 1000,
-        "KRW-ETH": 1000,
-        "KRW-BCH": 50,
-    };
+function setOrderPrice(price) {
+    const orderUnit = calculateOrderUnit(price);
+    const decimalString = orderUnit.toString().split(".")[1];
 
-    const roundUnit = roundUnits[market] || 1;
-
-    const result =
-        price > 1000
-            ? Math.round(price / roundUnit) * roundUnit
-            : price.toFixed(1);
-
-    return result;
+    if (decimalString) {
+        return parseFloat(price.toFixed(decimalString.length));
+    } else {
+        return Math.round(price / orderUnit) * orderUnit;
+    }
 }
+
+function calculateOrderUnit(price) {
+    const MAX_ORDER_UNIT = 1000;
+    let orderUnit = 1;
+
+    const count = price.toString().split(".")[0].length - 1;
+    for (let i = 0; i < count; i++) {
+        orderUnit *= 10;
+    }
+
+    const result = orderUnit / 1000;
+
+    return result >= MAX_ORDER_UNIT ? MAX_ORDER_UNIT : result;
+}
+
+// function transformPrice(market, price) {
+//     const roundUnits = {
+//         "KRW-BTC": 1000,
+//         "KRW-ETH": 1000,
+//         "KRW-BCH": 50,
+//     };
+
+//     const roundUnit = roundUnits[market] || 1;
+
+//     const result =
+//         price > 1000
+//             ? Math.round(price / roundUnit) * roundUnit
+//             : price.toFixed(1);
+
+//     return result;
+// }
 
 function formatTime(date) {
     const options = {
