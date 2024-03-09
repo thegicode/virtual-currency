@@ -121,7 +121,7 @@ export default class OrderBase extends HTMLElement {
     private setPrice(price: number) {
         if (!this.priceInput) return;
 
-        this.orderPrice = this.transformPrice(price);
+        this.orderPrice = this.setOrderPrice(price);
 
         this.priceInput.value = this.orderPrice.toLocaleString();
     }
@@ -130,21 +130,78 @@ export default class OrderBase extends HTMLElement {
         return value.replace(/[^0-9.-]+/g, "");
     }
 
-    private transformPrice(price: number) {
-        const roundUnits: { [key: string]: number } = {
-            "KRW-BTC": 1000,
-            "KRW-ETH": 1000,
-            "KRW-BCH": 50,
-        };
+    private setOrderPrice(price: number) {
+        const orderUnit = this.calculateOrderUnit(price);
+        const decimalString = orderUnit.toString().split(".")[1];
 
-        const decimalCount = this.accountItem.decimalCount || 0;
-        const roundUnit = roundUnits[this.market as string] || 1;
-
-        if (decimalCount > 0) {
-            const roundedPrice = price / roundUnit;
-            return parseFloat(roundedPrice.toFixed(decimalCount));
+        if (decimalString) {
+            return parseFloat(price.toFixed(decimalString.length));
         } else {
-            return Math.round(price / roundUnit) * roundUnit;
+            return Math.round(price / orderUnit) * orderUnit;
         }
     }
+
+    // private transformPrice(price: number) {
+    //     const roundUnits: { [key: string]: number } = {
+    //         "KRW-BTC": 1000,
+    //         "KRW-ETH": 1000,
+    //         "KRW-BCH": 50,
+    //     };
+
+    //     const decimalCount = this.accountItem.decimalCount || 0;
+    //     const roundUnit = roundUnits[this.market as string] || 1;
+
+    //     if (decimalCount > 0) {
+    //         const roundedPrice = price / roundUnit;
+    //         return parseFloat(roundedPrice.toFixed(decimalCount));
+    //     } else {
+    //         return Math.round(price / roundUnit) * roundUnit;
+    //     }
+    // }
+
+    private calculateOrderUnit(price: number) {
+        const MAX_ORDER_UNIT = 1000;
+        let orderUnit = 1;
+
+        const count = price.toString().split(".")[0].length - 1;
+        // const integerPartLength = Math.floor(Math.log10(price));
+
+        for (let i = 0; i < count; i++) {
+            orderUnit *= 10;
+        }
+
+        const result = orderUnit / 1000;
+
+        return result >= MAX_ORDER_UNIT ? MAX_ORDER_UNIT : result;
+    }
+
+    /*  test() {
+        const originPrice = [
+            1, 12.3, 123, 1234.33, 12345.099, 123456.999, 1234567.77, 12345678,
+            12345678.88888,
+        ];
+
+        const price = originPrice.map((p) => {
+            let supply = 1;
+
+            const count = Number(p.toString().split(".")[0].length) - 1;
+
+            for (let i = 0; i < count; i++) {
+                supply *= 10;
+            }
+
+            return supply;
+        });
+
+        // console.log(price);
+
+        // const price = [
+        //     1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000,
+        // ];
+
+        const result = price.map((p) => p / 1000);
+
+        console.log(result);
+        // [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000, 1000]
+    } */
 }

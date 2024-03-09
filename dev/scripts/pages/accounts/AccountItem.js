@@ -63,10 +63,10 @@ export default class AccountItem extends HTMLElement {
             unitCurrency: this.data.unitCurrency,
             volume: this.data.volume,
             buyPrice: Math.round(this.data.buyPrice).toLocaleString(),
-            avgBuyPrice: this.getLocalPrice(this.data.avgBuyPrice),
+            avgBuyPrice: this.tranformPrice(this.data.avgBuyPrice),
             profit: Math.round(this.data.profit).toLocaleString(),
             profitRate: this.data.profitRate.toFixed(2) + "%",
-            tradePrice: this.getLocalPrice(this.data.tradePrice),
+            tradePrice: this.tranformPrice(this.data.tradePrice),
         };
         updateElementsTextWithData(contentData, cloned);
         const upbitAnchor = cloned.querySelector(".upbit");
@@ -141,11 +141,11 @@ export default class AccountItem extends HTMLElement {
         }
         return 0;
     }
-    getLocalPrice(price) {
-        if (!this._decimalCount)
+    tranformPrice(price) {
+        if (this._decimalCount === null || this._decimalCount < 0)
             return;
         const result = Number(price.toFixed(this._decimalCount));
-        return result > 1000 ? result.toLocaleString() : result;
+        return result >= 1000 ? result.toLocaleString() : result;
     }
 }
 //# sourceMappingURL=AccountItem.js.map

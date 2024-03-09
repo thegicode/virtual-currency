@@ -226,26 +226,30 @@
     setPrice(price) {
       if (!this.priceInput)
         return;
-      this.orderPrice = this.transformPrice(price);
+      this.orderPrice = this.setOrderPrice(price);
       this.priceInput.value = this.orderPrice.toLocaleString();
     }
     validateInputNumber(value) {
       return value.replace(/[^0-9.-]+/g, "");
     }
-    transformPrice(price) {
-      const roundUnits = {
-        "KRW-BTC": 1e3,
-        "KRW-ETH": 1e3,
-        "KRW-BCH": 50
-      };
-      const decimalCount = this.accountItem.decimalCount || 0;
-      const roundUnit = roundUnits[this.market] || 1;
-      if (decimalCount > 0) {
-        const roundedPrice = price / roundUnit;
-        return parseFloat(roundedPrice.toFixed(decimalCount));
+    setOrderPrice(price) {
+      const orderUnit = this.calculateOrderUnit(price);
+      const decimalString = orderUnit.toString().split(".")[1];
+      if (decimalString) {
+        return parseFloat(price.toFixed(decimalString.length));
       } else {
-        return Math.round(price / roundUnit) * roundUnit;
+        return Math.round(price / orderUnit) * orderUnit;
       }
+    }
+    calculateOrderUnit(price) {
+      const MAX_ORDER_UNIT = 1e3;
+      let orderUnit = 1;
+      const count = price.toString().split(".")[0].length - 1;
+      for (let i = 0; i < count; i++) {
+        orderUnit *= 10;
+      }
+      const result = orderUnit / 1e3;
+      return result >= MAX_ORDER_UNIT ? MAX_ORDER_UNIT : result;
     }
   };
 
@@ -327,7 +331,6 @@
     onReset() {
       this.orderAmountPrice = 0;
       this.orderPrice = 0;
-      console.log(this.orderAmountPrice, this.orderPrice);
     }
     onInputAmount(event) {
       const target = event.target;
@@ -501,10 +504,10 @@
         unitCurrency: this.data.unitCurrency,
         volume: this.data.volume,
         buyPrice: Math.round(this.data.buyPrice).toLocaleString(),
-        avgBuyPrice: this.getLocalPrice(this.data.avgBuyPrice),
+        avgBuyPrice: this.tranformPrice(this.data.avgBuyPrice),
         profit: Math.round(this.data.profit).toLocaleString(),
         profitRate: this.data.profitRate.toFixed(2) + "%",
-        tradePrice: this.getLocalPrice(this.data.tradePrice)
+        tradePrice: this.tranformPrice(this.data.tradePrice)
       };
       updateElementsTextWithData(contentData, cloned);
       const upbitAnchor = cloned.querySelector(".upbit");
@@ -579,11 +582,11 @@
       }
       return 0;
     }
-    getLocalPrice(price) {
-      if (!this._decimalCount)
+    tranformPrice(price) {
+      if (this._decimalCount === null || this._decimalCount < 0)
         return;
       const result = Number(price.toFixed(this._decimalCount));
-      return result > 1e3 ? result.toLocaleString() : result;
+      return result >= 1e3 ? result.toLocaleString() : result;
     }
   };
 

@@ -67,7 +67,7 @@ export default class OrderBid extends OrderBase {
     private onReset() {
         this.orderAmountPrice = 0;
         this.orderPrice = 0;
-        console.log(this.orderAmountPrice, this.orderPrice);
+        // console.log(this.orderAmountPrice, this.orderPrice);
     }
 
     private onInputAmount(event: Event) {

@@ -99,27 +99,31 @@ export default class OrderBase extends HTMLElement {
     setPrice(price) {
         if (!this.priceInput)
             return;
-        this.orderPrice = this.transformPrice(price);
+        this.orderPrice = this.setOrderPrice(price);
         this.priceInput.value = this.orderPrice.toLocaleString();
     }
     validateInputNumber(value) {
         return value.replace(/[^0-9.-]+/g, "");
     }
-    transformPrice(price) {
-        const roundUnits = {
-            "KRW-BTC": 1000,
-            "KRW-ETH": 1000,
-            "KRW-BCH": 50,
-        };
-        const decimalCount = this.accountItem.decimalCount || 0;
-        const roundUnit = roundUnits[this.market] || 1;
-        if (decimalCount > 0) {
-            const roundedPrice = price / roundUnit;
-            return parseFloat(roundedPrice.toFixed(decimalCount));
+    setOrderPrice(price) {
+        const orderUnit = this.calculateOrderUnit(price);
+        const decimalString = orderUnit.toString().split(".")[1];
+        if (decimalString) {
+            return parseFloat(price.toFixed(decimalString.length));
         }
         else {
-            return Math.round(price / roundUnit) * roundUnit;
+            return Math.round(price / orderUnit) * orderUnit;
         }
+    }
+    calculateOrderUnit(price) {
+        const MAX_ORDER_UNIT = 1000;
+        let orderUnit = 1;
+        const count = price.toString().split(".")[0].length - 1;
+        for (let i = 0; i < count; i++) {
+            orderUnit *= 10;
+        }
+        const result = orderUnit / 1000;
+        return result >= MAX_ORDER_UNIT ? MAX_ORDER_UNIT : result;
     }
 }
 //# sourceMappingURL=OrderBase.js.map
