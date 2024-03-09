@@ -90,14 +90,10 @@ export default class AccountItem extends HTMLElement {
             unitCurrency: this.data.unitCurrency,
             volume: this.data.volume,
             buyPrice: Math.round(this.data.buyPrice).toLocaleString(),
-            avgBuyPrice: Number(
-                this.data.avgBuyPrice.toFixed(this._decimalCount)
-            ).toLocaleString(),
+            avgBuyPrice: this.getLocalPrice(this.data.avgBuyPrice),
             profit: Math.round(this.data.profit).toLocaleString(),
             profitRate: this.data.profitRate.toFixed(2) + "%",
-            tradePrice: Number(
-                this.data.tradePrice.toFixed(this._decimalCount)
-            ).toLocaleString(),
+            tradePrice: this.getLocalPrice(this.data.tradePrice),
         };
 
         updateElementsTextWithData(contentData, cloned);
@@ -174,5 +170,11 @@ export default class AccountItem extends HTMLElement {
             return price.toString().split(".")[1].length;
         }
         return 0;
+    }
+
+    getLocalPrice(price: number) {
+        if (!this._decimalCount) return;
+        const result = Number(price.toFixed(this._decimalCount));
+        return result > 1000 ? result.toLocaleString() : result;
     }
 }
