@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const setupStaticHtmlRoutes = (app, staticPath) => {
-    const routes = ["accounts", "order"];
+    const routes = ["accounts", "backtest", "order"];
     routes.forEach((route) => {
         app.get(`/${route}`, (req, res) => {
             const htmlPath = path.join(staticPath, "html", `${route}.html`);

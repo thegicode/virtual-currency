@@ -1,0 +1,48 @@
+body {
+  margin: 0;
+  font: normal 12px "Roboto", "Noto Sans KR", sans-serif, "AppleSDGothicNeo-Regular", "Malgun Gothic", "Dotum", sans-serif;
+}
+
+button {
+  border-radius: 3px;
+  border: 1px solid #f1f1f1;
+  background-color: transparent;
+  cursor: pointer;
+}
+button:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+body {
+  --margin-side: 1rem;
+  --transition-duration: 1.5s;
+  --font-color: #666;
+  --border-color: #bfe3d4;
+}
+
+html,
+body {
+  margin: 1rem;
+  font-size: 12px;
+}
+
+table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 100%;
+  border-spacing: 0;
+  color: #666;
+}
+
+th,
+td {
+  padding: 5px;
+  border: 1px solid #ececec;
+}
+
+td:not(:first-child) {
+  text-align: right;
+}
+
+/*# sourceMappingURL=backtest.css.map */

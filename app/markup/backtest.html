@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Backtest</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="shortcut icon"
+            href="/assets/images/favicon.ico"
+            type="image/x-icon"
+        />
+        <link
+            rel="icon"
+            href="/assets/images/favicon.ico"
+            type="image/x-icon"
+        />
+        <link rel="stylesheet" href="/css/backtest.css" />
+        <script type="module" src="/js/backtest/index.js" async></script>
+    </head>
+    <body>
+        <app-backtest class="root">
+            <h1>Backtest</h1>
+            <section class="backtest">
+                <h2>투자방법 2</h2>
+                <div class="backtest-contents">
+                    <table>
+                        <thead>
+                            <th>캔들 기준 시각(KST 기준)</th>
+                            <th>시가</th>
+                            <th>종가</th>
+                            <th>전일 종가(UTC 0시 기준)</th>
+                            <th>5일 평균</th>
+                            <th>매수 여부</th>
+                            <th></th>
+                        </thead>
+                    </table>
+                </div>
+            </section>
+        </app-backtest>
+
+        <template id="tp-item">
+            <tr class="backtest-item">
+                <td class="candle_date_time_kst"></td>
+                <td class="opening_price"></td>
+                <td class="trade_price"></td>
+                <td class="prev_closing_price"></td>
+                <td class="moving_average_5"></td>
+                <td class="condition"></td>
+            </tr>
+        </template>
+    </body>
+</html>

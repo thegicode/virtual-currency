@@ -9,7 +9,6 @@ console.log("port : ", port);
 
 async function test() {
     const accounts = await getAccounts();
-    console.log(accounts);
 }
 
 test();
