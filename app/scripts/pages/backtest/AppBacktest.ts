@@ -323,3 +323,10 @@ export default class AppBacktest extends HTMLElement {
         console.log(data);
     }
 }
+
+/**
+ * TODO
+ * 수수료 적용
+ * 현금비중 80% 유지
+ * 자금관리 : 가상화폐별 투입금액은 자산의 20%/가상화폐 수
+ **/
