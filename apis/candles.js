@@ -2,11 +2,12 @@ const URL = require("../server/config/URL");
 
 // candelsDays
 
-async function candles(querys) {
+async function candles(reqQuery) {
     try {
         const body = {
-            market: querys.market,
-            count: Number(querys.count) + 4,
+            market: reqQuery.market,
+            count: reqQuery.count,
+            // count: Number(reqQuery.count) + 4,
         };
 
         const query = new URLSearchParams(body).toString();
@@ -28,12 +29,14 @@ async function candles(querys) {
                 candle_date_time_kst: aData.candle_date_time_kst,
                 opening_price: Number(aData.opening_price),
                 trade_price: Number(aData.trade_price),
+                high_price: Number(aData.high_price),
+                low_price: Number(aData.low_price),
             };
         });
         return result.reverse();
     } catch (error) {
         console.error("Error:", error);
-        res.status(500).send("Internal Server Error");
+        // res.status(500).send("Internal Server Error");
     }
 }
 

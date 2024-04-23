@@ -137,9 +137,20 @@ export default class AppBacktest extends HTMLElement {
         const cloned = cloneTemplate(tpElement);
         if (!aData.moving_average_5)
             return cloned;
-        const parseData = Object.assign(Object.assign({}, aData), { index, candle_date_time_kst: aData.candle_date_time_kst.replace("T", " "), opening_price: aData.opening_price.toLocaleString(), trade_price: aData.trade_price.toLocaleString(), moving_average_5: aData.moving_average_5 &&
-                aData.moving_average_5.toLocaleString(), profit: aData.profit && Math.round(aData.profit).toLocaleString(), totalProfit: aData.totalProfit &&
-                Math.round(aData.totalProfit).toLocaleString(), total: aData.total && Math.round(aData.total).toLocaleString() });
+        const parseData = {
+            index,
+            candle_date_time_kst: aData.candle_date_time_kst.replace("T", " "),
+            opening_price: aData.opening_price.toLocaleString(),
+            trade_price: aData.trade_price.toLocaleString(),
+            moving_average_5: aData.moving_average_5 &&
+                aData.moving_average_5.toLocaleString(),
+            condition: aData.condition,
+            action: aData.action,
+            profit: aData.profit && Math.round(aData.profit).toLocaleString(),
+            totalProfit: aData.totalProfit &&
+                Math.round(aData.totalProfit).toLocaleString(),
+            total: aData.total && Math.round(aData.total).toLocaleString(),
+        };
         updateElementsTextWithData(parseData, cloned);
         cloned.dataset.action = aData.action;
         return cloned;

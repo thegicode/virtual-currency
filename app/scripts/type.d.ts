@@ -73,3 +73,21 @@ interface ICandles {
     totalProfit?: number;
     total?: number;
 }
+
+interface ICandles2 {
+    candle_date_time_kst: string;
+    opening_price: number;
+    trade_price: number;
+    moving_average_3: number;
+    moving_average_5: number;
+    moving_average_10: number;
+    moving_average_20: number;
+    condition?: boolean;
+    action?: string;
+    daily_volatility?: number;
+    volatility?: number;
+    order_price?: number;
+    profit?: number;
+    sumProfit?: number;
+    sumPrice?: number;
+}

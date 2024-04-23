@@ -11,6 +11,7 @@ export function cloneTemplate<T extends HTMLElement>(
 export function updateElementsTextWithData<T>(data: T, container: HTMLElement) {
     Object.entries(data as Record<string, unknown>).forEach(([key, value]) => {
         const element = container.querySelector(`.${key}`) as HTMLElement;
+        // console.log(key, element);
         element.textContent = String(value);
     });
 }

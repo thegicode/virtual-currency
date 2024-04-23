@@ -202,7 +202,6 @@ export default class AppBacktest extends HTMLElement {
         if (!aData.moving_average_5) return cloned;
 
         const parseData = {
-            ...aData,
             index,
             candle_date_time_kst: aData.candle_date_time_kst.replace("T", " "),
             opening_price: aData.opening_price.toLocaleString(),
@@ -210,6 +209,8 @@ export default class AppBacktest extends HTMLElement {
             moving_average_5:
                 aData.moving_average_5 &&
                 aData.moving_average_5.toLocaleString(),
+            condition: aData.condition,
+            action: aData.action,
             profit: aData.profit && Math.round(aData.profit).toLocaleString(),
             totalProfit:
                 aData.totalProfit &&
