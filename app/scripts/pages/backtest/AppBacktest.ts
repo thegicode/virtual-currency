@@ -47,6 +47,8 @@ export default class AppBacktest extends HTMLElement {
             "submit",
             this.onOptionSubmit
         );
+
+        // this.getMinutes();
     }
 
     private initialize() {
@@ -303,5 +305,21 @@ export default class AppBacktest extends HTMLElement {
         this.periodInput.value = this.period.toString();
 
         this.loadAndRender();
+    }
+
+    private async getMinutes() {
+        const searchParams = new URLSearchParams({
+            market: "KRW-XRP",
+            unit: "30",
+            to: "2024-01-11T09:00:00",
+            count: "10",
+        });
+
+        const response = await fetch(`/fetchCandlesMinutes?${searchParams}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log(data);
     }
 }

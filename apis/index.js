@@ -1,6 +1,7 @@
 const { fetchAccounts, accounts } = require("./accounts");
 const { fetchCancel, cancel } = require("./cancel");
 const { fetchCandles, candles } = require("./candles");
+const { fetchCandlesMinutes, candlesMinutes } = require("./candlesMinutes");
 const { fetchChance, chance } = require("./chance");
 const { orders, fetchOrders } = require("./orders");
 const ordereds = require("./ordereds");
@@ -16,6 +17,8 @@ module.exports = {
     fetchChance,
     fetchCandles,
     candles,
+    fetchCandlesMinutes,
+    candlesMinutes,
     chance,
     ordereds,
     orders,

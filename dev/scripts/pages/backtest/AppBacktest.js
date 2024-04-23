@@ -197,5 +197,21 @@ export default class AppBacktest extends HTMLElement {
         this.periodInput.value = this.period.toString();
         this.loadAndRender();
     }
+    getMinutes() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const searchParams = new URLSearchParams({
+                market: "KRW-XRP",
+                unit: "30",
+                to: "2024-01-11T09:00:00",
+                count: "10",
+            });
+            const response = yield fetch(`/fetchCandlesMinutes?${searchParams}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = yield response.json();
+            console.log(data);
+        });
+    }
 }
 //# sourceMappingURL=AppBacktest.js.map
