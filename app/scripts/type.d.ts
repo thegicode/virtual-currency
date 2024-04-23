@@ -63,10 +63,13 @@ interface ITicker {
 type TOrdredData = Record<string, IOrdered[]>;
 
 interface ICandles {
-    // marekt: string;
     candle_date_time_kst: string;
-    opening_price: string;
-    trade_price: string;
-    prev_closing_price: string;
+    opening_price: number;
+    trade_price: number;
     moving_average_5?: number;
+    condition?: boolean;
+    action?: string;
+    profit?: number;
+    totalProfit?: number;
+    total?: number;
 }

@@ -6,10 +6,17 @@ const queryEncode = require("querystring").encode;
 const { ACCESS_KEY, SECRET_KEY } = require("../server/config/key");
 const URL = require("../server/config/URL");
 
-async function candles() {
+async function candles(querys) {
     try {
+        const body = {
+            market: querys.market,
+            count: querys.count,
+        };
+
+        const query = new URLSearchParams(body).toString();
+
         const response = await fetch(
-            "https://api.upbit.com/v1/candles/days?market=KRW-BTC&count=34&convertingPriceUnit=KRW",
+            `https://api.upbit.com/v1/candles/days?${query}`,
             {
                 method: "GET",
                 headers: {
@@ -25,11 +32,9 @@ async function candles() {
         const data = await response.json();
         const result = data.map((aData) => {
             return {
-                // marekt: aData.market,
                 candle_date_time_kst: aData.candle_date_time_kst,
-                opening_price: aData.opening_price,
-                trade_price: aData.trade_price,
-                prev_closing_price: aData.prev_closing_price,
+                opening_price: Number(aData.opening_price),
+                trade_price: Number(aData.trade_price),
             };
         });
         return result.reverse();
@@ -40,7 +45,7 @@ async function candles() {
 }
 
 async function fetchCandles(req, res) {
-    const candled = await candles();
+    const candled = await candles(req.query);
     res.send(candled);
 }
 

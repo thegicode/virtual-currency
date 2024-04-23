@@ -7,6 +7,16 @@ body {
     font-size: 12px;
 }
 
+header {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.summary {
+    margin-left: auto;
+    font-size: 14px;
+}
+
 table {
     table-layout: fixed;
     border-collapse: collapse;
