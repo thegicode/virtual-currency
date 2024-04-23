@@ -30,9 +30,8 @@ export default class AppBacktest2 extends HTMLElement {
             this.setAction();
             this.setVolatility();
             this.order();
-            this.render();
             this.setProfit();
-            console.log(this.data);
+            this.render();
         });
     }
     getCandles() {
@@ -123,7 +122,7 @@ export default class AppBacktest2 extends HTMLElement {
         let orderPrice = 0;
         let profit = 0;
         let sumProfit = 0;
-        let sumPrice = 0;
+        let sumPrice = this.totalInvestmentPrice / this.marketSize;
         this.data = this.data.map((aData) => {
             switch (aData.action) {
                 case "Buy":
@@ -136,14 +135,13 @@ export default class AppBacktest2 extends HTMLElement {
                     const rate = (aData.trade_price - buyTradePrice) / buyTradePrice;
                     profit = orderPrice * rate;
                     sumProfit += profit;
-                    sumPrice = orderPrice + sumProfit;
-                    console.log("sumProfit", sumProfit);
-                    console.log("sumPrice", sumPrice);
+                    sumPrice += sumProfit;
+                    break;
+                case "Reserve":
+                    profit = 0;
                     break;
             }
-            return Object.assign(Object.assign({}, aData), { profit,
-                sumProfit,
-                sumPrice });
+            return Object.assign(Object.assign({}, aData), { profit, sumProfit: Number(sumProfit.toFixed(2)), sumPrice: Number(sumPrice.toFixed(2)) });
         });
     }
     render() {
