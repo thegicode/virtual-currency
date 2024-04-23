@@ -23,22 +23,43 @@
             <h1>Backtest</h1>
             <section class="backtest">
                 <h2>투자방법 2 : 이동평균</h2>
-                <header>
-                    <div class="backtest-options">
+                <form class="backtest-options">
+                    <div class="option">
+                        <span class="title">| Market : </span>
                         <select name="market">
                             <option value="KRW-BTC" selected>비트코인</option>
                             <option value="KRW-ETH">이더리움</option>
                             <option value="KRW-DOGE">도지코인</option>
                             <option value="KRW-SBD">스팀달러</option>
                             <option value="KRW-XRP">리플</option>
+                            <!-- <option value="KRW-ONT">온톨로지</option> -->
                         </select>
                     </div>
-                    <div class="summary"></div>
-                </header>
+                    <label class="option">
+                        <span class="title"> | 개수 : </span>
+                        <input type="number" name="period" max="200" value="" />
+                        <button type="submit">적용</button>
+                    </label>
+                    <div class="option">
+                        <p>
+                            | 각 투자금 :
+                            <span class="investmentPrice"></span>
+                        </p>
+                    </div>
+                </form>
+
+                <div class="summary">
+                    <ul class="summary-all">
+                        <li>수익 총합 : <span class="allSumPrice"></span>원</li>
+                        <li>총 수익률 : <span class="allSumRate"></span>%</li>
+                    </ul>
+                    <ul class="summary-list"></ul>
+                </div>
 
                 <div class="backtest-contents">
                     <table>
                         <thead>
+                            <th>번호</th>
                             <th>캔들 기준 시각(KST 기준)</th>
                             <th>시가</th>
                             <th>종가</th>
@@ -57,6 +78,7 @@
 
         <template id="tp-item">
             <tr class="backtest-item">
+                <td class="index"></td>
                 <td class="candle_date_time_kst"></td>
                 <td class="opening_price"></td>
                 <td class="trade_price"></td>
@@ -67,6 +89,16 @@
                 <td class="totalProfit"></td>
                 <td class="total"></td>
             </tr>
+        </template>
+
+        <template id="tp-summary">
+            <li>
+                <p>・ <span class="market"></span></p>
+                <p>・ 기간 : <span class="period"></span></p>
+                <p>・ 수익률 : <span class="totalRate"></span></p>
+                <p>・ 총수익: <span class="lastProfit"></span></p>
+                <button type="button" class="deleteButton">삭제</button>
+            </li>
         </template>
     </body>
 </html>

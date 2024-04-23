@@ -25,34 +25,101 @@ html,
 body {
   margin: 1rem;
   font-size: 12px;
-}
-
-header {
-  display: flex;
-  margin-bottom: 5px;
-}
-
-.summary {
-  margin-left: auto;
-  font-size: 14px;
-}
-
-table {
-  table-layout: fixed;
-  border-collapse: collapse;
-  width: 100%;
-  border-spacing: 0;
   color: #666;
 }
 
-th,
-td {
+.backtest-options {
+  display: flex;
+  align-items: center;
+}
+.backtest-options .option {
+  margin-right: 50px;
+}
+.backtest-options .option .title {
+  margin: 0 10px;
+}
+.backtest-options .option input[name=period] {
+  width: 50px;
+}
+.backtest-options .option button {
+  margin-left: 5px;
+}
+.backtest-options .option .investmentPrice {
+  margin-left: 5px;
+}
+
+.summary {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ebebeb;
+}
+
+.summary-all {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+  padding: 0 0 10px;
+  font-weight: bold;
+  color: orangered;
+  font-size: 14px;
+}
+.summary-all p {
+  margin: 0;
+}
+.summary-all span {
+  margin-left: 5px;
+}
+
+.summary-list {
+  padding: 0;
+}
+.summary-list li {
+  display: flex;
+  margin: 5px 0;
+  padding-bottom: 5px;
+}
+.summary-list p {
+  display: inline-block;
+  width: 25%;
+  margin: 0;
+}
+.summary-list span {
+  margin-left: 5px;
+}
+.summary-list .deleteButton {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.backtest-contents {
+  margin-top: 10px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  border-spacing: 0;
+  font-size: 10px;
+}
+table tr[data-action=Buy] {
+  background-color: rgba(255, 254, 185, 0.5);
+}
+table tr[data-action=Sell] {
+  background-color: rgba(204, 193, 255, 0.3);
+}
+table th,
+table td {
   padding: 5px;
   border: 1px solid #ececec;
 }
-
-td:not(:first-child) {
+table td {
   text-align: right;
+}
+table td.index {
+  text-align: center;
+}
+table td.candle_date_time_kst {
+  text-align: left;
 }
 
 /*# sourceMappingURL=backtest.css.map */

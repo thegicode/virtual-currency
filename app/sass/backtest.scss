@@ -5,32 +5,113 @@ html,
 body {
     margin: 1rem;
     font-size: 12px;
-}
-
-header {
-    display: flex;
-    margin-bottom: 5px;
-}
-
-.summary {
-    margin-left: auto;
-    font-size: 14px;
-}
-
-table {
-    table-layout: fixed;
-    border-collapse: collapse;
-    width: 100%;
-    border-spacing: 0;
     color: #666;
 }
 
-th,
-td {
-    padding: 5px;
-    border: 1px solid #ececec;
+.backtest-options {
+    display: flex;
+    align-items: center;
+    .option {
+        margin-right: 50px;
+
+        .title {
+            margin: 0 10px;
+        }
+
+        input[name="period"] {
+            width: 50px;
+        }
+
+        button {
+            margin-left: 5px;
+        }
+
+        .investmentPrice {
+            margin-left: 5px;
+        }
+    }
 }
 
-td:not(:first-child) {
-    text-align: right;
+.summary {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ebebeb;
+}
+
+.summary-all {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+    padding: 0 0 10px;
+    font-weight: bold;
+    color: orangered;
+    font-size: 14px;
+
+    p {
+        margin: 0;
+    }
+    span {
+        margin-left: 5px;
+    }
+}
+
+.summary-list {
+    padding: 0;
+    // font-size: 13px;
+    li {
+        display: flex;
+        margin: 5px 0;
+        padding-bottom: 5px;
+        // border-bottom: 1px dashed #ebebeb;
+    }
+    p {
+        display: inline-block;
+        width: 25%;
+        margin: 0;
+    }
+    span {
+        margin-left: 5px;
+    }
+
+    .deleteButton {
+        font-size: 11px;
+        white-space: nowrap;
+    }
+}
+
+.backtest-contents {
+    margin-top: 10px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    border-spacing: 0;
+    font-size: 10px;
+
+    tr[data-action="Buy"] {
+        background-color: rgba(255, 254, 185, 0.5);
+    }
+
+    tr[data-action="Sell"] {
+        background-color: rgba(204, 193, 255, 0.3);
+    }
+
+    th,
+    td {
+        padding: 5px;
+        border: 1px solid #ececec;
+    }
+
+    td {
+        text-align: right;
+    }
+
+    td.index {
+        text-align: center;
+    }
+
+    td.candle_date_time_kst {
+        text-align: left;
+    }
 }

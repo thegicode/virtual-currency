@@ -6,28 +6,53 @@ import {
 export default class AppBacktest extends HTMLElement {
     private data: ICandles[];
     private market: string;
+    private period: number;
+    private fee: number; // TODO
+    private investmentPrice: number;
+    private allSumPrice: number;
+    private allSumSize: number;
+    private periodInput: HTMLInputElement;
 
     constructor() {
         super();
+
         this.data = [];
         this.market = "KRW-BTC";
+        this.period = 100;
+        this.investmentPrice = 500000;
+        this.fee = 0.00139;
+
+        this.allSumPrice = 0;
+        this.allSumSize = 0;
+
+        this.periodInput = this.querySelector(
+            "input[name=period]"
+        ) as HTMLInputElement;
 
         this.onChangeMarket = this.onChangeMarket.bind(this);
+        this.onOptionSubmit = this.onOptionSubmit.bind(this);
     }
 
     connectedCallback() {
+        this.initialize();
+
         this.loadAndRender();
 
         this.querySelector("select")?.addEventListener(
             "change",
             this.onChangeMarket
         );
+
+        this.querySelector("form")?.addEventListener(
+            "submit",
+            this.onOptionSubmit
+        );
     }
 
-    private onChangeMarket(event: Event) {
-        const target = event.target as HTMLInputElement;
-        this.market = target.value;
-        this.loadAndRender();
+    private initialize() {
+        this.periodInput.value = this.period.toString();
+        (this.querySelector(".investmentPrice") as HTMLElement).textContent =
+            this.investmentPrice.toLocaleString();
     }
 
     private async loadAndRender() {
@@ -35,12 +60,13 @@ export default class AppBacktest extends HTMLElement {
         this.calculateMovingAverage(originData); // 5일 이동평균선
         this.enrichingData();
         this.render();
+        this.renderSummary();
     }
 
     private async getCandles() {
         const searchParams = new URLSearchParams({
             market: this.market,
-            count: "1000",
+            count: this.period.toString(),
         });
 
         const response = await fetch(`/fetchCandles?${searchParams}`);
@@ -105,7 +131,7 @@ export default class AppBacktest extends HTMLElement {
         });
 
         // order
-        const investmentAmount = 200000;
+        // const investmentAmount = 200000;
         let orderPrice = 0;
         let profit = 0;
         let totalProfit = 0;
@@ -115,16 +141,16 @@ export default class AppBacktest extends HTMLElement {
                 case "Buy":
                     orderPrice = aData.trade_price;
                     profit = 0;
-                    total = total || investmentAmount;
+                    total = total || this.investmentPrice;
 
                     // console.log("Buy", aData.candle_date_time_kst, orderPrice);
 
                     break;
                 case "Sell":
                     const rate = (aData.trade_price - orderPrice) / orderPrice;
-                    profit = rate * total || investmentAmount;
+                    profit = rate * total || this.investmentPrice;
                     totalProfit += profit;
-                    total = investmentAmount + totalProfit;
+                    total = this.investmentPrice + totalProfit;
 
                     // console.log(
                     //     "Sell",
@@ -151,28 +177,20 @@ export default class AppBacktest extends HTMLElement {
         });
     }
 
-    private async render() {
+    private render() {
         const tableElement = this.querySelector("tbody") as HTMLElement;
-        const summaryElement = this.querySelector(".summary") as HTMLElement;
 
         tableElement.innerHTML = "";
         const fragment = new DocumentFragment();
 
         this.data
-            .map((aData: ICandles) => this.createItem(aData))
+            .map((aData: ICandles, index) => this.createItem(aData, index))
             .forEach((cloned: HTMLElement) => fragment.appendChild(cloned));
 
         tableElement?.appendChild(fragment);
-
-        const lastProfit = this.data[this.data.length - 1].totalProfit;
-        if (!lastProfit) return;
-        const totalRate = Math.round((lastProfit / 200000) * 100);
-        summaryElement.textContent = `${
-            this.market
-        } | ${totalRate}% | ${Math.round(lastProfit).toLocaleString()}`;
     }
 
-    private createItem(aData: ICandles) {
+    private createItem(aData: ICandles, index: number) {
         const tpElement = document.querySelector(
             "#tp-item"
         ) as HTMLTemplateElement;
@@ -183,6 +201,7 @@ export default class AppBacktest extends HTMLElement {
 
         const parseData = {
             ...aData,
+            index,
             candle_date_time_kst: aData.candle_date_time_kst.replace("T", " "),
             opening_price: aData.opening_price.toLocaleString(),
             trade_price: aData.trade_price.toLocaleString(),
@@ -198,6 +217,91 @@ export default class AppBacktest extends HTMLElement {
 
         updateElementsTextWithData(parseData, cloned);
 
+        cloned.dataset.action = aData.action;
+
         return cloned;
+    }
+
+    private renderSummary() {
+        if (this.data.length === 0) return;
+
+        const tpElement = document.querySelector(
+            "#tp-summary"
+        ) as HTMLTemplateElement;
+
+        const summaryListElement = this.querySelector(
+            ".summary-list"
+        ) as HTMLElement;
+
+        const cloned = cloneTemplate<HTMLElement>(tpElement);
+        const deleteButton = cloned.querySelector(
+            ".deleteButton"
+        ) as HTMLButtonElement;
+
+        const lastProfit = this.data[this.data.length - 1].totalProfit;
+        if (!lastProfit) return;
+
+        const totalRate = Math.round((lastProfit / this.investmentPrice) * 100);
+
+        const summaryData = {
+            market: this.market,
+            period: this.period,
+            totalRate: `${totalRate} %`,
+            lastProfit: ` ${Math.round(lastProfit).toLocaleString()} 원`,
+        };
+
+        updateElementsTextWithData(summaryData, cloned);
+
+        summaryListElement.appendChild(cloned);
+
+        // summary-all
+        this.allSumPrice += lastProfit;
+        this.allSumSize++;
+
+        this.renderAllSum();
+
+        // delete
+
+        deleteButton.addEventListener("click", () => {
+            cloned.remove();
+            this.allSumPrice -= lastProfit;
+            this.allSumSize--;
+
+            this.renderAllSum();
+        });
+    }
+
+    private renderAllSum() {
+        const allSumRate =
+            (this.allSumPrice / (this.allSumSize * this.investmentPrice)) * 100;
+
+        const allSumData = {
+            allSumPrice: Math.round(this.allSumPrice).toLocaleString(),
+            allSumRate: allSumRate.toFixed(2).toLocaleString(),
+        };
+        const summaryAllElement = this.querySelector(
+            ".summary-all"
+        ) as HTMLElement;
+        updateElementsTextWithData(allSumData, summaryAllElement);
+    }
+
+    private onChangeMarket(event: Event) {
+        const target = event.target as HTMLInputElement;
+        this.market = target.value;
+        this.loadAndRender();
+    }
+
+    private onOptionSubmit(event: Event) {
+        event?.preventDefault();
+        const maxSize = Number(this.periodInput.getAttribute("max"));
+
+        this.period =
+            Number(this.periodInput.value) > maxSize
+                ? maxSize
+                : Number(this.periodInput.value);
+
+        this.periodInput.value = this.period.toString();
+
+        this.loadAndRender();
     }
 }

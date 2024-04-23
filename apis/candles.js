@@ -1,29 +1,20 @@
-const uuidv4 = require("uuid").v4;
-const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
-const queryEncode = require("querystring").encode;
-
-const { ACCESS_KEY, SECRET_KEY } = require("../server/config/key");
 const URL = require("../server/config/URL");
 
 async function candles(querys) {
     try {
         const body = {
             market: querys.market,
-            count: querys.count,
+            count: Number(querys.count) + 4,
         };
 
         const query = new URLSearchParams(body).toString();
 
-        const response = await fetch(
-            `https://api.upbit.com/v1/candles/days?${query}`,
-            {
-                method: "GET",
-                headers: {
-                    accept: "application/json",
-                },
-            }
-        );
+        const response = await fetch(`${URL.candles_days}?${query}`, {
+            method: "GET",
+            headers: {
+                accept: "application/json",
+            },
+        });
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
