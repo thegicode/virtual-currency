@@ -279,7 +279,7 @@ export default class AppBacktest extends HTMLElement {
         const cloned = cloneTemplate<HTMLElement>(tpElement);
 
         const lastProfit = this.data[this.data.length - 1].sumProfit;
-        if (!lastProfit) return;
+        if (lastProfit === undefined) return;
 
         const totalRate = (lastProfit / this.investmentPrice) * 100;
 

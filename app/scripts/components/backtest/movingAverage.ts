@@ -6,7 +6,7 @@ function setMovingAverage(data: any[], period = 5) {
 
         const average = calculateMovingAverage(data, index, period);
 
-        aData[`moving_average_${period}`] = average.toFixed(2);
+        aData[`moving_average_${period}`] = average;
 
         return aData;
     });

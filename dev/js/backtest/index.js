@@ -214,7 +214,7 @@
       const summaryListElement = this.querySelector(".summary-list");
       const cloned = cloneTemplate(tpElement);
       const lastProfit = this.data[this.data.length - 1].sumProfit;
-      if (!lastProfit)
+      if (lastProfit === void 0)
         return;
       const totalRate = lastProfit / this.investmentPrice * 100;
       const summaryData = {
