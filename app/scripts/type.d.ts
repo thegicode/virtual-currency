@@ -68,7 +68,7 @@ interface ICandles {
     trade_price: number;
     moving_average_5?: number;
     condition?: boolean;
-    action?: string;
+    tradingAction?: string;
     unrealize_rate?: number;
     unrealize_profit?: number;
     unrealize_gain?: number;
@@ -87,7 +87,7 @@ interface ICandles2 {
     moving_average_10: number;
     moving_average_20: number;
     condition?: boolean;
-    action?: string;
+    tradingAction?: string;
     daily_volatility?: number;
     volatility?: number;
     order_price?: number;
@@ -95,6 +95,7 @@ interface ICandles2 {
     rate?: number;
     sumProfit?: number;
     sumPrice?: number;
+    unrealize_rate?: number;
     unrealize_profit?: number;
     unrealize_gain?: number;
 }

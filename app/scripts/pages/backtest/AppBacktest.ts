@@ -1,3 +1,13 @@
+/**
+ * TODO
+ * 수수료 적용
+ * 현금비중 80% 유지
+ * 자금관리 : 가상화폐별 투입금액은 자산의 20%/가상화폐 수
+ * 거래 횟수 추가
+ * 승률 추가
+ * 총 투자금 입력
+ **/
+
 import {
     cloneTemplate,
     updateElementsTextWithData,
@@ -9,7 +19,7 @@ export default class AppBacktest extends HTMLElement {
     private period: number;
     private fee: number; // TODO
     private investmentPrice: number;
-    private allSumPrice: number;
+    private summaryAllPrice: number;
     private allSumSize: number;
     private periodInput: HTMLInputElement;
 
@@ -22,7 +32,7 @@ export default class AppBacktest extends HTMLElement {
         this.investmentPrice = 200000;
         this.fee = 0.00139;
 
-        this.allSumPrice = 0;
+        this.summaryAllPrice = 0;
         this.allSumSize = 0;
 
         this.periodInput = this.querySelector(
@@ -60,7 +70,7 @@ export default class AppBacktest extends HTMLElement {
         const originData = await this.getCandles();
         this.calculateMovingAverage(originData); // 5일 이동평균선
         this.checkCondition();
-        this.setAction();
+        this.setTradingAction();
         this.setProfit();
         this.render();
         this.renderSummary();
@@ -108,28 +118,23 @@ export default class AppBacktest extends HTMLElement {
         });
     }
 
-    private setAction() {
+    private setTradingAction() {
         this.data = this.data.map((aData, index) => {
-            let action = "";
+            let tradingAction = "";
             if (index === 0) {
-                if (aData.condition) action = "Buy";
-                else if (!aData.condition) action = "";
+                tradingAction = aData.condition ? "Buy" : "Reserve";
             } else {
                 const prevCondition = this.data[index - 1].condition;
-                if (prevCondition && aData.condition) {
-                    action = "Hold";
-                } else if (prevCondition && !aData.condition) {
-                    action = "Sell";
-                } else if (!prevCondition && aData.condition) {
-                    action = "Buy";
-                } else if (!prevCondition && !aData.condition) {
-                    action = "Reserve";
+                if (prevCondition !== aData.condition) {
+                    tradingAction = aData.condition ? "Buy" : "Sell";
+                } else {
+                    tradingAction = aData.condition ? "Hold" : "Reserve";
                 }
             }
 
             return {
                 ...aData,
-                action,
+                tradingAction,
             };
         });
     }
@@ -152,7 +157,7 @@ export default class AppBacktest extends HTMLElement {
         const getSumPrice = () => sumPrice || this.investmentPrice;
 
         this.data = this.data.map((aData) => {
-            switch (aData.action) {
+            switch (aData.tradingAction) {
                 case "Buy":
                     buyTradePrice = aData.trade_price;
                     profit = 0;
@@ -160,6 +165,7 @@ export default class AppBacktest extends HTMLElement {
 
                     sumPrice = getSumPrice();
 
+                    unrealize_rate = 0;
                     unrealize_profit = 0;
                     unrealize_gain = sumPrice;
 
@@ -236,7 +242,7 @@ export default class AppBacktest extends HTMLElement {
                 aData.moving_average_5 &&
                 aData.moving_average_5.toLocaleString(),
             condition: aData.condition,
-            action: aData.action,
+            tradingAction: aData.tradingAction,
 
             unrealize_rate: aData.unrealize_rate,
             unrealize_profit: aData.unrealize_profit?.toLocaleString(),
@@ -254,7 +260,7 @@ export default class AppBacktest extends HTMLElement {
 
         updateElementsTextWithData(parseData, cloned);
 
-        cloned.dataset.action = aData.action;
+        cloned.dataset.action = aData.tradingAction;
 
         return cloned;
     }
@@ -275,12 +281,12 @@ export default class AppBacktest extends HTMLElement {
         const lastProfit = this.data[this.data.length - 1].sumProfit;
         if (!lastProfit) return;
 
-        const totalRate = Math.round((lastProfit / this.investmentPrice) * 100);
+        const totalRate = (lastProfit / this.investmentPrice) * 100;
 
         const summaryData = {
             market: this.market,
             period: this.period,
-            totalRate: `${totalRate} %`,
+            totalRate: `${totalRate.toFixed(2)} %`,
             lastProfit: ` ${Math.round(lastProfit).toLocaleString()} 원`,
         };
 
@@ -289,7 +295,7 @@ export default class AppBacktest extends HTMLElement {
         summaryListElement.appendChild(cloned);
 
         // summary-all
-        this.allSumPrice += lastProfit;
+        this.summaryAllPrice += lastProfit;
         this.allSumSize++;
 
         this.renderAllSum();
@@ -300,7 +306,7 @@ export default class AppBacktest extends HTMLElement {
         ) as HTMLButtonElement;
         deleteButton.addEventListener("click", () => {
             cloned.remove();
-            this.allSumPrice -= lastProfit;
+            this.summaryAllPrice -= lastProfit;
             this.allSumSize--;
 
             this.renderAllSum();
@@ -308,17 +314,18 @@ export default class AppBacktest extends HTMLElement {
     }
 
     private renderAllSum() {
-        const allSumRate =
-            (this.allSumPrice / (this.allSumSize * this.investmentPrice)) *
+        const summaryAllRate =
+            (this.summaryAllPrice / (this.allSumSize * this.investmentPrice)) *
                 100 || 0;
 
         const allSumData = {
-            allSumPrice: Math.round(this.allSumPrice).toLocaleString(),
-            allSumRate: allSumRate.toFixed(2).toLocaleString(),
+            summaryAllPrice: Math.round(this.summaryAllPrice).toLocaleString(),
+            summaryAllRate: summaryAllRate.toFixed(2).toLocaleString(),
         };
         const summaryAllElement = this.querySelector(
             ".summary-all"
         ) as HTMLElement;
+
         updateElementsTextWithData(allSumData, summaryAllElement);
     }
 
@@ -358,10 +365,3 @@ export default class AppBacktest extends HTMLElement {
         console.log(data);
     }
 }
-
-/**
- * TODO
- * 수수료 적용
- * 현금비중 80% 유지
- * 자금관리 : 가상화폐별 투입금액은 자산의 20%/가상화폐 수
- **/

@@ -38,7 +38,7 @@ body {
 .backtest-options .option .title {
   margin: 0 10px;
 }
-.backtest-options .option input[name=period] {
+.backtest-options .option input[name=count] {
   width: 50px;
 }
 .backtest-options .option button {
