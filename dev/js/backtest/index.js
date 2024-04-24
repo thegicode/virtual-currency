@@ -53,7 +53,7 @@
       this.fee = 139e-5;
       this.summaryAllPrice = 0;
       this.allSumSize = 0;
-      this.periodInput = this.querySelector("input[name=period]");
+      this.periodInput = this.querySelector("input[name=count]");
       this.onChangeMarket = this.onChangeMarket.bind(this);
       this.onOptionSubmit = this.onOptionSubmit.bind(this);
     }

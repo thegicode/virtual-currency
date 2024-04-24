@@ -36,7 +36,7 @@ export default class AppBacktest extends HTMLElement {
         this.allSumSize = 0;
 
         this.periodInput = this.querySelector(
-            "input[name=period]"
+            "input[name=count]"
         ) as HTMLInputElement;
 
         this.onChangeMarket = this.onChangeMarket.bind(this);
