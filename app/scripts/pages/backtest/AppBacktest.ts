@@ -18,8 +18,8 @@ export default class AppBacktest extends HTMLElement {
 
         this.data = [];
         this.market = "KRW-BTC";
-        this.period = 100;
-        this.investmentPrice = 500000;
+        this.period = 200;
+        this.investmentPrice = 200000;
         this.fee = 0.00139;
 
         this.allSumPrice = 0;
@@ -35,7 +35,6 @@ export default class AppBacktest extends HTMLElement {
 
     connectedCallback() {
         this.initialize();
-
         this.loadAndRender();
 
         this.querySelector("select")?.addEventListener(
@@ -60,7 +59,9 @@ export default class AppBacktest extends HTMLElement {
     private async loadAndRender() {
         const originData = await this.getCandles();
         this.calculateMovingAverage(originData); // 5일 이동평균선
-        this.enrichingData();
+        this.checkCondition();
+        this.setAction();
+        this.setProfit();
         this.render();
         this.renderSummary();
     }
@@ -96,18 +97,18 @@ export default class AppBacktest extends HTMLElement {
         });
     }
 
-    private enrichingData() {
-        // condition
+    private checkCondition() {
         this.data = this.data.map((aData) => {
             if (!aData.moving_average_5) return aData;
 
             return {
                 ...aData,
-                condition: aData.moving_average_5 > aData.trade_price,
+                condition: aData.trade_price > aData.moving_average_5,
             };
         });
+    }
 
-        // action
+    private setAction() {
         this.data = this.data.map((aData, index) => {
             let action = "";
             if (index === 0) {
@@ -122,7 +123,7 @@ export default class AppBacktest extends HTMLElement {
                 } else if (!prevCondition && aData.condition) {
                     action = "Buy";
                 } else if (!prevCondition && !aData.condition) {
-                    action = "none";
+                    action = "Reserve";
                 }
             }
 
@@ -131,50 +132,75 @@ export default class AppBacktest extends HTMLElement {
                 action,
             };
         });
+    }
 
-        // order
-        // const investmentAmount = 200000;
-        let orderPrice = 0;
+    private setProfit() {
+        let buyTradePrice = 0;
         let profit = 0;
-        let totalProfit = 0;
-        let total = 0;
+        let rate = 0;
+
+        let unrealize_rate = 0;
+        let unrealize_profit = 0;
+        let unrealize_gain = 0;
+
+        let sumProfit = 0;
+        let sumPrice = 0;
+
+        const getRate = (aData: ICandles) =>
+            (aData.trade_price - buyTradePrice) / buyTradePrice;
+        const getProfit = (aData: ICandles) => getRate(aData) * getSumPrice();
+        const getSumPrice = () => sumPrice || this.investmentPrice;
+
         this.data = this.data.map((aData) => {
             switch (aData.action) {
                 case "Buy":
-                    orderPrice = aData.trade_price;
+                    buyTradePrice = aData.trade_price;
                     profit = 0;
-                    total = total || this.investmentPrice;
+                    rate = 0;
 
-                    // console.log("Buy", aData.candle_date_time_kst, orderPrice);
+                    sumPrice = getSumPrice();
+
+                    unrealize_profit = 0;
+                    unrealize_gain = sumPrice;
 
                     break;
                 case "Sell":
-                    const rate = (aData.trade_price - orderPrice) / orderPrice;
-                    profit = rate * total || this.investmentPrice;
-                    totalProfit += profit;
-                    total = this.investmentPrice + totalProfit;
+                    rate = getRate(aData);
+                    profit = getProfit(aData);
 
-                    // console.log(
-                    //     "Sell",
-                    //     aData.candle_date_time_kst,
-                    //     "orderPrice:",
-                    //     orderPrice,
-                    //     "trade_price: ",
-                    //     aData.trade_price,
-                    //     aData.trade_price - orderPrice
-                    // );
+                    sumProfit += profit;
+                    sumPrice = this.investmentPrice + sumProfit;
+
+                    unrealize_rate = rate;
+                    unrealize_profit = profit;
+                    unrealize_gain = sumPrice;
 
                     break;
-                case "none":
+                case "Hold":
+                    unrealize_rate = getRate(aData);
+                    unrealize_profit = getProfit(aData);
+                    unrealize_gain = sumPrice + getProfit(aData);
+
+                    break;
+                case "Reserve":
                     profit = 0;
+                    rate = 0;
+                    sumPrice = getSumPrice();
+                    unrealize_rate = 0;
+                    unrealize_profit = 0;
+                    unrealize_gain = sumPrice;
                     break;
             }
 
             return {
                 ...aData,
+                unrealize_rate: Number((unrealize_rate * 100).toFixed(2)),
+                unrealize_profit: Math.round(unrealize_profit) || 0,
+                unrealize_gain: Math.round(unrealize_gain) || 0,
+                rate: rate * 100,
                 profit,
-                totalProfit,
-                total,
+                sumProfit: Number(sumProfit.toFixed(2)),
+                sumPrice: Number(sumPrice.toFixed(2)),
             };
         });
     }
@@ -211,11 +237,19 @@ export default class AppBacktest extends HTMLElement {
                 aData.moving_average_5.toLocaleString(),
             condition: aData.condition,
             action: aData.action,
+
+            unrealize_rate: aData.unrealize_rate,
+            unrealize_profit: aData.unrealize_profit?.toLocaleString(),
+            unrealize_gain: aData.unrealize_gain?.toLocaleString(),
+
+            rate: aData.rate && aData.rate.toFixed(2),
+
             profit: aData.profit && Math.round(aData.profit).toLocaleString(),
-            totalProfit:
-                aData.totalProfit &&
-                Math.round(aData.totalProfit).toLocaleString(),
-            total: aData.total && Math.round(aData.total).toLocaleString(),
+
+            sumProfit:
+                aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),
+            sumPrice:
+                aData.sumPrice && Math.round(aData.sumPrice).toLocaleString(),
         };
 
         updateElementsTextWithData(parseData, cloned);
@@ -237,11 +271,8 @@ export default class AppBacktest extends HTMLElement {
         ) as HTMLElement;
 
         const cloned = cloneTemplate<HTMLElement>(tpElement);
-        const deleteButton = cloned.querySelector(
-            ".deleteButton"
-        ) as HTMLButtonElement;
 
-        const lastProfit = this.data[this.data.length - 1].totalProfit;
+        const lastProfit = this.data[this.data.length - 1].sumProfit;
         if (!lastProfit) return;
 
         const totalRate = Math.round((lastProfit / this.investmentPrice) * 100);
@@ -264,7 +295,9 @@ export default class AppBacktest extends HTMLElement {
         this.renderAllSum();
 
         // delete
-
+        const deleteButton = cloned.querySelector(
+            ".deleteButton"
+        ) as HTMLButtonElement;
         deleteButton.addEventListener("click", () => {
             cloned.remove();
             this.allSumPrice -= lastProfit;
@@ -276,7 +309,8 @@ export default class AppBacktest extends HTMLElement {
 
     private renderAllSum() {
         const allSumRate =
-            (this.allSumPrice / (this.allSumSize * this.investmentPrice)) * 100;
+            (this.allSumPrice / (this.allSumSize * this.investmentPrice)) *
+                100 || 0;
 
         const allSumData = {
             allSumPrice: Math.round(this.allSumPrice).toLocaleString(),

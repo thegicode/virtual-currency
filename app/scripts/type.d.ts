@@ -69,9 +69,13 @@ interface ICandles {
     moving_average_5?: number;
     condition?: boolean;
     action?: string;
+    unrealize_rate?: number;
+    unrealize_profit?: number;
+    unrealize_gain?: number;
+    rate?: number;
     profit?: number;
-    totalProfit?: number;
-    total?: number;
+    sumProfit?: number;
+    sumPrice?: number;
 }
 
 interface ICandles2 {
@@ -88,6 +92,9 @@ interface ICandles2 {
     volatility?: number;
     order_price?: number;
     profit?: number;
+    rate?: number;
     sumProfit?: number;
     sumPrice?: number;
+    unrealize_profit?: number;
+    unrealize_gain?: number;
 }

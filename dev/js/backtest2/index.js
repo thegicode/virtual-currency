@@ -83,13 +83,32 @@
     constructor() {
       super();
       this.data = [];
-      this.market = "KRW-XRP";
-      this.count = 50;
+      this.market = "KRW-BTC";
+      this.count = 200;
       this.marketSize = 5;
       this.totalInvestmentPrice = 1e6;
+      this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
+      this.allSumPrice = 0;
+      this.allSumSize = 0;
+      this.countElement = this.querySelector("input[name=count]");
+      this.selectElement = this.querySelector("select");
+      this.formElement = this.querySelector("form");
+      this.onChangeMarket = this.onChangeMarket.bind(this);
+      this.onOptionSubmit = this.onOptionSubmit.bind(this);
     }
     connectedCallback() {
+      this.initialize();
       this.loadAndRender();
+      this.selectElement.addEventListener("change", this.onChangeMarket);
+      this.formElement.addEventListener("submit", this.onOptionSubmit);
+    }
+    disconnectedCallback() {
+      this.selectElement.removeEventListener("change", this.onChangeMarket);
+      this.formElement.removeEventListener("submit", this.onOptionSubmit);
+    }
+    initialize() {
+      this.countElement.value = this.count.toString();
+      this.querySelector(".investmentPrice").textContent = this.investmentPrice.toLocaleString();
     }
     loadAndRender() {
       return __awaiter(this, void 0, void 0, function* () {
@@ -101,6 +120,7 @@
         this.order();
         this.setProfit();
         this.render();
+        this.renderSummary();
       });
     }
     getCandles() {
@@ -124,8 +144,8 @@
       this.data = data;
     }
     checkCondition() {
-      this.data = this.data.map((aData) => {
-        if (aData.moving_average_3 > aData.trade_price && aData.moving_average_5 > aData.trade_price && aData.moving_average_10 > aData.trade_price && aData.moving_average_20 > aData.trade_price)
+      this.data = this.data.map((aData, index) => {
+        if (aData.trade_price > aData.moving_average_3 && aData.trade_price > aData.moving_average_5 && aData.trade_price > aData.moving_average_10 && aData.trade_price > aData.moving_average_20)
           aData.condition = true;
         else
           aData.condition = false;
@@ -182,8 +202,14 @@
       let buyTradePrice = 0;
       let orderPrice = 0;
       let profit = 0;
+      let rate = 0;
+      let unrealize_gain = 0;
+      let unrealize_profit = 0;
       let sumProfit = 0;
-      let sumPrice = this.totalInvestmentPrice / this.marketSize;
+      let sumPrice = this.investmentPrice;
+      const getRate = (aData) => (aData.trade_price - buyTradePrice) / buyTradePrice;
+      const getProfit = (aData) => orderPrice * getRate(aData);
+      const getSumPrice = () => this.investmentPrice + sumProfit;
       this.data = this.data.map((aData) => {
         switch (aData.action) {
           case "Buy":
@@ -191,18 +217,32 @@
             if (aData.order_price)
               orderPrice = aData.order_price;
             profit = 0;
+            rate = 0;
+            sumPrice = getSumPrice();
+            unrealize_profit = 0;
+            unrealize_gain = sumPrice;
             break;
           case "Sell":
-            const rate = (aData.trade_price - buyTradePrice) / buyTradePrice;
-            profit = orderPrice * rate;
+            rate = getRate(aData);
+            profit = getProfit(aData);
             sumProfit += profit;
-            sumPrice += sumProfit;
+            sumPrice = getSumPrice();
+            unrealize_profit = profit;
+            unrealize_gain = sumPrice;
+            break;
+          case "Hold":
+            unrealize_profit = getProfit(aData);
+            unrealize_gain = sumPrice + getProfit(aData);
             break;
           case "Reserve":
             profit = 0;
+            rate = 0;
+            sumPrice = getSumPrice();
+            unrealize_profit = 0;
+            unrealize_gain = sumPrice;
             break;
         }
-        return Object.assign(Object.assign({}, aData), { profit, sumProfit: Number(sumProfit.toFixed(2)), sumPrice: Number(sumPrice.toFixed(2)) });
+        return Object.assign(Object.assign({}, aData), { profit, rate: rate * 100, unrealize_profit: Math.round(unrealize_profit) || 0, unrealize_gain: Math.round(unrealize_gain), sumProfit: Number(sumProfit.toFixed(2)), sumPrice: Number(sumPrice.toFixed(2)) });
       });
     }
     render() {
@@ -213,6 +253,7 @@
       tableElement === null || tableElement === void 0 ? void 0 : tableElement.appendChild(fragment);
     }
     createItem(aData, index) {
+      var _a, _b;
       const tpElement = document.querySelector("#tp-item");
       tpElement;
       const cloned = cloneTemplate(tpElement);
@@ -221,18 +262,75 @@
         candle_date_time_kst: aData.candle_date_time_kst.replace("T", " "),
         opening_price: aData.opening_price.toLocaleString(),
         trade_price: aData.trade_price.toLocaleString(),
+        moving_average_3: aData.moving_average_3 && aData.moving_average_3.toLocaleString() || "",
+        moving_average_5: aData.moving_average_5 && aData.moving_average_5.toLocaleString() || "",
+        moving_average_10: aData.moving_average_10 && aData.moving_average_10.toLocaleString() || "",
+        moving_average_20: aData.moving_average_20 && aData.moving_average_20.toLocaleString() || "",
         condition: aData.condition,
         action: aData.action,
         daily_volatility: aData.daily_volatility && aData.daily_volatility,
         volatility: aData.volatility && aData.volatility || "",
         order_price: aData.order_price && aData.order_price.toLocaleString() || "",
+        unrealize_profit: (_a = aData.unrealize_profit) === null || _a === void 0 ? void 0 : _a.toLocaleString(),
+        unrealize_gain: (_b = aData.unrealize_gain) === null || _b === void 0 ? void 0 : _b.toLocaleString(),
         profit: aData.profit && Math.round(aData.profit).toLocaleString(),
+        rate: aData.rate && aData.rate.toFixed(2),
         sumProfit: aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),
         sumPrice: aData.sumPrice && Math.round(aData.sumPrice).toLocaleString()
       };
       updateElementsTextWithData(parseData, cloned);
       cloned.dataset.action = aData.action;
       return cloned;
+    }
+    renderSummary() {
+      if (this.data.length === 0)
+        return;
+      const tpElement = document.querySelector("#tp-summary");
+      const summaryListElement = this.querySelector(".summary-list");
+      const cloned = cloneTemplate(tpElement);
+      const deleteButton = cloned.querySelector(".deleteButton");
+      const lastProfit = this.data[this.data.length - 1].sumProfit;
+      if (!lastProfit)
+        return;
+      const totalRate = lastProfit / this.investmentPrice * 100;
+      const summaryData = {
+        market: this.market,
+        period: this.count,
+        totalRate: `${totalRate.toFixed(2)} %`,
+        lastProfit: ` ${Math.round(lastProfit).toLocaleString()} \uC6D0`
+      };
+      updateElementsTextWithData(summaryData, cloned);
+      summaryListElement.appendChild(cloned);
+      this.allSumPrice += lastProfit;
+      this.allSumSize++;
+      this.renderAllSum();
+      deleteButton.addEventListener("click", () => {
+        cloned.remove();
+        this.allSumPrice -= lastProfit;
+        this.allSumSize--;
+        this.renderAllSum();
+      });
+    }
+    renderAllSum() {
+      const summaryAllElement = this.querySelector(".summary-all");
+      const allSumRate = this.allSumPrice / (this.allSumSize * this.investmentPrice) * 100 || 0;
+      const allSumData = {
+        allSumPrice: Math.round(this.allSumPrice).toLocaleString(),
+        allSumRate: allSumRate.toFixed(2).toLocaleString()
+      };
+      updateElementsTextWithData(allSumData, summaryAllElement);
+    }
+    onChangeMarket(event) {
+      const target = event.target;
+      this.market = target.value;
+      this.loadAndRender();
+    }
+    onOptionSubmit(event) {
+      event === null || event === void 0 ? void 0 : event.preventDefault();
+      const maxSize = Number(this.countElement.getAttribute("max"));
+      this.count = Number(this.countElement.value) > maxSize ? maxSize : Number(this.countElement.value);
+      this.countElement.value = this.count.toString();
+      this.loadAndRender();
     }
   };
 

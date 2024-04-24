@@ -48,8 +48,8 @@
       super();
       this.data = [];
       this.market = "KRW-BTC";
-      this.period = 100;
-      this.investmentPrice = 5e5;
+      this.period = 200;
+      this.investmentPrice = 2e5;
       this.fee = 139e-5;
       this.allSumPrice = 0;
       this.allSumSize = 0;
@@ -72,7 +72,9 @@
       return __awaiter(this, void 0, void 0, function* () {
         const originData = yield this.getCandles();
         this.calculateMovingAverage(originData);
-        this.enrichingData();
+        this.checkCondition();
+        this.setAction();
+        this.setProfit();
         this.render();
         this.renderSummary();
       });
@@ -99,12 +101,14 @@
         return Object.assign(Object.assign({}, aData), { moving_average_5: sum / period });
       });
     }
-    enrichingData() {
+    checkCondition() {
       this.data = this.data.map((aData) => {
         if (!aData.moving_average_5)
           return aData;
-        return Object.assign(Object.assign({}, aData), { condition: aData.moving_average_5 > aData.trade_price });
+        return Object.assign(Object.assign({}, aData), { condition: aData.trade_price > aData.moving_average_5 });
       });
+    }
+    setAction() {
       this.data = this.data.map((aData, index) => {
         let action = "";
         if (index === 0) {
@@ -121,37 +125,58 @@
           } else if (!prevCondition && aData.condition) {
             action = "Buy";
           } else if (!prevCondition && !aData.condition) {
-            action = "none";
+            action = "Reserve";
           }
         }
         return Object.assign(Object.assign({}, aData), { action });
       });
-      let orderPrice = 0;
+    }
+    setProfit() {
+      let buyTradePrice = 0;
       let profit = 0;
-      let totalProfit = 0;
-      let total = 0;
+      let rate = 0;
+      let unrealize_rate = 0;
+      let unrealize_profit = 0;
+      let unrealize_gain = 0;
+      let sumProfit = 0;
+      let sumPrice = 0;
+      const getRate = (aData) => (aData.trade_price - buyTradePrice) / buyTradePrice;
+      const getProfit = (aData) => getRate(aData) * getSumPrice();
+      const getSumPrice = () => sumPrice || this.investmentPrice;
       this.data = this.data.map((aData) => {
         switch (aData.action) {
           case "Buy":
-            orderPrice = aData.trade_price;
+            buyTradePrice = aData.trade_price;
             profit = 0;
-            total = total || this.investmentPrice;
+            rate = 0;
+            sumPrice = getSumPrice();
+            unrealize_profit = 0;
+            unrealize_gain = sumPrice;
             break;
           case "Sell":
-            const rate = (aData.trade_price - orderPrice) / orderPrice;
-            profit = rate * total || this.investmentPrice;
-            totalProfit += profit;
-            total = this.investmentPrice + totalProfit;
+            rate = getRate(aData);
+            profit = getProfit(aData);
+            sumProfit += profit;
+            sumPrice = this.investmentPrice + sumProfit;
+            unrealize_rate = rate;
+            unrealize_profit = profit;
+            unrealize_gain = sumPrice;
             break;
-          case "none":
+          case "Hold":
+            unrealize_rate = getRate(aData);
+            unrealize_profit = getProfit(aData);
+            unrealize_gain = sumPrice + getProfit(aData);
+            break;
+          case "Reserve":
             profit = 0;
+            rate = 0;
+            sumPrice = getSumPrice();
+            unrealize_rate = 0;
+            unrealize_profit = 0;
+            unrealize_gain = sumPrice;
             break;
         }
-        return Object.assign(Object.assign({}, aData), {
-          profit,
-          totalProfit,
-          total
-        });
+        return Object.assign(Object.assign({}, aData), { unrealize_rate: Number((unrealize_rate * 100).toFixed(2)), unrealize_profit: Math.round(unrealize_profit) || 0, unrealize_gain: Math.round(unrealize_gain) || 0, rate: rate * 100, profit, sumProfit: Number(sumProfit.toFixed(2)), sumPrice: Number(sumPrice.toFixed(2)) });
       });
     }
     render() {
@@ -162,6 +187,7 @@
       tableElement === null || tableElement === void 0 ? void 0 : tableElement.appendChild(fragment);
     }
     createItem(aData, index) {
+      var _a, _b;
       const tpElement = document.querySelector("#tp-item");
       tpElement;
       const cloned = cloneTemplate(tpElement);
@@ -175,9 +201,13 @@
         moving_average_5: aData.moving_average_5 && aData.moving_average_5.toLocaleString(),
         condition: aData.condition,
         action: aData.action,
+        unrealize_rate: aData.unrealize_rate,
+        unrealize_profit: (_a = aData.unrealize_profit) === null || _a === void 0 ? void 0 : _a.toLocaleString(),
+        unrealize_gain: (_b = aData.unrealize_gain) === null || _b === void 0 ? void 0 : _b.toLocaleString(),
+        rate: aData.rate && aData.rate.toFixed(2),
         profit: aData.profit && Math.round(aData.profit).toLocaleString(),
-        totalProfit: aData.totalProfit && Math.round(aData.totalProfit).toLocaleString(),
-        total: aData.total && Math.round(aData.total).toLocaleString()
+        sumProfit: aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),
+        sumPrice: aData.sumPrice && Math.round(aData.sumPrice).toLocaleString()
       };
       updateElementsTextWithData(parseData, cloned);
       cloned.dataset.action = aData.action;
@@ -189,8 +219,7 @@
       const tpElement = document.querySelector("#tp-summary");
       const summaryListElement = this.querySelector(".summary-list");
       const cloned = cloneTemplate(tpElement);
-      const deleteButton = cloned.querySelector(".deleteButton");
-      const lastProfit = this.data[this.data.length - 1].totalProfit;
+      const lastProfit = this.data[this.data.length - 1].sumProfit;
       if (!lastProfit)
         return;
       const totalRate = Math.round(lastProfit / this.investmentPrice * 100);
@@ -205,6 +234,7 @@
       this.allSumPrice += lastProfit;
       this.allSumSize++;
       this.renderAllSum();
+      const deleteButton = cloned.querySelector(".deleteButton");
       deleteButton.addEventListener("click", () => {
         cloned.remove();
         this.allSumPrice -= lastProfit;
@@ -213,7 +243,7 @@
       });
     }
     renderAllSum() {
-      const allSumRate = this.allSumPrice / (this.allSumSize * this.investmentPrice) * 100;
+      const allSumRate = this.allSumPrice / (this.allSumSize * this.investmentPrice) * 100 || 0;
       const allSumData = {
         allSumPrice: Math.round(this.allSumPrice).toLocaleString(),
         allSumRate: allSumRate.toFixed(2).toLocaleString()

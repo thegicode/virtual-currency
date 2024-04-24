@@ -110,7 +110,7 @@ table tr[data-action=Buy] {
   background-color: rgba(255, 254, 185, 0.5);
 }
 table tr[data-action=Sell] {
-  background-color: rgba(204, 193, 255, 0.3);
+  background-color: rgba(212, 202, 255, 0.2);
 }
 table th,
 table td {
@@ -127,4 +127,4 @@ table td.candle_date_time_kst {
   text-align: left;
 }
 
-/*# sourceMappingURL=backtest.css.map */
+/*# sourceMappingURL=backtest2.css.map */

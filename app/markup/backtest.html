@@ -22,7 +22,7 @@
         <app-backtest class="root">
             <h1>Backtest</h1>
             <section class="backtest">
-                <h2>투자방법 2 : 이동평균</h2>
+                <h2>투자방법 : 5일 이동평균</h2>
                 <form class="backtest-options">
                     <div class="option">
                         <span class="title">| Market : </span>
@@ -66,9 +66,13 @@
                             <th>5일 평균</th>
                             <th>조건 만족</th>
                             <th>판단</th>
-                            <th>이윤</th>
-                            <th>누적이윤</th>
-                            <th>누적금액</th>
+                            <th>평가 이율(%)</th>
+                            <th>평가 이윤</th>
+                            <th>평가 손익</th>
+                            <th>실 이율(%)</th>
+                            <th>실 이윤</th>
+                            <th>실 누적이윤</th>
+                            <th>실 누적금액</th>
                         </thead>
                         <tbody></tbody>
                     </table>
@@ -85,9 +89,13 @@
                 <td class="moving_average_5"></td>
                 <td class="condition"></td>
                 <td class="action"></td>
+                <td class="unrealize_rate"></td>
+                <td class="unrealize_profit"></td>
+                <td class="unrealize_gain"></td>
+                <td class="rate"></td>
                 <td class="profit"></td>
-                <td class="totalProfit"></td>
-                <td class="total"></td>
+                <td class="sumProfit"></td>
+                <td class="sumPrice"></td>
             </tr>
         </template>
 
