@@ -52,27 +52,26 @@
       this.data = [];
       this.sum = 0;
       this.template = document.querySelector("#tp-item");
-      this.container = this.querySelector("tbody");
     }
     connectedCallback() {
       return __awaiter(this, void 0, void 0, function* () {
         const toDate = this.getToDate();
-        this.data = yield this.loadData(toDate, "60");
+        this.data = yield this.loadData(toDate, "200");
         this.runBackTest();
       });
     }
     runBackTest() {
       return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < 30; index++) {
+        for (let index = 0; index < 171; index++) {
           const testMonthData = this.getTestData(index);
           const marketWithRates = this.getMarketWithRates(testMonthData);
           const sortedMarkets = this.getSortedMarkets(marketWithRates);
           const tradeMarkets = this.getTradeMarkets(sortedMarkets);
           const tradeData = this.getTradeData(tradeMarkets, index);
-          const profit = this.calculateTradeProfit(tradeData);
-          this.profit.push(profit);
+          const { tradeProfits, sumProfits } = this.getTradeProfits(tradeData);
+          this.profit.push(sumProfits);
           const tradeDate = testMonthData[0].candles[29].candle_date_time_kst;
-          this.render(index, tradeDate, tradeMarkets, profit);
+          this.render(index, tradeDate, tradeProfits, sumProfits);
         }
         this.sum = this.profit.reduce((acc, value) => {
           return acc + value;
@@ -80,17 +79,6 @@
         const sumElement = this.querySelector(".sum");
         sumElement.textContent = Math.round(this.sum).toLocaleString();
       });
-    }
-    render(index, tradeDate, tradeMarkets, profit) {
-      const cloned = cloneTemplate(this.template);
-      const data = {
-        index,
-        date: tradeDate,
-        tradeMarkets: tradeMarkets.join(" | "),
-        profit: Math.round(profit).toLocaleString()
-      };
-      updateElementsTextWithData(data, cloned);
-      this.container.appendChild(cloned);
     }
     getToDate() {
       const now = /* @__PURE__ */ new Date();
@@ -171,14 +159,49 @@
       });
       return tradeData;
     }
-    calculateTradeProfit(tradeData) {
-      return tradeData.map(({ candles }) => {
+    getTradeProfits(tradeData) {
+      const tradeProfits = tradeData.map(({ market, candles }) => {
         const distance = candles[1].trade_price - candles[0].trade_price;
         const rate = distance / candles[0].trade_price;
-        return this.investmentPrice * rate;
-      }).reduce((acc, value) => {
-        return acc + value;
+        const gain = this.investmentPrice * rate;
+        return {
+          market,
+          rate,
+          gain
+        };
+      });
+      const sumProfits = tradeProfits.reduce((acc, value) => {
+        return acc + value.gain;
       }, 0);
+      return {
+        tradeProfits,
+        sumProfits
+      };
+    }
+    render(index, tradeDate, tradeProfits, profit) {
+      var _a;
+      const ul = document.createElement("ul");
+      const tradeTp = document.querySelector("#tp-trade");
+      tradeProfits.map(({ market, rate, gain }) => {
+        const tradeData = {
+          market,
+          rate: (rate * 100).toFixed(2),
+          gain: Math.round(gain).toLocaleString()
+        };
+        const clonedTrade = cloneTemplate(tradeTp);
+        updateElementsTextWithData(tradeData, clonedTrade);
+        return clonedTrade;
+      }).forEach((cloned2) => ul.appendChild(cloned2));
+      const cloned = cloneTemplate(this.template);
+      const data = {
+        index,
+        date: tradeDate,
+        profit: Math.round(profit).toLocaleString()
+      };
+      updateElementsTextWithData(data, cloned);
+      (_a = cloned.querySelector(".tradeMarkets")) === null || _a === void 0 ? void 0 : _a.appendChild(ul);
+      const container = this.querySelector("tbody");
+      container.appendChild(cloned);
     }
   };
 

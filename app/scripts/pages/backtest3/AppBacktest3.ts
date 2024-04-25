@@ -26,7 +26,6 @@ export default class AppBacktest3 extends HTMLElement {
     private data: IBackTestData3[];
     private sum: number;
     private template: HTMLTemplateElement;
-    private container: HTMLElement;
 
     constructor() {
         super();
@@ -40,12 +39,11 @@ export default class AppBacktest3 extends HTMLElement {
         this.template = document.querySelector(
             "#tp-item"
         ) as HTMLTemplateElement;
-        this.container = this.querySelector("tbody") as HTMLElement;
     }
 
     async connectedCallback() {
         const toDate = this.getToDate();
-        this.data = await this.loadData(toDate, "60");
+        this.data = await this.loadData(toDate, "200");
 
         this.runBackTest();
     }
@@ -53,17 +51,27 @@ export default class AppBacktest3 extends HTMLElement {
     // disconnectedCallback() {}
 
     private async runBackTest() {
-        for (let index = 0; index < 30; index++) {
+        for (let index = 0; index < 171; index++) {
             const testMonthData = this.getTestData(index);
             const marketWithRates = this.getMarketWithRates(testMonthData);
             const sortedMarkets = this.getSortedMarkets(marketWithRates);
             const tradeMarkets = this.getTradeMarkets(sortedMarkets);
             const tradeData = this.getTradeData(tradeMarkets, index);
-            const profit = this.calculateTradeProfit(tradeData);
-            this.profit.push(profit);
+            const { tradeProfits, sumProfits } =
+                this.getTradeProfits(tradeData);
+
+            this.profit.push(sumProfits);
 
             const tradeDate = testMonthData[0].candles[29].candle_date_time_kst;
-            this.render(index, tradeDate, tradeMarkets, profit);
+            this.render(
+                index,
+                tradeDate,
+                // tradeMarkets,
+                tradeProfits,
+                sumProfits
+            );
+
+            // console.log(index, tradeProfits, sumProfits);
         }
 
         this.sum = this.profit.reduce((acc: number, value: number) => {
@@ -72,23 +80,6 @@ export default class AppBacktest3 extends HTMLElement {
 
         const sumElement = this.querySelector(".sum") as HTMLElement;
         sumElement.textContent = Math.round(this.sum).toLocaleString();
-    }
-
-    render(
-        index: number,
-        tradeDate: string,
-        tradeMarkets: string[],
-        profit: number
-    ) {
-        const cloned = cloneTemplate(this.template);
-        const data = {
-            index,
-            date: tradeDate,
-            tradeMarkets: tradeMarkets.join(" | "),
-            profit: Math.round(profit).toLocaleString(),
-        };
-        updateElementsTextWithData(data, cloned);
-        this.container.appendChild(cloned);
     }
 
     private getToDate() {
@@ -180,16 +171,63 @@ export default class AppBacktest3 extends HTMLElement {
         return tradeData;
     }
 
-    private calculateTradeProfit(tradeData: IBackTestData3[]) {
-        return tradeData
-            .map(({ candles }) => {
-                const distance =
-                    candles[1].trade_price - candles[0].trade_price;
-                const rate = distance / candles[0].trade_price;
-                return this.investmentPrice * rate;
+    private getTradeProfits(tradeData: IBackTestData3[]) {
+        const tradeProfits = tradeData.map(({ market, candles }) => {
+            const distance = candles[1].trade_price - candles[0].trade_price;
+            const rate = distance / candles[0].trade_price;
+            const gain = this.investmentPrice * rate;
+            return {
+                market,
+                rate,
+                gain,
+            };
+        });
+
+        const sumProfits = tradeProfits.reduce((acc: number, value: any) => {
+            return acc + value.gain;
+        }, 0);
+
+        return {
+            tradeProfits,
+            sumProfits,
+        };
+    }
+
+    private render(
+        index: number,
+        tradeDate: string,
+        tradeProfits: ITradeProfits[],
+        profit: number
+    ) {
+        const ul = document.createElement("ul") as HTMLUListElement;
+        const tradeTp = document.querySelector(
+            "#tp-trade"
+        ) as HTMLTemplateElement;
+        tradeProfits
+            .map(({ market, rate, gain }) => {
+                const tradeData = {
+                    market,
+                    rate: (rate * 100).toFixed(2),
+                    gain: Math.round(gain).toLocaleString(),
+                };
+                const clonedTrade = cloneTemplate(tradeTp);
+                updateElementsTextWithData(tradeData, clonedTrade);
+                return clonedTrade;
             })
-            .reduce((acc: number, value: number) => {
-                return acc + value;
-            }, 0);
+            .forEach((cloned) => ul.appendChild(cloned));
+
+        const cloned = cloneTemplate(this.template);
+        const data = {
+            index,
+            date: tradeDate,
+            profit: Math.round(profit).toLocaleString(),
+        };
+
+        updateElementsTextWithData(data, cloned);
+
+        cloned.querySelector(".tradeMarkets")?.appendChild(ul);
+
+        const container = this.querySelector("tbody") as HTMLElement;
+        container.appendChild(cloned);
     }
 }

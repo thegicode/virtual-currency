@@ -7,10 +7,24 @@
             .sum {
                 margin-left: 5px;
             }
-            .date,
-            .tradeMarkets {
-                text-align: left;
+            .date {
+                text-align: center;
             }
             table {
                 font-size: 12px;
-            }</style><app-backtest2><h1>Backtest 3</h1><section class=backtest><h2>투자방법 : 듀얼 모멘텀 + 현금 비중 최소 90%</h2><p>각 코인당 20만원씩</p><div class=total><p>총 수익 :<span class=sum></span>원</p></div><table><thead><th>index</th><th>날짜</th><th>거래 코인</th><th>수익(원)</th></thead><tbody></tbody></table></section></app-backtest2><template id=tp-item><tr><td class=index></td><td class=date></td><td class=tradeMarkets></td><td class=profit></td></tr></template></body></html>
+            }
+
+            .tradeMarkets ul {
+                margin: 5px 0;
+                padding: 0;
+            }
+            .tradeMarkets li {
+                display: flex;
+                justify-content: space-around;
+                margin: 0;
+                padding: 5px 0;
+                border-bottom: 1px dashed #efefef;
+            }
+            .tradeMarkets p {
+                margin: 0;
+            }</style><app-backtest2><h1>Backtest 3</h1><section class=backtest><h2>투자방법 : 듀얼 모멘텀 + 현금 비중 최소 90%</h2><p>상승장에 좋다.</p><p>각 코인당 20만원씩</p><div class=total><p>총 수익 :<span class=sum></span>원</p></div><table><thead><th>index</th><th>날짜</th><th>거래 코인</th><th>수익 합계(원)</th></thead><tbody></tbody></table></section></app-backtest2><template id=tp-item><tr><td class=index></td><td class=date></td><td class=tradeMarkets></td><td class=profit></td></tr></template><template id=tp-trade><li><p><span class=market></span></p><p><span class=rate></span>%</p><p><span class=gain></span>원</p></li></template></body></html>

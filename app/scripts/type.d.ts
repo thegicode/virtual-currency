@@ -120,3 +120,9 @@ interface IBackTestData3 {
     market: string;
     candles: IBackTest3_Candle[];
 }
+
+interface ITradeProfits {
+    market: string;
+    rate: number;
+    gain: number;
+}
