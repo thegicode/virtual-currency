@@ -62,6 +62,8 @@ interface ITicker {
 
 type TOrdredData = Record<string, IOrdered[]>;
 
+// 작업중
+
 interface ICandles {
     candle_date_time_kst: string;
     opening_price: number;
@@ -98,4 +100,9 @@ interface ICandles2 {
     unrealize_rate?: number;
     unrealize_profit?: number;
     unrealize_gain?: number;
+}
+
+interface IMarketWithRate {
+    market: string;
+    rate: number;
 }

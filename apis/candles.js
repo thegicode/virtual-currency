@@ -7,6 +7,7 @@ async function candles(reqQuery) {
         const body = {
             market: reqQuery.market,
             count: reqQuery.count,
+            to: reqQuery.to,
             // count: Number(reqQuery.count) + 4,
         };
 
@@ -26,6 +27,7 @@ async function candles(reqQuery) {
         const data = await response.json();
         const result = data.map((aData) => {
             return {
+                market: aData.market,
                 candle_date_time_kst: aData.candle_date_time_kst,
                 opening_price: Number(aData.opening_price),
                 trade_price: Number(aData.trade_price),
@@ -35,13 +37,14 @@ async function candles(reqQuery) {
         });
         return result.reverse();
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Error:", error, error.message, error.name);
         // res.status(500).send("Internal Server Error");
     }
 }
 
 async function fetchCandles(req, res) {
     const candled = await candles(req.query);
+    // console.log("candled", candled);
     res.send(candled);
 }
 
