@@ -155,4 +155,4 @@ export default class AppBacktest3 extends HTMLElement {
         return newDate.toISOString().slice(0, 19);
     }
 }
-//# sourceMappingURL=AppBacktest3%20%E1%84%87%E1%85%A9%E1%86%A8%E1%84%89%E1%85%A1%E1%84%87%E1%85%A9%E1%86%AB.js.map
+//# sourceMappingURL=AppBacktest_2.js.map

@@ -1,5 +1,20 @@
 "use strict";
 (() => {
+  // app/scripts/utils/helpers.ts
+  function cloneTemplate(template) {
+    const content = template.content.firstElementChild;
+    if (!content) {
+      throw new Error("Template content is empty");
+    }
+    return content.cloneNode(true);
+  }
+  function updateElementsTextWithData(data, container) {
+    Object.entries(data).forEach(([key, value]) => {
+      const element = container.querySelector(`.${key}`);
+      element.textContent = String(value);
+    });
+  }
+
   // dev/scripts/pages/backtest3/AppBacktest3.js
   var __awaiter = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
@@ -34,30 +49,60 @@
       this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
       this.investmentPrice = 2e5;
       this.profit = [];
+      this.data = [];
+      this.sum = 0;
+      this.template = document.querySelector("#tp-item");
+      this.container = this.querySelector("tbody");
     }
     connectedCallback() {
-      this.story();
-    }
-    story() {
       return __awaiter(this, void 0, void 0, function* () {
-        try {
-          const toDate = this.getTestDate(0);
-          const oneMonthData = yield this.loadData(toDate);
-          const marketWithRates = this.getMarketWithRates(oneMonthData);
-          const sortedMarkets = this.getSortedMarkets(marketWithRates);
-          const tradeMarkets = this.getTradeMarkets(sortedMarkets);
-          console.log("tradeMarkets", tradeMarkets);
-          const profit = yield this.trade(tradeMarkets, toDate);
-          this.profit.push(profit);
-        } catch (error) {
-          console.error("An error occurred during the story execution:", error);
-        }
+        const toDate = this.getToDate();
+        this.data = yield this.loadData(toDate, "60");
+        this.runBackTest();
       });
     }
-    loadData(toDate) {
+    runBackTest() {
+      return __awaiter(this, void 0, void 0, function* () {
+        for (let index = 0; index < 30; index++) {
+          const testMonthData = this.getTestData(index);
+          const marketWithRates = this.getMarketWithRates(testMonthData);
+          const sortedMarkets = this.getSortedMarkets(marketWithRates);
+          const tradeMarkets = this.getTradeMarkets(sortedMarkets);
+          const tradeData = this.getTradeData(tradeMarkets, index);
+          const profit = this.calculateTradeProfit(tradeData);
+          this.profit.push(profit);
+          const tradeDate = testMonthData[0].candles[29].candle_date_time_kst;
+          this.render(index, tradeDate, tradeMarkets, profit);
+        }
+        this.sum = this.profit.reduce((acc, value) => {
+          return acc + value;
+        }, 0);
+        const sumElement = this.querySelector(".sum");
+        sumElement.textContent = Math.round(this.sum).toLocaleString();
+      });
+    }
+    render(index, tradeDate, tradeMarkets, profit) {
+      const cloned = cloneTemplate(this.template);
+      const data = {
+        index,
+        date: tradeDate,
+        tradeMarkets: tradeMarkets.join(" | "),
+        profit: Math.round(profit).toLocaleString()
+      };
+      updateElementsTextWithData(data, cloned);
+      this.container.appendChild(cloned);
+    }
+    getToDate() {
+      const now = /* @__PURE__ */ new Date();
+      now.setMonth(now.getMonth());
+      now.setDate(now.getDate());
+      now.setHours(18, 0, 0, 0);
+      return now.toISOString().slice(0, 19);
+    }
+    loadData(toDate, count) {
       return __awaiter(this, void 0, void 0, function* () {
         const promises = this.markets.map((market) => __awaiter(this, void 0, void 0, function* () {
-          const candles = yield this.getCandles(market, "30", toDate);
+          const candles = yield this.getCandles(market, count, toDate);
           return {
             market,
             candles
@@ -65,6 +110,16 @@
         }));
         return yield Promise.all(promises);
       });
+    }
+    getTestData(index) {
+      const testData = this.data.map(({ market, candles }) => {
+        const newCandles = candles.slice(index, 30 + index);
+        return {
+          market,
+          candles: newCandles
+        };
+      });
+      return testData;
     }
     getCandles(market, count, to) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -96,17 +151,6 @@
       const newMarkets = sortedMarkets.filter((aMarket) => aMarket.rate > 0);
       return newMarkets;
     }
-    renderSortedMarkets(markets) {
-      const resultElement = this.querySelector(".list");
-      let markupStrings = "";
-      if (markets.length === 0) {
-        markupStrings = "\uBAA8\uB4E0 \uAC00\uC0C1\uD654\uD3D0\uC758 30\uC77C \uC218\uC775\uB960\uC774 \uB9C8\uC774\uB108\uC2A4\uC785\uB2C8\uB2E4. <br>\uBAA8\uB4E0 \uCF54\uC778\uC744 \uB9E4\uB3C4\uD558\uC138\uC694.";
-      }
-      markets.forEach((aMarket) => {
-        markupStrings += `<li><dl><dt>${aMarket.market}</dt><dd>${aMarket.rate.toFixed(2)}%</dd></dl></li>`;
-      });
-      resultElement.innerHTML = markupStrings;
-    }
     getTradeMarkets(markets) {
       const newMarkets = markets.filter((aMarket) => {
         if (aMarket.rate > 0)
@@ -114,42 +158,27 @@
       }).map((aMarket) => aMarket.market);
       return newMarkets.length > 3 ? newMarkets.slice(0, 3) : newMarkets;
     }
-    trade(markets, toDate) {
-      return __awaiter(this, void 0, void 0, function* () {
-        const marketsData = yield this.loadData2(markets, toDate);
-        const result = marketsData.map((aMarket, index) => {
-          const distance = aMarket[1].trade_price - aMarket[0].trade_price;
-          const rate = distance / aMarket[0].trade_price;
-          const gain = this.investmentPrice * rate;
-          return gain;
-        }).reduce((acc, value) => {
-          return acc + value;
-        }, 0);
-        return result;
+    getTradeData(tradeMarkets, index) {
+      const tradeIndex = 30 + index;
+      const marketNames = this.data.map((aMarketData) => aMarketData.market);
+      const tradeData = tradeMarkets.map((market) => {
+        const index2 = marketNames.indexOf(market);
+        const candles = this.data[index2].candles;
+        return {
+          market,
+          candles: [candles[tradeIndex - 1], candles[tradeIndex]]
+        };
       });
+      return tradeData;
     }
-    loadData2(markets, toDate) {
-      return __awaiter(this, void 0, void 0, function* () {
-        const newToDate = this.getTradeDate(toDate);
-        console.log("newToDate", newToDate);
-        const promises = markets.map((market) => __awaiter(this, void 0, void 0, function* () {
-          return yield this.getCandles(market, "2", newToDate);
-        }));
-        return yield Promise.all(promises);
-      });
-    }
-    getTestDate(index) {
-      const now = /* @__PURE__ */ new Date();
-      now.setMonth(now.getMonth() - 1);
-      now.setDate(now.getDate() + index);
-      now.setHours(18, 0, 0, 0);
-      return now.toISOString().slice(0, 19);
-    }
-    getTradeDate(toDate) {
-      const newDate = new Date(toDate);
-      newDate.setDate(newDate.getDate() + 1);
-      newDate.setHours(18, 0, 0, 0);
-      return newDate.toISOString().slice(0, 19);
+    calculateTradeProfit(tradeData) {
+      return tradeData.map(({ candles }) => {
+        const distance = candles[1].trade_price - candles[0].trade_price;
+        const rate = distance / candles[0].trade_price;
+        return this.investmentPrice * rate;
+      }).reduce((acc, value) => {
+        return acc + value;
+      }, 0);
     }
   };
 

@@ -14,10 +14,19 @@
  *
  */
 
+import {
+    cloneTemplate,
+    updateElementsTextWithData,
+} from "@app/scripts/utils/helpers";
+
 export default class AppBacktest3 extends HTMLElement {
     private markets: string[];
     private investmentPrice: number;
     private profit: number[];
+    private data: IBackTestData3[];
+    private sum: number;
+    private template: HTMLTemplateElement;
+    private container: HTMLElement;
 
     constructor() {
         super();
@@ -25,52 +34,91 @@ export default class AppBacktest3 extends HTMLElement {
         this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
         this.investmentPrice = 200000;
         this.profit = [];
+        this.data = [];
+        this.sum = 0;
+
+        this.template = document.querySelector(
+            "#tp-item"
+        ) as HTMLTemplateElement;
+        this.container = this.querySelector("tbody") as HTMLElement;
     }
 
-    connectedCallback() {
-        this.story();
+    async connectedCallback() {
+        const toDate = this.getToDate();
+        this.data = await this.loadData(toDate, "60");
+
+        this.runBackTest();
     }
 
     // disconnectedCallback() {}
 
-    private async story() {
-        // for (let index = 0; index < 30; index++) {
-        try {
-            const toDate = this.getTestDate(0);
-            const oneMonthData = await this.loadData(toDate);
-
-            // if (!oneMonthData) {
-            //     console.error("Failed to load data for date:", toDate);
-            //     continue;
-            // }
-
-            const marketWithRates = this.getMarketWithRates(oneMonthData);
+    private async runBackTest() {
+        for (let index = 0; index < 30; index++) {
+            const testMonthData = this.getTestData(index);
+            const marketWithRates = this.getMarketWithRates(testMonthData);
             const sortedMarkets = this.getSortedMarkets(marketWithRates);
             const tradeMarkets = this.getTradeMarkets(sortedMarkets);
-
-            console.log("tradeMarkets", tradeMarkets);
-
-            const profit = await this.trade(tradeMarkets, toDate);
+            const tradeData = this.getTradeData(tradeMarkets, index);
+            const profit = this.calculateTradeProfit(tradeData);
             this.profit.push(profit);
-            // console.log(profit);
-        } catch (error) {
-            console.error(
-                "An error occurred during the story execution:",
-                error
-            );
+
+            const tradeDate = testMonthData[0].candles[29].candle_date_time_kst;
+            this.render(index, tradeDate, tradeMarkets, profit);
         }
-        // }
+
+        this.sum = this.profit.reduce((acc: number, value: number) => {
+            return acc + value;
+        }, 0);
+
+        const sumElement = this.querySelector(".sum") as HTMLElement;
+        sumElement.textContent = Math.round(this.sum).toLocaleString();
     }
 
-    private async loadData(toDate: string) {
+    render(
+        index: number,
+        tradeDate: string,
+        tradeMarkets: string[],
+        profit: number
+    ) {
+        const cloned = cloneTemplate(this.template);
+        const data = {
+            index,
+            date: tradeDate,
+            tradeMarkets: tradeMarkets.join(" | "),
+            profit: Math.round(profit).toLocaleString(),
+        };
+        updateElementsTextWithData(data, cloned);
+        this.container.appendChild(cloned);
+    }
+
+    private getToDate() {
+        const now = new Date();
+        now.setMonth(now.getMonth());
+        now.setDate(now.getDate());
+        now.setHours(18, 0, 0, 0);
+        return now.toISOString().slice(0, 19);
+    }
+
+    private async loadData(toDate: string, count: string) {
         const promises = this.markets.map(async (market) => {
-            const candles = await this.getCandles(market, "30", toDate);
+            const candles = await this.getCandles(market, count, toDate);
             return {
                 market,
                 candles,
             };
         });
         return await Promise.all(promises);
+    }
+
+    private getTestData(index: number) {
+        const testData = this.data.map(({ market, candles }) => {
+            const newCandles = candles.slice(index, 30 + index);
+            return {
+                market,
+                candles: newCandles,
+            };
+        });
+        return testData;
     }
 
     private async getCandles(market: string, count: string, to: string) {
@@ -87,8 +135,8 @@ export default class AppBacktest3 extends HTMLElement {
         return await response.json();
     }
 
-    private getMarketWithRates(oneMonthData: any) {
-        return oneMonthData.map(({ market, candles }: any) => {
+    private getMarketWithRates(oneMonthData: IBackTestData3[]) {
+        return oneMonthData.map(({ market, candles }) => {
             const startPrice = candles[0].trade_price;
             const lastPrice = candles[candles.length - 1].trade_price;
             const rate = (lastPrice - startPrice) / startPrice;
@@ -99,32 +147,12 @@ export default class AppBacktest3 extends HTMLElement {
         });
     }
 
-    private getSortedMarkets(marketRates: any) {
-        const sortedMarkets = [...marketRates].sort(
-            (a: any, b: any) => b.rate - a.rate
-        );
-        const newMarkets = sortedMarkets.filter(
-            (aMarket: any) => aMarket.rate > 0
-        );
+    private getSortedMarkets(marketRates: IMarketWithRate[]) {
+        const sortedMarkets = [...marketRates].sort((a, b) => b.rate - a.rate);
+
+        const newMarkets = sortedMarkets.filter((aMarket) => aMarket.rate > 0);
 
         return newMarkets;
-    }
-
-    private renderSortedMarkets(markets: IMarketWithRate[]) {
-        const resultElement = this.querySelector(".list") as HTMLElement;
-        let markupStrings = "";
-
-        if (markets.length === 0) {
-            markupStrings =
-                "모든 가상화폐의 30일 수익률이 마이너스입니다. <br>모든 코인을 매도하세요.";
-        }
-
-        markets.forEach((aMarket: any) => {
-            markupStrings += `<li><dl><dt>${
-                aMarket.market
-            }</dt><dd>${aMarket.rate.toFixed(2)}%</dd></dl></li>`;
-        });
-        resultElement.innerHTML = markupStrings;
     }
 
     private getTradeMarkets(markets: IMarketWithRate[]) {
@@ -137,61 +165,31 @@ export default class AppBacktest3 extends HTMLElement {
         return newMarkets.length > 3 ? newMarkets.slice(0, 3) : newMarkets;
     }
 
-    private async trade(markets: string[], toDate: string) {
-        const marketsData = await this.loadData2(markets, toDate);
-        const result = marketsData
-            .map((aMarket, index) => {
+    private getTradeData(tradeMarkets: string[], index: number) {
+        const tradeIndex = 30 + index;
+        const marketNames = this.data.map((aMarketData) => aMarketData.market);
+        const tradeData = tradeMarkets.map((market: string) => {
+            const index = marketNames.indexOf(market);
+            const candles = this.data[index].candles;
+            return {
+                market,
+                candles: [candles[tradeIndex - 1], candles[tradeIndex]],
+            };
+        });
+
+        return tradeData;
+    }
+
+    private calculateTradeProfit(tradeData: IBackTestData3[]) {
+        return tradeData
+            .map(({ candles }) => {
                 const distance =
-                    aMarket[1].trade_price - aMarket[0].trade_price;
-                const rate = distance / aMarket[0].trade_price;
-                const gain = this.investmentPrice * rate;
-
-                // console.log(
-                //     markets[index],
-                //     distance.toLocaleString(),
-                //     rate * 100,
-                //     Math.round(gain).toLocaleString()
-                // );
-
-                return gain;
+                    candles[1].trade_price - candles[0].trade_price;
+                const rate = distance / candles[0].trade_price;
+                return this.investmentPrice * rate;
             })
-            .reduce((acc, value) => {
+            .reduce((acc: number, value: number) => {
                 return acc + value;
             }, 0);
-
-        return result;
-    }
-
-    private async loadData2(markets: string[], toDate: string) {
-        const newToDate = this.getTradeDate(toDate);
-        console.log("newToDate", newToDate);
-        const promises = markets.map(async (market) => {
-            return await this.getCandles(market, "2", newToDate);
-        });
-        return await Promise.all(promises);
-    }
-
-    private getTestDate(index: number) {
-        const now = new Date();
-        now.setMonth(now.getMonth() - 1);
-        now.setDate(now.getDate() + index);
-        now.setHours(18, 0, 0, 0);
-        return now.toISOString().slice(0, 19);
-    }
-
-    private getTradeDate(toDate: string) {
-        const newDate = new Date(toDate);
-        newDate.setDate(newDate.getDate() + 1);
-        newDate.setHours(18, 0, 0, 0);
-        return newDate.toISOString().slice(0, 19);
     }
 }
-
-// const marketRates = [
-//     {
-//         market: "KRW-BTC",
-//         rate: 20,
-//     },
-//     { market: "KRW-ETH", rate: 10 },
-//     { market: "KRW-XRP", rate: -0.2 },
-// ];

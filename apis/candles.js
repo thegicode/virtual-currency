@@ -7,7 +7,7 @@ async function candles(reqQuery) {
         const body = {
             market: reqQuery.market,
             count: reqQuery.count,
-            to: reqQuery.to,
+            to: reqQuery.to || "",
             // count: Number(reqQuery.count) + 4,
         };
 

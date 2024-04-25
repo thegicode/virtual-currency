@@ -20,35 +20,47 @@
     </head>
     <body>
         <style>
-            ol {
-                line-height: 1.7;
+            .total {
+                font-size: 14px;
+                color: blueviolet;
             }
-            dl {
-                display: flex;
-                margin: 5px 0;
+            .sum {
+                margin-left: 5px;
             }
-            dt {
-                width: 100px;
+            .date,
+            .tradeMarkets {
+                text-align: left;
+            }
+            table {
+                font-size: 12px;
             }
         </style>
         <app-backtest2>
             <h1>Backtest 3</h1>
             <section class="backtest">
                 <h2>투자방법 : 듀얼 모멘텀 + 현금 비중 최소 90%</h2>
-
-                <hr />
-
-                <h3>한 달 전 수익률 순위</h3>
-                <ol class="list" style="font-size: 14px"></ol>
-
-                <hr />
-
-                <h3>거래할 가상화폐</h3>
-                <p class="choiced"></p>
-
-                <!-- <h3>1위 도지코인</h3>
-                <p>24일 매수, 25일 확인</p> -->
+                <p>각 코인당 20만원씩</p>
+                <div class="total">
+                    <p>총 수익 : <span class="sum"></span>원</p>
+                </div>
+                <table>
+                    <thead>
+                        <th>index</th>
+                        <th>날짜</th>
+                        <th>거래 코인</th>
+                        <th>수익(원)</th>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </section>
         </app-backtest2>
+        <template id="tp-item">
+            <tr>
+                <td class="index"></td>
+                <td class="date"></td>
+                <td class="tradeMarkets"></td>
+                <td class="profit"></td>
+            </tr>
+        </template>
     </body>
 </html>

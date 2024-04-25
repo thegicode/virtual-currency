@@ -62,7 +62,7 @@ interface ITicker {
 
 type TOrdredData = Record<string, IOrdered[]>;
 
-// 작업중
+// Backtest
 
 interface ICandles {
     candle_date_time_kst: string;
@@ -105,4 +105,18 @@ interface ICandles2 {
 interface IMarketWithRate {
     market: string;
     rate: number;
+}
+
+interface IBackTest3_Candle {
+    candle_date_time_kst: string;
+    high_price: number;
+    low_price: number;
+    market: string;
+    opening_price: number;
+    trade_price: number;
+}
+
+interface IBackTestData3 {
+    market: string;
+    candles: IBackTest3_Candle[];
 }
