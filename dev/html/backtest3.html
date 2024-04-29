@@ -14,17 +14,20 @@
                 font-size: 12px;
             }
 
-            .tradeMarkets ul {
+            .tradeMarkets ul,
+            .sellMarkets ul {
                 margin: 5px 0;
                 padding: 0;
             }
-            .tradeMarkets li {
+            .tradeMarkets li,
+            .sellMarkets li {
                 display: flex;
-                justify-content: space-around;
+                justify-content: space-between;
                 margin: 0;
                 padding: 5px 0;
-                border-bottom: 1px dashed #efefef;
+                /* border-bottom: 1px dashed #efefef; */
             }
-            .tradeMarkets p {
+            .tradeMarkets p,
+            .sellMarkets p {
                 margin: 0;
-            }</style><app-backtest2><h1>Backtest 3</h1><section class=backtest><h2>투자방법 : 듀얼 모멘텀 + 현금 비중 최소 90%</h2><p>상승장에 좋다.</p><p>각 코인당 20만원씩</p><div class=total><p>총 수익 :<span class=sum></span>원</p></div><table><thead><th>index</th><th>날짜</th><th>거래 코인</th><th>수익 합계(원)</th></thead><tbody></tbody></table></section></app-backtest2><template id=tp-item><tr><td class=index></td><td class=date></td><td class=tradeMarkets></td><td class=profit></td></tr></template><template id=tp-trade><li><p><span class=market></span></p><p><span class=rate></span>%</p><p><span class=gain></span>원</p></li></template></body></html>
+            }</style><app-backtest2><h1>Backtest 3</h1><section class=backtest><h2>투자방법 : 듀얼 모멘텀 + 현금 비중 최소 90%</h2><p>상승장에서 좋다. 하락장에서는 손실이 크다.</p><div class=summary><ul class=summary-all><li>수익 평가 총합 :<span class=summaryAllPrice></span>원</li><li>총 평가(대략) 수익률 :<span class=summaryAllRate></span>%</li></ul><ul class=summary-list><li>・ 테스트 가상화폐 :<span class=markets></span></li><li>・ count :<span class=count></span>개</li><li>・ 각 코인 당 20만원씩</li></ul></div><table><thead><th>index</th><th>날짜</th><th>매수(Buy, Hold)</th><th>매도(Sell)</th><th>실 수익 (원)</th><th>Hold 수익(원)</th><th>실 누적합계(원)</th><th>수익 평가 누적합계(원)</th></thead><tbody></tbody></table></section></app-backtest2><template id=tp-item><tr><td class=index></td><td class=date></td><td class=tradeMarkets></td><td class=sellMarkets></td><td class=sumGain></td><td class=SumUnrealizeGain></td><td class=totalGain></td><td class=totalUnrealizeGain></td></tr></template><template id=tp-trade><li><p><span class=market></span></p><p><span class=rate></span>%</p><p><span class=gain></span>원</p></li></template></body></html>

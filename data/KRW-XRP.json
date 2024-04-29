@@ -1,0 +1,802 @@
+[
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-01-21T09:00:00",
+        "opening_price": 764,
+        "trade_price": 754,
+        "high_price": 768,
+        "low_price": 754
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-01-22T09:00:00",
+        "opening_price": 754,
+        "trade_price": 729,
+        "high_price": 758,
+        "low_price": 723
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-01-23T09:00:00",
+        "opening_price": 729,
+        "trade_price": 720,
+        "high_price": 736,
+        "low_price": 689
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-01-24T09:00:00",
+        "opening_price": 720,
+        "trade_price": 713,
+        "high_price": 720,
+        "low_price": 705
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-01-25T09:00:00",
+        "opening_price": 713,
+        "trade_price": 708,
+        "high_price": 714,
+        "low_price": 698
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-01-26T09:00:00",
+        "opening_price": 709,
+        "trade_price": 732,
+        "high_price": 738,
+        "low_price": 702
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-01-27T09:00:00",
+        "opening_price": 732,
+        "trade_price": 732,
+        "high_price": 738,
+        "low_price": 725
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-01-28T09:00:00",
+        "opening_price": 732,
+        "trade_price": 721,
+        "high_price": 737,
+        "low_price": 716.1
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-01-29T09:00:00",
+        "opening_price": 721,
+        "trade_price": 730.9,
+        "high_price": 736,
+        "low_price": 715.6
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-01-30T09:00:00",
+        "opening_price": 730.9,
+        "trade_price": 701.7,
+        "high_price": 735,
+        "low_price": 699.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-01-31T09:00:00",
+        "opening_price": 701.8,
+        "trade_price": 694.6,
+        "high_price": 705.8,
+        "low_price": 682.3
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-01T09:00:00",
+        "opening_price": 694.6,
+        "trade_price": 695.2,
+        "high_price": 699.5,
+        "low_price": 676.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-02T09:00:00",
+        "opening_price": 695.2,
+        "trade_price": 700.7,
+        "high_price": 705.9,
+        "low_price": 685.6
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-03T09:00:00",
+        "opening_price": 700.8,
+        "trade_price": 714.5,
+        "high_price": 726.5,
+        "low_price": 695
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-04T09:00:00",
+        "opening_price": 714.5,
+        "trade_price": 695,
+        "high_price": 715.5,
+        "low_price": 693.7
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-05T09:00:00",
+        "opening_price": 695.2,
+        "trade_price": 698.3,
+        "high_price": 708.2,
+        "low_price": 686.5
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-06T09:00:00",
+        "opening_price": 698.3,
+        "trade_price": 692,
+        "high_price": 698.9,
+        "low_price": 686.7
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-07T09:00:00",
+        "opening_price": 692.3,
+        "trade_price": 698.6,
+        "high_price": 701.2,
+        "low_price": 686.8
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-08T09:00:00",
+        "opening_price": 698.6,
+        "trade_price": 704.2,
+        "high_price": 706.7,
+        "low_price": 696.4
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-09T09:00:00",
+        "opening_price": 704.3,
+        "trade_price": 710.2,
+        "high_price": 716,
+        "low_price": 702.1
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-10T09:00:00",
+        "opening_price": 710.2,
+        "trade_price": 708,
+        "high_price": 715,
+        "low_price": 700.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-11T09:00:00",
+        "opening_price": 708,
+        "trade_price": 712,
+        "high_price": 724.1,
+        "low_price": 705.5
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-12T09:00:00",
+        "opening_price": 712,
+        "trade_price": 713,
+        "high_price": 721.1,
+        "low_price": 700.4
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-13T09:00:00",
+        "opening_price": 713,
+        "trade_price": 711.4,
+        "high_price": 716.8,
+        "low_price": 702
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-14T09:00:00",
+        "opening_price": 711.3,
+        "trade_price": 728.3,
+        "high_price": 731.9,
+        "low_price": 706
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-15T09:00:00",
+        "opening_price": 728.3,
+        "trade_price": 772.3,
+        "high_price": 791.5,
+        "low_price": 728
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-16T09:00:00",
+        "opening_price": 772.1,
+        "trade_price": 780.9,
+        "high_price": 796.1,
+        "low_price": 762.5
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-17T09:00:00",
+        "opening_price": 781,
+        "trade_price": 760.2,
+        "high_price": 784,
+        "low_price": 743.9
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-18T09:00:00",
+        "opening_price": 760.2,
+        "trade_price": 768.4,
+        "high_price": 772.5,
+        "low_price": 755.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-19T09:00:00",
+        "opening_price": 768.5,
+        "trade_price": 779.4,
+        "high_price": 785,
+        "low_price": 767.8
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-20T09:00:00",
+        "opening_price": 779.2,
+        "trade_price": 776,
+        "high_price": 792.2,
+        "low_price": 759.7
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-21T09:00:00",
+        "opening_price": 776,
+        "trade_price": 767.2,
+        "high_price": 780,
+        "low_price": 747
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-22T09:00:00",
+        "opening_price": 767.3,
+        "trade_price": 754.7,
+        "high_price": 767.3,
+        "low_price": 751.6
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-23T09:00:00",
+        "opening_price": 754.7,
+        "trade_price": 745.5,
+        "high_price": 759.9,
+        "low_price": 740.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-24T09:00:00",
+        "opening_price": 745.2,
+        "trade_price": 751.4,
+        "high_price": 758.9,
+        "low_price": 741
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-25T09:00:00",
+        "opening_price": 751.4,
+        "trade_price": 748.2,
+        "high_price": 755.8,
+        "low_price": 747.8
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-26T09:00:00",
+        "opening_price": 748.1,
+        "trade_price": 755.6,
+        "high_price": 757.9,
+        "low_price": 731.3
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-27T09:00:00",
+        "opening_price": 755.6,
+        "trade_price": 806.5,
+        "high_price": 821.6,
+        "low_price": 750.4
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-28T09:00:00",
+        "opening_price": 806.4,
+        "trade_price": 807.5,
+        "high_price": 839,
+        "low_price": 779
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-02-29T09:00:00",
+        "opening_price": 807.5,
+        "trade_price": 824.1,
+        "high_price": 874,
+        "low_price": 793
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-01T09:00:00",
+        "opening_price": 824.2,
+        "trade_price": 842.5,
+        "high_price": 844.9,
+        "low_price": 824
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-02T09:00:00",
+        "opening_price": 842.5,
+        "trade_price": 897.4,
+        "high_price": 909.7,
+        "low_price": 840.5
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-03T09:00:00",
+        "opening_price": 897.4,
+        "trade_price": 874.2,
+        "high_price": 899.1,
+        "low_price": 823.5
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-04T09:00:00",
+        "opening_price": 874.2,
+        "trade_price": 907.2,
+        "high_price": 933.4,
+        "low_price": 858
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-05T09:00:00",
+        "opening_price": 907.3,
+        "trade_price": 847.2,
+        "high_price": 944.2,
+        "low_price": 805.9
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-06T09:00:00",
+        "opening_price": 847.2,
+        "trade_price": 863.9,
+        "high_price": 873.8,
+        "low_price": 810.1
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-07T09:00:00",
+        "opening_price": 863.9,
+        "trade_price": 882,
+        "high_price": 897.3,
+        "low_price": 856
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-08T09:00:00",
+        "opening_price": 882,
+        "trade_price": 876.9,
+        "high_price": 893,
+        "low_price": 855.4
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-09T09:00:00",
+        "opening_price": 877,
+        "trade_price": 872,
+        "high_price": 890,
+        "low_price": 864.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-10T09:00:00",
+        "opening_price": 871.3,
+        "trade_price": 860.3,
+        "high_price": 878.1,
+        "low_price": 850.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-11T09:00:00",
+        "opening_price": 860.4,
+        "trade_price": 1006,
+        "high_price": 1033,
+        "low_price": 830
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-12T09:00:00",
+        "opening_price": 1006,
+        "trade_price": 974.6,
+        "high_price": 1019,
+        "low_price": 950
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-13T09:00:00",
+        "opening_price": 974.7,
+        "trade_price": 981,
+        "high_price": 993.8,
+        "low_price": 954
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-14T09:00:00",
+        "opening_price": 980.9,
+        "trade_price": 960.5,
+        "high_price": 1010,
+        "low_price": 925
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-15T09:00:00",
+        "opening_price": 960.5,
+        "trade_price": 921,
+        "high_price": 971.1,
+        "low_price": 875
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-16T09:00:00",
+        "opening_price": 921,
+        "trade_price": 891.3,
+        "high_price": 943,
+        "low_price": 871
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-17T09:00:00",
+        "opening_price": 891.3,
+        "trade_price": 904.5,
+        "high_price": 910,
+        "low_price": 860
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-18T09:00:00",
+        "opening_price": 904.5,
+        "trade_price": 943.8,
+        "high_price": 979,
+        "low_price": 881.1
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-19T09:00:00",
+        "opening_price": 943.8,
+        "trade_price": 872,
+        "high_price": 953.4,
+        "low_price": 860
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-20T09:00:00",
+        "opening_price": 872,
+        "trade_price": 899,
+        "high_price": 911,
+        "low_price": 844.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-21T09:00:00",
+        "opening_price": 898.7,
+        "trade_price": 932.6,
+        "high_price": 955.6,
+        "low_price": 874.3
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-22T09:00:00",
+        "opening_price": 932.6,
+        "trade_price": 898.9,
+        "high_price": 939.8,
+        "low_price": 880.8
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-23T09:00:00",
+        "opening_price": 898.9,
+        "trade_price": 897.6,
+        "high_price": 918.3,
+        "low_price": 885.8
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-24T09:00:00",
+        "opening_price": 897.6,
+        "trade_price": 910.2,
+        "high_price": 920,
+        "low_price": 894.8
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-25T09:00:00",
+        "opening_price": 910.2,
+        "trade_price": 910.5,
+        "high_price": 936,
+        "low_price": 902
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-26T09:00:00",
+        "opening_price": 910.6,
+        "trade_price": 903.7,
+        "high_price": 919.7,
+        "low_price": 899.9
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-27T09:00:00",
+        "opening_price": 903.8,
+        "trade_price": 881.1,
+        "high_price": 905.6,
+        "low_price": 872
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-28T09:00:00",
+        "opening_price": 881,
+        "trade_price": 890.7,
+        "high_price": 906.9,
+        "low_price": 870.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-29T09:00:00",
+        "opening_price": 890.7,
+        "trade_price": 899.4,
+        "high_price": 915.7,
+        "low_price": 873.3
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-30T09:00:00",
+        "opening_price": 899.4,
+        "trade_price": 891.3,
+        "high_price": 908.8,
+        "low_price": 887.6
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-03-31T09:00:00",
+        "opening_price": 891.3,
+        "trade_price": 891.5,
+        "high_price": 898,
+        "low_price": 889.6
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-01T09:00:00",
+        "opening_price": 891.6,
+        "trade_price": 878.5,
+        "high_price": 897,
+        "low_price": 862
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-02T09:00:00",
+        "opening_price": 878.6,
+        "trade_price": 859.4,
+        "high_price": 889.7,
+        "low_price": 850.1
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-03T09:00:00",
+        "opening_price": 859.3,
+        "trade_price": 839,
+        "high_price": 863.3,
+        "low_price": 832.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-04T09:00:00",
+        "opening_price": 839,
+        "trade_price": 862,
+        "high_price": 893.3,
+        "low_price": 825.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-05T09:00:00",
+        "opening_price": 862,
+        "trade_price": 851.6,
+        "high_price": 862.7,
+        "low_price": 833
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-06T09:00:00",
+        "opening_price": 851.4,
+        "trade_price": 853.6,
+        "high_price": 862,
+        "low_price": 847.6
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-07T09:00:00",
+        "opening_price": 853.6,
+        "trade_price": 851.9,
+        "high_price": 862.8,
+        "low_price": 849.6
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-08T09:00:00",
+        "opening_price": 851.9,
+        "trade_price": 875.7,
+        "high_price": 889.1,
+        "low_price": 844
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-09T09:00:00",
+        "opening_price": 875.8,
+        "trade_price": 883,
+        "high_price": 914.6,
+        "low_price": 860.6
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-10T09:00:00",
+        "opening_price": 882.7,
+        "trade_price": 880.7,
+        "high_price": 888.7,
+        "low_price": 860
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-11T09:00:00",
+        "opening_price": 880.7,
+        "trade_price": 873.3,
+        "high_price": 884.8,
+        "low_price": 868.3
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-12T09:00:00",
+        "opening_price": 873.3,
+        "trade_price": 812.9,
+        "high_price": 878.7,
+        "low_price": 782.5
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-13T09:00:00",
+        "opening_price": 813,
+        "trade_price": 725.7,
+        "high_price": 814.4,
+        "low_price": 671.1
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-14T09:00:00",
+        "opening_price": 725.7,
+        "trade_price": 757.9,
+        "high_price": 766.2,
+        "low_price": 707
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-15T09:00:00",
+        "opening_price": 757.9,
+        "trade_price": 756.6,
+        "high_price": 774,
+        "low_price": 734
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-16T09:00:00",
+        "opening_price": 756.5,
+        "trade_price": 743.5,
+        "high_price": 757.4,
+        "low_price": 719.9
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-17T09:00:00",
+        "opening_price": 743.9,
+        "trade_price": 738.8,
+        "high_price": 757,
+        "low_price": 711.3
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-18T09:00:00",
+        "opening_price": 738.8,
+        "trade_price": 739.5,
+        "high_price": 743,
+        "low_price": 719
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-19T09:00:00",
+        "opening_price": 739.5,
+        "trade_price": 734.8,
+        "high_price": 746.9,
+        "low_price": 692.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-20T09:00:00",
+        "opening_price": 734.8,
+        "trade_price": 772,
+        "high_price": 774,
+        "low_price": 731
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-21T09:00:00",
+        "opening_price": 772,
+        "trade_price": 765.9,
+        "high_price": 785,
+        "low_price": 760.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-22T09:00:00",
+        "opening_price": 765.9,
+        "trade_price": 807.8,
+        "high_price": 829,
+        "low_price": 762.5
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-23T09:00:00",
+        "opening_price": 807.8,
+        "trade_price": 788.7,
+        "high_price": 811.8,
+        "low_price": 784.8
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-24T09:00:00",
+        "opening_price": 788.7,
+        "trade_price": 766.9,
+        "high_price": 795.2,
+        "low_price": 760.2
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-25T09:00:00",
+        "opening_price": 766.8,
+        "trade_price": 754.9,
+        "high_price": 772.6,
+        "low_price": 743.8
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-26T09:00:00",
+        "opening_price": 755.1,
+        "trade_price": 758.5,
+        "high_price": 768.7,
+        "low_price": 741.5
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-27T09:00:00",
+        "opening_price": 758.5,
+        "trade_price": 746.7,
+        "high_price": 758.9,
+        "low_price": 736.1
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-28T09:00:00",
+        "opening_price": 746.7,
+        "trade_price": 731.9,
+        "high_price": 755,
+        "low_price": 730.5
+    },
+    {
+        "market": "KRW-XRP",
+        "candle_date_time_kst": "2024-04-29T09:00:00",
+        "opening_price": 732.1,
+        "trade_price": 733.5,
+        "high_price": 735,
+        "low_price": 731.5
+    }
+]

@@ -126,3 +126,26 @@ interface ITradeProfits {
     rate: number;
     gain: number;
 }
+
+interface IMarketCandles {
+    [key: string]: {
+        market: string;
+        candle_date_time_kst: string;
+        opening_price: number;
+        trade_price: number;
+        high_price: number;
+        low_price: number;
+    }[];
+}
+
+interface ITradeMarket {
+    [key: string]: {
+        action: string;
+    };
+}
+
+interface ITradeData {
+    date?: string;
+    tradeMarkets?: ITradeMarket;
+    sellMarkets?: string[];
+}

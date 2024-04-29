@@ -1,43 +1,50 @@
 /**
- * TODO
- * 수수료 적용
- * 현금비중 80% 유지
- * 자금관리 : 가상화폐별 투입금액은 자산의 20%/가상화폐 수
- * 거래 횟수 추가
- * 승률 추가
- * 총 투자금 입력
- **/
+ * 나의 백테스트
+ * 5일봉 가격 변동에 따라 결정
+ * 올라가면 매수
+ * 내려가면 매도,
+ */
 
+import { setMovingAverage } from "@app/scripts/components/backtest/movingAverage";
+import {
+    getDaliyVolatility,
+    getVolatility,
+} from "@app/scripts/components/backtest/volatility";
 import {
     cloneTemplate,
     updateElementsTextWithData,
 } from "@app/scripts/utils/helpers";
 
-export default class AppBacktest extends HTMLElement {
-    private data: ICandles[];
+export default class AppThegiTest extends HTMLElement {
+    private data: ICandles2[];
     private market: string;
-    private period: number;
-    private fee: number; // TODO
+    private count: number;
+    private totalInvestmentPrice: number;
+    private marketSize: number;
     private investmentPrice: number;
     private summaryAllPrice: number;
     private allSumSize: number;
-    private periodInput: HTMLInputElement;
+    private countElement: HTMLInputElement;
+    private selectElement: HTMLSelectElement;
+    private formElement: HTMLFormElement;
 
     constructor() {
         super();
 
         this.data = [];
         this.market = "KRW-NEAR";
-        this.period = 200;
-        this.investmentPrice = 200000;
-        this.fee = 0.00139;
-
+        this.count = 200;
+        this.marketSize = 5;
+        this.totalInvestmentPrice = 1000000;
+        this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
         this.summaryAllPrice = 0;
         this.allSumSize = 0;
 
-        this.periodInput = this.querySelector(
+        this.countElement = this.querySelector(
             "input[name=count]"
         ) as HTMLInputElement;
+        this.selectElement = this.querySelector("select") as HTMLSelectElement;
+        this.formElement = this.querySelector("form") as HTMLFormElement;
 
         this.onChangeMarket = this.onChangeMarket.bind(this);
         this.onOptionSubmit = this.onOptionSubmit.bind(this);
@@ -47,39 +54,41 @@ export default class AppBacktest extends HTMLElement {
         this.initialize();
         this.loadAndRender();
 
-        this.querySelector("select")?.addEventListener(
-            "change",
-            this.onChangeMarket
-        );
+        this.selectElement.addEventListener("change", this.onChangeMarket);
+        this.formElement.addEventListener("submit", this.onOptionSubmit);
+    }
 
-        this.querySelector("form")?.addEventListener(
-            "submit",
-            this.onOptionSubmit
-        );
-
-        // this.getMinutes();
+    disconnectedCallback() {
+        this.selectElement.removeEventListener("change", this.onChangeMarket);
+        this.formElement.removeEventListener("submit", this.onOptionSubmit);
     }
 
     private initialize() {
-        this.periodInput.value = this.period.toString();
+        this.countElement.value = this.count.toString();
         (this.querySelector(".investmentPrice") as HTMLElement).textContent =
             this.investmentPrice.toLocaleString();
     }
 
-    private async loadAndRender() {
+    async loadAndRender() {
         const originData = await this.getCandles();
         this.calculateMovingAverage(originData); // 5일 이동평균선
         this.checkCondition();
         this.setTradingAction();
+        // this.setVolatility();
+        // this.order();
         this.setProfit();
         this.render();
         this.renderSummary();
     }
 
+    private calculateMovingAverage(data: any) {
+        this.data = setMovingAverage(data, 5);
+    }
+
     private async getCandles() {
         const searchParams = new URLSearchParams({
             market: this.market,
-            count: this.period.toString(),
+            count: this.count.toString(),
         });
 
         const response = await fetch(`/fetchCandles?${searchParams}`);
@@ -89,38 +98,45 @@ export default class AppBacktest extends HTMLElement {
         return await response.json();
     }
 
-    private calculateMovingAverage(originData: ICandles[], period = 5) {
-        this.data = originData.slice(period - 1).map((aData, index) => {
-            // console.log("!!!!!", index, aData);
-
-            let sum = 0;
-
-            for (let i = 0; i < period; i++) {
-                // console.log(index + i, originData[index + i]);
-                sum += originData[index + i].trade_price;
+    private checkCondition() {
+        this.data = this.data.map((aData, index) => {
+            if (
+                (this.data[index - 1] &&
+                    this.data[index - 1].moving_average_5 === undefined) ||
+                this.data[index].moving_average_5 === undefined
+            ) {
+                aData.condition = false;
+            } else {
+                const distance =
+                    this.data[index].moving_average_5 -
+                    this.data[index - 1].moving_average_5;
+                aData.condition = distance >= 0 ? true : false;
             }
 
-            return {
-                ...aData,
-                moving_average_5: sum / period,
-            };
-        });
-    }
-
-    private checkCondition() {
-        this.data = this.data.map((aData) => {
-            if (!aData.moving_average_5) return aData;
-
-            return {
-                ...aData,
-                condition: aData.trade_price > aData.moving_average_5,
-            };
+            if (
+                this.data[index - 1] &&
+                this.data[index] &&
+                this.data[index - 1].moving_average_5 &&
+                this.data[index].moving_average_5
+            ) {
+                console.log(
+                    index,
+                    this.data[index - 1].moving_average_5,
+                    this.data[index].moving_average_5,
+                    this.data[index].moving_average_5 -
+                        this.data[index - 1].moving_average_5,
+                    this.data[index].moving_average_5 >
+                        this.data[index - 1].moving_average_5
+                );
+            }
+            return { ...aData };
         });
     }
 
     private setTradingAction() {
         this.data = this.data.map((aData, index) => {
             let tradingAction = "";
+
             if (index === 0) {
                 tradingAction = aData.condition ? "Buy" : "Reserve";
             } else {
@@ -156,7 +172,7 @@ export default class AppBacktest extends HTMLElement {
         const getProfit = (aData: ICandles) => getRate(aData) * getSumPrice();
         const getSumPrice = () => sumPrice || this.investmentPrice;
 
-        this.data = this.data.map((aData) => {
+        this.data = this.data.map((aData, index) => {
             switch (aData.tradingAction) {
                 case "Buy":
                     buyTradePrice = aData.trade_price;
@@ -218,40 +234,45 @@ export default class AppBacktest extends HTMLElement {
         const fragment = new DocumentFragment();
 
         this.data
-            .map((aData: ICandles, index) => this.createItem(aData, index))
+            .map((aData: ICandles2, index) => this.createItem(aData, index))
             .forEach((cloned: HTMLElement) => fragment.appendChild(cloned));
 
         tableElement?.appendChild(fragment);
     }
 
-    private createItem(aData: ICandles, index: number) {
+    private createItem(aData: ICandles2, index: number) {
         const tpElement = document.querySelector(
             "#tp-item"
         ) as HTMLTemplateElement;
         tpElement;
 
         const cloned = cloneTemplate<HTMLElement>(tpElement);
-        if (!aData.moving_average_5) return cloned;
+        // if (!aData.moving_average_5) return cloned;
 
         const parseData = {
+            // ...aData,
             index,
             candle_date_time_kst: aData.candle_date_time_kst.replace("T", " "),
             opening_price: aData.opening_price.toLocaleString(),
             trade_price: aData.trade_price.toLocaleString(),
+
             moving_average_5:
-                aData.moving_average_5 &&
-                aData.moving_average_5.toLocaleString(),
+                (aData.moving_average_5 &&
+                    aData.moving_average_5.toLocaleString()) ||
+                "",
+
             condition: aData.condition,
             tradingAction: aData.tradingAction,
+
+            // order_price:
+            //     (aData.order_price && aData.order_price.toLocaleString()) || "",
 
             unrealize_rate: aData.unrealize_rate,
             unrealize_profit: aData.unrealize_profit?.toLocaleString(),
             unrealize_gain: aData.unrealize_gain?.toLocaleString(),
 
-            rate: aData.rate && aData.rate.toFixed(2),
-
             profit: aData.profit && Math.round(aData.profit).toLocaleString(),
-
+            rate: aData.rate && aData.rate.toFixed(2),
             sumProfit:
                 aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),
             sumPrice:
@@ -277,6 +298,9 @@ export default class AppBacktest extends HTMLElement {
         ) as HTMLElement;
 
         const cloned = cloneTemplate<HTMLElement>(tpElement);
+        const deleteButton = cloned.querySelector(
+            ".deleteButton"
+        ) as HTMLButtonElement;
 
         const lastData = this.data[this.data.length - 1];
         const lastProfit = lastData.sumProfit;
@@ -291,7 +315,7 @@ export default class AppBacktest extends HTMLElement {
 
         const summaryData = {
             market: this.market,
-            period: this.period,
+            period: this.count,
             totalRate: `${totalRate.toFixed(2)} %`,
             lastProfit: ` ${Math.round(lastProfit).toLocaleString()} 원`,
             unrealizeAllRate: `${
@@ -310,9 +334,7 @@ export default class AppBacktest extends HTMLElement {
         this.renderAllSum();
 
         // delete
-        const deleteButton = cloned.querySelector(
-            ".deleteButton"
-        ) as HTMLButtonElement;
+
         deleteButton.addEventListener("click", () => {
             cloned.remove();
             this.summaryAllPrice -= lastProfit;
@@ -323,17 +345,17 @@ export default class AppBacktest extends HTMLElement {
     }
 
     private renderAllSum() {
+        const summaryAllElement = this.querySelector(
+            ".summary-all"
+        ) as HTMLElement;
+
         const summaryAllRate =
             (this.summaryAllPrice / (this.allSumSize * this.investmentPrice)) *
                 100 || 0;
-
         const allSumData = {
             summaryAllPrice: Math.round(this.summaryAllPrice).toLocaleString(),
             summaryAllRate: summaryAllRate.toFixed(2).toLocaleString(),
         };
-        const summaryAllElement = this.querySelector(
-            ".summary-all"
-        ) as HTMLElement;
 
         updateElementsTextWithData(allSumData, summaryAllElement);
     }
@@ -346,31 +368,15 @@ export default class AppBacktest extends HTMLElement {
 
     private onOptionSubmit(event: Event) {
         event?.preventDefault();
-        const maxSize = Number(this.periodInput.getAttribute("max"));
+        const maxSize = Number(this.countElement.getAttribute("max"));
 
-        this.period =
-            Number(this.periodInput.value) > maxSize
+        this.count =
+            Number(this.countElement.value) > maxSize
                 ? maxSize
-                : Number(this.periodInput.value);
+                : Number(this.countElement.value);
 
-        this.periodInput.value = this.period.toString();
+        this.countElement.value = this.count.toString();
 
         this.loadAndRender();
-    }
-
-    private async getMinutes() {
-        const searchParams = new URLSearchParams({
-            market: "KRW-XRP",
-            unit: "30",
-            to: "2024-01-11T09:00:00",
-            count: "10",
-        });
-
-        const response = await fetch(`/fetchCandlesMinutes?${searchParams}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log(data);
     }
 }
