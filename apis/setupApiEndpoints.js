@@ -6,6 +6,7 @@ const {
     ordereds,
     fetchTickers,
     fetchOrders,
+    fetchMarketAll,
 } = require("./index");
 
 const setupApiEndpoints = (app) => {
@@ -16,6 +17,7 @@ const setupApiEndpoints = (app) => {
     app.get("/fetchOrdereds", ordereds);
     app.get("/fetchTickers", fetchTickers);
     app.get("/fetchOrders", fetchOrders);
+    app.get("/fetchMarketAll", fetchMarketAll);
     // app.get("/fetchChance", fetchChance);
 };
 

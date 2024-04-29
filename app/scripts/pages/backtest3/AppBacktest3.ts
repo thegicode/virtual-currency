@@ -22,7 +22,6 @@ import {
 export default class AppBacktest3 extends HTMLElement {
     private markets: string[];
     private investmentPrice: number;
-    private profit: number[];
     private data: IBackTestData3[];
     private qqqData: any;
     private template: HTMLTemplateElement;
@@ -36,7 +35,6 @@ export default class AppBacktest3 extends HTMLElement {
 
         this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
         this.investmentPrice = 200000;
-        this.profit = [];
         this.data = [];
         this.qqqData = {};
         this.tradeData = [];
@@ -51,6 +49,9 @@ export default class AppBacktest3 extends HTMLElement {
 
     async connectedCallback() {
         const toDate = this.getToDate();
+
+        // this.markets = await this.setMarkets();
+
         this.data = await this.loadData(toDate, this.count.toString());
         this.qqqData = this.transformData();
 
@@ -59,40 +60,43 @@ export default class AppBacktest3 extends HTMLElement {
 
     // disconnectedCallback() {}
 
+    private async setMarkets() {
+        const marketAll = await this.getMarkets();
+        return marketAll.slice(0, 10).map((m: any) => m.market);
+    }
+
+    private async getMarkets() {
+        const response = await fetch(`/fetchMarketAll`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json();
+    }
+
     private async runBackTest() {
-        for (let index = 0; index < 30; index++) {
-            // 한달 데이터 테스트, 수익률 계산
-            const { testMonthData, qqqTestMonthData } = this.getTestData(index);
-            const {
-                marketTestRates,
-                qqqMarketTestRates, // 이건 배열로?
-            } = this.getMarketTestRates(testMonthData, qqqTestMonthData);
+        for (let index = 0; index < this.count - 30; index++) {
+            // 한달 데이터 테스트
+            const testMonthData = this.getTestData(index);
+
+            // 한달 데이터 이율
+            const marketTestRates = this.getMarketTestRates(testMonthData);
 
             // 거래 날짜
             const tradeDate = testMonthData[0].tradeDate;
             console.log(index, tradeDate);
 
             // 테스트 결과 수익이 난 코인 정렬
-            const { sortedMarkets, qqqSortedMarkets } = this.getSortedMarkets(
-                marketTestRates,
-                qqqMarketTestRates // 배열 받아서 처리?
-            );
+            const sortedMarkets = this.getSortedMarkets(marketTestRates);
 
             // 거래할 코인 목록 가져오기
-            const { tradeMarkets, qqqTradeMarkets } = this.getTradeMarkets(
-                sortedMarkets,
-                qqqMarketTestRates // sortedMarkets 방식이 더 나은 ?
-            );
+            const tradeMarkets = this.getTradeMarkets(sortedMarkets);
 
             // 거래 데이터
-            const { tradeData, newTradeData } = this.getTradeData(
-                tradeMarkets,
-                index
-            );
+            const tradeData = this.getTradeData(tradeMarkets, index);
 
             // 거래하는 데이터 정비
             const formedTradeData = this.setTradeData(
-                newTradeData,
+                tradeData,
                 index,
                 tradeDate
             );
@@ -101,14 +105,7 @@ export default class AppBacktest3 extends HTMLElement {
 
             // Hold, Sell 이윤
             const { tradeProfits, selledProfits, sumGain, SumUnrealizeGain } =
-                this.getTradeProfits(
-                    tradeData,
-                    newTradeData,
-                    index,
-                    formedTradeData
-                );
-
-            this.profit.push(SumUnrealizeGain);
+                this.getTradeProfits(tradeData, index, formedTradeData);
 
             this.render(
                 index,
@@ -136,10 +133,6 @@ export default class AppBacktest3 extends HTMLElement {
     private async loadData(toDate: string, count: string) {
         const promises = this.markets.map(async (market) => {
             const candles = await this.getCandles(market, count, toDate);
-            // const qqqData = {
-            //     [market]: candles,
-            // };
-
             return {
                 market,
                 candles,
@@ -154,6 +147,14 @@ export default class AppBacktest3 extends HTMLElement {
         data.forEach(({ market, candles }) => {
             newData[market] = candles;
         });
+
+        // const newData: IMarketCandles = this.data.reduce(
+        //     (acc, { market, candles }) => {
+        //         acc[market] = candles;
+        //         return acc;
+        //     },
+        //     {}
+        // );
 
         return newData;
     }
@@ -170,18 +171,7 @@ export default class AppBacktest3 extends HTMLElement {
             };
         });
 
-        const qqqTestMonthData: any = {};
-        for (const market in this.qqqData) {
-            const candles = this.qqqData[market].slice(index, 30 + index);
-            const tradeDate =
-                this.qqqData[market][30 + index].candle_date_time_kst;
-            qqqTestMonthData[market] = {
-                candles,
-                tradeDate,
-            };
-        }
-
-        return { testMonthData, qqqTestMonthData };
+        return testMonthData;
     }
 
     private async getCandles(market: string, count: string, to: string) {
@@ -199,8 +189,7 @@ export default class AppBacktest3 extends HTMLElement {
     }
 
     private getMarketTestRates(
-        oneMonthData: IBackTestData3[],
-        qqqTestMonthData: any
+        oneMonthData: IBackTestData3[] // array
     ) {
         const marketTestRates = oneMonthData.map(({ market, candles }) => {
             const startPrice = candles[0].trade_price;
@@ -212,39 +201,26 @@ export default class AppBacktest3 extends HTMLElement {
             };
         });
 
-        const qqqMarketTestRates: any = {};
-        for (const market in qqqTestMonthData) {
-            const candles = qqqTestMonthData[market].candles;
-            const startPrice = candles[0].trade_price;
-            const lastPrice = candles[candles.length - 1].trade_price;
-            const rate = (lastPrice - startPrice) / startPrice;
-
-            qqqMarketTestRates[market] = rate * 100;
-        }
-
-        return {
-            marketTestRates,
-            qqqMarketTestRates,
-        };
+        return marketTestRates;
     }
 
     private getSortedMarkets(
-        marketRates: IMarketWithRate[],
-        qqqMarketTestRates: any
+        marketRates: IMarketWithRate[]
+        // qqqMarketTestRates: any
     ) {
         const markets = [...marketRates].sort((a, b) => b.rate - a.rate);
         const sortedMarkets = markets.filter((aMarket) => aMarket.rate > 0);
 
-        const qqqSortedMarkets = Object.entries(qqqMarketTestRates)
-            .sort((a: any, b: any) => b[1] - a[1])
-            .filter((item: any) => item[1] > 0);
+        // const qqqSortedMarkets = Object.entries(qqqMarketTestRates)
+        //     .sort((a: any, b: any) => b[1] - a[1])
+        //     .filter((item: any) => item[1] > 0);
 
-        return { sortedMarkets, qqqSortedMarkets };
+        return sortedMarkets;
     }
 
     private getTradeMarkets(
-        markets: IMarketWithRate[],
-        qqqMarketTestRates: any
+        markets: IMarketWithRate[]
+        // qqqMarketTestRates: any
     ) {
         const newMarkets = markets
             .filter((aMarket) => {
@@ -254,38 +230,38 @@ export default class AppBacktest3 extends HTMLElement {
         const tradeMarkets =
             newMarkets.length > 3 ? newMarkets.slice(0, 3) : newMarkets;
 
-        const qqqMarkets = Object.entries(qqqMarketTestRates)
-            .filter(([market, rate]: any) => rate > 0)
-            .map(([market, rate]) => market);
+        // const qqqMarkets = Object.entries(qqqMarketTestRates)
+        //     .filter(([market, rate]: any) => rate > 0)
+        //     .map(([market, rate]) => market);
 
-        const qqqTradeMarkets =
-            qqqMarkets.length > 3 ? qqqMarkets.slice(0, 3) : qqqMarkets;
+        // const qqqTradeMarkets =
+        //     qqqMarkets.length > 3 ? qqqMarkets.slice(0, 3) : qqqMarkets;
 
-        return { tradeMarkets, qqqTradeMarkets };
+        return tradeMarkets;
     }
 
     private getTradeData(tradeMarkets: string[], index: number) {
         const tradeIndex = 30 + index;
 
-        const marketNames = this.data.map((aMarketData) => aMarketData.market);
-        const tradeData = tradeMarkets.map((market: string) => {
-            const index = marketNames.indexOf(market);
-            const candles = this.data[index].candles;
-            return {
-                market,
-                candles: [candles[tradeIndex - 1], candles[tradeIndex]],
-            };
-        });
+        // const marketNames = this.data.map((aMarketData) => aMarketData.market);
+        // const tradeData = tradeMarkets.map((market: string) => {
+        //     const index = marketNames.indexOf(market);
+        //     const candles = this.data[index].candles;
+        //     return {
+        //         market,
+        //         candles: [candles[tradeIndex - 1], candles[tradeIndex]],
+        //     };
+        // });
 
-        const newTradeData: any = {};
+        const tradeData: any = {};
         tradeMarkets.forEach((market) => {
-            newTradeData[market] = [
+            tradeData[market] = [
                 this.qqqData[market][tradeIndex - 1],
                 this.qqqData[market][tradeIndex],
             ];
         });
 
-        return { tradeData, newTradeData };
+        return tradeData;
     }
 
     private setTradeData(
@@ -293,41 +269,30 @@ export default class AppBacktest3 extends HTMLElement {
         index: number,
         date: string
     ) {
-        let tradeMarkets: ITradeMarket = {};
+        const tradeIndex = 30 + index;
 
         const prevTrades = index > 0 && this.tradeData[index - 1].tradeMarkets;
         const prevMarkets = Object.keys(prevTrades);
 
-        if (index === 0) {
-            for (const market in tradeData) {
-                tradeMarkets[market] = {
-                    action: "Buy",
-                };
-            }
-        } else {
-            for (const market in tradeData) {
-                tradeMarkets[market] = {
-                    action: prevMarkets.includes(market) ? "Hold" : "Buy",
-                };
-            }
+        let tradeMarkets: ITradeMarket = {};
+        for (const market in tradeData) {
+            tradeMarkets[market] = {
+                action: prevMarkets.includes(market) ? "Hold" : "Buy",
+            };
         }
 
-        const markets = Object.keys(tradeData);
         const sellMarkets = prevMarkets.filter(
-            (prevMarket) => !markets.includes(prevMarket)
+            (prevMarket) => !Object.keys(tradeData).includes(prevMarket)
         );
 
-        const result = {
+        return {
             date,
             tradeMarkets,
             sellMarkets,
         };
-
-        return result;
     }
 
     private getTradeProfits(
-        tradeData: IBackTestData3[], //array
         newTradeData: any, // object
         index: number,
         formedTradeData: any
@@ -484,16 +449,11 @@ export default class AppBacktest3 extends HTMLElement {
         ) as HTMLElement;
         const marketsElement = this.querySelector(".markets") as HTMLElement;
         const countElement = this.querySelector(".count") as HTMLElement;
+        const gain = this.totalUnrealizeGain - this.investmentPrice * 3;
+        const sumRate = gain / (this.investmentPrice * 3);
 
-        const sumRate =
-            ((this.totalUnrealizeGain - this.investmentPrice * 3) /
-                this.investmentPrice) *
-            100;
-
-        priceElement.textContent = Math.round(
-            this.totalUnrealizeGain - this.investmentPrice * 3
-        ).toLocaleString();
-        rateElement.textContent = Math.round(sumRate).toLocaleString();
+        priceElement.textContent = Math.round(gain).toLocaleString();
+        rateElement.textContent = Math.round(sumRate * 100).toLocaleString();
         marketsElement.textContent = this.markets.join(" | ");
         countElement.textContent = this.count.toString();
     }

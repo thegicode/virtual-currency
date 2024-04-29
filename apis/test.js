@@ -8,7 +8,7 @@
 //     .then((response) => console.log(response))
 //     .catch((err) => console.error(err));
 
-const fn = require("./candlesMinutes.js");
+/* const fn = require("./candlesMinutes.js");
 
 const searchParams = {
     market: "KRW-XRP",
@@ -20,6 +20,11 @@ const searchParams = {
 async function test() {
     const data = await fn.candlesMinutes(searchParams);
     console.log(data);
-}
+} */
 
+const fn = require("./marketAll.js");
+async function test() {
+    const data = await fn.marketAll();
+    console.log(data);
+}
 test();

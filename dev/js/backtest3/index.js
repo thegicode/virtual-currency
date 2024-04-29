@@ -48,7 +48,6 @@
       super();
       this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
       this.investmentPrice = 2e5;
-      this.profit = [];
       this.data = [];
       this.qqqData = {};
       this.tradeData = [];
@@ -65,20 +64,34 @@
         this.runBackTest();
       });
     }
+    setMarkets() {
+      return __awaiter(this, void 0, void 0, function* () {
+        const marketAll = yield this.getMarkets();
+        return marketAll.slice(0, 10).map((m) => m.market);
+      });
+    }
+    getMarkets() {
+      return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(`/fetchMarketAll`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return yield response.json();
+      });
+    }
     runBackTest() {
       return __awaiter(this, void 0, void 0, function* () {
-        for (let index = 0; index < 30; index++) {
-          const { testMonthData, qqqTestMonthData } = this.getTestData(index);
-          const { marketTestRates, qqqMarketTestRates } = this.getMarketTestRates(testMonthData, qqqTestMonthData);
+        for (let index = 0; index < this.count - 30; index++) {
+          const testMonthData = this.getTestData(index);
+          const marketTestRates = this.getMarketTestRates(testMonthData);
           const tradeDate = testMonthData[0].tradeDate;
           console.log(index, tradeDate);
-          const { sortedMarkets, qqqSortedMarkets } = this.getSortedMarkets(marketTestRates, qqqMarketTestRates);
-          const { tradeMarkets, qqqTradeMarkets } = this.getTradeMarkets(sortedMarkets, qqqMarketTestRates);
-          const { tradeData, newTradeData } = this.getTradeData(tradeMarkets, index);
-          const formedTradeData = this.setTradeData(newTradeData, index, tradeDate);
+          const sortedMarkets = this.getSortedMarkets(marketTestRates);
+          const tradeMarkets = this.getTradeMarkets(sortedMarkets);
+          const tradeData = this.getTradeData(tradeMarkets, index);
+          const formedTradeData = this.setTradeData(tradeData, index, tradeDate);
           this.tradeData.push(formedTradeData);
-          const { tradeProfits, selledProfits, sumGain, SumUnrealizeGain } = this.getTradeProfits(tradeData, newTradeData, index, formedTradeData);
-          this.profit.push(SumUnrealizeGain);
+          const { tradeProfits, selledProfits, sumGain, SumUnrealizeGain } = this.getTradeProfits(tradeData, index, formedTradeData);
           this.render(index, tradeDate, tradeProfits, selledProfits, sumGain, SumUnrealizeGain);
         }
         this.renderSummary();
@@ -121,16 +134,7 @@
           tradeDate
         };
       });
-      const qqqTestMonthData = {};
-      for (const market in this.qqqData) {
-        const candles = this.qqqData[market].slice(index, 30 + index);
-        const tradeDate = this.qqqData[market][30 + index].candle_date_time_kst;
-        qqqTestMonthData[market] = {
-          candles,
-          tradeDate
-        };
-      }
-      return { testMonthData, qqqTestMonthData };
+      return testMonthData;
     }
     getCandles(market, count, to) {
       return __awaiter(this, void 0, void 0, function* () {
@@ -146,7 +150,7 @@
         return yield response.json();
       });
     }
-    getMarketTestRates(oneMonthData, qqqTestMonthData) {
+    getMarketTestRates(oneMonthData) {
       const marketTestRates = oneMonthData.map(({ market, candles }) => {
         const startPrice = candles[0].trade_price;
         const lastPrice = candles[candles.length - 1].trade_price;
@@ -156,82 +160,50 @@
           rate: rate * 100
         };
       });
-      const qqqMarketTestRates = {};
-      for (const market in qqqTestMonthData) {
-        const candles = qqqTestMonthData[market].candles;
-        const startPrice = candles[0].trade_price;
-        const lastPrice = candles[candles.length - 1].trade_price;
-        const rate = (lastPrice - startPrice) / startPrice;
-        qqqMarketTestRates[market] = rate * 100;
-      }
-      return {
-        marketTestRates,
-        qqqMarketTestRates
-      };
+      return marketTestRates;
     }
-    getSortedMarkets(marketRates, qqqMarketTestRates) {
+    getSortedMarkets(marketRates) {
       const markets = [...marketRates].sort((a, b) => b.rate - a.rate);
       const sortedMarkets = markets.filter((aMarket) => aMarket.rate > 0);
-      const qqqSortedMarkets = Object.entries(qqqMarketTestRates).sort((a, b) => b[1] - a[1]).filter((item) => item[1] > 0);
-      return { sortedMarkets, qqqSortedMarkets };
+      return sortedMarkets;
     }
-    getTradeMarkets(markets, qqqMarketTestRates) {
+    getTradeMarkets(markets) {
       const newMarkets = markets.filter((aMarket) => {
         if (aMarket.rate > 0)
           return aMarket;
       }).map((aMarket) => aMarket.market);
       const tradeMarkets = newMarkets.length > 3 ? newMarkets.slice(0, 3) : newMarkets;
-      const qqqMarkets = Object.entries(qqqMarketTestRates).filter(([market, rate]) => rate > 0).map(([market, rate]) => market);
-      const qqqTradeMarkets = qqqMarkets.length > 3 ? qqqMarkets.slice(0, 3) : qqqMarkets;
-      return { tradeMarkets, qqqTradeMarkets };
+      return tradeMarkets;
     }
     getTradeData(tradeMarkets, index) {
       const tradeIndex = 30 + index;
-      const marketNames = this.data.map((aMarketData) => aMarketData.market);
-      const tradeData = tradeMarkets.map((market) => {
-        const index2 = marketNames.indexOf(market);
-        const candles = this.data[index2].candles;
-        return {
-          market,
-          candles: [candles[tradeIndex - 1], candles[tradeIndex]]
-        };
-      });
-      const newTradeData = {};
+      const tradeData = {};
       tradeMarkets.forEach((market) => {
-        newTradeData[market] = [
+        tradeData[market] = [
           this.qqqData[market][tradeIndex - 1],
           this.qqqData[market][tradeIndex]
         ];
       });
-      return { tradeData, newTradeData };
+      return tradeData;
     }
     setTradeData(tradeData, index, date) {
-      let tradeMarkets = {};
+      const tradeIndex = 30 + index;
       const prevTrades = index > 0 && this.tradeData[index - 1].tradeMarkets;
       const prevMarkets = Object.keys(prevTrades);
-      if (index === 0) {
-        for (const market in tradeData) {
-          tradeMarkets[market] = {
-            action: "Buy"
-          };
-        }
-      } else {
-        for (const market in tradeData) {
-          tradeMarkets[market] = {
-            action: prevMarkets.includes(market) ? "Hold" : "Buy"
-          };
-        }
+      let tradeMarkets = {};
+      for (const market in tradeData) {
+        tradeMarkets[market] = {
+          action: prevMarkets.includes(market) ? "Hold" : "Buy"
+        };
       }
-      const markets = Object.keys(tradeData);
-      const sellMarkets = prevMarkets.filter((prevMarket) => !markets.includes(prevMarket));
-      const result = {
+      const sellMarkets = prevMarkets.filter((prevMarket) => !Object.keys(tradeData).includes(prevMarket));
+      return {
         date,
         tradeMarkets,
         sellMarkets
       };
-      return result;
     }
-    getTradeProfits(tradeData, newTradeData, index, formedTradeData) {
+    getTradeProfits(newTradeData, index, formedTradeData) {
       for (const market in formedTradeData.tradeMarkets) {
         let buyPrice = 0;
         const action = formedTradeData.tradeMarkets[market].action;
@@ -332,9 +304,10 @@
       const rateElement = this.querySelector(".summaryAllRate");
       const marketsElement = this.querySelector(".markets");
       const countElement = this.querySelector(".count");
-      const sumRate = (this.totalUnrealizeGain - this.investmentPrice * 3) / this.investmentPrice * 100;
-      priceElement.textContent = Math.round(this.totalUnrealizeGain - this.investmentPrice * 3).toLocaleString();
-      rateElement.textContent = Math.round(sumRate).toLocaleString();
+      const gain = this.totalUnrealizeGain - this.investmentPrice * 3;
+      const sumRate = gain / (this.investmentPrice * 3);
+      priceElement.textContent = Math.round(gain).toLocaleString();
+      rateElement.textContent = Math.round(sumRate * 100).toLocaleString();
       marketsElement.textContent = this.markets.join(" | ");
       countElement.textContent = this.count.toString();
     }
