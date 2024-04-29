@@ -149,3 +149,36 @@ interface ITradeData {
     tradeMarkets?: ITradeMarket;
     sellMarkets?: string[];
 }
+
+interface ICandlesMinutes {
+    candle_acc_trade_price: number;
+    candle_acc_trade_volume: number;
+    candle_date_time_kst: string;
+    market: string;
+    trade_price: number;
+    opening_price: number;
+    trade_price: number;
+    high_price: number;
+    low_price: number;
+}
+
+interface ITradeData4 {
+    date: string;
+    condition: boolean;
+    action?: string;
+    volatility?: number;
+    order_amount?: number;
+    rate?: number;
+    profit?: number;
+    sumProfit?: number;
+    unrealize_rate?: number;
+    unrealize_profit?: number;
+    unrealize_sum?: number;
+    afternoonData: IAfternoonData;
+}
+
+interface IAfternoonData {
+    high_price: number;
+    low_price: number;
+    opening_price: number;
+}

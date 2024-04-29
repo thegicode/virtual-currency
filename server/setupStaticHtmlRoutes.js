@@ -8,6 +8,7 @@ const setupStaticHtmlRoutes = (app, staticPath) => {
         "backtest",
         "backtest2",
         "backtest3",
+        "backtest4",
         "thegitest",
     ];
     routes.forEach((route) => {

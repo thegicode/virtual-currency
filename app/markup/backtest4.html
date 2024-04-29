@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Backtest4</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="shortcut icon"
+            href="/assets/images/favicon.ico"
+            type="image/x-icon"
+        />
+        <link
+            rel="icon"
+            href="/assets/images/favicon.ico"
+            type="image/x-icon"
+        />
+        <link rel="stylesheet" href="/css/backtest.css" />
+        <script type="module" src="/js/backtest4/index.js" async></script>
+    </head>
+    <body>
+        <app-backtest4>
+            <h1>Backtest 4</h1>
+            <section class="backtest">
+                <h2>
+                    투자방법4 : 다자 가상화폐 + 전일 오후 상승 시 오전 투자 +
+                    변동성 조절
+                </h2>
+                <form class="backtest-options">
+                    <div class="option">
+                        <span class="title">| Market : </span>
+                        <select name="market">
+                            <option value="KRW-BTC" selected>비트코인</option>
+                            <option value="KRW-ETH">이더리움</option>
+                            <option value="KRW-DOGE">도지코인</option>
+                            <option value="KRW-SBD">스팀달러</option>
+                            <option value="KRW-XRP">리플</option>
+                        </select>
+                    </div>
+                    <label class="option">
+                        <span class="title"> | 개수 : </span>
+                        <input type="number" name="count" max="200" value="" />
+                        <button type="submit">적용</button>
+                    </label>
+                    <div class="option">
+                        <p>
+                            | 각 투자금 :
+                            <span class="investmentPrice"></span>
+                        </p>
+                    </div>
+                </form>
+
+                <div class="summary">
+                    <ul class="summary-all">
+                        <li>
+                            수익 총합 : <span class="summaryAllPrice"></span>원
+                        </li>
+                        <li>
+                            총 수익률 : <span class="summaryAllRate"></span>%
+                        </li>
+                    </ul>
+                    <ul class="summary-list"></ul>
+                </div>
+
+                <div class="backtest-contents">
+                    <table>
+                        <thead>
+                            <th>번호</th>
+                            <th>날짜</th>
+                            <th>조건 만족</th>
+                            <th>action</th>
+                            <th>변동성</th>
+                            <th>매수 금액</th>
+                            <th>매도 이율(%)</th>
+                            <th>실 이윤(원)</th>
+                            <th>실 누적 이윤(원)</th>
+                            <th>Hold 이율(%)</th>
+                            <th>평가 이윤(원)</th>
+                            <th>평가 누적 이윤(원)</th>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </app-backtest4>
+
+        <template id="tp-item">
+            <tr class="backtest-item">
+                <td class="index"></td>
+                <td class="date"></td>
+                <td class="condition"></td>
+                <td class="action"></td>
+                <td class="volatility"></td>
+                <td class="order_amount"></td>
+                <td class="rate"></td>
+                <td class="profit"></td>
+                <td class="sumProfit"></td>
+                <td class="unrealize_rate"></td>
+                <td class="unrealize_profit"></td>
+                <td class="unrealize_sum"></td>
+            </tr>
+        </template>
+
+        <template id="tp-summary">
+            <li>
+                <p>・ <span class="market"></span></p>
+                <p>・ 기간 : <span class="period"></span></p>
+                <p>・ 수익률 : <span class="totalRate"></span></p>
+                <p>・ 총수익: <span class="lastProfit"></span></p>
+                <button type="button" class="deleteButton">삭제</button>
+            </li>
+        </template>
+    </body>
+</html>
