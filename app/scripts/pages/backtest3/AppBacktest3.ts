@@ -41,7 +41,7 @@ export default class AppBacktest3 extends HTMLElement {
         this.data = [];
         this.qqqData = {};
         this.tradeData = [];
-        this.count = 200;
+        this.count = 60;
         this.totalGain = 0;
         this.totalUnrealizeGain = 0;
 
@@ -60,7 +60,7 @@ export default class AppBacktest3 extends HTMLElement {
     async connectedCallback() {
         this.initialize();
 
-        // this.markets = await this.setMarkets();
+        this.markets = await this.setMarkets();
 
         this.runBackTest();
 
@@ -79,7 +79,9 @@ export default class AppBacktest3 extends HTMLElement {
 
     private async setMarkets() {
         const marketAll = await this.getMarkets();
-        return marketAll.slice(0, 10).map((m: any) => m.market);
+        const idx = 20;
+        // const idx = marketAll.length - 21;
+        return marketAll.slice(idx, idx + 10).map((m: any) => m.market);
     }
 
     private async getMarkets() {

@@ -16,7 +16,7 @@ export default class AppBacktest3 extends HTMLElement {
         this.data = [];
         this.qqqData = {};
         this.tradeData = [];
-        this.count = 200;
+        this.count = 60;
         this.totalGain = 0;
         this.totalUnrealizeGain = 0;
         this.template = document.querySelector("#tp-item");
@@ -28,6 +28,7 @@ export default class AppBacktest3 extends HTMLElement {
     connectedCallback() {
         return __awaiter(this, void 0, void 0, function* () {
             this.initialize();
+            this.markets = yield this.setMarkets();
             this.runBackTest();
             this.formElement.addEventListener("submit", this.onOptionSubmit);
         });
@@ -43,7 +44,8 @@ export default class AppBacktest3 extends HTMLElement {
     setMarkets() {
         return __awaiter(this, void 0, void 0, function* () {
             const marketAll = yield this.getMarkets();
-            return marketAll.slice(0, 10).map((m) => m.market);
+            const idx = 20;
+            return marketAll.slice(idx, idx + 10).map((m) => m.market);
         });
     }
     getMarkets() {

@@ -20,9 +20,12 @@ async function marketAll(reqQuery) {
         }
 
         const data = await response.json();
-        return data.filter((aData) => {
-            return aData.market_warning === "NONE";
-        });
+        const result = data
+            .filter((aData) => {
+                return aData.market_warning === "NONE";
+            })
+            .filter((aData) => aData.market.includes("KRW-"));
+        return result;
     } catch (error) {
         console.error("Error:", error);
     }

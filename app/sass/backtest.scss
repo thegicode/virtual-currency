@@ -32,13 +32,18 @@ body {
     }
 }
 
-.summary {
+backtest-overview {
+    display: block;
+}
+.summary,
+backtest-overview {
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ebebeb;
 }
 
-.summary-all {
+.summary-all,
+.overview-sum {
     display: flex;
     justify-content: space-around;
     margin-bottom: 10px;
@@ -55,7 +60,8 @@ body {
     }
 }
 
-.summary-list {
+.summary-list,
+.overview-list {
     padding: 0;
     // font-size: 13px;
     li {

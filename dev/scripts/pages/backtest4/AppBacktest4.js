@@ -7,27 +7,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { getDaliyVolatility, } from "@app/scripts/components/backtest/volatility";
+import { getDaliyVolatility } from "@app/scripts/components/backtest/volatility";
 import { cloneTemplate, updateElementsTextWithData, } from "@app/scripts/utils/helpers";
 export default class AppBacktest4 extends HTMLElement {
     constructor() {
         super();
         this.data = [];
         this.tradeData = [];
-        this.market = "KRW-BTC";
-        this.size = 30;
+        this.market = "KRW-ONG";
+        this.count = 30;
         this.marketSize = 5;
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
-        this.sumProfit = 0;
-        this.summaryAllPrice = 0;
-        this.allSumSize = 0;
         this.target = 2;
-        this.sizeElement = this.querySelector("input[name=count]");
+        this.countElement = this.querySelector("input[name=count]");
         this.tableElement = this.querySelector("tbody");
         this.itemTempleteElement = document.querySelector("#tp-item");
         this.selectElement = this.querySelector("select");
         this.formElement = this.querySelector("form");
+        this.overviewCustomElement = this.querySelector("backtest-overview");
         this.onChangeMarket = this.onChangeMarket.bind(this);
         this.onOptionSubmit = this.onOptionSubmit.bind(this);
     }
@@ -42,15 +40,17 @@ export default class AppBacktest4 extends HTMLElement {
         this.formElement.removeEventListener("submit", this.onOptionSubmit);
     }
     initialize() {
-        this.sizeElement.value = this.size.toString();
-        this.querySelector(".investmentPrice").textContent =
+        const investmentPriceElement = this.querySelector(".investmentPrice");
+        this.countElement.value = this.count.toString();
+        investmentPriceElement.textContent =
             this.investmentPrice.toLocaleString();
     }
     runBackTest() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.dataset.loading = "true";
             this.data = [];
             this.tradeData = [];
-            for (let index = 0; index < this.size; index++) {
+            for (let index = 0; index < this.count; index++) {
                 console.log(index);
                 try {
                     const toDate = `${this.getToDate(index)}+09:00`;
@@ -69,18 +69,18 @@ export default class AppBacktest4 extends HTMLElement {
                 }
             }
             this.render();
-            this.renderSummary();
-            this.renderAllSum();
+            this.overviewCustomElement.redner(this);
+            this.dataset.loading = "false";
         });
     }
     delay(duration) {
         return new Promise((resolve) => setTimeout(resolve, duration));
     }
-    fetchData(unit, count, to) {
+    fetchData(unit, fetchCount, to) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchParams = new URLSearchParams({
                 market: this.market,
-                count,
+                count: fetchCount,
                 unit,
                 to,
             });
@@ -94,7 +94,7 @@ export default class AppBacktest4 extends HTMLElement {
     getToDate(index) {
         const now = new Date();
         now.setMonth(now.getMonth());
-        now.setDate(now.getDate() - this.size + index);
+        now.setDate(now.getDate() - this.count + index);
         now.setHours(22, 0, 0, 0);
         return now.toISOString().slice(0, 19);
     }
@@ -199,6 +199,7 @@ export default class AppBacktest4 extends HTMLElement {
         const parseData = {
             index,
             date: aData.date,
+            trade_price: aData.trade_price.toLocaleString(),
             condition: aData.condition.toString(),
             action: aData.action,
             volatility: (_a = aData.volatility) === null || _a === void 0 ? void 0 : _a.toFixed(2),
@@ -220,43 +221,6 @@ export default class AppBacktest4 extends HTMLElement {
         cloned.dataset.action = aData.action;
         return cloned;
     }
-    renderSummary() {
-        if (this.data.length === 0)
-            return;
-        const tpElement = document.querySelector("#tp-summary");
-        const summaryListElement = this.querySelector(".summary-list");
-        const cloned = cloneTemplate(tpElement);
-        const deleteButton = cloned.querySelector(".deleteButton");
-        const totalProfit = this.tradeData[this.tradeData.length - 1].unrealize_sum;
-        const totalRate = (totalProfit / this.investmentPrice) * 100;
-        const summaryData = {
-            market: this.market,
-            period: this.size,
-            totalRate: `${totalRate.toFixed(2)}%`,
-            totalProfit: ` ${Math.round(totalProfit).toLocaleString()} 원`,
-        };
-        updateElementsTextWithData(summaryData, cloned);
-        summaryListElement.appendChild(cloned);
-        this.summaryAllPrice += totalProfit;
-        this.allSumSize++;
-        this.renderAllSum();
-        deleteButton.addEventListener("click", () => {
-            cloned.remove();
-            this.summaryAllPrice -= totalProfit;
-            this.allSumSize--;
-            this.renderAllSum();
-        });
-    }
-    renderAllSum() {
-        const summaryAllElement = this.querySelector(".summary-all");
-        const unrealizeSum = this.tradeData[this.tradeData.length - 1].unrealize_sum;
-        const summaryAllRate = (this.summaryAllPrice / this.investmentPrice) * 100;
-        const allSumData = {
-            summaryAllPrice: Math.round(this.summaryAllPrice).toLocaleString(),
-            summaryAllRate: summaryAllRate.toFixed(2).toLocaleString(),
-        };
-        updateElementsTextWithData(allSumData, summaryAllElement);
-    }
     onChangeMarket(event) {
         const target = event.target;
         this.market = target.value;
@@ -264,12 +228,12 @@ export default class AppBacktest4 extends HTMLElement {
     }
     onOptionSubmit(event) {
         event === null || event === void 0 ? void 0 : event.preventDefault();
-        const maxSize = Number(this.sizeElement.getAttribute("max"));
-        this.size =
-            Number(this.sizeElement.value) > maxSize
+        const maxSize = Number(this.countElement.getAttribute("max"));
+        this.count =
+            Number(this.countElement.value) > maxSize
                 ? maxSize
-                : Number(this.sizeElement.value);
-        this.sizeElement.value = this.size.toString();
+                : Number(this.countElement.value);
+        this.countElement.value = this.count.toString();
         this.runBackTest();
     }
 }

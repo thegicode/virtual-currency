@@ -13,50 +13,44 @@
  *       전일 오전 & 오후 거래량
  */
 
-import { setMovingAverage } from "@app/scripts/components/backtest/movingAverage";
-import {
-    getDaliyVolatility,
-    getVolatility,
-} from "@app/scripts/components/backtest/volatility";
+import { getDaliyVolatility } from "@app/scripts/components/backtest/volatility";
 import {
     cloneTemplate,
     updateElementsTextWithData,
 } from "@app/scripts/utils/helpers";
+import Overview from "./Overview";
 
 export default class AppBacktest4 extends HTMLElement {
     private data: ICandlesMinutes[];
-    private tradeData: any[];
-    private market: string;
-    private size: number;
+    public tradeData: any[];
+    public market: string;
+    public count: number;
     private totalInvestmentPrice: number;
     private marketSize: number;
-    private investmentPrice: number;
-    private sumProfit: number;
-    private summaryAllPrice: number;
-    private allSumSize: number;
+    public investmentPrice: number;
     private target: number;
-    private sizeElement: HTMLInputElement;
+
+    private countElement: HTMLInputElement;
     private tableElement: HTMLElement;
     private itemTempleteElement: HTMLTemplateElement;
     private selectElement: HTMLSelectElement;
     private formElement: HTMLFormElement;
+
+    private overviewCustomElement: Overview;
 
     constructor() {
         super();
 
         this.data = [];
         this.tradeData = [];
-        this.market = "KRW-BTC";
-        this.size = 30;
+        this.market = "KRW-ONG";
+        this.count = 30;
         this.marketSize = 5;
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
-        this.sumProfit = 0;
-        this.summaryAllPrice = 0;
-        this.allSumSize = 0;
         this.target = 2; // 추천 2
 
-        this.sizeElement = this.querySelector(
+        this.countElement = this.querySelector(
             "input[name=count]"
         ) as HTMLInputElement;
         this.tableElement = this.querySelector("tbody") as HTMLElement;
@@ -66,6 +60,10 @@ export default class AppBacktest4 extends HTMLElement {
 
         this.selectElement = this.querySelector("select") as HTMLSelectElement;
         this.formElement = this.querySelector("form") as HTMLFormElement;
+
+        this.overviewCustomElement = this.querySelector(
+            "backtest-overview"
+        ) as Overview;
 
         this.onChangeMarket = this.onChangeMarket.bind(this);
         this.onOptionSubmit = this.onOptionSubmit.bind(this);
@@ -86,16 +84,21 @@ export default class AppBacktest4 extends HTMLElement {
     }
 
     private initialize() {
-        this.sizeElement.value = this.size.toString();
-        (this.querySelector(".investmentPrice") as HTMLElement).textContent =
+        const investmentPriceElement = this.querySelector(
+            ".investmentPrice"
+        ) as HTMLElement;
+
+        this.countElement.value = this.count.toString();
+        investmentPriceElement.textContent =
             this.investmentPrice.toLocaleString();
     }
 
     async runBackTest() {
+        this.dataset.loading = "true";
         this.data = [];
         this.tradeData = [];
 
-        for (let index = 0; index < this.size; index++) {
+        for (let index = 0; index < this.count; index++) {
             console.log(index);
 
             try {
@@ -124,21 +127,22 @@ export default class AppBacktest4 extends HTMLElement {
                 );
             }
         }
-        // console.log(this.tradeData);
 
         this.render();
-        this.renderSummary();
-        this.renderAllSum();
+
+        this.overviewCustomElement.redner(this);
+
+        this.dataset.loading = "false";
     }
 
     private delay(duration: number) {
         return new Promise((resolve) => setTimeout(resolve, duration));
     }
 
-    private async fetchData(unit: string, count: string, to: string) {
+    private async fetchData(unit: string, fetchCount: string, to: string) {
         const searchParams = new URLSearchParams({
             market: this.market,
-            count,
+            count: fetchCount,
             unit,
             to,
             // to: "2024-04-28T01:00:00+09:00",
@@ -154,7 +158,7 @@ export default class AppBacktest4 extends HTMLElement {
     private getToDate(index: number) {
         const now = new Date();
         now.setMonth(now.getMonth());
-        now.setDate(now.getDate() - this.size + index);
+        now.setDate(now.getDate() - this.count + index);
         now.setHours(22, 0, 0, 0);
         return now.toISOString().slice(0, 19);
     }
@@ -320,6 +324,7 @@ export default class AppBacktest4 extends HTMLElement {
         const parseData = {
             index,
             date: aData.date,
+            trade_price: aData.trade_price.toLocaleString(),
             condition: aData.condition.toString(),
             action: aData.action,
             volatility: aData.volatility?.toFixed(2),
@@ -350,72 +355,6 @@ export default class AppBacktest4 extends HTMLElement {
         return cloned;
     }
 
-    private renderSummary() {
-        if (this.data.length === 0) return;
-
-        const tpElement = document.querySelector(
-            "#tp-summary"
-        ) as HTMLTemplateElement;
-
-        const summaryListElement = this.querySelector(
-            ".summary-list"
-        ) as HTMLElement;
-
-        const cloned = cloneTemplate<HTMLElement>(tpElement);
-        const deleteButton = cloned.querySelector(
-            ".deleteButton"
-        ) as HTMLButtonElement;
-
-        const totalProfit =
-            this.tradeData[this.tradeData.length - 1].unrealize_sum;
-
-        const totalRate = (totalProfit / this.investmentPrice) * 100;
-        const summaryData = {
-            market: this.market,
-            period: this.size,
-            totalRate: `${totalRate.toFixed(2)}%`,
-            totalProfit: ` ${Math.round(totalProfit).toLocaleString()} 원`,
-        };
-
-        updateElementsTextWithData(summaryData, cloned);
-
-        summaryListElement.appendChild(cloned);
-
-        // summary-all
-        this.summaryAllPrice += totalProfit;
-        this.allSumSize++;
-
-        this.renderAllSum();
-
-        // delete
-
-        deleteButton.addEventListener("click", () => {
-            cloned.remove();
-            this.summaryAllPrice -= totalProfit;
-            this.allSumSize--;
-
-            this.renderAllSum();
-        });
-    }
-
-    private renderAllSum() {
-        const summaryAllElement = this.querySelector(
-            ".summary-all"
-        ) as HTMLElement;
-
-        const unrealizeSum =
-            this.tradeData[this.tradeData.length - 1].unrealize_sum;
-
-        const summaryAllRate =
-            (this.summaryAllPrice / this.investmentPrice) * 100;
-
-        const allSumData = {
-            summaryAllPrice: Math.round(this.summaryAllPrice).toLocaleString(),
-            summaryAllRate: summaryAllRate.toFixed(2).toLocaleString(),
-        };
-        updateElementsTextWithData(allSumData, summaryAllElement);
-    }
-
     private onChangeMarket(event: Event) {
         const target = event.target as HTMLInputElement;
         this.market = target.value;
@@ -424,12 +363,12 @@ export default class AppBacktest4 extends HTMLElement {
 
     private onOptionSubmit(event: Event) {
         event?.preventDefault();
-        const maxSize = Number(this.sizeElement.getAttribute("max"));
-        this.size =
-            Number(this.sizeElement.value) > maxSize
+        const maxSize = Number(this.countElement.getAttribute("max"));
+        this.count =
+            Number(this.countElement.value) > maxSize
                 ? maxSize
-                : Number(this.sizeElement.value);
-        this.sizeElement.value = this.size.toString();
+                : Number(this.countElement.value);
+        this.countElement.value = this.count.toString();
         this.runBackTest();
     }
 }

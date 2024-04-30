@@ -164,6 +164,7 @@ interface ICandlesMinutes {
 
 interface ITradeData4 {
     date: string;
+    trade_price: number;
     condition: boolean;
     action?: string;
     volatility?: number;
