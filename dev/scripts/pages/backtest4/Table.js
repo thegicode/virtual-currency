@@ -18,7 +18,7 @@ export default class BacktestTable extends HTMLElement {
         this.tableElement.appendChild(fragment);
     }
     createItem(aData, index) {
-        var _a, _b, _c;
+        var _a, _b;
         const cloned = cloneTemplate(this.template);
         const parseData = {
             index,
@@ -27,8 +27,7 @@ export default class BacktestTable extends HTMLElement {
             condition: aData.condition.toString(),
             action: aData.action,
             volatility: (_a = aData.volatility) === null || _a === void 0 ? void 0 : _a.toFixed(2),
-            order_amount: ((_b = aData.order_amount) === null || _b === void 0 ? void 0 : _b.toLocaleString()) || "",
-            rate: ((_c = (aData.rate && aData.rate * 100)) === null || _c === void 0 ? void 0 : _c.toFixed(2)) || "",
+            rate: ((_b = (aData.rate && aData.rate * 100)) === null || _b === void 0 ? void 0 : _b.toFixed(2)) || "",
             profit: (aData.profit && Math.round(aData.profit).toLocaleString()) ||
                 "",
             sumProfit: aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),

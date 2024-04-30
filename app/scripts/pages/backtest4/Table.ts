@@ -46,7 +46,6 @@ export default class BacktestTable extends HTMLElement {
             condition: aData.condition.toString(),
             action: aData.action,
             volatility: aData.volatility?.toFixed(2),
-            order_amount: aData.order_amount?.toLocaleString() || "",
             rate: (aData.rate && aData.rate * 100)?.toFixed(2) || "",
             profit:
                 (aData.profit && Math.round(aData.profit).toLocaleString()) ||

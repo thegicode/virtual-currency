@@ -168,7 +168,6 @@ interface ITradeData4 {
     condition: boolean;
     action?: string;
     volatility?: number;
-    order_amount?: number;
     rate?: number;
     profit?: number;
     sumProfit?: number;
@@ -177,8 +176,6 @@ interface ITradeData4 {
     unrealize_sum?: number;
     buy_index?: number;
     sumProfit?: number;
-    trade_sell_date?: ICandlesMinutes;
-    afternoonData: IAfternoonData;
 }
 
 interface IAfternoonData {

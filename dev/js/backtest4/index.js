@@ -75,11 +75,10 @@
       return __awaiter(this, void 0, void 0, function* () {
         const toDate = `${this.getToDate(index)}+09:00`;
         const fetchedData = yield this.fetchData("60", "37", toDate);
-        const makedData = this.makeTradeData(fetchedData);
+        const { makedData, afternoonData, sellPrice } = this.makeTradeData(fetchedData);
         const actionedData = this.setTradingAction(makedData, index);
-        const volatedData = this.setVolatility(actionedData);
-        const orderedData = this.order(volatedData);
-        const profitedData = this.setProfit(orderedData, index);
+        const volatedData = this.setVolatility(actionedData, afternoonData);
+        const profitedData = this.setProfit(volatedData, index, sellPrice);
         return profitedData;
       });
     }
@@ -124,13 +123,15 @@
       const moringVolume = prevDayData.morning[1].candle_acc_trade_volume - prevDayData.morning[0].candle_acc_trade_volume;
       const afterVolume = prevDayData.afternoon[1].candle_acc_trade_volume - prevDayData.afternoon[0].candle_acc_trade_volume;
       const condition = afternoonRate > 0 && afterVolume > moringVolume;
-      const afternoonData = this.getAfternoonData(data.slice(12));
-      return {
+      const makedData = {
         date,
         condition,
-        afternoonData,
-        trade_price: lastData.trade_price,
-        trade_sell_date: data[data.length - 1]
+        trade_price: lastData.trade_price
+      };
+      return {
+        makedData,
+        afternoonData: this.getAfternoonData(data.slice(12)),
+        sellPrice: data[data.length - 1].trade_price
       };
     }
     getAfternoonData(data) {
@@ -155,31 +156,24 @@
       }
       return Object.assign(Object.assign({}, JSON.parse(JSON.stringify(aData))), { action });
     }
-    setVolatility(data) {
-      return Object.assign(Object.assign({}, JSON.parse(JSON.stringify(data))), { volatility: getDaliyVolatility(data.afternoonData) });
+    setVolatility(data, afternoonData) {
+      return Object.assign(Object.assign({}, JSON.parse(JSON.stringify(data))), { volatility: getDaliyVolatility(afternoonData) });
     }
-    order(data) {
-      const parseData = JSON.parse(JSON.stringify(data));
-      if (!data.volatility)
-        return parseData;
-      if (data.action === "Buy") {
-        const percent = this.target / data.volatility * 100;
-        const unitPercent = percent / this.marketSize;
-        const orderAmount = this.totalInvestmentPrice * unitPercent / 100;
-        return Object.assign(Object.assign({}, parseData), { order_amount: Math.round(orderAmount) });
-      }
-      return parseData;
-    }
-    setProfit(data, index) {
+    setProfit(data, index, sellPrice) {
       const aData = JSON.parse(JSON.stringify(data));
       const prevTradeData = index > 0 && this.tradeData[index - 1];
       const buyData = index > 0 && this.tradeData[prevTradeData.buy_index];
+      const getOrderAmount = () => {
+        const percent = this.target / buyData.volatility * 100;
+        const unitPercent = percent / this.marketSize;
+        return this.totalInvestmentPrice * unitPercent / 100;
+      };
       switch (aData.action) {
         case "Buy":
           return Object.assign(Object.assign({}, aData), { buy_index: index, sumProfit: prevTradeData.sumProfit || 0, unrealize_sum: prevTradeData.unrealize_sum || 0 });
         case "Hold":
           const unrealize_rate = (aData.trade_price - buyData.trade_price) / buyData.trade_price;
-          const unrealize_profit = unrealize_rate * buyData.order_amount;
+          const unrealize_profit = unrealize_rate * getOrderAmount();
           return Object.assign(Object.assign({}, aData), {
             buy_index: prevTradeData.buy_index,
             sumProfit: prevTradeData.sumProfit || 0,
@@ -188,8 +182,8 @@
             unrealize_sum: prevTradeData.unrealize_sum + unrealize_profit
           });
         case "Sell":
-          const rate = (aData.trade_sell_date.trade_price - buyData.trade_price) / buyData.trade_price;
-          const profit = rate * buyData.order_amount;
+          const rate = (sellPrice - buyData.trade_price) / buyData.trade_price;
+          const profit = rate * getOrderAmount();
           const sumProfit = prevTradeData.sumProfit + profit;
           return Object.assign(Object.assign({}, aData), {
             rate,
@@ -348,7 +342,7 @@
       this.tableElement.appendChild(fragment);
     }
     createItem(aData, index) {
-      var _a, _b, _c;
+      var _a, _b;
       const cloned = cloneTemplate(this.template);
       const parseData = {
         index,
@@ -357,8 +351,7 @@
         condition: aData.condition.toString(),
         action: aData.action,
         volatility: (_a = aData.volatility) === null || _a === void 0 ? void 0 : _a.toFixed(2),
-        order_amount: ((_b = aData.order_amount) === null || _b === void 0 ? void 0 : _b.toLocaleString()) || "",
-        rate: ((_c = aData.rate && aData.rate * 100) === null || _c === void 0 ? void 0 : _c.toFixed(2)) || "",
+        rate: ((_b = aData.rate && aData.rate * 100) === null || _b === void 0 ? void 0 : _b.toFixed(2)) || "",
         profit: aData.profit && Math.round(aData.profit).toLocaleString() || "",
         sumProfit: aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),
         unrealize_rate: aData.unrealize_rate && (aData.unrealize_rate * 100).toFixed(2) || "",
