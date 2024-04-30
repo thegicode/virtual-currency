@@ -8,11 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { getDaliyVolatility } from "@app/scripts/components/backtest/volatility";
-import { cloneTemplate, updateElementsTextWithData, } from "@app/scripts/utils/helpers";
 export default class AppBacktest4 extends HTMLElement {
     constructor() {
         super();
-        this.data = [];
         this.tradeData = [];
         this.market = "KRW-ONG";
         this.count = 30;
@@ -20,10 +18,9 @@ export default class AppBacktest4 extends HTMLElement {
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
         this.target = 2;
-        this.tableElement = this.querySelector("tbody");
-        this.itemTempleteElement = document.querySelector("#tp-item");
         this.overviewCustomElement = this.querySelector("backtest-overview");
         this.controlCustomElement = this.querySelector("backtest-control");
+        this.tableCustomElement = this.querySelector("backtest-table");
     }
     connectedCallback() {
         this.initialize();
@@ -34,21 +31,12 @@ export default class AppBacktest4 extends HTMLElement {
     }
     runBackTest() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.dataset.loading = "true";
-            this.data = [];
-            this.tradeData = [];
+            this.reset();
             for (let index = 0; index < this.count; index++) {
                 console.log(index);
                 try {
-                    const toDate = `${this.getToDate(index)}+09:00`;
-                    const fetchedData = yield this.fetchData("60", "37", toDate);
-                    this.data.push(fetchedData);
-                    const makedData = this.makeTradeData(fetchedData);
-                    const actionedData = this.setTradingAction(makedData, index);
-                    const volatedData = this.setVolatility(actionedData);
-                    const orderedData = this.order(volatedData);
-                    const profitedData = this.setProfit(orderedData, index);
-                    this.tradeData.push(profitedData);
+                    const tradeData = yield this.getTradeData(index);
+                    this.tradeData.push(tradeData);
                     yield this.delay(90);
                 }
                 catch (error) {
@@ -56,9 +44,23 @@ export default class AppBacktest4 extends HTMLElement {
                 }
             }
             this.render();
-            this.overviewCustomElement.redner(this);
-            this.dataset.loading = "false";
         });
+    }
+    getTradeData(index) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const toDate = `${this.getToDate(index)}+09:00`;
+            const fetchedData = yield this.fetchData("60", "37", toDate);
+            const makedData = this.makeTradeData(fetchedData);
+            const actionedData = this.setTradingAction(makedData, index);
+            const volatedData = this.setVolatility(actionedData);
+            const orderedData = this.order(volatedData);
+            const profitedData = this.setProfit(orderedData, index);
+            return profitedData;
+        });
+    }
+    reset() {
+        this.dataset.loading = "true";
+        this.tradeData = [];
     }
     delay(duration) {
         return new Promise((resolve) => setTimeout(resolve, duration));
@@ -173,40 +175,9 @@ export default class AppBacktest4 extends HTMLElement {
         }
     }
     render() {
-        this.tableElement.innerHTML = "";
-        const fragment = new DocumentFragment();
-        this.tradeData
-            .map((aData, index) => this.createItem(aData, index))
-            .forEach((cloned) => fragment.appendChild(cloned));
-        this.tableElement.appendChild(fragment);
-    }
-    createItem(aData, index) {
-        var _a, _b, _c;
-        const cloned = cloneTemplate(this.itemTempleteElement);
-        const parseData = {
-            index,
-            date: aData.date,
-            trade_price: aData.trade_price.toLocaleString(),
-            condition: aData.condition.toString(),
-            action: aData.action,
-            volatility: (_a = aData.volatility) === null || _a === void 0 ? void 0 : _a.toFixed(2),
-            order_amount: ((_b = aData.order_amount) === null || _b === void 0 ? void 0 : _b.toLocaleString()) || "",
-            rate: ((_c = (aData.rate && aData.rate * 100)) === null || _c === void 0 ? void 0 : _c.toFixed(2)) || "",
-            profit: (aData.profit && Math.round(aData.profit).toLocaleString()) ||
-                "",
-            sumProfit: aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),
-            unrealize_rate: (aData.unrealize_rate &&
-                (aData.unrealize_rate * 100).toFixed(2)) ||
-                "",
-            unrealize_profit: (aData.unrealize_profit &&
-                Math.round(aData.unrealize_profit).toLocaleString()) ||
-                "",
-            unrealize_sum: aData.unrealize_sum &&
-                Math.round(aData.unrealize_sum).toLocaleString(),
-        };
-        updateElementsTextWithData(parseData, cloned);
-        cloned.dataset.action = aData.action;
-        return cloned;
+        this.tableCustomElement.render();
+        this.overviewCustomElement.redner();
+        this.dataset.loading = "false";
     }
 }
 //# sourceMappingURL=AppBacktest4.js.map

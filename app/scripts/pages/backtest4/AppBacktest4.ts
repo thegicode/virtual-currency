@@ -13,16 +13,13 @@
  *       전일 오전 & 오후 거래량
  */
 
-import { getDaliyVolatility } from "@app/scripts/components/backtest/volatility";
-import {
-    cloneTemplate,
-    updateElementsTextWithData,
-} from "@app/scripts/utils/helpers";
 import Control from "./Control";
 import Overview from "./Overview";
+import Table from "./Table";
+
+import { getDaliyVolatility } from "@app/scripts/components/backtest/volatility";
 
 export default class AppBacktest4 extends HTMLElement {
-    private data: ICandlesMinutes[];
     public tradeData: any[];
     public market: string;
     public count: number;
@@ -31,16 +28,13 @@ export default class AppBacktest4 extends HTMLElement {
     public investmentPrice: number;
     private target: number;
 
-    private tableElement: HTMLElement;
-    private itemTempleteElement: HTMLTemplateElement;
-
     private overviewCustomElement: Overview;
     private controlCustomElement: Control;
+    private tableCustomElement: Table;
 
     constructor() {
         super();
 
-        this.data = [];
         this.tradeData = [];
         this.market = "KRW-ONG";
         this.count = 30;
@@ -49,17 +43,13 @@ export default class AppBacktest4 extends HTMLElement {
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
         this.target = 2; // 추천 2
 
-        this.tableElement = this.querySelector("tbody") as HTMLElement;
-        this.itemTempleteElement = document.querySelector(
-            "#tp-item"
-        ) as HTMLTemplateElement;
-
         this.overviewCustomElement = this.querySelector(
             "backtest-overview"
         ) as Overview;
         this.controlCustomElement = this.querySelector(
             "backtest-control"
         ) as Control;
+        this.tableCustomElement = this.querySelector("backtest-table") as Table;
     }
 
     connectedCallback() {
@@ -75,30 +65,15 @@ export default class AppBacktest4 extends HTMLElement {
     }
 
     public async runBackTest() {
-        this.dataset.loading = "true";
-        this.data = [];
-        this.tradeData = [];
+        this.reset();
 
         for (let index = 0; index < this.count; index++) {
             console.log(index);
 
             try {
-                const toDate = `${this.getToDate(index)}+09:00`;
-                const fetchedData = await this.fetchData("60", "37", toDate);
+                const tradeData = await this.getTradeData(index);
 
-                this.data.push(fetchedData);
-
-                const makedData = this.makeTradeData(fetchedData);
-
-                const actionedData = this.setTradingAction(makedData, index);
-
-                const volatedData = this.setVolatility(actionedData);
-
-                const orderedData = this.order(volatedData);
-
-                const profitedData = this.setProfit(orderedData, index);
-
-                this.tradeData.push(profitedData);
+                this.tradeData.push(tradeData);
 
                 await this.delay(90);
             } catch (error: any) {
@@ -110,10 +85,29 @@ export default class AppBacktest4 extends HTMLElement {
         }
 
         this.render();
+    }
 
-        this.overviewCustomElement.redner(this);
+    private async getTradeData(index: number) {
+        const toDate = `${this.getToDate(index)}+09:00`;
 
-        this.dataset.loading = "false";
+        const fetchedData = await this.fetchData("60", "37", toDate);
+
+        const makedData = this.makeTradeData(fetchedData);
+
+        const actionedData = this.setTradingAction(makedData, index);
+
+        const volatedData = this.setVolatility(actionedData);
+
+        const orderedData = this.order(volatedData);
+
+        const profitedData = this.setProfit(orderedData, index);
+
+        return profitedData;
+    }
+
+    private reset() {
+        this.dataset.loading = "true";
+        this.tradeData = [];
     }
 
     private delay(duration: number) {
@@ -181,7 +175,7 @@ export default class AppBacktest4 extends HTMLElement {
         };
     }
 
-    getAfternoonData(data: ICandlesMinutes[]) {
+    private getAfternoonData(data: ICandlesMinutes[]) {
         const highPrices = data.map((d) => d.high_price);
         const lowPrices = data.map((d) => d.low_price);
 
@@ -289,50 +283,10 @@ export default class AppBacktest4 extends HTMLElement {
     }
 
     private render() {
-        this.tableElement.innerHTML = "";
-        const fragment = new DocumentFragment();
+        this.tableCustomElement.render();
 
-        this.tradeData
-            .map((aData: ITradeData4, index) => this.createItem(aData, index))
-            .forEach((cloned: HTMLElement) => fragment.appendChild(cloned));
+        this.overviewCustomElement.redner();
 
-        this.tableElement.appendChild(fragment);
-    }
-
-    private createItem(aData: ITradeData4, index: number) {
-        const cloned = cloneTemplate<HTMLElement>(this.itemTempleteElement);
-
-        const parseData = {
-            index,
-            date: aData.date,
-            trade_price: aData.trade_price.toLocaleString(),
-            condition: aData.condition.toString(),
-            action: aData.action,
-            volatility: aData.volatility?.toFixed(2),
-            order_amount: aData.order_amount?.toLocaleString() || "",
-            rate: (aData.rate && aData.rate * 100)?.toFixed(2) || "",
-            profit:
-                (aData.profit && Math.round(aData.profit).toLocaleString()) ||
-                "",
-            sumProfit:
-                aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),
-            unrealize_rate:
-                (aData.unrealize_rate &&
-                    (aData.unrealize_rate * 100).toFixed(2)) ||
-                "",
-            unrealize_profit:
-                (aData.unrealize_profit &&
-                    Math.round(aData.unrealize_profit).toLocaleString()) ||
-                "",
-            unrealize_sum:
-                aData.unrealize_sum &&
-                Math.round(aData.unrealize_sum).toLocaleString(),
-        };
-
-        updateElementsTextWithData(parseData, cloned);
-
-        cloned.dataset.action = aData.action;
-
-        return cloned;
+        this.dataset.loading = "false";
     }
 }

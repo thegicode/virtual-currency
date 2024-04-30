@@ -1,7 +1,6 @@
 export default class Control extends HTMLElement {
     constructor() {
         super();
-        this.app = null;
         this.app = document.querySelector("app-backtest4");
         this.formElement = this.querySelector("form");
         this.selectElement = this.querySelector("select");

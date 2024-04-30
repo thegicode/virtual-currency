@@ -1,7 +1,7 @@
 import AppBacktest4 from "./AppBacktest4";
 
 export default class Control extends HTMLElement {
-    private app: AppBacktest4 | null = null;
+    private app: AppBacktest4;
 
     private formElement: HTMLFormElement;
     private selectElement: HTMLSelectElement;

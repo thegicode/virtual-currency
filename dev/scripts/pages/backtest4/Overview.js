@@ -2,7 +2,7 @@ import { cloneTemplate, updateElementsTextWithData, } from "@app/scripts/utils/h
 export default class Overview extends HTMLElement {
     constructor() {
         super();
-        this.app = null;
+        this.app = document.querySelector("app-backtest4");
         this.totalProfit = 0;
         this.totalSumPrice = 0;
         this.allSumSize = 0;
@@ -11,8 +11,7 @@ export default class Overview extends HTMLElement {
         this.itemTemplate = document.querySelector("#tp-overviewItem");
     }
     connectedCallback() { }
-    redner(app) {
-        this.app = app;
+    redner() {
         this.renderList();
         this.renderSum(true);
     }

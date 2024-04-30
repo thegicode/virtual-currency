@@ -5,7 +5,7 @@ import {
 import AppBacktest4 from "./AppBacktest4";
 
 export default class Overview extends HTMLElement {
-    private app: AppBacktest4 | null = null;
+    private app: AppBacktest4;
 
     private totalProfit: number;
     private totalSumPrice: number;
@@ -17,6 +17,8 @@ export default class Overview extends HTMLElement {
 
     constructor() {
         super();
+
+        this.app = document.querySelector("app-backtest4") as AppBacktest4;
 
         this.totalProfit = 0;
         this.totalSumPrice = 0;
@@ -31,8 +33,7 @@ export default class Overview extends HTMLElement {
 
     connectedCallback() {}
 
-    public redner(app: AppBacktest4) {
-        this.app = app;
+    public redner() {
         this.renderList();
         this.renderSum(true);
     }

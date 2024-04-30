@@ -175,6 +175,9 @@ interface ITradeData4 {
     unrealize_rate?: number;
     unrealize_profit?: number;
     unrealize_sum?: number;
+    buy_index?: number;
+    sumProfit?: number;
+    trade_sell_date?: ICandlesMinutes;
     afternoonData: IAfternoonData;
 }
 
