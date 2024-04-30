@@ -47,7 +47,7 @@ export default class AppBacktest4 extends HTMLElement {
         this.data = [];
         this.tradeData = [];
         this.market = "KRW-BTC";
-        this.size = 60;
+        this.size = 30;
         this.marketSize = 5;
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
@@ -227,15 +227,9 @@ export default class AppBacktest4 extends HTMLElement {
 
     private setVolatility(data: ITradeData4) {
         // 특정 화폐의 전일 오후 변동성
-        const afternoonData = data.afternoonData;
-        const volatility =
-            ((afternoonData.high_price - afternoonData.low_price) /
-                afternoonData.opening_price) *
-            100;
-
         return {
             ...JSON.parse(JSON.stringify(data)),
-            volatility,
+            volatility: getDaliyVolatility(data.afternoonData),
         };
     }
 
@@ -357,39 +351,51 @@ export default class AppBacktest4 extends HTMLElement {
     }
 
     private renderSummary() {
-        // if (this.data.length === 0) return;
-        // const tpElement = document.querySelector(
-        //     "#tp-summary"
-        // ) as HTMLTemplateElement;
-        // const summaryListElement = this.querySelector(
-        //     ".summary-list"
-        // ) as HTMLElement;
-        // const cloned = cloneTemplate<HTMLElement>(tpElement);
-        // const deleteButton = cloned.querySelector(
-        //     ".deleteButton"
-        // ) as HTMLButtonElement;
-        // const lastProfit = this.data[this.data.length - 1].sumProfit;
-        // if (lastProfit === undefined) return;
-        // const totalRate = (lastProfit / this.investmentPrice) * 100;
-        // const summaryData = {
-        //     market: this.market,
-        //     period: this.count,
-        //     totalRate: `${totalRate.toFixed(2)} %`,
-        //     lastProfit: ` ${Math.round(lastProfit).toLocaleString()} 원`,
-        // };
-        // updateElementsTextWithData(summaryData, cloned);
-        // summaryListElement.appendChild(cloned);
-        // // summary-all
-        // this.summaryAllPrice += lastProfit;
-        // this.allSumSize++;
-        // this.renderAllSum();
-        // // delete
-        // deleteButton.addEventListener("click", () => {
-        //     cloned.remove();
-        //     this.summaryAllPrice -= lastProfit;
-        //     this.allSumSize--;
-        //     this.renderAllSum();
-        // });
+        if (this.data.length === 0) return;
+
+        const tpElement = document.querySelector(
+            "#tp-summary"
+        ) as HTMLTemplateElement;
+
+        const summaryListElement = this.querySelector(
+            ".summary-list"
+        ) as HTMLElement;
+
+        const cloned = cloneTemplate<HTMLElement>(tpElement);
+        const deleteButton = cloned.querySelector(
+            ".deleteButton"
+        ) as HTMLButtonElement;
+
+        const totalProfit =
+            this.tradeData[this.tradeData.length - 1].unrealize_sum;
+
+        const totalRate = (totalProfit / this.investmentPrice) * 100;
+        const summaryData = {
+            market: this.market,
+            period: this.size,
+            totalRate: `${totalRate.toFixed(2)}%`,
+            totalProfit: ` ${Math.round(totalProfit).toLocaleString()} 원`,
+        };
+
+        updateElementsTextWithData(summaryData, cloned);
+
+        summaryListElement.appendChild(cloned);
+
+        // summary-all
+        this.summaryAllPrice += totalProfit;
+        this.allSumSize++;
+
+        this.renderAllSum();
+
+        // delete
+
+        deleteButton.addEventListener("click", () => {
+            cloned.remove();
+            this.summaryAllPrice -= totalProfit;
+            this.allSumSize--;
+
+            this.renderAllSum();
+        });
     }
 
     private renderAllSum() {
@@ -400,10 +406,11 @@ export default class AppBacktest4 extends HTMLElement {
         const unrealizeSum =
             this.tradeData[this.tradeData.length - 1].unrealize_sum;
 
-        const summaryAllRate = (unrealizeSum / this.investmentPrice) * 100;
+        const summaryAllRate =
+            (this.summaryAllPrice / this.investmentPrice) * 100;
 
         const allSumData = {
-            summaryAllPrice: Math.round(unrealizeSum).toLocaleString(),
+            summaryAllPrice: Math.round(this.summaryAllPrice).toLocaleString(),
             summaryAllRate: summaryAllRate.toFixed(2).toLocaleString(),
         };
         updateElementsTextWithData(allSumData, summaryAllElement);

@@ -52,17 +52,27 @@
       this.qqqData = {};
       this.tradeData = [];
       this.count = 200;
-      this.totalGain = this.investmentPrice * 3;
+      this.totalGain = 0;
       this.totalUnrealizeGain = 0;
       this.template = document.querySelector("#tp-item");
+      this.countElement = this.querySelector("input[name=count]");
+      this.formElement = this.querySelector("form");
+      this.containerElement = this.querySelector("tbody");
+      this.onOptionSubmit = this.onOptionSubmit.bind(this);
     }
     connectedCallback() {
       return __awaiter(this, void 0, void 0, function* () {
-        const toDate = this.getToDate();
-        this.data = yield this.loadData(toDate, this.count.toString());
-        this.qqqData = this.transformData();
+        this.initialize();
         this.runBackTest();
+        this.formElement.addEventListener("submit", this.onOptionSubmit);
       });
+    }
+    disconnectedCallback() {
+      this.formElement.removeEventListener("submit", this.onOptionSubmit);
+    }
+    initialize() {
+      this.countElement.value = this.count.toString();
+      this.querySelector(".investmentPrice").textContent = this.investmentPrice.toLocaleString();
     }
     setMarkets() {
       return __awaiter(this, void 0, void 0, function* () {
@@ -81,6 +91,13 @@
     }
     runBackTest() {
       return __awaiter(this, void 0, void 0, function* () {
+        const toDate = this.getToDate();
+        this.data = yield this.loadData(toDate, this.count.toString());
+        this.qqqData = this.transformData();
+        this.tradeData = [];
+        this.totalGain = 0;
+        this.totalUnrealizeGain = 0;
+        this.containerElement.innerHTML = "";
         for (let index = 0; index < this.count - 30; index++) {
           const testMonthData = this.getTestData(index);
           const marketTestRates = this.getMarketTestRates(testMonthData);
@@ -281,8 +298,7 @@
         totalUnrealizeGain: Math.round(this.totalUnrealizeGain).toLocaleString()
       };
       updateElementsTextWithData(data, cloned);
-      const container = this.querySelector("tbody");
-      container.appendChild(cloned);
+      this.containerElement.appendChild(cloned);
     }
     renderBuySell(data) {
       const tradeTp = document.querySelector("#tp-trade");
@@ -304,12 +320,18 @@
       const rateElement = this.querySelector(".summaryAllRate");
       const marketsElement = this.querySelector(".markets");
       const countElement = this.querySelector(".count");
-      const gain = this.totalUnrealizeGain - this.investmentPrice * 3;
-      const sumRate = gain / (this.investmentPrice * 3);
-      priceElement.textContent = Math.round(gain).toLocaleString();
+      const sumRate = this.totalUnrealizeGain / (this.investmentPrice * 3);
+      priceElement.textContent = Math.round(this.totalUnrealizeGain).toLocaleString();
       rateElement.textContent = Math.round(sumRate * 100).toLocaleString();
       marketsElement.textContent = this.markets.join(" | ");
       countElement.textContent = this.count.toString();
+    }
+    onOptionSubmit(event) {
+      event === null || event === void 0 ? void 0 : event.preventDefault();
+      const maxSize = Number(this.countElement.getAttribute("max"));
+      const value = Number(this.countElement.value) + 30;
+      this.count = value > maxSize ? maxSize : value;
+      this.runBackTest();
     }
   };
 

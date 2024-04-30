@@ -24,11 +24,14 @@ export default class AppBacktest3 extends HTMLElement {
     private investmentPrice: number;
     private data: IBackTestData3[];
     private qqqData: any;
-    private template: HTMLTemplateElement;
     private tradeData: any[];
     private count: number;
     private totalGain: number;
     private totalUnrealizeGain: number;
+    private template: HTMLTemplateElement;
+    private countElement: HTMLInputElement;
+    private formElement: HTMLFormElement;
+    private containerElement: HTMLElement;
 
     constructor() {
         super();
@@ -39,26 +42,40 @@ export default class AppBacktest3 extends HTMLElement {
         this.qqqData = {};
         this.tradeData = [];
         this.count = 200;
-        this.totalGain = this.investmentPrice * 3;
+        this.totalGain = 0;
         this.totalUnrealizeGain = 0;
 
         this.template = document.querySelector(
             "#tp-item"
         ) as HTMLTemplateElement;
+        this.countElement = this.querySelector(
+            "input[name=count]"
+        ) as HTMLInputElement;
+        this.formElement = this.querySelector("form") as HTMLFormElement;
+        this.containerElement = this.querySelector("tbody") as HTMLElement;
+
+        this.onOptionSubmit = this.onOptionSubmit.bind(this);
     }
 
     async connectedCallback() {
-        const toDate = this.getToDate();
+        this.initialize();
 
         // this.markets = await this.setMarkets();
 
-        this.data = await this.loadData(toDate, this.count.toString());
-        this.qqqData = this.transformData();
-
         this.runBackTest();
+
+        this.formElement.addEventListener("submit", this.onOptionSubmit);
     }
 
-    // disconnectedCallback() {}
+    disconnectedCallback() {
+        this.formElement.removeEventListener("submit", this.onOptionSubmit);
+    }
+
+    private initialize() {
+        this.countElement.value = this.count.toString();
+        (this.querySelector(".investmentPrice") as HTMLElement).textContent =
+            this.investmentPrice.toLocaleString();
+    }
 
     private async setMarkets() {
         const marketAll = await this.getMarkets();
@@ -74,6 +91,15 @@ export default class AppBacktest3 extends HTMLElement {
     }
 
     private async runBackTest() {
+        const toDate = this.getToDate();
+        this.data = await this.loadData(toDate, this.count.toString());
+        this.qqqData = this.transformData();
+        this.tradeData = [];
+        this.totalGain = 0;
+        this.totalUnrealizeGain = 0;
+
+        this.containerElement.innerHTML = "";
+
         for (let index = 0; index < this.count - 30; index++) {
             // 한달 데이터 테스트
             const testMonthData = this.getTestData(index);
@@ -418,8 +444,7 @@ export default class AppBacktest3 extends HTMLElement {
         };
         updateElementsTextWithData(data, cloned);
 
-        const container = this.querySelector("tbody") as HTMLElement;
-        container.appendChild(cloned);
+        this.containerElement.appendChild(cloned);
     }
 
     private renderBuySell(data: any[]) {
@@ -449,12 +474,23 @@ export default class AppBacktest3 extends HTMLElement {
         ) as HTMLElement;
         const marketsElement = this.querySelector(".markets") as HTMLElement;
         const countElement = this.querySelector(".count") as HTMLElement;
-        const gain = this.totalUnrealizeGain - this.investmentPrice * 3;
-        const sumRate = gain / (this.investmentPrice * 3);
+        const sumRate = this.totalUnrealizeGain / (this.investmentPrice * 3);
 
-        priceElement.textContent = Math.round(gain).toLocaleString();
+        priceElement.textContent = Math.round(
+            this.totalUnrealizeGain
+        ).toLocaleString();
         rateElement.textContent = Math.round(sumRate * 100).toLocaleString();
         marketsElement.textContent = this.markets.join(" | ");
         countElement.textContent = this.count.toString();
+    }
+
+    private onOptionSubmit(event: Event) {
+        event?.preventDefault();
+        const maxSize = Number(this.countElement.getAttribute("max"));
+        const value = Number(this.countElement.value) + 30;
+
+        this.count = value > maxSize ? maxSize : value;
+
+        this.runBackTest();
     }
 }

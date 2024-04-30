@@ -1,5 +1,11 @@
 "use strict";
 (() => {
+  // app/scripts/components/backtest/volatility.ts
+  function getDaliyVolatility(aData) {
+    const result = (aData.high_price - aData.low_price) / aData.opening_price * 100;
+    return Number(result.toFixed(2));
+  }
+
   // app/scripts/utils/helpers.ts
   function cloneTemplate(template) {
     const content = template.content.firstElementChild;
@@ -49,7 +55,7 @@
       this.data = [];
       this.tradeData = [];
       this.market = "KRW-BTC";
-      this.size = 60;
+      this.size = 30;
       this.marketSize = 5;
       this.totalInvestmentPrice = 1e6;
       this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
@@ -174,9 +180,7 @@
       return Object.assign(Object.assign({}, JSON.parse(JSON.stringify(aData))), { action });
     }
     setVolatility(data) {
-      const afternoonData = data.afternoonData;
-      const volatility = (afternoonData.high_price - afternoonData.low_price) / afternoonData.opening_price * 100;
-      return Object.assign(Object.assign({}, JSON.parse(JSON.stringify(data))), { volatility });
+      return Object.assign(Object.assign({}, JSON.parse(JSON.stringify(data))), { volatility: getDaliyVolatility(data.afternoonData) });
     }
     order(data) {
       const parseData = JSON.parse(JSON.stringify(data));
@@ -250,13 +254,38 @@
       return cloned;
     }
     renderSummary() {
+      if (this.data.length === 0)
+        return;
+      const tpElement = document.querySelector("#tp-summary");
+      const summaryListElement = this.querySelector(".summary-list");
+      const cloned = cloneTemplate(tpElement);
+      const deleteButton = cloned.querySelector(".deleteButton");
+      const totalProfit = this.tradeData[this.tradeData.length - 1].unrealize_sum;
+      const totalRate = totalProfit / this.investmentPrice * 100;
+      const summaryData = {
+        market: this.market,
+        period: this.size,
+        totalRate: `${totalRate.toFixed(2)}%`,
+        totalProfit: ` ${Math.round(totalProfit).toLocaleString()} \uC6D0`
+      };
+      updateElementsTextWithData(summaryData, cloned);
+      summaryListElement.appendChild(cloned);
+      this.summaryAllPrice += totalProfit;
+      this.allSumSize++;
+      this.renderAllSum();
+      deleteButton.addEventListener("click", () => {
+        cloned.remove();
+        this.summaryAllPrice -= totalProfit;
+        this.allSumSize--;
+        this.renderAllSum();
+      });
     }
     renderAllSum() {
       const summaryAllElement = this.querySelector(".summary-all");
       const unrealizeSum = this.tradeData[this.tradeData.length - 1].unrealize_sum;
-      const summaryAllRate = unrealizeSum / this.investmentPrice * 100;
+      const summaryAllRate = this.summaryAllPrice / this.investmentPrice * 100;
       const allSumData = {
-        summaryAllPrice: Math.round(unrealizeSum).toLocaleString(),
+        summaryAllPrice: Math.round(this.summaryAllPrice).toLocaleString(),
         summaryAllRate: summaryAllRate.toFixed(2).toLocaleString()
       };
       updateElementsTextWithData(allSumData, summaryAllElement);
