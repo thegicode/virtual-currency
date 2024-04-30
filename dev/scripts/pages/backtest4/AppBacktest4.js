@@ -20,30 +20,17 @@ export default class AppBacktest4 extends HTMLElement {
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
         this.target = 2;
-        this.countElement = this.querySelector("input[name=count]");
         this.tableElement = this.querySelector("tbody");
         this.itemTempleteElement = document.querySelector("#tp-item");
-        this.selectElement = this.querySelector("select");
-        this.formElement = this.querySelector("form");
         this.overviewCustomElement = this.querySelector("backtest-overview");
-        this.onChangeMarket = this.onChangeMarket.bind(this);
-        this.onOptionSubmit = this.onOptionSubmit.bind(this);
+        this.controlCustomElement = this.querySelector("backtest-control");
     }
     connectedCallback() {
         this.initialize();
         this.runBackTest();
-        this.selectElement.addEventListener("change", this.onChangeMarket);
-        this.formElement.addEventListener("submit", this.onOptionSubmit);
-    }
-    disconnectedCallback() {
-        this.selectElement.removeEventListener("change", this.onChangeMarket);
-        this.formElement.removeEventListener("submit", this.onOptionSubmit);
     }
     initialize() {
-        const investmentPriceElement = this.querySelector(".investmentPrice");
-        this.countElement.value = this.count.toString();
-        investmentPriceElement.textContent =
-            this.investmentPrice.toLocaleString();
+        this.controlCustomElement.initialize();
     }
     runBackTest() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -220,21 +207,6 @@ export default class AppBacktest4 extends HTMLElement {
         updateElementsTextWithData(parseData, cloned);
         cloned.dataset.action = aData.action;
         return cloned;
-    }
-    onChangeMarket(event) {
-        const target = event.target;
-        this.market = target.value;
-        this.runBackTest();
-    }
-    onOptionSubmit(event) {
-        event === null || event === void 0 ? void 0 : event.preventDefault();
-        const maxSize = Number(this.countElement.getAttribute("max"));
-        this.count =
-            Number(this.countElement.value) > maxSize
-                ? maxSize
-                : Number(this.countElement.value);
-        this.countElement.value = this.count.toString();
-        this.runBackTest();
     }
 }
 //# sourceMappingURL=AppBacktest4.js.map

@@ -18,6 +18,7 @@ import {
     cloneTemplate,
     updateElementsTextWithData,
 } from "@app/scripts/utils/helpers";
+import Control from "./Control";
 import Overview from "./Overview";
 
 export default class AppBacktest4 extends HTMLElement {
@@ -30,13 +31,11 @@ export default class AppBacktest4 extends HTMLElement {
     public investmentPrice: number;
     private target: number;
 
-    private countElement: HTMLInputElement;
     private tableElement: HTMLElement;
     private itemTempleteElement: HTMLTemplateElement;
-    private selectElement: HTMLSelectElement;
-    private formElement: HTMLFormElement;
 
     private overviewCustomElement: Overview;
+    private controlCustomElement: Control;
 
     constructor() {
         super();
@@ -50,50 +49,32 @@ export default class AppBacktest4 extends HTMLElement {
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
         this.target = 2; // 추천 2
 
-        this.countElement = this.querySelector(
-            "input[name=count]"
-        ) as HTMLInputElement;
         this.tableElement = this.querySelector("tbody") as HTMLElement;
         this.itemTempleteElement = document.querySelector(
             "#tp-item"
         ) as HTMLTemplateElement;
 
-        this.selectElement = this.querySelector("select") as HTMLSelectElement;
-        this.formElement = this.querySelector("form") as HTMLFormElement;
-
         this.overviewCustomElement = this.querySelector(
             "backtest-overview"
         ) as Overview;
-
-        this.onChangeMarket = this.onChangeMarket.bind(this);
-        this.onOptionSubmit = this.onOptionSubmit.bind(this);
+        this.controlCustomElement = this.querySelector(
+            "backtest-control"
+        ) as Control;
     }
 
     connectedCallback() {
         this.initialize();
-
         this.runBackTest();
-
-        this.selectElement.addEventListener("change", this.onChangeMarket);
-        this.formElement.addEventListener("submit", this.onOptionSubmit);
     }
 
-    disconnectedCallback() {
-        this.selectElement.removeEventListener("change", this.onChangeMarket);
-        this.formElement.removeEventListener("submit", this.onOptionSubmit);
-    }
+    // disconnectedCallback() {
+    // }
 
     private initialize() {
-        const investmentPriceElement = this.querySelector(
-            ".investmentPrice"
-        ) as HTMLElement;
-
-        this.countElement.value = this.count.toString();
-        investmentPriceElement.textContent =
-            this.investmentPrice.toLocaleString();
+        this.controlCustomElement.initialize();
     }
 
-    async runBackTest() {
+    public async runBackTest() {
         this.dataset.loading = "true";
         this.data = [];
         this.tradeData = [];
@@ -353,22 +334,5 @@ export default class AppBacktest4 extends HTMLElement {
         cloned.dataset.action = aData.action;
 
         return cloned;
-    }
-
-    private onChangeMarket(event: Event) {
-        const target = event.target as HTMLInputElement;
-        this.market = target.value;
-        this.runBackTest();
-    }
-
-    private onOptionSubmit(event: Event) {
-        event?.preventDefault();
-        const maxSize = Number(this.countElement.getAttribute("max"));
-        this.count =
-            Number(this.countElement.value) > maxSize
-                ? maxSize
-                : Number(this.countElement.value);
-        this.countElement.value = this.count.toString();
-        this.runBackTest();
     }
 }

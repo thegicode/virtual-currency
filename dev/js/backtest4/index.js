@@ -60,29 +60,17 @@
       this.totalInvestmentPrice = 1e6;
       this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
       this.target = 2;
-      this.countElement = this.querySelector("input[name=count]");
       this.tableElement = this.querySelector("tbody");
       this.itemTempleteElement = document.querySelector("#tp-item");
-      this.selectElement = this.querySelector("select");
-      this.formElement = this.querySelector("form");
       this.overviewCustomElement = this.querySelector("backtest-overview");
-      this.onChangeMarket = this.onChangeMarket.bind(this);
-      this.onOptionSubmit = this.onOptionSubmit.bind(this);
+      this.controlCustomElement = this.querySelector("backtest-control");
     }
     connectedCallback() {
       this.initialize();
       this.runBackTest();
-      this.selectElement.addEventListener("change", this.onChangeMarket);
-      this.formElement.addEventListener("submit", this.onOptionSubmit);
-    }
-    disconnectedCallback() {
-      this.selectElement.removeEventListener("change", this.onChangeMarket);
-      this.formElement.removeEventListener("submit", this.onOptionSubmit);
     }
     initialize() {
-      const investmentPriceElement = this.querySelector(".investmentPrice");
-      this.countElement.value = this.count.toString();
-      investmentPriceElement.textContent = this.investmentPrice.toLocaleString();
+      this.controlCustomElement.initialize();
     }
     runBackTest() {
       return __awaiter(this, void 0, void 0, function* () {
@@ -254,18 +242,6 @@
       cloned.dataset.action = aData.action;
       return cloned;
     }
-    onChangeMarket(event) {
-      const target = event.target;
-      this.market = target.value;
-      this.runBackTest();
-    }
-    onOptionSubmit(event) {
-      event === null || event === void 0 ? void 0 : event.preventDefault();
-      const maxSize = Number(this.countElement.getAttribute("max"));
-      this.count = Number(this.countElement.value) > maxSize ? maxSize : Number(this.countElement.value);
-      this.countElement.value = this.count.toString();
-      this.runBackTest();
-    }
   };
 
   // dev/scripts/pages/backtest4/Overview.js
@@ -330,8 +306,54 @@
     }
   };
 
+  // dev/scripts/pages/backtest4/Control.js
+  var Control = class extends HTMLElement {
+    constructor() {
+      super();
+      this.app = null;
+      this.app = document.querySelector("app-backtest4");
+      this.formElement = this.querySelector("form");
+      this.selectElement = this.querySelector("select");
+      this.countElement = this.querySelector("input[name=count]");
+      this.investmentPriceElement = this.querySelector(".investmentPrice");
+      this.onSubmit = this.onSubmit.bind(this);
+      this.onChange = this.onChange.bind(this);
+    }
+    connectedCallback() {
+      this.formElement.addEventListener("submit", this.onSubmit);
+      this.selectElement.addEventListener("change", this.onChange);
+    }
+    disconnectedCallback() {
+      this.formElement.removeEventListener("submit", this.onSubmit);
+      this.selectElement.removeEventListener("change", this.onChange);
+    }
+    initialize() {
+      if (!this.app)
+        return;
+      this.countElement.value = this.app.count.toString();
+      this.investmentPriceElement.textContent = this.app.investmentPrice.toLocaleString();
+    }
+    onChange(event) {
+      if (!this.app)
+        return;
+      const target = event.target;
+      this.app.market = target.value;
+      this.app.runBackTest();
+    }
+    onSubmit(event) {
+      event === null || event === void 0 ? void 0 : event.preventDefault();
+      if (!this.app)
+        return;
+      const maxSize = Number(this.countElement.getAttribute("max"));
+      this.app.count = Number(this.countElement.value) > maxSize ? maxSize : Number(this.countElement.value);
+      this.countElement.value = this.app.count.toString();
+      this.app.runBackTest();
+    }
+  };
+
   // dev/scripts/pages/backtest4/index.js
-  customElements.define("app-backtest4", AppBacktest4);
+  customElements.define("backtest-control", Control);
   customElements.define("backtest-overview", Overview);
+  customElements.define("app-backtest4", AppBacktest4);
 })();
 //# sourceMappingURL=index.js.map

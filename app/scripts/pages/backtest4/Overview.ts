@@ -5,11 +5,12 @@ import {
 import AppBacktest4 from "./AppBacktest4";
 
 export default class Overview extends HTMLElement {
+    private app: AppBacktest4 | null = null;
+
     private totalProfit: number;
     private totalSumPrice: number;
     private allSumSize: number;
 
-    private app: AppBacktest4 | null = null;
     private sumElement: HTMLElement;
     private listElement: HTMLElement;
     private itemTemplate: HTMLTemplateElement;
