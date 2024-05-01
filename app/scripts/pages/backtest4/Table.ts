@@ -50,8 +50,9 @@ export default class BacktestTable extends HTMLElement {
             profit:
                 (aData.profit && Math.round(aData.profit).toLocaleString()) ||
                 "",
-            sumProfit:
-                aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),
+            sum_profit:
+                aData.sum_profit &&
+                Math.round(aData.sum_profit).toLocaleString(),
             unrealize_rate:
                 (aData.unrealize_rate &&
                     (aData.unrealize_rate * 100).toFixed(2)) ||

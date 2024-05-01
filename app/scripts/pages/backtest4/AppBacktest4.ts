@@ -18,15 +18,21 @@ import Overview from "./Overview";
 import Table from "./Table";
 
 import { getDaliyVolatility } from "@app/scripts/components/backtest/volatility";
+import {
+    BuyStrategy,
+    HoldStrategy,
+    ReserveStrategy,
+    SellStrategy,
+} from "./TradeStrategy";
 
 export default class AppBacktest4 extends HTMLElement {
     public tradeData: any[];
     public market: string;
     public count: number;
-    private totalInvestmentPrice: number;
-    private marketSize: number;
+    public totalInvestmentPrice: number;
+    public marketSize: number;
     public investmentPrice: number;
-    private target: number;
+    public target: number;
 
     private overviewCustomElement: Overview;
     private controlCustomElement: Control;
@@ -99,9 +105,9 @@ export default class AppBacktest4 extends HTMLElement {
 
         const volatedData = this.setVolatility(actionedData, afternoonData);
 
-        const profitedData = this.setProfit(volatedData, index, sellPrice);
+        const enrichedData = this.getStrategy(volatedData, index, sellPrice);
 
-        return profitedData;
+        return enrichedData;
     }
 
     private reset() {
@@ -213,61 +219,32 @@ export default class AppBacktest4 extends HTMLElement {
         };
     }
 
-    private setProfit(data: ITradeData4, index: number, sellPrice: number) {
-        const aData = JSON.parse(JSON.stringify(data));
-        const prevTradeData = index > 0 && this.tradeData[index - 1];
-        const buyData = index > 0 && this.tradeData[prevTradeData.buy_index];
-
-        const getOrderAmount = () => {
-            const percent = (this.target / buyData.volatility) * 100;
-            const unitPercent = percent / this.marketSize;
-            return (this.totalInvestmentPrice * unitPercent) / 100;
+    private getStrategy(data: ITradeData4, index: number, sellPrice: number) {
+        const result = this.tradeStrategy(data, index, sellPrice);
+        return {
+            ...data,
+            buy_index: result.buy_index,
+            rate: result.rate,
+            profit: result.profit,
+            sum_profit: result.sum_profit,
+            unrealize_rate: result.unrealize_rate,
+            unrealize_profit: result.unrealize_profit,
+            unrealize_sum: result.unrealize_sum,
         };
+    }
 
-        switch (aData.action) {
+    private tradeStrategy(data: ITradeData4, index: number, sellPrice: number) {
+        switch (data.action) {
             case "Buy":
-                return {
-                    ...aData,
-                    buy_index: index,
-                    sumProfit: prevTradeData.sumProfit || 0,
-                    unrealize_sum: prevTradeData.unrealize_sum || 0,
-                };
+                return new BuyStrategy(this, data, index);
             case "Hold":
-                const unrealize_rate =
-                    (aData.trade_price - buyData.trade_price) /
-                    buyData.trade_price;
-                const unrealize_profit = unrealize_rate * getOrderAmount();
-
-                return {
-                    ...aData,
-                    buy_index: prevTradeData.buy_index,
-                    sumProfit: prevTradeData.sumProfit || 0,
-                    unrealize_rate,
-                    unrealize_profit,
-                    unrealize_sum:
-                        prevTradeData.unrealize_sum + unrealize_profit,
-                };
+                return new HoldStrategy(this, data, index);
             case "Sell":
-                const rate =
-                    (sellPrice - buyData.trade_price) / buyData.trade_price;
-                const profit = rate * getOrderAmount();
-                const sumProfit = prevTradeData.sumProfit + profit;
-
-                return {
-                    ...aData,
-                    rate,
-                    profit,
-                    sumProfit: sumProfit,
-                    unrealize_sum: sumProfit,
-                };
-
-            case "Reserve": {
-                return {
-                    ...aData,
-                    sumProfit: prevTradeData.sumProfit || 0,
-                    unrealize_sum: prevTradeData.unrealize_sum || 0,
-                };
-            }
+                return new SellStrategy(this, data, index, sellPrice);
+            case "Reserve":
+                return new ReserveStrategy(this, data, index);
+            default:
+                throw new Error(`알 수 없는 장르: ${data.action}`);
         }
     }
 
@@ -279,3 +256,61 @@ export default class AppBacktest4 extends HTMLElement {
         this.dataset.loading = "false";
     }
 }
+
+// private setProfit(data: ITradeData4, index: number, sellPrice: number) {
+//     const aData = JSON.parse(JSON.stringify(data));
+//     const prevTradeData = index > 0 && this.tradeData[index - 1];
+//     const buyData = index > 0 && this.tradeData[prevTradeData.buy_index];
+
+//     const getOrderAmount = () => {
+//         const percent = (this.target / buyData.volatility) * 100;
+//         const unitPercent = percent / this.marketSize;
+//         return (this.totalInvestmentPrice * unitPercent) / 100;
+//     };
+
+//     switch (aData.action) {
+//         case "Buy":
+//             return {
+//                 ...aData,
+//                 buy_index: index,
+//                 sum_profit: prevTradeData.sum_profit || 0,
+//                 unrealize_sum: prevTradeData.unrealize_sum || 0,
+//             };
+//         case "Hold":
+//             const unrealize_rate =
+//                 (aData.trade_price - buyData.trade_price) /
+//                 buyData.trade_price;
+//             const unrealize_profit = unrealize_rate * getOrderAmount();
+
+//             return {
+//                 ...aData,
+//                 buy_index: prevTradeData.buy_index,
+//                 sum_profit: prevTradeData.sum_profit || 0,
+//                 unrealize_rate,
+//                 unrealize_profit,
+//                 unrealize_sum:
+//                     prevTradeData.unrealize_sum + unrealize_profit,
+//             };
+//         case "Sell":
+//             const rate =
+//                 (sellPrice - buyData.trade_price) / buyData.trade_price;
+//             const profit = rate * getOrderAmount();
+//             const sum_profit = prevTradeData.sum_profit + profit;
+
+//             return {
+//                 ...aData,
+//                 rate,
+//                 profit,
+//                 sum_profit: sum_profit,
+//                 unrealize_sum: sum_profit,
+//             };
+
+//         case "Reserve": {
+//             return {
+//                 ...aData,
+//                 sum_profit: prevTradeData.sum_profit || 0,
+//                 unrealize_sum: prevTradeData.unrealize_sum || 0,
+//             };
+//         }
+//     }
+// }

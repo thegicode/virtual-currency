@@ -163,19 +163,18 @@ interface ICandlesMinutes {
 }
 
 interface ITradeData4 {
-    date: string;
-    trade_price: number;
-    condition: boolean;
     action?: string;
-    volatility?: number;
-    rate?: number;
-    profit?: number;
-    sumProfit?: number;
-    unrealize_rate?: number;
-    unrealize_profit?: number;
-    unrealize_sum?: number;
     buy_index?: number;
-    sumProfit?: number;
+    condition: boolean;
+    date: string;
+    profit?: number;
+    rate?: number;
+    sum_profit?: number;
+    trade_price: number;
+    unrealize_profit?: number;
+    unrealize_rate?: number;
+    unrealize_sum?: number;
+    volatility?: number;
 }
 
 interface IAfternoonData {

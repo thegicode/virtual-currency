@@ -6,6 +6,97 @@
     return Number(result.toFixed(2));
   }
 
+  // dev/scripts/pages/backtest4/TradeStrategy.js
+  var TradeStrategy = class {
+    constructor(app, data, index) {
+      this.app = app;
+      this.data = data;
+      this.index = index;
+    }
+    get buy_index() {
+      return this.index > 0 ? this.prevData.buy_index : null;
+    }
+    get prevData() {
+      return this.index > 0 ? this.app.tradeData[this.index - 1] : null;
+    }
+    get buyData() {
+      return this.index > 0 && this.prevData && this.prevData.buy_index ? this.app.tradeData[this.prevData.buy_index] : null;
+    }
+    get orderAmount() {
+      if (!this.buyData.volatility)
+        return 0;
+      const percent = this.app.target / this.buyData.volatility * 100;
+      const unitPercent = percent / this.app.marketSize;
+      return this.app.totalInvestmentPrice * unitPercent / 100;
+    }
+    get rate() {
+      return 0;
+    }
+    get profit() {
+      return 0;
+    }
+    get sum_profit() {
+      return this.prevData ? this.prevData.sum_profit : 0;
+    }
+    get unrealize_rate() {
+      return 0;
+    }
+    get unrealize_profit() {
+      return 0;
+    }
+    get unrealize_sum() {
+      return this.prevData ? this.prevData.unrealize_sum : 0;
+    }
+  };
+  var BuyStrategy = class extends TradeStrategy {
+    constructor(app, data, index) {
+      super(app, data, index);
+    }
+    get buy_index() {
+      return this.index;
+    }
+    get unrealize_sum() {
+      return this.prevData.unrealize_sum ? this.prevData.unrealize_sum : 0;
+    }
+  };
+  var HoldStrategy = class extends TradeStrategy {
+    constructor(app, data, index) {
+      super(app, data, index);
+    }
+    get unrealize_rate() {
+      return (this.data.trade_price - this.buyData.trade_price) / this.buyData.trade_price;
+    }
+    get unrealize_profit() {
+      return this.unrealize_rate * this.orderAmount;
+    }
+    get unrealize_sum() {
+      return this.prevData.unrealize_sum ? this.prevData.unrealize_sum + this.unrealize_profit : 0;
+    }
+  };
+  var SellStrategy = class extends TradeStrategy {
+    constructor(app, data, index, sellPrice) {
+      super(app, data, index);
+      this.sellPrice = sellPrice;
+    }
+    get rate() {
+      return (this.sellPrice - this.buyData.trade_price) / this.buyData.trade_price;
+    }
+    get profit() {
+      return this.rate * this.orderAmount;
+    }
+    get sum_profit() {
+      return (this.prevData.sum_profit || 0) + this.profit;
+    }
+    get unrealize_sum() {
+      return this.sum_profit;
+    }
+  };
+  var ReserveStrategy = class extends TradeStrategy {
+    constructor(app, data, index) {
+      super(app, data, index);
+    }
+  };
+
   // dev/scripts/pages/backtest4/AppBacktest4.js
   var __awaiter = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
@@ -78,8 +169,8 @@
         const { makedData, afternoonData, sellPrice } = this.makeTradeData(fetchedData);
         const actionedData = this.setTradingAction(makedData, index);
         const volatedData = this.setVolatility(actionedData, afternoonData);
-        const profitedData = this.setProfit(volatedData, index, sellPrice);
-        return profitedData;
+        const enrichedData = this.getStrategy(volatedData, index, sellPrice);
+        return enrichedData;
       });
     }
     reset() {
@@ -159,41 +250,22 @@
     setVolatility(data, afternoonData) {
       return Object.assign(Object.assign({}, JSON.parse(JSON.stringify(data))), { volatility: getDaliyVolatility(afternoonData) });
     }
-    setProfit(data, index, sellPrice) {
-      const aData = JSON.parse(JSON.stringify(data));
-      const prevTradeData = index > 0 && this.tradeData[index - 1];
-      const buyData = index > 0 && this.tradeData[prevTradeData.buy_index];
-      const getOrderAmount = () => {
-        const percent = this.target / buyData.volatility * 100;
-        const unitPercent = percent / this.marketSize;
-        return this.totalInvestmentPrice * unitPercent / 100;
-      };
-      switch (aData.action) {
+    getStrategy(data, index, sellPrice) {
+      const result = this.tradeStrategy(data, index, sellPrice);
+      return Object.assign(Object.assign({}, data), { buy_index: result.buy_index, rate: result.rate, profit: result.profit, sum_profit: result.sum_profit, unrealize_rate: result.unrealize_rate, unrealize_profit: result.unrealize_profit, unrealize_sum: result.unrealize_sum });
+    }
+    tradeStrategy(data, index, sellPrice) {
+      switch (data.action) {
         case "Buy":
-          return Object.assign(Object.assign({}, aData), { buy_index: index, sumProfit: prevTradeData.sumProfit || 0, unrealize_sum: prevTradeData.unrealize_sum || 0 });
+          return new BuyStrategy(this, data, index);
         case "Hold":
-          const unrealize_rate = (aData.trade_price - buyData.trade_price) / buyData.trade_price;
-          const unrealize_profit = unrealize_rate * getOrderAmount();
-          return Object.assign(Object.assign({}, aData), {
-            buy_index: prevTradeData.buy_index,
-            sumProfit: prevTradeData.sumProfit || 0,
-            unrealize_rate,
-            unrealize_profit,
-            unrealize_sum: prevTradeData.unrealize_sum + unrealize_profit
-          });
+          return new HoldStrategy(this, data, index);
         case "Sell":
-          const rate = (sellPrice - buyData.trade_price) / buyData.trade_price;
-          const profit = rate * getOrderAmount();
-          const sumProfit = prevTradeData.sumProfit + profit;
-          return Object.assign(Object.assign({}, aData), {
-            rate,
-            profit,
-            sumProfit,
-            unrealize_sum: sumProfit
-          });
-        case "Reserve": {
-          return Object.assign(Object.assign({}, aData), { sumProfit: prevTradeData.sumProfit || 0, unrealize_sum: prevTradeData.unrealize_sum || 0 });
-        }
+          return new SellStrategy(this, data, index, sellPrice);
+        case "Reserve":
+          return new ReserveStrategy(this, data, index);
+        default:
+          throw new Error(`\uC54C \uC218 \uC5C6\uB294 \uC7A5\uB974: ${data.action}`);
       }
     }
     render() {
@@ -353,7 +425,7 @@
         volatility: (_a = aData.volatility) === null || _a === void 0 ? void 0 : _a.toFixed(2),
         rate: ((_b = aData.rate && aData.rate * 100) === null || _b === void 0 ? void 0 : _b.toFixed(2)) || "",
         profit: aData.profit && Math.round(aData.profit).toLocaleString() || "",
-        sumProfit: aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),
+        sum_profit: aData.sum_profit && Math.round(aData.sum_profit).toLocaleString(),
         unrealize_rate: aData.unrealize_rate && (aData.unrealize_rate * 100).toFixed(2) || "",
         unrealize_profit: aData.unrealize_profit && Math.round(aData.unrealize_profit).toLocaleString() || "",
         unrealize_sum: aData.unrealize_sum && Math.round(aData.unrealize_sum).toLocaleString()

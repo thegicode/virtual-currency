@@ -30,7 +30,8 @@ export default class BacktestTable extends HTMLElement {
             rate: ((_b = (aData.rate && aData.rate * 100)) === null || _b === void 0 ? void 0 : _b.toFixed(2)) || "",
             profit: (aData.profit && Math.round(aData.profit).toLocaleString()) ||
                 "",
-            sumProfit: aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),
+            sum_profit: aData.sum_profit &&
+                Math.round(aData.sum_profit).toLocaleString(),
             unrealize_rate: (aData.unrealize_rate &&
                 (aData.unrealize_rate * 100).toFixed(2)) ||
                 "",
