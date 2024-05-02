@@ -9,7 +9,7 @@ export default class Overview extends HTMLElement {
 
     private totalProfit: number;
     private totalSumPrice: number;
-    private allSumSize: number;
+    private size: number;
 
     private sumElement: HTMLElement;
     private listElement: HTMLElement;
@@ -22,7 +22,7 @@ export default class Overview extends HTMLElement {
 
         this.totalProfit = 0;
         this.totalSumPrice = 0;
-        this.allSumSize = 0;
+        this.size = 0;
 
         this.sumElement = this.querySelector(".overview-sum") as HTMLElement;
         this.listElement = this.querySelector(".overview-list") as HTMLElement;
@@ -52,7 +52,10 @@ export default class Overview extends HTMLElement {
         };
 
         const cloned = cloneTemplate<HTMLElement>(this.itemTemplate);
+        cloned.dataset.value = totalProfit;
+
         updateElementsTextWithData(renderData, cloned);
+
         this.listElement.appendChild(cloned);
 
         this.addEvent(cloned);
@@ -66,31 +69,36 @@ export default class Overview extends HTMLElement {
         ) as HTMLButtonElement;
 
         deleteButton.addEventListener("click", () => {
+            const profit = Number(cloned.dataset.value);
             cloned.remove();
-            this.renderSum(false);
+            this.renderSum(false, profit);
         });
     }
 
-    private renderSum(isAdd: boolean) {
+    private renderSum(isAdd: boolean, profit?: number) {
         if (!this.app) return;
 
         if (isAdd) {
             this.totalSumPrice += this.totalProfit;
-            this.allSumSize++;
+            this.size++;
         } else {
-            this.totalSumPrice -= this.totalProfit;
-            this.allSumSize--;
+            if (!profit) return;
+            this.totalSumPrice -= profit;
+            this.size--;
         }
 
         const totalSumRate =
-            (this.totalSumPrice /
-                (this.app.investmentPrice * this.allSumSize)) *
-            100;
+            this.totalSumPrice === 0
+                ? 0
+                : (this.totalSumPrice /
+                      (this.app.investmentPrice * this.size)) *
+                  100;
 
         const renderData = {
             totalSumPrice: Math.round(this.totalSumPrice).toLocaleString(),
             totalSumRate: totalSumRate.toFixed(2).toLocaleString(),
         };
+
         updateElementsTextWithData(renderData, this.sumElement);
     }
 }

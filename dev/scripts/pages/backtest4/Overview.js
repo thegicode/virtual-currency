@@ -5,7 +5,7 @@ export default class Overview extends HTMLElement {
         this.app = document.querySelector("app-backtest4");
         this.totalProfit = 0;
         this.totalSumPrice = 0;
-        this.allSumSize = 0;
+        this.size = 0;
         this.sumElement = this.querySelector(".overview-sum");
         this.listElement = this.querySelector(".overview-list");
         this.itemTemplate = document.querySelector("#tp-overviewItem");
@@ -27,6 +27,7 @@ export default class Overview extends HTMLElement {
             totalProfit: ` ${Math.round(totalProfit).toLocaleString()} 원`,
         };
         const cloned = cloneTemplate(this.itemTemplate);
+        cloned.dataset.value = totalProfit;
         updateElementsTextWithData(renderData, cloned);
         this.listElement.appendChild(cloned);
         this.addEvent(cloned);
@@ -35,24 +36,29 @@ export default class Overview extends HTMLElement {
     addEvent(cloned) {
         const deleteButton = cloned.querySelector(".deleteButton");
         deleteButton.addEventListener("click", () => {
+            const profit = Number(cloned.dataset.value);
             cloned.remove();
-            this.renderSum(false);
+            this.renderSum(false, profit);
         });
     }
-    renderSum(isAdd) {
+    renderSum(isAdd, profit) {
         if (!this.app)
             return;
         if (isAdd) {
             this.totalSumPrice += this.totalProfit;
-            this.allSumSize++;
+            this.size++;
         }
         else {
-            this.totalSumPrice -= this.totalProfit;
-            this.allSumSize--;
+            if (!profit)
+                return;
+            this.totalSumPrice -= profit;
+            this.size--;
         }
-        const totalSumRate = (this.totalSumPrice /
-            (this.app.investmentPrice * this.allSumSize)) *
-            100;
+        const totalSumRate = this.totalSumPrice === 0
+            ? 0
+            : (this.totalSumPrice /
+                (this.app.investmentPrice * this.size)) *
+                100;
         const renderData = {
             totalSumPrice: Math.round(this.totalSumPrice).toLocaleString(),
             totalSumRate: totalSumRate.toFixed(2).toLocaleString(),
