@@ -39,6 +39,7 @@ export default class Control extends HTMLElement {
     public initialize() {
         if (!this.app) return;
 
+        this.app.market = this.selectElement.value;
         this.countElement.value = this.app.count.toString();
         this.investmentPriceElement.textContent =
             this.app.investmentPrice.toLocaleString();

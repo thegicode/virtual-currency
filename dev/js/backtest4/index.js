@@ -129,7 +129,7 @@
     constructor() {
       super();
       this.tradeData = [];
-      this.market = "KRW-ONG";
+      this.market = "";
       this.count = 30;
       this.marketSize = 5;
       this.totalInvestmentPrice = 1e6;
@@ -378,6 +378,7 @@
     initialize() {
       if (!this.app)
         return;
+      this.app.market = this.selectElement.value;
       this.countElement.value = this.app.count.toString();
       this.investmentPriceElement.textContent = this.app.investmentPrice.toLocaleString();
     }

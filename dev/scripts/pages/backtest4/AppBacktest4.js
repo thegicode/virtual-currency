@@ -13,7 +13,7 @@ export default class AppBacktest4 extends HTMLElement {
     constructor() {
         super();
         this.tradeData = [];
-        this.market = "KRW-ONG";
+        this.market = "";
         this.count = 30;
         this.marketSize = 5;
         this.totalInvestmentPrice = 1000000;
