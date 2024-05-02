@@ -94,13 +94,13 @@
     runBackTest() {
       return __awaiter(this, void 0, void 0, function* () {
         const toDate = this.getToDate();
-        this.data = yield this.loadData(toDate, this.count.toString());
+        this.data = yield this.loadData(toDate, (this.count + 30).toString());
         this.qqqData = this.transformData();
         this.tradeData = [];
         this.totalGain = 0;
         this.totalUnrealizeGain = 0;
         this.containerElement.innerHTML = "";
-        for (let index = 0; index < this.count - 30; index++) {
+        for (let index = 0; index < this.count; index++) {
           const testMonthData = this.getTestData(index);
           const marketTestRates = this.getMarketTestRates(testMonthData);
           const tradeDate = testMonthData[0].tradeDate;
@@ -331,7 +331,7 @@
     onOptionSubmit(event) {
       event === null || event === void 0 ? void 0 : event.preventDefault();
       const maxSize = Number(this.countElement.getAttribute("max"));
-      const value = Number(this.countElement.value) + 30;
+      const value = Number(this.countElement.value);
       this.count = value > maxSize ? maxSize : value;
       this.runBackTest();
     }

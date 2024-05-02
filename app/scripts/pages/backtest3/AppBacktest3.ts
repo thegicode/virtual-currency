@@ -94,7 +94,7 @@ export default class AppBacktest3 extends HTMLElement {
 
     private async runBackTest() {
         const toDate = this.getToDate();
-        this.data = await this.loadData(toDate, this.count.toString());
+        this.data = await this.loadData(toDate, (this.count + 30).toString());
         this.qqqData = this.transformData();
         this.tradeData = [];
         this.totalGain = 0;
@@ -102,7 +102,7 @@ export default class AppBacktest3 extends HTMLElement {
 
         this.containerElement.innerHTML = "";
 
-        for (let index = 0; index < this.count - 30; index++) {
+        for (let index = 0; index < this.count; index++) {
             // 한달 데이터 테스트
             const testMonthData = this.getTestData(index);
 
@@ -489,7 +489,7 @@ export default class AppBacktest3 extends HTMLElement {
     private onOptionSubmit(event: Event) {
         event?.preventDefault();
         const maxSize = Number(this.countElement.getAttribute("max"));
-        const value = Number(this.countElement.value) + 30;
+        const value = Number(this.countElement.value);
 
         this.count = value > maxSize ? maxSize : value;
 
