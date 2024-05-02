@@ -199,9 +199,14 @@ interface IBacktest5 {
     buyCondition: boolean;
     action: string;
     standardPrice: number;
-    buyPrice: number;
-    sellPrice: number;
-    rate: number;
-    profit: number;
+    buyPrice: number | null;
+    sellPrice: number | null;
+    rate?: number;
+    profit?: number;
     sumProfit?: number;
+}
+
+interface IRealPrice {
+    date: string;
+    price: number;
 }

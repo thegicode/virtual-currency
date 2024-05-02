@@ -24,24 +24,18 @@
     - 시가 : 필자는 주로 오전 0시나 1시
     - 종가 : 시가에서 24시간 후의 가격
     - 고가(저가): 24시간 동안 가장 높은 가격
+
+
+TODO : 다중 코인 적용
  */
 
 import Control from "./Control";
 import Overview from "./Overview";
 import Table from "./Table";
 
-import { getDaliyVolatility } from "@app/scripts/components/backtest/volatility";
-import {
-    BuyStrategy,
-    HoldStrategy,
-    ReserveStrategy,
-    SellStrategy,
-} from "./TradeStrategy";
-
 export default class AppBacktest5 extends HTMLElement {
     public tradeData: any[];
     public markets: string[];
-    public market: string;
     public count: number;
     public totalInvestmentAmount: number;
     public investmentAmount: number;
@@ -57,7 +51,6 @@ export default class AppBacktest5 extends HTMLElement {
         this.tradeData = [];
         // this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
         this.markets = ["KRW-NEAR"];
-        this.market = this.markets[0];
         this.count = 60;
         this.totalInvestmentAmount = 1000000;
         this.investmentAmount =
@@ -99,90 +92,86 @@ export default class AppBacktest5 extends HTMLElement {
         }
     }
 
-    private backtest(fetchedData: ICandles5[], orginRealPrices: any) {
-        const data = fetchedData.slice(1);
+    private backtest(fetchedData: ICandles5[], orginRealPrices: IRealPrice[]) {
         const realPrices = orginRealPrices.slice(1);
-        let sumProfit = 0;
-        let action = "";
+        const strategedData = this.strategy(fetchedData, realPrices);
+        const calculatedData = this.calculateProfits(strategedData);
+        return calculatedData;
+    }
 
-        const result = data.map((aData: ICandles5, index: number) => {
-            // 1. 전날 하루만에 움직인 최대폭
-            const prevData = fetchedData[index];
-            const range = prevData.high_price - prevData.low_price;
+    private strategy(fetchedData: ICandles5[], realPrices: IRealPrice[]) {
+        const result = fetchedData
+            .slice(1)
+            .map((aData: ICandles5, index: number) => {
+                // 1. 전날 하루만에 움직인 최대폭
+                const prevData = fetchedData[index];
+                const range = prevData.high_price - prevData.low_price;
 
-            // 2. 매수 기준
-            // 실시간 가격 > 당일 시가 + (레인지 * k)
-            const realPrice = realPrices[index].price;
-            const standardPrice = aData.opening_price + range * this.k;
-            const buyCondition = realPrice > standardPrice;
+                // 2. 매수 기준
+                // 실시간 가격 > 당일 시가 + (레인지 * k)
+                const realPrice = realPrices[index].price;
+                const standardPrice = aData.opening_price + range * this.k;
+                const buyCondition = realPrice > standardPrice;
 
-            // action
-            if (index === 0) {
-                action = buyCondition ? "Buy" : "Reserve";
-            } else {
-                // const prevCondition =
-            }
-
-            debugger;
-
-            // 3. 매수, 매도 가격
-            // const buyPrice = aData.opening_price; //
-
-            //  매수 가격(시가): realPrice
-            const buyPrice = realPrice;
-
-            // 매도 가격(종가)
-            const sellPrice = aData.trade_price;
-
-            // 4. 수익
-            const rate = !buyCondition ? (sellPrice - buyPrice) / buyPrice : 0;
-            const profit = !buyCondition ? rate * this.investmentAmount : 0;
-
-            // 5. 누적 수익
-            sumProfit += profit;
-
-            return {
-                market: aData.market,
-                date: aData.candle_date_time_kst,
-                range,
-                buyCondition,
-                action,
-                standardPrice,
-                buyPrice: buyCondition ? buyPrice : 0,
-                sellPrice: !buyCondition ? sellPrice : 0,
-                rate,
-                profit,
-                sumProfit,
-            };
-        });
-        // console.log(strategedData);
+                return {
+                    market: aData.market,
+                    date: aData.candle_date_time_kst,
+                    range,
+                    standardPrice,
+                    buyCondition,
+                    action: buyCondition ? "Trade" : "Reserve",
+                    buyPrice: realPrice,
+                    sellPrice: aData.trade_price,
+                };
+            });
 
         return result;
     }
 
-    // private strategy(
-    //     index: number,
-    //     aData: ICandles5,
-    //     fetchData: ICandles5[],
-    //     realPrices: any
-    // ) {
-    //     // 1. 전날 하루만에 움직인 최대폭
-    //     const prevData = fetchedData[index];
-    //     const range = prevData.high_price - prevData.low_price;
+    private calculateProfits(data: IBacktest5[]) {
+        let sumProfit = 0;
 
-    //     // 2. 매수 기준
-    //     // 실시간 가격 > 당일 시가 + (레인지 * k)
-    //     const realPrice = realPrices[index].price;
-    //     const standardPrice = aData.opening_price + range * this.k;
-    //     const buyCondition = realPrice > standardPrice;
-    // }
+        const result = data.map((aData) => {
+            switch (aData.action) {
+                case "Trade":
+                    const rate =
+                        aData.sellPrice && aData.buyPrice
+                            ? (aData.sellPrice - aData.buyPrice) /
+                              aData.buyPrice
+                            : 0;
+                    const profit = rate * this.investmentAmount;
+                    sumProfit += profit;
+
+                    return {
+                        ...aData,
+                        rate,
+                        profit,
+                        sumProfit,
+                    };
+
+                default:
+                    return {
+                        ...aData,
+                        buyPrice: null,
+                        sellPrice: null,
+                        sumProfit,
+                    };
+            }
+        });
+        return result;
+    }
 
     private async getRealPrices(data: ICandles5[]) {
         const realprices = [];
         for (const aData of data) {
             const date = aData.candle_date_time_kst;
             const toDate = date.replace("T09:00:00", "T13:00:00+09:00");
-            const response = await this.fetchMinutes("60", "1", toDate);
+            const response = await this.fetchMinutes(
+                aData.market,
+                "60",
+                "1",
+                toDate
+            );
             const price = response[0].opening_price;
 
             realprices.push({
@@ -208,9 +197,14 @@ export default class AppBacktest5 extends HTMLElement {
         return await response.json();
     }
 
-    private async fetchMinutes(unit: string, fetchCount: string, to: string) {
+    private async fetchMinutes(
+        market: string,
+        unit: string,
+        fetchCount: string,
+        to: string
+    ) {
         const searchParams = new URLSearchParams({
-            market: this.market,
+            market: market,
             count: fetchCount,
             unit,
             to,

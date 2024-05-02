@@ -12,7 +12,6 @@ export default class AppBacktest5 extends HTMLElement {
         super();
         this.tradeData = [];
         this.markets = ["KRW-NEAR"];
-        this.market = this.markets[0];
         this.count = 60;
         this.totalInvestmentAmount = 1000000;
         this.investmentAmount =
@@ -42,40 +41,50 @@ export default class AppBacktest5 extends HTMLElement {
         });
     }
     backtest(fetchedData, orginRealPrices) {
-        const data = fetchedData.slice(1);
         const realPrices = orginRealPrices.slice(1);
-        let sumProfit = 0;
-        let action = "";
-        const result = data.map((aData, index) => {
+        const strategedData = this.strategy(fetchedData, realPrices);
+        const calculatedData = this.calculateProfits(strategedData);
+        return calculatedData;
+    }
+    strategy(fetchedData, realPrices) {
+        const result = fetchedData
+            .slice(1)
+            .map((aData, index) => {
             const prevData = fetchedData[index];
             const range = prevData.high_price - prevData.low_price;
             const realPrice = realPrices[index].price;
             const standardPrice = aData.opening_price + range * this.k;
             const buyCondition = realPrice > standardPrice;
-            if (index === 0) {
-                action = buyCondition ? "Buy" : "Reserve";
-            }
-            else {
-            }
-            debugger;
-            const buyPrice = realPrice;
-            const sellPrice = aData.trade_price;
-            const rate = !buyCondition ? (sellPrice - buyPrice) / buyPrice : 0;
-            const profit = !buyCondition ? rate * this.investmentAmount : 0;
-            sumProfit += profit;
             return {
                 market: aData.market,
                 date: aData.candle_date_time_kst,
                 range,
-                buyCondition,
-                action,
                 standardPrice,
-                buyPrice: buyCondition ? buyPrice : 0,
-                sellPrice: !buyCondition ? sellPrice : 0,
-                rate,
-                profit,
-                sumProfit,
+                buyCondition,
+                action: buyCondition ? "Trade" : "Reserve",
+                buyPrice: realPrice,
+                sellPrice: aData.trade_price,
             };
+        });
+        return result;
+    }
+    calculateProfits(data) {
+        let sumProfit = 0;
+        const result = data.map((aData) => {
+            switch (aData.action) {
+                case "Trade":
+                    const rate = aData.sellPrice && aData.buyPrice
+                        ? (aData.sellPrice - aData.buyPrice) /
+                            aData.buyPrice
+                        : 0;
+                    const profit = rate * this.investmentAmount;
+                    sumProfit += profit;
+                    return Object.assign(Object.assign({}, aData), { rate,
+                        profit,
+                        sumProfit });
+                default:
+                    return Object.assign(Object.assign({}, aData), { buyPrice: null, sellPrice: null, sumProfit });
+            }
         });
         return result;
     }
@@ -85,7 +94,7 @@ export default class AppBacktest5 extends HTMLElement {
             for (const aData of data) {
                 const date = aData.candle_date_time_kst;
                 const toDate = date.replace("T09:00:00", "T13:00:00+09:00");
-                const response = yield this.fetchMinutes("60", "1", toDate);
+                const response = yield this.fetchMinutes(aData.market, "60", "1", toDate);
                 const price = response[0].opening_price;
                 realprices.push({
                     date,
@@ -109,10 +118,10 @@ export default class AppBacktest5 extends HTMLElement {
             return yield response.json();
         });
     }
-    fetchMinutes(unit, fetchCount, to) {
+    fetchMinutes(market, unit, fetchCount, to) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchParams = new URLSearchParams({
-                market: this.market,
+                market: market,
                 count: fetchCount,
                 unit,
                 to,

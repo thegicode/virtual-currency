@@ -2,18 +2,13 @@ import {
     cloneTemplate,
     updateElementsTextWithData,
 } from "@app/scripts/utils/helpers";
-import AppBacktest5 from "./AppBacktest5";
 
 export default class BacktestTable extends HTMLElement {
-    private app: AppBacktest5;
-
     private tableElement: HTMLElement;
     private template: HTMLTemplateElement;
 
     constructor() {
         super();
-
-        this.app = document.querySelector("app-backtest5") as AppBacktest5;
 
         this.tableElement = this.querySelector("tbody") as HTMLElement;
         this.template = document.querySelector(
@@ -24,8 +19,6 @@ export default class BacktestTable extends HTMLElement {
     connectedCallback() {}
 
     public render(data: IBacktest5[]) {
-        if (!this.app) return;
-
         this.tableElement.innerHTML = "";
         const fragment = new DocumentFragment();
 
@@ -44,19 +37,27 @@ export default class BacktestTable extends HTMLElement {
             date: aData.date,
             range: aData.range.toLocaleString(),
             condition: aData.buyCondition.toString(),
-            action: aData.action.toString(),
+            action: aData.action?.toString(),
             standardPrice: aData.standardPrice.toLocaleString(),
-            buyPrice: Math.round(aData.buyPrice).toLocaleString(),
-            sellPrice: Math.round(aData.sellPrice).toLocaleString(),
-            rate: (aData.rate && aData.rate * 100)?.toFixed(2),
-            profit: Math.round(aData.profit).toLocaleString(),
+            buyPrice:
+                (aData.buyPrice &&
+                    Math.round(aData.buyPrice).toLocaleString()) ||
+                "",
+            sellPrice:
+                (aData.sellPrice &&
+                    Math.round(aData.sellPrice).toLocaleString()) ||
+                "",
+            rate: (aData.rate && aData.rate * 100)?.toFixed(2) || "",
+            profit:
+                (aData.profit && Math.round(aData.profit).toLocaleString()) ||
+                "",
             sumProfit:
                 aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),
         };
 
         updateElementsTextWithData(parseData, cloned);
 
-        cloned.dataset.action = aData.buyCondition.toString();
+        cloned.dataset.action = aData.action?.toString();
 
         return cloned;
     }

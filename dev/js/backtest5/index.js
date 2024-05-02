@@ -33,7 +33,6 @@
       super();
       this.tradeData = [];
       this.markets = ["KRW-NEAR"];
-      this.market = this.markets[0];
       this.count = 60;
       this.totalInvestmentAmount = 1e6;
       this.investmentAmount = this.totalInvestmentAmount / this.markets.length;
@@ -61,39 +60,47 @@
       });
     }
     backtest(fetchedData, orginRealPrices) {
-      const data = fetchedData.slice(1);
       const realPrices = orginRealPrices.slice(1);
-      let sumProfit = 0;
-      let action = "";
-      const result = data.map((aData, index) => {
+      const strategedData = this.strategy(fetchedData, realPrices);
+      const calculatedData = this.calculateProfits(strategedData);
+      return calculatedData;
+    }
+    strategy(fetchedData, realPrices) {
+      const result = fetchedData.slice(1).map((aData, index) => {
         const prevData = fetchedData[index];
         const range = prevData.high_price - prevData.low_price;
         const realPrice = realPrices[index].price;
         const standardPrice = aData.opening_price + range * this.k;
         const buyCondition = realPrice > standardPrice;
-        if (index === 0) {
-          action = buyCondition ? "Buy" : "Reserve";
-        } else {
-        }
-        debugger;
-        const buyPrice = realPrice;
-        const sellPrice = aData.trade_price;
-        const rate = !buyCondition ? (sellPrice - buyPrice) / buyPrice : 0;
-        const profit = !buyCondition ? rate * this.investmentAmount : 0;
-        sumProfit += profit;
         return {
           market: aData.market,
           date: aData.candle_date_time_kst,
           range,
-          buyCondition,
-          action,
           standardPrice,
-          buyPrice: buyCondition ? buyPrice : 0,
-          sellPrice: !buyCondition ? sellPrice : 0,
-          rate,
-          profit,
-          sumProfit
+          buyCondition,
+          action: buyCondition ? "Trade" : "Reserve",
+          buyPrice: realPrice,
+          sellPrice: aData.trade_price
         };
+      });
+      return result;
+    }
+    calculateProfits(data) {
+      let sumProfit = 0;
+      const result = data.map((aData) => {
+        switch (aData.action) {
+          case "Trade":
+            const rate = aData.sellPrice && aData.buyPrice ? (aData.sellPrice - aData.buyPrice) / aData.buyPrice : 0;
+            const profit = rate * this.investmentAmount;
+            sumProfit += profit;
+            return Object.assign(Object.assign({}, aData), {
+              rate,
+              profit,
+              sumProfit
+            });
+          default:
+            return Object.assign(Object.assign({}, aData), { buyPrice: null, sellPrice: null, sumProfit });
+        }
       });
       return result;
     }
@@ -103,7 +110,7 @@
         for (const aData of data) {
           const date = aData.candle_date_time_kst;
           const toDate = date.replace("T09:00:00", "T13:00:00+09:00");
-          const response = yield this.fetchMinutes("60", "1", toDate);
+          const response = yield this.fetchMinutes(aData.market, "60", "1", toDate);
           const price = response[0].opening_price;
           realprices.push({
             date,
@@ -127,10 +134,10 @@
         return yield response.json();
       });
     }
-    fetchMinutes(unit, fetchCount, to) {
+    fetchMinutes(market, unit, fetchCount, to) {
       return __awaiter(this, void 0, void 0, function* () {
         const searchParams = new URLSearchParams({
-          market: this.market,
+          market,
           count: fetchCount,
           unit,
           to
@@ -279,38 +286,35 @@
   var BacktestTable = class extends HTMLElement {
     constructor() {
       super();
-      this.app = document.querySelector("app-backtest5");
       this.tableElement = this.querySelector("tbody");
       this.template = document.querySelector("#tp-item");
     }
     connectedCallback() {
     }
     render(data) {
-      if (!this.app)
-        return;
       this.tableElement.innerHTML = "";
       const fragment = new DocumentFragment();
       data.map((aData, index) => this.createItem(aData, index)).forEach((cloned) => fragment.appendChild(cloned));
       this.tableElement.appendChild(fragment);
     }
     createItem(aData, index) {
-      var _a;
+      var _a, _b, _c;
       const cloned = cloneTemplate(this.template);
       const parseData = {
         index,
         date: aData.date,
         range: aData.range.toLocaleString(),
         condition: aData.buyCondition.toString(),
-        action: aData.action.toString(),
+        action: (_a = aData.action) === null || _a === void 0 ? void 0 : _a.toString(),
         standardPrice: aData.standardPrice.toLocaleString(),
-        buyPrice: Math.round(aData.buyPrice).toLocaleString(),
-        sellPrice: Math.round(aData.sellPrice).toLocaleString(),
-        rate: (_a = aData.rate && aData.rate * 100) === null || _a === void 0 ? void 0 : _a.toFixed(2),
-        profit: Math.round(aData.profit).toLocaleString(),
+        buyPrice: aData.buyPrice && Math.round(aData.buyPrice).toLocaleString() || "",
+        sellPrice: aData.sellPrice && Math.round(aData.sellPrice).toLocaleString() || "",
+        rate: ((_b = aData.rate && aData.rate * 100) === null || _b === void 0 ? void 0 : _b.toFixed(2)) || "",
+        profit: aData.profit && Math.round(aData.profit).toLocaleString() || "",
         sumProfit: aData.sumProfit && Math.round(aData.sumProfit).toLocaleString()
       };
       updateElementsTextWithData(parseData, cloned);
-      cloned.dataset.action = aData.buyCondition.toString();
+      cloned.dataset.action = (_c = aData.action) === null || _c === void 0 ? void 0 : _c.toString();
       return cloned;
     }
   };
