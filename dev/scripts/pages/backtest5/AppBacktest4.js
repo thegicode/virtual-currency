@@ -19,7 +19,6 @@ export default class AppBacktest4 extends HTMLElement {
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
         this.target = 2;
-        this.realPrices = [];
         this.overviewCustomElement = this.querySelector("backtest-overview");
         this.controlCustomElement = this.querySelector("backtest-control");
         this.tableCustomElement = this.querySelector("backtest-table");

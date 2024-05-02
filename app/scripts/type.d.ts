@@ -182,3 +182,26 @@ interface IAfternoonData {
     low_price: number;
     opening_price: number;
 }
+
+interface ICandles5 {
+    candle_date_time_kst: string;
+    high_price: number;
+    low_price: number;
+    market: string;
+    opening_price: number;
+    trade_price: number;
+}
+
+interface IBacktest5 {
+    market: string;
+    date: string;
+    range: number;
+    buyCondition: boolean;
+    action: string;
+    standardPrice: number;
+    buyPrice: number;
+    sellPrice: number;
+    rate: number;
+    profit: number;
+    sumProfit?: number;
+}

@@ -33,6 +33,7 @@ export default class AppBacktest4 extends HTMLElement {
     public marketSize: number;
     public investmentPrice: number;
     public target: number;
+    private realPrices: any[];
 
     private overviewCustomElement: Overview;
     private controlCustomElement: Control;
@@ -48,6 +49,7 @@ export default class AppBacktest4 extends HTMLElement {
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
         this.target = 2; // 추천 2
+        this.realPrices = [];
 
         this.overviewCustomElement = this.querySelector(
             "backtest-overview"
