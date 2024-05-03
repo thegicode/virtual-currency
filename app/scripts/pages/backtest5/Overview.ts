@@ -14,6 +14,7 @@ export default class Overview extends HTMLElement {
 
     private sumElement: HTMLElement;
     private listElement: HTMLElement;
+
     private itemTemplate: HTMLTemplateElement;
 
     constructor() {
@@ -35,6 +36,22 @@ export default class Overview extends HTMLElement {
 
     connectedCallback() {}
 
+    public initialize() {
+        this.data = [];
+        this.profit = 0;
+        this.totalSumPrice = 0;
+        this.size = 0;
+
+        this.listElement.innerHTML = "";
+
+        const renderData = {
+            totalSumPrice: 0,
+            totalSumRate: 0,
+        };
+
+        updateElementsTextWithData(renderData, this.sumElement);
+    }
+
     public redner(data: IBacktest5[]) {
         this.data = data;
         this.renderList();
@@ -44,9 +61,10 @@ export default class Overview extends HTMLElement {
     private renderList() {
         const profit = this.data[this.data.length - 1].sumProfit || 0;
         const rate = (profit / this.app.investmentAmount) * 100;
+        const market = this.data[0].market;
 
         const renderData = {
-            market: this.data[0].market,
+            market,
             period: this.app.count,
             totalRate: `${rate.toFixed(2)}%`,
             totalProfit: ` ${Math.round(profit).toLocaleString()} 원`,
@@ -54,6 +72,7 @@ export default class Overview extends HTMLElement {
 
         const cloned = cloneTemplate<HTMLElement>(this.itemTemplate);
         cloned.dataset.value = profit.toString();
+        cloned.dataset.market = market;
         updateElementsTextWithData(renderData, cloned);
 
         this.listElement.appendChild(cloned);

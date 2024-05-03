@@ -1,47 +1,40 @@
 export default class Control extends HTMLElement {
     constructor() {
         super();
-        this.app = document.querySelector("app-backtest4");
+        this.app = document.querySelector("app-backtest5");
         this.formElement = this.querySelector("form");
-        this.selectElement = this.querySelector("select");
-        this.countElement = this.querySelector("input[name=count]");
+        this.marketsInput = this.querySelector('input[name="markets"]');
+        this.countInput = this.querySelector("input[name=count]");
         this.investmentPriceElement = this.querySelector(".investmentPrice");
         this.onSubmit = this.onSubmit.bind(this);
-        this.onChange = this.onChange.bind(this);
     }
     connectedCallback() {
         this.formElement.addEventListener("submit", this.onSubmit);
-        this.selectElement.addEventListener("change", this.onChange);
     }
     disconnectedCallback() {
         this.formElement.removeEventListener("submit", this.onSubmit);
-        this.selectElement.removeEventListener("change", this.onChange);
     }
-    initialize() {
+    render() {
         if (!this.app)
             return;
-        this.app.market = this.selectElement.value;
-        this.countElement.value = this.app.count.toString();
+        this.marketsInput.value = this.app.markets.join(", ");
+        this.countInput.value = this.app.count.toString();
         this.investmentPriceElement.textContent =
-            this.app.investmentPrice.toLocaleString();
+            this.app.investmentAmount.toLocaleString();
     }
-    onChange(event) {
-        if (!this.app)
-            return;
-        const target = event.target;
-        this.app.market = target.value;
-        this.app.runBackTest();
-    }
+    initialize() { }
     onSubmit(event) {
         event === null || event === void 0 ? void 0 : event.preventDefault();
         if (!this.app)
             return;
-        const maxSize = Number(this.countElement.getAttribute("max"));
+        this.app.markets = this.marketsInput.value.split(",");
+        const maxSize = Number(this.countInput.getAttribute("max"));
         this.app.count =
-            Number(this.countElement.value) > maxSize
+            Number(this.countInput.value) > maxSize
                 ? maxSize
-                : Number(this.countElement.value);
-        this.countElement.value = this.app.count.toString();
+                : Number(this.countInput.value);
+        this.countInput.value = this.app.count.toString();
+        this.app.initialize();
         this.app.runBackTest();
     }
 }

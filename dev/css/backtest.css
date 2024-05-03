@@ -28,6 +28,15 @@ body {
   color: #666;
 }
 
+h1 {
+  font-size: 1.3rem;
+}
+
+h2 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
 .backtest-options {
   display: flex;
   align-items: center;
@@ -48,13 +57,56 @@ body {
   margin-left: 5px;
 }
 
+.backtest-form {
+  display: flex;
+  gap: 10px;
+}
+.backtest-form .col:first-child {
+  flex: 1;
+}
+.backtest-form input {
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #f4f0dd;
+  font-size: 11px;
+  color: #818181;
+}
+.backtest-form button {
+  padding: 4px 10px;
+  background-color: #f8f8f8;
+  color: #818181;
+  font-size: 11px;
+}
+.backtest-form .row {
+  display: flex;
+  margin: 4px 0;
+  gap: 10px;
+}
+.backtest-form .cell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.backtest-form .title {
+  min-width: 60px;
+}
+.backtest-form input[name=markets] {
+  flex: 1;
+}
+.backtest-form input[name=count] {
+  width: 50px;
+}
+
 backtest-overview {
   display: block;
 }
 
 .summary,
 backtest-overview {
-  padding: 10px;
+  margin-top: 1rem;
+  padding: 0 0 5px;
   border-radius: 5px;
   border: 1px solid #ebebeb;
 }
@@ -65,8 +117,7 @@ backtest-overview {
   justify-content: space-around;
   margin-bottom: 10px;
   padding: 0 0 10px;
-  font-weight: bold;
-  color: orangered;
+  color: #a048ff;
   font-size: 14px;
 }
 .summary-all p,
@@ -80,12 +131,13 @@ backtest-overview {
 
 .summary-list,
 .overview-list {
+  margin: 0 10px;
   padding: 0;
 }
 .summary-list li,
 .overview-list li {
   display: flex;
-  margin: 5px 0;
+  align-items: center;
   padding-bottom: 5px;
 }
 .summary-list p,
@@ -108,12 +160,15 @@ backtest-table {
   display: block;
   margin-top: 10px;
 }
+backtest-table nav {
+  margin-bottom: 5px;
+}
 backtest-table nav a {
   display: inline-block;
-  margin-left: 4px;
-  padding: 10px;
+  margin-right: 4px;
+  padding: 5px 12px;
   border: 1px solid #ddd;
-  border-radius: 5px 5px 0 0;
+  border-radius: 3px;
   text-decoration: none;
   color: #666;
 }
@@ -136,11 +191,11 @@ table thead {
   top: 0;
   background: #e9e9e9;
 }
-table tr[data-action=Buy],
-table tr[data-action=Trade] {
+table tr[data-action=Buy] {
   background-color: rgba(255, 254, 185, 0.5);
 }
-table tr[data-action=Sell] {
+table tr[data-action=Sell],
+table tr[data-action=Trade] {
   background-color: rgba(204, 193, 255, 0.3);
 }
 table th,

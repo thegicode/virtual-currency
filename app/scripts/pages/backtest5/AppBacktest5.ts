@@ -36,7 +36,6 @@ import Overview from "./Overview";
 import Table from "./Table";
 
 export default class AppBacktest5 extends HTMLElement {
-    public tradeData: any[];
     public markets: string[];
     public count: number;
     public totalInvestmentAmount: number;
@@ -50,10 +49,8 @@ export default class AppBacktest5 extends HTMLElement {
     constructor() {
         super();
 
-        this.tradeData = [];
         this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
-        // this.markets = ["KRW-NEAR", "KRW-BTC"];
-        this.count = 30;
+        this.count = 10;
         this.totalInvestmentAmount = 1000000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;
@@ -87,7 +84,7 @@ export default class AppBacktest5 extends HTMLElement {
                 const result = this.backtest(data, realprices);
 
                 this.render(result);
-                this.tradeData.push(result);
+                // this.tradeData.push(result);
             } catch (error) {
                 console.error("Error in runBackTest:", error);
                 // 에러 처리 로직 추가 (예: 에러 발생시 재시도 또는 로그 저장 등)
@@ -228,7 +225,14 @@ export default class AppBacktest5 extends HTMLElement {
     }
 
     private render(data: IBacktest5[]) {
+        this.controlCustomElement.render();
         this.tableCustomElement.render(data);
         this.overviewCustomElement.redner(data);
+    }
+
+    public initialize() {
+        this.controlCustomElement.initialize();
+        this.overviewCustomElement.initialize();
+        this.tableCustomElement.initialize();
     }
 }

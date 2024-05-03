@@ -4,15 +4,23 @@ export default class BacktestTable extends HTMLElement {
         super();
         this.data = [];
         this.market = "";
+        this.activedTable = null;
+        this.activedTab = null;
         this.navElement = this.querySelector("nav");
         this.dataElement = this.querySelector(".dataTable");
         this.tableTemplate = document.querySelector("#tp-table");
         this.itemTemplate = document.querySelector("#tp-item");
-        this.activedTable = null;
-        this.activedTab = null;
         this.addNavEvent = this.addNavEvent.bind(this);
     }
     connectedCallback() { }
+    initialize() {
+        this.data = [];
+        this.market = "";
+        this.activedTable = null;
+        this.activedTab = null;
+        this.navElement.innerHTML = "";
+        this.dataElement.innerHTML = "";
+    }
     render(data) {
         this.data = data;
         this.market = this.data[0].market;

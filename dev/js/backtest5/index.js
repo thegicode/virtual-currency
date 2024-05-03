@@ -31,9 +31,8 @@
   var AppBacktest5 = class extends HTMLElement {
     constructor() {
       super();
-      this.tradeData = [];
       this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
-      this.count = 30;
+      this.count = 10;
       this.totalInvestmentAmount = 1e6;
       this.investmentAmount = this.totalInvestmentAmount / this.markets.length;
       this.k = 0.5;
@@ -53,7 +52,6 @@
             const realprices = yield this.getRealPrices(data);
             const result = this.backtest(data, realprices);
             this.render(result);
-            this.tradeData.push(result);
           } catch (error) {
             console.error("Error in runBackTest:", error);
           }
@@ -155,8 +153,14 @@
       return new Promise((resolve) => setTimeout(resolve, duration));
     }
     render(data) {
+      this.controlCustomElement.render();
       this.tableCustomElement.render(data);
       this.overviewCustomElement.redner(data);
+    }
+    initialize() {
+      this.controlCustomElement.initialize();
+      this.overviewCustomElement.initialize();
+      this.tableCustomElement.initialize();
     }
   };
 
@@ -190,6 +194,18 @@
     }
     connectedCallback() {
     }
+    initialize() {
+      this.data = [];
+      this.profit = 0;
+      this.totalSumPrice = 0;
+      this.size = 0;
+      this.listElement.innerHTML = "";
+      const renderData = {
+        totalSumPrice: 0,
+        totalSumRate: 0
+      };
+      updateElementsTextWithData(renderData, this.sumElement);
+    }
     redner(data) {
       this.data = data;
       this.renderList();
@@ -198,14 +214,16 @@
     renderList() {
       const profit = this.data[this.data.length - 1].sumProfit || 0;
       const rate = profit / this.app.investmentAmount * 100;
+      const market = this.data[0].market;
       const renderData = {
-        market: this.data[0].market,
+        market,
         period: this.app.count,
         totalRate: `${rate.toFixed(2)}%`,
         totalProfit: ` ${Math.round(profit).toLocaleString()} \uC6D0`
       };
       const cloned = cloneTemplate(this.itemTemplate);
       cloned.dataset.value = profit.toString();
+      cloned.dataset.market = market;
       updateElementsTextWithData(renderData, cloned);
       this.listElement.appendChild(cloned);
       this.addEvent(cloned);
@@ -244,43 +262,37 @@
   var Control = class extends HTMLElement {
     constructor() {
       super();
-      this.app = document.querySelector("app-backtest4");
+      this.app = document.querySelector("app-backtest5");
       this.formElement = this.querySelector("form");
-      this.selectElement = this.querySelector("select");
-      this.countElement = this.querySelector("input[name=count]");
+      this.marketsInput = this.querySelector('input[name="markets"]');
+      this.countInput = this.querySelector("input[name=count]");
       this.investmentPriceElement = this.querySelector(".investmentPrice");
       this.onSubmit = this.onSubmit.bind(this);
-      this.onChange = this.onChange.bind(this);
     }
     connectedCallback() {
       this.formElement.addEventListener("submit", this.onSubmit);
-      this.selectElement.addEventListener("change", this.onChange);
     }
     disconnectedCallback() {
       this.formElement.removeEventListener("submit", this.onSubmit);
-      this.selectElement.removeEventListener("change", this.onChange);
+    }
+    render() {
+      if (!this.app)
+        return;
+      this.marketsInput.value = this.app.markets.join(", ");
+      this.countInput.value = this.app.count.toString();
+      this.investmentPriceElement.textContent = this.app.investmentAmount.toLocaleString();
     }
     initialize() {
-      if (!this.app)
-        return;
-      this.app.market = this.selectElement.value;
-      this.countElement.value = this.app.count.toString();
-      this.investmentPriceElement.textContent = this.app.investmentPrice.toLocaleString();
-    }
-    onChange(event) {
-      if (!this.app)
-        return;
-      const target = event.target;
-      this.app.market = target.value;
-      this.app.runBackTest();
     }
     onSubmit(event) {
       event === null || event === void 0 ? void 0 : event.preventDefault();
       if (!this.app)
         return;
-      const maxSize = Number(this.countElement.getAttribute("max"));
-      this.app.count = Number(this.countElement.value) > maxSize ? maxSize : Number(this.countElement.value);
-      this.countElement.value = this.app.count.toString();
+      this.app.markets = this.marketsInput.value.split(",");
+      const maxSize = Number(this.countInput.getAttribute("max"));
+      this.app.count = Number(this.countInput.value) > maxSize ? maxSize : Number(this.countInput.value);
+      this.countInput.value = this.app.count.toString();
+      this.app.initialize();
       this.app.runBackTest();
     }
   };
@@ -291,15 +303,23 @@
       super();
       this.data = [];
       this.market = "";
+      this.activedTable = null;
+      this.activedTab = null;
       this.navElement = this.querySelector("nav");
       this.dataElement = this.querySelector(".dataTable");
       this.tableTemplate = document.querySelector("#tp-table");
       this.itemTemplate = document.querySelector("#tp-item");
-      this.activedTable = null;
-      this.activedTab = null;
       this.addNavEvent = this.addNavEvent.bind(this);
     }
     connectedCallback() {
+    }
+    initialize() {
+      this.data = [];
+      this.market = "";
+      this.activedTable = null;
+      this.activedTab = null;
+      this.navElement.innerHTML = "";
+      this.dataElement.innerHTML = "";
     }
     render(data) {
       this.data = data;
@@ -382,9 +402,9 @@
   };
 
   // dev/scripts/pages/backtest5/index.js
+  customElements.define("backtest-table", BacktestTable);
   customElements.define("backtest-control", Control);
   customElements.define("backtest-overview", Overview);
-  customElements.define("backtest-table", BacktestTable);
   customElements.define("app-backtest5", AppBacktest5);
 })();
 //# sourceMappingURL=index.js.map

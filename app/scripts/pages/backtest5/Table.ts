@@ -22,6 +22,9 @@ export default class BacktestTable extends HTMLElement {
         this.data = [];
         this.market = "";
 
+        this.activedTable = null;
+        this.activedTab = null;
+
         this.navElement = this.querySelector("nav") as HTMLElement;
         this.dataElement = this.querySelector(".dataTable") as HTMLElement;
 
@@ -32,13 +35,21 @@ export default class BacktestTable extends HTMLElement {
             "#tp-item"
         ) as HTMLTemplateElement;
 
-        this.activedTable = null;
-        this.activedTab = null;
-
         this.addNavEvent = this.addNavEvent.bind(this);
     }
 
     connectedCallback() {}
+
+    public initialize() {
+        this.data = [];
+        this.market = "";
+
+        this.activedTable = null;
+        this.activedTab = null;
+
+        this.navElement.innerHTML = "";
+        this.dataElement.innerHTML = "";
+    }
 
     public render(data: IBacktest5[]) {
         this.data = data;
@@ -66,8 +77,8 @@ export default class BacktestTable extends HTMLElement {
         const tabElement = document.createElement("a") as HTMLAnchorElement;
         tabElement.textContent = this.market;
         tabElement.href = `#${this.market}`;
-        this.navElement.appendChild(tabElement);
 
+        this.navElement.appendChild(tabElement);
         tabElement.addEventListener("click", this.addNavEvent);
     }
 

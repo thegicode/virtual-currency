@@ -10,9 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 export default class AppBacktest5 extends HTMLElement {
     constructor() {
         super();
-        this.tradeData = [];
         this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
-        this.count = 30;
+        this.count = 10;
         this.totalInvestmentAmount = 1000000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;
@@ -33,7 +32,6 @@ export default class AppBacktest5 extends HTMLElement {
                     const realprices = yield this.getRealPrices(data);
                     const result = this.backtest(data, realprices);
                     this.render(result);
-                    this.tradeData.push(result);
                 }
                 catch (error) {
                     console.error("Error in runBackTest:", error);
@@ -139,8 +137,14 @@ export default class AppBacktest5 extends HTMLElement {
         return new Promise((resolve) => setTimeout(resolve, duration));
     }
     render(data) {
+        this.controlCustomElement.render();
         this.tableCustomElement.render(data);
         this.overviewCustomElement.redner(data);
+    }
+    initialize() {
+        this.controlCustomElement.initialize();
+        this.overviewCustomElement.initialize();
+        this.tableCustomElement.initialize();
     }
 }
 //# sourceMappingURL=AppBacktest5.js.map

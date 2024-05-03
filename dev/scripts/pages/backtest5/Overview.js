@@ -12,6 +12,18 @@ export default class Overview extends HTMLElement {
         this.itemTemplate = document.querySelector("#tp-overviewItem");
     }
     connectedCallback() { }
+    initialize() {
+        this.data = [];
+        this.profit = 0;
+        this.totalSumPrice = 0;
+        this.size = 0;
+        this.listElement.innerHTML = "";
+        const renderData = {
+            totalSumPrice: 0,
+            totalSumRate: 0,
+        };
+        updateElementsTextWithData(renderData, this.sumElement);
+    }
     redner(data) {
         this.data = data;
         this.renderList();
@@ -20,14 +32,16 @@ export default class Overview extends HTMLElement {
     renderList() {
         const profit = this.data[this.data.length - 1].sumProfit || 0;
         const rate = (profit / this.app.investmentAmount) * 100;
+        const market = this.data[0].market;
         const renderData = {
-            market: this.data[0].market,
+            market,
             period: this.app.count,
             totalRate: `${rate.toFixed(2)}%`,
             totalProfit: ` ${Math.round(profit).toLocaleString()} 원`,
         };
         const cloned = cloneTemplate(this.itemTemplate);
         cloned.dataset.value = profit.toString();
+        cloned.dataset.market = market;
         updateElementsTextWithData(renderData, cloned);
         this.listElement.appendChild(cloned);
         this.addEvent(cloned);

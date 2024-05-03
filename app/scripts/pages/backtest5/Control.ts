@@ -1,21 +1,27 @@
-import AppBacktest4 from "./AppBacktest4";
+import AppBacktest5 from "./AppBacktest5";
 
 export default class Control extends HTMLElement {
-    private app: AppBacktest4;
+    private app: AppBacktest5;
 
     private formElement: HTMLFormElement;
-    private selectElement: HTMLSelectElement;
-    private countElement: HTMLInputElement;
+    private marketsInput: HTMLInputElement;
+    // private marketsButton: HTMLButtonElement;
+    private countInput: HTMLInputElement;
     private investmentPriceElement: HTMLElement;
 
     constructor() {
         super();
 
-        this.app = document.querySelector("app-backtest4") as AppBacktest4;
+        this.app = document.querySelector("app-backtest5") as AppBacktest5;
 
         this.formElement = this.querySelector("form") as HTMLFormElement;
-        this.selectElement = this.querySelector("select") as HTMLSelectElement;
-        this.countElement = this.querySelector(
+        this.marketsInput = this.querySelector(
+            'input[name="markets"]'
+        ) as HTMLInputElement;
+        // this.marketsButton = this.querySelector(
+        //     ".marketsButton"
+        // ) as HTMLButtonElement;
+        this.countInput = this.querySelector(
             "input[name=count]"
         ) as HTMLInputElement;
         this.investmentPriceElement = this.querySelector(
@@ -23,47 +29,49 @@ export default class Control extends HTMLElement {
         ) as HTMLElement;
 
         this.onSubmit = this.onSubmit.bind(this);
-        this.onChange = this.onChange.bind(this);
+        // this.onClickMarkets = this.onClickMarkets.bind(this);
     }
 
     connectedCallback() {
         this.formElement.addEventListener("submit", this.onSubmit);
-        this.selectElement.addEventListener("change", this.onChange);
+        // this.marketsButton.addEventListener("click", this.onClickMarkets);
     }
 
     disconnectedCallback() {
         this.formElement.removeEventListener("submit", this.onSubmit);
-        this.selectElement.removeEventListener("change", this.onChange);
+        // this.marketsButton.removeEventListener("click", this.onClickMarkets);
     }
 
-    public initialize() {
+    public render() {
         if (!this.app) return;
 
-        this.app.market = this.selectElement.value;
-        this.countElement.value = this.app.count.toString();
+        this.marketsInput.value = this.app.markets.join(", ");
+        this.countInput.value = this.app.count.toString();
         this.investmentPriceElement.textContent =
-            this.app.investmentPrice.toLocaleString();
+            this.app.investmentAmount.toLocaleString();
     }
 
-    private onChange(event: Event) {
-        if (!this.app) return;
+    public initialize() {}
 
-        const target = event.target as HTMLInputElement;
-        this.app.market = target.value;
-        this.app.runBackTest();
-    }
+    // private onClickMarkets() {
+    //     this.app.markets = this.marketsInput.value.split(",");
+    //     this.app.initialize();
+    //     this.app.runBackTest();
+    // }
 
     private onSubmit(event: Event) {
         event?.preventDefault();
-
         if (!this.app) return;
 
-        const maxSize = Number(this.countElement.getAttribute("max"));
+        this.app.markets = this.marketsInput.value.split(",");
+        const maxSize = Number(this.countInput.getAttribute("max"));
         this.app.count =
-            Number(this.countElement.value) > maxSize
+            Number(this.countInput.value) > maxSize
                 ? maxSize
-                : Number(this.countElement.value);
-        this.countElement.value = this.app.count.toString();
+                : Number(this.countInput.value);
+
+        this.countInput.value = this.app.count.toString();
+        this.app.initialize();
         this.app.runBackTest();
     }
 }

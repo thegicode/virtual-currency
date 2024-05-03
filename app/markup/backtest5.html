@@ -44,37 +44,38 @@
             <section class="backtest">
                 <h2>투자방법5 : 다자 가상화폐 + 변동성 돌파</h2>
                 <backtest-control>
-                    <form class="backtest-options">
-                        <div class="option">
-                            <span class="title">| Market : </span>
-                            <select name="market">
-                                <option value="KRW-ONG" selected>
-                                    온톨로지가스
-                                </option>
-                                <option value="KRW-NEAR">니어프로토콜</option>
-                                <option value="KRW-BTC">비트코인</option>
-                                <option value="KRW-ETH">이더리움</option>
-                                <option value="KRW-DOGE">도지코인</option>
-                                <option value="KRW-SBD">스팀달러</option>
-                                <option value="KRW-XRP">리플</option>
-                            </select>
+                    <form class="backtest-form">
+                        <div class="col">
+                            <div class="row">
+                                <label class="cell">
+                                    <span class="title">| Markets : </span>
+                                    <input type="text" name="markets" />
+                                </label>
+                                <!-- <button type="button" class="marketsButton">
+                                확인
+                            </button> -->
+                            </div>
+                            <div class="row">
+                                <label class="cell">
+                                    <span class="title"> | 기간 : </span>
+                                    <input
+                                        type="number"
+                                        name="count"
+                                        max="200"
+                                        value=""
+                                    />
+                                    일
+                                </label>
+                                <div class="cell">
+                                    <span class="title">
+                                        | Market 당 투자금 :
+                                    </span>
+                                    <span class="investmentPrice"></span>원
+                                </div>
+                            </div>
                         </div>
-                        <label class="option">
-                            <span class="title"> | 기간 : </span>
-                            <input
-                                type="number"
-                                name="count"
-                                max="200"
-                                value=""
-                            />
-                            일
+                        <div class="col">
                             <button type="submit">적용</button>
-                        </label>
-                        <div class="option">
-                            <p>
-                                | Market 투자금 :
-                                <span class="investmentPrice"></span>
-                            </p>
                         </div>
                     </form>
                 </backtest-control>
