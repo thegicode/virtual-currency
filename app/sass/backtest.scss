@@ -88,6 +88,21 @@ backtest-overview {
 backtest-table {
     display: block;
     margin-top: 10px;
+
+    nav {
+        a {
+            display: inline-block;
+            margin-left: 4px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px 5px 0 0;
+            text-decoration: none;
+            color: #666;
+            &[data-active="true"] {
+                background-color: #f8f8f8;
+            }
+        }
+    }
 }
 
 .backtest-contents {
@@ -125,7 +140,10 @@ table {
         text-align: right;
     }
 
-    td.index {
+    td.index,
+    td.date,
+    td.condition,
+    td.action {
         text-align: center;
     }
 

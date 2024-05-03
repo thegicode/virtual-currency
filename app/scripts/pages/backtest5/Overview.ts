@@ -2,12 +2,13 @@ import {
     cloneTemplate,
     updateElementsTextWithData,
 } from "@app/scripts/utils/helpers";
-import AppBacktest4 from "./AppBacktest4";
+import AppBacktest5 from "./AppBacktest5";
 
 export default class Overview extends HTMLElement {
-    private app: AppBacktest4;
+    private app: AppBacktest5;
 
-    private totalProfit: number;
+    private data: IBacktest5[];
+    private profit: number;
     private totalSumPrice: number;
     private size: number;
 
@@ -18,9 +19,10 @@ export default class Overview extends HTMLElement {
     constructor() {
         super();
 
-        this.app = document.querySelector("app-backtest4") as AppBacktest4;
+        this.app = document.querySelector("app-backtest5") as AppBacktest5;
 
-        this.totalProfit = 0;
+        this.data = [];
+        this.profit = 0;
         this.totalSumPrice = 0;
         this.size = 0;
 
@@ -33,34 +35,32 @@ export default class Overview extends HTMLElement {
 
     connectedCallback() {}
 
-    public redner() {
+    public redner(data: IBacktest5[]) {
+        this.data = data;
         this.renderList();
         this.renderSum(true);
     }
 
     private renderList() {
-        if (!this.app) return;
+        const profit = this.data[this.data.length - 1].sumProfit || 0;
+        const rate = (profit / this.app.investmentAmount) * 100;
 
-        const totalProfit =
-            this.app.tradeData[this.app.tradeData.length - 1].unrealize_sum;
-        const totalRate = (totalProfit / this.app.investmentPrice) * 100;
         const renderData = {
-            market: this.app.market,
+            market: this.data[0].market,
             period: this.app.count,
-            totalRate: `${totalRate.toFixed(2)}%`,
-            totalProfit: ` ${Math.round(totalProfit).toLocaleString()} 원`,
+            totalRate: `${rate.toFixed(2)}%`,
+            totalProfit: ` ${Math.round(profit).toLocaleString()} 원`,
         };
 
         const cloned = cloneTemplate<HTMLElement>(this.itemTemplate);
-        cloned.dataset.value = totalProfit;
-
+        cloned.dataset.value = profit.toString();
         updateElementsTextWithData(renderData, cloned);
 
         this.listElement.appendChild(cloned);
 
         this.addEvent(cloned);
 
-        this.totalProfit = totalProfit;
+        this.profit = profit;
     }
 
     addEvent(cloned: HTMLElement) {
@@ -79,10 +79,10 @@ export default class Overview extends HTMLElement {
         if (!this.app) return;
 
         if (isAdd) {
-            this.totalSumPrice += this.totalProfit;
+            this.totalSumPrice += this.profit;
             this.size++;
         } else {
-            if (!profit) return;
+            if (profit === undefined) return;
             this.totalSumPrice -= profit;
             this.size--;
         }
@@ -91,7 +91,7 @@ export default class Overview extends HTMLElement {
             this.totalSumPrice === 0
                 ? 0
                 : (this.totalSumPrice /
-                      (this.app.investmentPrice * this.size)) *
+                      (this.app.investmentAmount * this.size)) *
                   100;
 
         const renderData = {

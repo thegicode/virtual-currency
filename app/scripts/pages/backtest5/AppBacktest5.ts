@@ -26,7 +26,9 @@
     - 고가(저가): 24시간 동안 가장 높은 가격
 
 
-TODO : 다중 코인 적용
+TODO : 
+    Form
+    다중 코인 적용
  */
 
 import Control from "./Control";
@@ -49,9 +51,9 @@ export default class AppBacktest5 extends HTMLElement {
         super();
 
         this.tradeData = [];
-        // this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
-        this.markets = ["KRW-NEAR"];
-        this.count = 60;
+        this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
+        // this.markets = ["KRW-NEAR", "KRW-BTC"];
+        this.count = 30;
         this.totalInvestmentAmount = 1000000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;
@@ -85,11 +87,14 @@ export default class AppBacktest5 extends HTMLElement {
                 const result = this.backtest(data, realprices);
 
                 this.render(result);
+                this.tradeData.push(result);
             } catch (error) {
                 console.error("Error in runBackTest:", error);
                 // 에러 처리 로직 추가 (예: 에러 발생시 재시도 또는 로그 저장 등)
             }
         }
+
+        this.tableCustomElement.initialSet();
     }
 
     private backtest(fetchedData: ICandles5[], orginRealPrices: IRealPrice[]) {
@@ -224,5 +229,6 @@ export default class AppBacktest5 extends HTMLElement {
 
     private render(data: IBacktest5[]) {
         this.tableCustomElement.render(data);
+        this.overviewCustomElement.redner(data);
     }
 }

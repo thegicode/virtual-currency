@@ -2,8 +2,9 @@ import { cloneTemplate, updateElementsTextWithData, } from "@app/scripts/utils/h
 export default class Overview extends HTMLElement {
     constructor() {
         super();
-        this.app = document.querySelector("app-backtest4");
-        this.totalProfit = 0;
+        this.app = document.querySelector("app-backtest5");
+        this.data = [];
+        this.profit = 0;
         this.totalSumPrice = 0;
         this.size = 0;
         this.sumElement = this.querySelector(".overview-sum");
@@ -11,27 +12,26 @@ export default class Overview extends HTMLElement {
         this.itemTemplate = document.querySelector("#tp-overviewItem");
     }
     connectedCallback() { }
-    redner() {
+    redner(data) {
+        this.data = data;
         this.renderList();
         this.renderSum(true);
     }
     renderList() {
-        if (!this.app)
-            return;
-        const totalProfit = this.app.tradeData[this.app.tradeData.length - 1].unrealize_sum;
-        const totalRate = (totalProfit / this.app.investmentPrice) * 100;
+        const profit = this.data[this.data.length - 1].sumProfit || 0;
+        const rate = (profit / this.app.investmentAmount) * 100;
         const renderData = {
-            market: this.app.market,
+            market: this.data[0].market,
             period: this.app.count,
-            totalRate: `${totalRate.toFixed(2)}%`,
-            totalProfit: ` ${Math.round(totalProfit).toLocaleString()} 원`,
+            totalRate: `${rate.toFixed(2)}%`,
+            totalProfit: ` ${Math.round(profit).toLocaleString()} 원`,
         };
         const cloned = cloneTemplate(this.itemTemplate);
-        cloned.dataset.value = totalProfit;
+        cloned.dataset.value = profit.toString();
         updateElementsTextWithData(renderData, cloned);
         this.listElement.appendChild(cloned);
         this.addEvent(cloned);
-        this.totalProfit = totalProfit;
+        this.profit = profit;
     }
     addEvent(cloned) {
         const deleteButton = cloned.querySelector(".deleteButton");
@@ -45,11 +45,11 @@ export default class Overview extends HTMLElement {
         if (!this.app)
             return;
         if (isAdd) {
-            this.totalSumPrice += this.totalProfit;
+            this.totalSumPrice += this.profit;
             this.size++;
         }
         else {
-            if (!profit)
+            if (profit === undefined)
                 return;
             this.totalSumPrice -= profit;
             this.size--;
@@ -57,7 +57,7 @@ export default class Overview extends HTMLElement {
         const totalSumRate = this.totalSumPrice === 0
             ? 0
             : (this.totalSumPrice /
-                (this.app.investmentPrice * this.size)) *
+                (this.app.investmentAmount * this.size)) *
                 100;
         const renderData = {
             totalSumPrice: Math.round(this.totalSumPrice).toLocaleString(),

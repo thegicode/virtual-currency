@@ -32,8 +32,8 @@
     constructor() {
       super();
       this.tradeData = [];
-      this.markets = ["KRW-NEAR"];
-      this.count = 60;
+      this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
+      this.count = 30;
       this.totalInvestmentAmount = 1e6;
       this.investmentAmount = this.totalInvestmentAmount / this.markets.length;
       this.k = 0.5;
@@ -53,10 +53,12 @@
             const realprices = yield this.getRealPrices(data);
             const result = this.backtest(data, realprices);
             this.render(result);
+            this.tradeData.push(result);
           } catch (error) {
             console.error("Error in runBackTest:", error);
           }
         }
+        this.tableCustomElement.initialSet();
       });
     }
     backtest(fetchedData, orginRealPrices) {
@@ -154,6 +156,7 @@
     }
     render(data) {
       this.tableCustomElement.render(data);
+      this.overviewCustomElement.redner(data);
     }
   };
 
@@ -176,8 +179,9 @@
   var Overview = class extends HTMLElement {
     constructor() {
       super();
-      this.app = document.querySelector("app-backtest4");
-      this.totalProfit = 0;
+      this.app = document.querySelector("app-backtest5");
+      this.data = [];
+      this.profit = 0;
       this.totalSumPrice = 0;
       this.size = 0;
       this.sumElement = this.querySelector(".overview-sum");
@@ -186,27 +190,26 @@
     }
     connectedCallback() {
     }
-    redner() {
+    redner(data) {
+      this.data = data;
       this.renderList();
       this.renderSum(true);
     }
     renderList() {
-      if (!this.app)
-        return;
-      const totalProfit = this.app.tradeData[this.app.tradeData.length - 1].unrealize_sum;
-      const totalRate = totalProfit / this.app.investmentPrice * 100;
+      const profit = this.data[this.data.length - 1].sumProfit || 0;
+      const rate = profit / this.app.investmentAmount * 100;
       const renderData = {
-        market: this.app.market,
+        market: this.data[0].market,
         period: this.app.count,
-        totalRate: `${totalRate.toFixed(2)}%`,
-        totalProfit: ` ${Math.round(totalProfit).toLocaleString()} \uC6D0`
+        totalRate: `${rate.toFixed(2)}%`,
+        totalProfit: ` ${Math.round(profit).toLocaleString()} \uC6D0`
       };
       const cloned = cloneTemplate(this.itemTemplate);
-      cloned.dataset.value = totalProfit;
+      cloned.dataset.value = profit.toString();
       updateElementsTextWithData(renderData, cloned);
       this.listElement.appendChild(cloned);
       this.addEvent(cloned);
-      this.totalProfit = totalProfit;
+      this.profit = profit;
     }
     addEvent(cloned) {
       const deleteButton = cloned.querySelector(".deleteButton");
@@ -220,15 +223,15 @@
       if (!this.app)
         return;
       if (isAdd) {
-        this.totalSumPrice += this.totalProfit;
+        this.totalSumPrice += this.profit;
         this.size++;
       } else {
-        if (!profit)
+        if (profit === void 0)
           return;
         this.totalSumPrice -= profit;
         this.size--;
       }
-      const totalSumRate = this.totalSumPrice === 0 ? 0 : this.totalSumPrice / (this.app.investmentPrice * this.size) * 100;
+      const totalSumRate = this.totalSumPrice === 0 ? 0 : this.totalSumPrice / (this.app.investmentAmount * this.size) * 100;
       const renderData = {
         totalSumPrice: Math.round(this.totalSumPrice).toLocaleString(),
         totalSumRate: totalSumRate.toFixed(2).toLocaleString()
@@ -286,23 +289,64 @@
   var BacktestTable = class extends HTMLElement {
     constructor() {
       super();
-      this.tableElement = this.querySelector("tbody");
-      this.template = document.querySelector("#tp-item");
+      this.data = [];
+      this.market = "";
+      this.navElement = this.querySelector("nav");
+      this.dataElement = this.querySelector(".dataTable");
+      this.tableTemplate = document.querySelector("#tp-table");
+      this.itemTemplate = document.querySelector("#tp-item");
+      this.activedTable = null;
+      this.activedTab = null;
+      this.addNavEvent = this.addNavEvent.bind(this);
     }
     connectedCallback() {
     }
     render(data) {
-      this.tableElement.innerHTML = "";
+      this.data = data;
+      this.market = this.data[0].market;
+      this.renderNav();
+      this.renderTable();
+    }
+    initialSet() {
+      const firstNav = this.navElement.querySelector("a");
+      const firstTable = this.dataElement.querySelector("table");
+      this.hideDataTables();
+      this.activateNav(firstNav);
+      this.activateTalble(firstTable);
+    }
+    renderNav() {
+      const tabElement = document.createElement("a");
+      tabElement.textContent = this.market;
+      tabElement.href = `#${this.market}`;
+      this.navElement.appendChild(tabElement);
+      tabElement.addEventListener("click", this.addNavEvent);
+    }
+    addNavEvent(event) {
+      event.preventDefault();
+      const target = event.target;
+      const targetTable = document.querySelector(target.hash);
+      this.activateTalble(targetTable);
+      this.activateNav(target);
+    }
+    renderTable() {
+      const cloned = this.crateTable();
+      this.dataElement.appendChild(cloned);
+    }
+    crateTable() {
+      const cloned = cloneTemplate(this.tableTemplate);
       const fragment = new DocumentFragment();
-      data.map((aData, index) => this.createItem(aData, index)).forEach((cloned) => fragment.appendChild(cloned));
-      this.tableElement.appendChild(fragment);
+      this.data.map((aData, index) => this.createItem(aData, index)).forEach((cloned2) => fragment.appendChild(cloned2));
+      cloned.id = this.market;
+      cloned.dataset.market = this.market;
+      cloned.appendChild(fragment);
+      return cloned;
     }
     createItem(aData, index) {
       var _a, _b, _c;
-      const cloned = cloneTemplate(this.template);
+      const cloned = cloneTemplate(this.itemTemplate);
       const parseData = {
         index,
-        date: aData.date,
+        date: aData.date.slice(0, 10),
         range: aData.range.toLocaleString(),
         condition: aData.buyCondition.toString(),
         action: (_a = aData.action) === null || _a === void 0 ? void 0 : _a.toString(),
@@ -316,6 +360,24 @@
       updateElementsTextWithData(parseData, cloned);
       cloned.dataset.action = (_c = aData.action) === null || _c === void 0 ? void 0 : _c.toString();
       return cloned;
+    }
+    hideDataTables() {
+      const tables = this.dataElement.querySelectorAll("table");
+      for (const t of tables) {
+        t.hidden = true;
+      }
+    }
+    activateNav(tabElement) {
+      tabElement.dataset.active = "true";
+      if (this.activedTab)
+        this.activedTab.dataset.active = "false";
+      this.activedTab = tabElement;
+    }
+    activateTalble(table) {
+      table.hidden = false;
+      if (this.activedTable)
+        this.activedTable.hidden = true;
+      this.activedTable = table;
     }
   };
 

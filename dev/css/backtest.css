@@ -108,6 +108,18 @@ backtest-table {
   display: block;
   margin-top: 10px;
 }
+backtest-table nav a {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px 5px 0 0;
+  text-decoration: none;
+  color: #666;
+}
+backtest-table nav a[data-active=true] {
+  background-color: #f8f8f8;
+}
 
 .backtest-contents {
   margin-top: 10px;
@@ -139,7 +151,10 @@ table td {
 table td {
   text-align: right;
 }
-table td.index {
+table td.index,
+table td.date,
+table td.condition,
+table td.action {
   text-align: center;
 }
 table td.candle_date_time_kst {

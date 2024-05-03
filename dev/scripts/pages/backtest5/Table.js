@@ -2,22 +2,65 @@ import { cloneTemplate, updateElementsTextWithData, } from "@app/scripts/utils/h
 export default class BacktestTable extends HTMLElement {
     constructor() {
         super();
-        this.tableElement = this.querySelector("tbody");
-        this.template = document.querySelector("#tp-item");
+        this.data = [];
+        this.market = "";
+        this.navElement = this.querySelector("nav");
+        this.dataElement = this.querySelector(".dataTable");
+        this.tableTemplate = document.querySelector("#tp-table");
+        this.itemTemplate = document.querySelector("#tp-item");
+        this.activedTable = null;
+        this.activedTab = null;
+        this.addNavEvent = this.addNavEvent.bind(this);
     }
     connectedCallback() { }
     render(data) {
-        this.tableElement.innerHTML = "";
+        this.data = data;
+        this.market = this.data[0].market;
+        this.renderNav();
+        this.renderTable();
+    }
+    initialSet() {
+        const firstNav = this.navElement.querySelector("a");
+        const firstTable = this.dataElement.querySelector("table");
+        this.hideDataTables();
+        this.activateNav(firstNav);
+        this.activateTalble(firstTable);
+    }
+    renderNav() {
+        const tabElement = document.createElement("a");
+        tabElement.textContent = this.market;
+        tabElement.href = `#${this.market}`;
+        this.navElement.appendChild(tabElement);
+        tabElement.addEventListener("click", this.addNavEvent);
+    }
+    addNavEvent(event) {
+        event.preventDefault();
+        const target = event.target;
+        const targetTable = document.querySelector(target.hash);
+        this.activateTalble(targetTable);
+        this.activateNav(target);
+    }
+    renderTable() {
+        const cloned = this.crateTable();
+        this.dataElement.appendChild(cloned);
+    }
+    crateTable() {
+        const cloned = cloneTemplate(this.tableTemplate);
         const fragment = new DocumentFragment();
-        data.map((aData, index) => this.createItem(aData, index)).forEach((cloned) => fragment.appendChild(cloned));
-        this.tableElement.appendChild(fragment);
+        this.data
+            .map((aData, index) => this.createItem(aData, index))
+            .forEach((cloned) => fragment.appendChild(cloned));
+        cloned.id = this.market;
+        cloned.dataset.market = this.market;
+        cloned.appendChild(fragment);
+        return cloned;
     }
     createItem(aData, index) {
         var _a, _b, _c;
-        const cloned = cloneTemplate(this.template);
+        const cloned = cloneTemplate(this.itemTemplate);
         const parseData = {
             index,
-            date: aData.date,
+            date: aData.date.slice(0, 10),
             range: aData.range.toLocaleString(),
             condition: aData.buyCondition.toString(),
             action: (_a = aData.action) === null || _a === void 0 ? void 0 : _a.toString(),
@@ -36,6 +79,24 @@ export default class BacktestTable extends HTMLElement {
         updateElementsTextWithData(parseData, cloned);
         cloned.dataset.action = (_c = aData.action) === null || _c === void 0 ? void 0 : _c.toString();
         return cloned;
+    }
+    hideDataTables() {
+        const tables = this.dataElement.querySelectorAll("table");
+        for (const t of tables) {
+            t.hidden = true;
+        }
+    }
+    activateNav(tabElement) {
+        tabElement.dataset.active = "true";
+        if (this.activedTab)
+            this.activedTab.dataset.active = "false";
+        this.activedTab = tabElement;
+    }
+    activateTalble(table) {
+        table.hidden = false;
+        if (this.activedTable)
+            this.activedTable.hidden = true;
+        this.activedTable = table;
     }
 }
 //# sourceMappingURL=Table.js.map
