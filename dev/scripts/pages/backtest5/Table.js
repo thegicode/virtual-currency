@@ -21,23 +21,20 @@ export default class BacktestTable extends HTMLElement {
         this.navElement.innerHTML = "";
         this.dataElement.innerHTML = "";
     }
-    render(data) {
+    render(data, index) {
         this.data = data;
         this.market = this.data[0].market;
-        this.renderNav();
-        this.renderTable();
+        this.renderNav(index);
+        this.renderTable(index);
     }
-    initialSet() {
-        const firstNav = this.navElement.querySelector("a");
-        const firstTable = this.dataElement.querySelector("table");
-        this.hideDataTables();
-        this.activateNav(firstNav);
-        this.activateTalble(firstTable);
-    }
-    renderNav() {
+    renderNav(index) {
         const tabElement = document.createElement("a");
         tabElement.textContent = this.market;
         tabElement.href = `#${this.market}`;
+        if (index === 0) {
+            tabElement.dataset.active = "true";
+            this.activedTab = tabElement;
+        }
         this.navElement.appendChild(tabElement);
         tabElement.addEventListener("click", this.addNavEvent);
     }
@@ -48,8 +45,15 @@ export default class BacktestTable extends HTMLElement {
         this.activateTalble(targetTable);
         this.activateNav(target);
     }
-    renderTable() {
+    renderTable(index) {
         const cloned = this.crateTable();
+        if (index === 0) {
+            cloned.hidden = false;
+            this.activedTable = cloned;
+        }
+        else {
+            cloned.hidden = true;
+        }
         this.dataElement.appendChild(cloned);
     }
     crateTable() {

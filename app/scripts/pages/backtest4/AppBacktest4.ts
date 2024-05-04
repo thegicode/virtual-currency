@@ -11,6 +11,9 @@
  *
  * 재료 : 전일 오후 (12시 ~ 24시) 수익률과
  *       전일 오전 & 오후 거래량
+ *
+ * 하루 두 번 자정, 정오에 매수하는 전략도 ?
+ * 2018년 하락장에서도 이더리움은 수익
  */
 
 import Control from "./Control";
@@ -33,7 +36,6 @@ export default class AppBacktest4 extends HTMLElement {
     public marketSize: number;
     public investmentPrice: number;
     public target: number;
-    private realPrices: any[];
 
     private overviewCustomElement: Overview;
     private controlCustomElement: Control;
@@ -44,12 +46,11 @@ export default class AppBacktest4 extends HTMLElement {
 
         this.tradeData = [];
         this.market = "";
-        this.count = 30;
+        this.count = 60;
         this.marketSize = 5;
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
         this.target = 2; // 추천 2
-        this.realPrices = [];
 
         this.overviewCustomElement = this.querySelector(
             "backtest-overview"
@@ -76,7 +77,7 @@ export default class AppBacktest4 extends HTMLElement {
         this.reset();
 
         for (let index = 0; index < this.count; index++) {
-            console.log(index);
+            // console.log(index);
 
             try {
                 const tradeData = await this.getTradeData(index);

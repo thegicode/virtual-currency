@@ -51,32 +51,23 @@ export default class BacktestTable extends HTMLElement {
         this.dataElement.innerHTML = "";
     }
 
-    public render(data: IBacktest5[]) {
+    public render(data: IBacktest5[], index: number) {
         this.data = data;
         this.market = this.data[0].market;
 
-        this.renderNav();
-        this.renderTable();
+        this.renderNav(index);
+        this.renderTable(index);
     }
 
-    public initialSet() {
-        const firstNav = this.navElement.querySelector(
-            "a"
-        ) as HTMLAnchorElement;
-        const firstTable = this.dataElement.querySelector(
-            "table"
-        ) as HTMLTableElement;
-
-        this.hideDataTables();
-
-        this.activateNav(firstNav);
-        this.activateTalble(firstTable);
-    }
-
-    private renderNav() {
+    private renderNav(index: number) {
         const tabElement = document.createElement("a") as HTMLAnchorElement;
         tabElement.textContent = this.market;
         tabElement.href = `#${this.market}`;
+
+        if (index === 0) {
+            tabElement.dataset.active = "true";
+            this.activedTab = tabElement;
+        }
 
         this.navElement.appendChild(tabElement);
         tabElement.addEventListener("click", this.addNavEvent);
@@ -91,8 +82,16 @@ export default class BacktestTable extends HTMLElement {
         this.activateNav(target);
     }
 
-    private renderTable() {
+    private renderTable(index: number) {
         const cloned = this.crateTable();
+
+        if (index === 0) {
+            cloned.hidden = false;
+            this.activedTable = cloned;
+        } else {
+            cloned.hidden = true;
+        }
+
         this.dataElement.appendChild(cloned);
     }
 

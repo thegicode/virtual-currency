@@ -14,12 +14,11 @@ export default class AppBacktest4 extends HTMLElement {
         super();
         this.tradeData = [];
         this.market = "";
-        this.count = 30;
+        this.count = 60;
         this.marketSize = 5;
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
         this.target = 2;
-        this.realPrices = [];
         this.overviewCustomElement = this.querySelector("backtest-overview");
         this.controlCustomElement = this.querySelector("backtest-control");
         this.tableCustomElement = this.querySelector("backtest-table");
@@ -35,7 +34,6 @@ export default class AppBacktest4 extends HTMLElement {
         return __awaiter(this, void 0, void 0, function* () {
             this.reset();
             for (let index = 0; index < this.count; index++) {
-                console.log(index);
                 try {
                     const tradeData = yield this.getTradeData(index);
                     this.tradeData.push(tradeData);

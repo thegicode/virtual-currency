@@ -173,7 +173,7 @@ backtest-table nav a {
   color: #666;
 }
 backtest-table nav a[data-active=true] {
-  background-color: #f8f8f8;
+  background-color: #f2e5ff;
 }
 
 .backtest-contents {

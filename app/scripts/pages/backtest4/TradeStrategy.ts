@@ -3,12 +3,18 @@ import AppBacktest4 from "./AppBacktest4";
 class TradeStrategy {
     protected app: AppBacktest4;
     protected index: number;
+    // protected buyData: number;
     protected data: ITradeData4;
 
     constructor(app: AppBacktest4, data: ITradeData4, index: number) {
         this.app = app;
         this.data = data;
         this.index = index;
+
+        // this.buyData =
+        //     this.index > 0 && this.prevData && this.prevData.buy_index
+        //         ? this.app.tradeData[this.prevData.buy_index]
+        //         : null;
     }
 
     get buy_index() {
@@ -20,7 +26,9 @@ class TradeStrategy {
     }
 
     get buyData() {
-        return this.index > 0 && this.prevData && this.prevData.buy_index
+        return this.index > 0 &&
+            this.prevData &&
+            typeof this.prevData.buy_index === "number"
             ? this.app.tradeData[this.prevData.buy_index]
             : null;
     }
@@ -67,6 +75,7 @@ class BuyStrategy extends TradeStrategy {
     }
 
     get unrealize_sum() {
+        if (!this.prevData) return 0;
         return this.prevData.unrealize_sum ? this.prevData.unrealize_sum : 0;
     }
 }

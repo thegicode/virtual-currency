@@ -11,7 +11,7 @@ export default class AppBacktest5 extends HTMLElement {
     constructor() {
         super();
         this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
-        this.count = 10;
+        this.count = 60;
         this.totalInvestmentAmount = 1000000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;
@@ -31,13 +31,12 @@ export default class AppBacktest5 extends HTMLElement {
                     const data = yield this.fetchData(market, (this.count + 1).toString());
                     const realprices = yield this.getRealPrices(data);
                     const result = this.backtest(data, realprices);
-                    this.render(result);
+                    this.render(result, this.markets.indexOf(market));
                 }
                 catch (error) {
                     console.error("Error in runBackTest:", error);
                 }
             }
-            this.tableCustomElement.initialSet();
         });
     }
     backtest(fetchedData, orginRealPrices) {
@@ -136,10 +135,10 @@ export default class AppBacktest5 extends HTMLElement {
     delay(duration) {
         return new Promise((resolve) => setTimeout(resolve, duration));
     }
-    render(data) {
+    render(data, index) {
         this.controlCustomElement.render();
-        this.tableCustomElement.render(data);
         this.overviewCustomElement.redner(data);
+        this.tableCustomElement.render(data, index);
     }
     initialize() {
         this.controlCustomElement.initialize();

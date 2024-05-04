@@ -20,7 +20,7 @@
       return this.index > 0 ? this.app.tradeData[this.index - 1] : null;
     }
     get buyData() {
-      return this.index > 0 && this.prevData && this.prevData.buy_index ? this.app.tradeData[this.prevData.buy_index] : null;
+      return this.index > 0 && this.prevData && typeof this.prevData.buy_index === "number" ? this.app.tradeData[this.prevData.buy_index] : null;
     }
     get orderAmount() {
       if (!this.buyData.volatility)
@@ -56,6 +56,8 @@
       return this.index;
     }
     get unrealize_sum() {
+      if (!this.prevData)
+        return 0;
       return this.prevData.unrealize_sum ? this.prevData.unrealize_sum : 0;
     }
   };
@@ -130,12 +132,11 @@
       super();
       this.tradeData = [];
       this.market = "";
-      this.count = 30;
+      this.count = 60;
       this.marketSize = 5;
       this.totalInvestmentPrice = 1e6;
       this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
       this.target = 2;
-      this.realPrices = [];
       this.overviewCustomElement = this.querySelector("backtest-overview");
       this.controlCustomElement = this.querySelector("backtest-control");
       this.tableCustomElement = this.querySelector("backtest-table");
@@ -151,7 +152,6 @@
       return __awaiter(this, void 0, void 0, function* () {
         this.reset();
         for (let index = 0; index < this.count; index++) {
-          console.log(index);
           try {
             const tradeData = yield this.getTradeData(index);
             this.tradeData.push(tradeData);

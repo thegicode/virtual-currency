@@ -32,7 +32,7 @@
     constructor() {
       super();
       this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
-      this.count = 10;
+      this.count = 60;
       this.totalInvestmentAmount = 1e6;
       this.investmentAmount = this.totalInvestmentAmount / this.markets.length;
       this.k = 0.5;
@@ -51,12 +51,11 @@
             const data = yield this.fetchData(market, (this.count + 1).toString());
             const realprices = yield this.getRealPrices(data);
             const result = this.backtest(data, realprices);
-            this.render(result);
+            this.render(result, this.markets.indexOf(market));
           } catch (error) {
             console.error("Error in runBackTest:", error);
           }
         }
-        this.tableCustomElement.initialSet();
       });
     }
     backtest(fetchedData, orginRealPrices) {
@@ -152,10 +151,10 @@
     delay(duration) {
       return new Promise((resolve) => setTimeout(resolve, duration));
     }
-    render(data) {
+    render(data, index) {
       this.controlCustomElement.render();
-      this.tableCustomElement.render(data);
       this.overviewCustomElement.redner(data);
+      this.tableCustomElement.render(data, index);
     }
     initialize() {
       this.controlCustomElement.initialize();
@@ -321,23 +320,20 @@
       this.navElement.innerHTML = "";
       this.dataElement.innerHTML = "";
     }
-    render(data) {
+    render(data, index) {
       this.data = data;
       this.market = this.data[0].market;
-      this.renderNav();
-      this.renderTable();
+      this.renderNav(index);
+      this.renderTable(index);
     }
-    initialSet() {
-      const firstNav = this.navElement.querySelector("a");
-      const firstTable = this.dataElement.querySelector("table");
-      this.hideDataTables();
-      this.activateNav(firstNav);
-      this.activateTalble(firstTable);
-    }
-    renderNav() {
+    renderNav(index) {
       const tabElement = document.createElement("a");
       tabElement.textContent = this.market;
       tabElement.href = `#${this.market}`;
+      if (index === 0) {
+        tabElement.dataset.active = "true";
+        this.activedTab = tabElement;
+      }
       this.navElement.appendChild(tabElement);
       tabElement.addEventListener("click", this.addNavEvent);
     }
@@ -348,8 +344,14 @@
       this.activateTalble(targetTable);
       this.activateNav(target);
     }
-    renderTable() {
+    renderTable(index) {
       const cloned = this.crateTable();
+      if (index === 0) {
+        cloned.hidden = false;
+        this.activedTable = cloned;
+      } else {
+        cloned.hidden = true;
+      }
       this.dataElement.appendChild(cloned);
     }
     crateTable() {

@@ -11,7 +11,9 @@ class TradeStrategy {
         return this.index > 0 ? this.app.tradeData[this.index - 1] : null;
     }
     get buyData() {
-        return this.index > 0 && this.prevData && this.prevData.buy_index
+        return this.index > 0 &&
+            this.prevData &&
+            typeof this.prevData.buy_index === "number"
             ? this.app.tradeData[this.prevData.buy_index]
             : null;
     }
@@ -49,6 +51,8 @@ class BuyStrategy extends TradeStrategy {
         return this.index;
     }
     get unrealize_sum() {
+        if (!this.prevData)
+            return 0;
         return this.prevData.unrealize_sum ? this.prevData.unrealize_sum : 0;
     }
 }

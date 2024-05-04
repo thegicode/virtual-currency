@@ -45,7 +45,7 @@ export default class AppBacktest2 extends HTMLElement {
 
         this.data = [];
         this.market = "KRW-BTC";
-        this.count = 60;
+        this.count = 30;
         this.marketSize = 5;
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
