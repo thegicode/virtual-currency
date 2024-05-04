@@ -183,6 +183,9 @@ table {
     tr[data-action="Buy"] {
         background-color: rgba(255, 254, 185, 0.5);
     }
+    tr[data-action="AddBuy"] {
+        background-color: rgba(255, 254, 185, 0.2);
+    }
 
     tr[data-action="Sell"],
     tr[data-action="Trade"] {

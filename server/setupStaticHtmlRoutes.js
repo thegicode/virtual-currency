@@ -11,6 +11,7 @@ const setupStaticHtmlRoutes = (app, staticPath) => {
         "backtest4",
         "backtest5",
         "thegitest",
+        "thegitest2",
     ];
     routes.forEach((route) => {
         app.get(`/${route}`, (req, res) => {

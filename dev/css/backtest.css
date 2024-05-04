@@ -194,6 +194,9 @@ table thead {
 table tr[data-action=Buy] {
   background-color: rgba(255, 254, 185, 0.5);
 }
+table tr[data-action=AddBuy] {
+  background-color: rgba(255, 254, 185, 0.2);
+}
 table tr[data-action=Sell],
 table tr[data-action=Trade] {
   background-color: rgba(204, 193, 255, 0.3);
