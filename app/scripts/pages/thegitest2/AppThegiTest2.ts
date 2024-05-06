@@ -19,8 +19,8 @@ export default class AppThegiTest2 extends HTMLElement {
     private data: any[];
     private market: string;
     private count: number;
-    private totalInvestmentPrice: number;
-    private marketSize: number;
+    // private totalInvestmentPrice: number;
+    // private marketSize: number;
     private investmentPrice: number;
     private summaryAllPrice: number;
     private allSumSize: number;
@@ -34,9 +34,9 @@ export default class AppThegiTest2 extends HTMLElement {
         this.data = [];
         this.market = "KRW-SBD";
         this.count = 100;
-        this.marketSize = 5;
-        this.totalInvestmentPrice = 500000;
-        this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
+        // this.marketSize = 5;
+        // this.totalInvestmentPrice = 100000;
+        this.investmentPrice = 50000;
         this.summaryAllPrice = 0;
         this.allSumSize = 0;
 

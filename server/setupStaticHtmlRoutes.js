@@ -10,6 +10,7 @@ const setupStaticHtmlRoutes = (app, staticPath) => {
         "backtest3",
         "backtest4",
         "backtest5",
+        "backtest6",
         "thegitest",
         "thegitest2",
     ];

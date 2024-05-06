@@ -12,5 +12,15 @@ function getVolatility(data, aData, index) {
     }
     return Number((sum / 5).toFixed(2));
 }
-export { getDaliyVolatility, getVolatility };
+function volatilityBreakout(prevData, realPrice, openingPrice, k) {
+    const range = prevData.high_price - prevData.low_price;
+    const standardPrice = openingPrice + range * k;
+    const buyCondition = realPrice > standardPrice;
+    return {
+        range,
+        standardPrice,
+        buyCondition,
+    };
+}
+export { getDaliyVolatility, getVolatility, volatilityBreakout };
 //# sourceMappingURL=volatility.js.map

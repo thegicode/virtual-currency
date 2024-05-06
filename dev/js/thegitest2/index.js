@@ -49,9 +49,7 @@
       this.data = [];
       this.market = "KRW-SBD";
       this.count = 100;
-      this.marketSize = 5;
-      this.totalInvestmentPrice = 5e5;
-      this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
+      this.investmentPrice = 5e4;
       this.summaryAllPrice = 0;
       this.allSumSize = 0;
       this.countElement = this.querySelector("input[name=count]");

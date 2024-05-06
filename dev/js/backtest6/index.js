@@ -1,5 +1,25 @@
 "use strict";
 (() => {
+  // app/scripts/components/backtest/movingAverage.ts
+  function setMovingAverage(data, period = 5) {
+    const result = data.map((aData, index) => {
+      if (index < period - 1) {
+        return aData;
+      }
+      const average = calculateMovingAverage(data, index, period);
+      aData[`moving_average_${period}`] = average;
+      return aData;
+    });
+    return result;
+  }
+  function calculateMovingAverage(data, index, period = 5) {
+    let sum = 0;
+    for (let i = 0; i < period; i++) {
+      sum += data[index - i].trade_price;
+    }
+    return sum / period;
+  }
+
   // app/scripts/components/backtest/volatility.ts
   function volatilityBreakout(prevData, realPrice, openingPrice, k) {
     const range = prevData.high_price - prevData.low_price;
@@ -12,7 +32,7 @@
     };
   }
 
-  // dev/scripts/pages/backtest5/AppBacktest5.js
+  // dev/scripts/pages/backtest6/AppBacktest6.js
   var __awaiter = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
@@ -40,7 +60,7 @@
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
-  var AppBacktest5 = class extends HTMLElement {
+  var AppBacktest6 = class extends HTMLElement {
     constructor() {
       super();
       this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
@@ -53,14 +73,16 @@
       this.tableCustomElement = this.querySelector("backtest-table");
     }
     connectedCallback() {
-      this.runBackTest();
+      return __awaiter(this, void 0, void 0, function* () {
+        this.runBackTest();
+      });
     }
     runBackTest() {
       return __awaiter(this, void 0, void 0, function* () {
         for (const market of this.markets) {
           console.log(market);
           try {
-            const data = yield this.fetchData(market, (this.count + 1).toString());
+            const data = yield this.fetchData(market, (this.count + 4).toString());
             const realprices = yield this.getRealPrices(data);
             const result = this.backtest(data, realprices);
             this.render(result, this.markets.indexOf(market));
@@ -71,14 +93,16 @@
       });
     }
     backtest(fetchedData, orginRealPrices) {
-      const realPrices = orginRealPrices.slice(1);
-      const strategedData = this.strategy(fetchedData, realPrices);
+      const realPrices = orginRealPrices.slice(4);
+      const avereagedData = setMovingAverage(fetchedData);
+      const strategedData = this.strategy(avereagedData, realPrices);
       const calculatedData = this.calculateProfits(strategedData);
       return calculatedData;
     }
     strategy(fetchedData, realPrices) {
-      const result = fetchedData.slice(1).map((aData, index) => {
-        const prevData = fetchedData[index];
+      const result = fetchedData.slice(4).map((aData, index) => {
+        const isAverageOver = aData.moving_average_5 ? aData.trade_price > aData.moving_average_5 : null;
+        const prevData = fetchedData[index + 3];
         const realPrice = realPrices[index].price;
         const { range, standardPrice, buyCondition } = volatilityBreakout(prevData, realPrice, aData.opening_price, this.k);
         return {
@@ -86,8 +110,8 @@
           date: aData.candle_date_time_kst,
           range,
           standardPrice,
-          buyCondition,
-          action: buyCondition ? "Trade" : "Reserve",
+          buyCondition: Boolean(isAverageOver && buyCondition),
+          action: isAverageOver && buyCondition ? "Trade" : "Reserve",
           buyPrice: realPrice,
           sellPrice: aData.trade_price
         };
@@ -188,7 +212,7 @@
     });
   }
 
-  // dev/scripts/pages/backtest5/Overview.js
+  // dev/scripts/pages/backtest6/Overview.js
   var Overview = class extends HTMLElement {
     constructor() {
       super();
@@ -267,7 +291,7 @@
     }
   };
 
-  // dev/scripts/pages/backtest5/Control.js
+  // dev/scripts/pages/backtest6/Control.js
   var Control = class extends HTMLElement {
     constructor() {
       super();
@@ -306,7 +330,7 @@
     }
   };
 
-  // dev/scripts/pages/backtest5/Table.js
+  // dev/scripts/pages/backtest6/Table.js
   var BacktestTable = class extends HTMLElement {
     constructor() {
       super();
@@ -382,7 +406,7 @@
         range: (_a = aData.range) === null || _a === void 0 ? void 0 : _a.toLocaleString(),
         condition: aData.buyCondition.toString(),
         action: (_b = aData.action) === null || _b === void 0 ? void 0 : _b.toString(),
-        standardPrice: (_c = aData.standardPrice) === null || _c === void 0 ? void 0 : _c.toLocaleString(),
+        standardPrice: ((_c = aData.standardPrice) === null || _c === void 0 ? void 0 : _c.toLocaleString()) || "",
         buyPrice: aData.buyPrice && Math.round(aData.buyPrice).toLocaleString() || "",
         sellPrice: aData.sellPrice && Math.round(aData.sellPrice).toLocaleString() || "",
         rate: ((_d = aData.rate && aData.rate * 100) === null || _d === void 0 ? void 0 : _d.toFixed(2)) || "",
@@ -413,10 +437,10 @@
     }
   };
 
-  // dev/scripts/pages/backtest5/index.js
+  // dev/scripts/pages/backtest6/index.js
   customElements.define("backtest-table", BacktestTable);
   customElements.define("backtest-control", Control);
   customElements.define("backtest-overview", Overview);
-  customElements.define("app-backtest5", AppBacktest5);
+  customElements.define("app-backtest5", AppBacktest6);
 })();
 //# sourceMappingURL=index.js.map

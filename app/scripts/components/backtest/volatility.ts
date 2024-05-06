@@ -23,4 +23,26 @@ function getVolatility(data: any, aData: any, index: number) {
     return Number((sum / 5).toFixed(2));
 }
 
-export { getDaliyVolatility, getVolatility };
+//
+function volatilityBreakout(
+    prevData: { high_price: number; low_price: number },
+    realPrice: number,
+    openingPrice: number,
+    k: number
+) {
+    // 1. 전날 하루만에 움직인 최대폭
+    const range = prevData.high_price - prevData.low_price;
+
+    // 2. 매수 기준 : 실시간 가격 > 당일 시가 + (레인지 * k)
+    const standardPrice = openingPrice + range * k;
+
+    const buyCondition = realPrice > standardPrice;
+
+    return {
+        range,
+        standardPrice,
+        buyCondition,
+    };
+}
+
+export { getDaliyVolatility, getVolatility, volatilityBreakout };

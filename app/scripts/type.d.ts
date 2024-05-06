@@ -190,15 +190,16 @@ interface ICandles5 {
     market: string;
     opening_price: number;
     trade_price: number;
+    moving_average_5?: number;
 }
 
 interface IBacktest5 {
     market: string;
     date: string;
-    range: number;
+    range: number | null;
     buyCondition: boolean;
     action: string;
-    standardPrice: number;
+    standardPrice: number | null;
     buyPrice: number | null;
     sellPrice: number | null;
     rate?: number;

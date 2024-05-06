@@ -7,8 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import { setMovingAverage } from "@app/scripts/components/backtest/movingAverage";
 import { volatilityBreakout } from "@app/scripts/components/backtest/volatility";
-export default class AppBacktest5 extends HTMLElement {
+export default class AppBacktest6 extends HTMLElement {
     constructor() {
         super();
         this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
@@ -22,14 +23,16 @@ export default class AppBacktest5 extends HTMLElement {
         this.tableCustomElement = this.querySelector("backtest-table");
     }
     connectedCallback() {
-        this.runBackTest();
+        return __awaiter(this, void 0, void 0, function* () {
+            this.runBackTest();
+        });
     }
     runBackTest() {
         return __awaiter(this, void 0, void 0, function* () {
             for (const market of this.markets) {
                 console.log(market);
                 try {
-                    const data = yield this.fetchData(market, (this.count + 1).toString());
+                    const data = yield this.fetchData(market, (this.count + 4).toString());
                     const realprices = yield this.getRealPrices(data);
                     const result = this.backtest(data, realprices);
                     this.render(result, this.markets.indexOf(market));
@@ -41,16 +44,20 @@ export default class AppBacktest5 extends HTMLElement {
         });
     }
     backtest(fetchedData, orginRealPrices) {
-        const realPrices = orginRealPrices.slice(1);
-        const strategedData = this.strategy(fetchedData, realPrices);
+        const realPrices = orginRealPrices.slice(4);
+        const avereagedData = setMovingAverage(fetchedData);
+        const strategedData = this.strategy(avereagedData, realPrices);
         const calculatedData = this.calculateProfits(strategedData);
         return calculatedData;
     }
     strategy(fetchedData, realPrices) {
         const result = fetchedData
-            .slice(1)
+            .slice(4)
             .map((aData, index) => {
-            const prevData = fetchedData[index];
+            const isAverageOver = aData.moving_average_5
+                ? aData.trade_price > aData.moving_average_5
+                : null;
+            const prevData = fetchedData[index + 3];
             const realPrice = realPrices[index].price;
             const { range, standardPrice, buyCondition } = volatilityBreakout(prevData, realPrice, aData.opening_price, this.k);
             return {
@@ -58,8 +65,8 @@ export default class AppBacktest5 extends HTMLElement {
                 date: aData.candle_date_time_kst,
                 range,
                 standardPrice,
-                buyCondition,
-                action: buyCondition ? "Trade" : "Reserve",
+                buyCondition: Boolean(isAverageOver && buyCondition),
+                action: isAverageOver && buyCondition ? "Trade" : "Reserve",
                 buyPrice: realPrice,
                 sellPrice: aData.trade_price,
             };
@@ -145,4 +152,4 @@ export default class AppBacktest5 extends HTMLElement {
         this.tableCustomElement.initialize();
     }
 }
-//# sourceMappingURL=AppBacktest5.js.map
+//# sourceMappingURL=AppBacktest6.js.map

@@ -1,42 +1,27 @@
 /**
- * 투자전략 5 : 다자 가상화폐 + 변동성 돌파
+ * 투자전략 6 : 다자 가상화폐 + 상승장 + 변동성 돌파
  * 투자대상 : 아무 가상화폐 몇 개 선택
  * 거래비용  : 0.2% 적용
  * 투자전략 :
  *      - 각 화폐의 레인지 계산 (전일 고가 - 저가)
+ *      - 각 화폐의 가격이 5일 이동 평균보다 높은지 여부 파악
+ *          - 낮을 경우 투자 대상에서 제외
  *      - 매수 : 실시간 가격 > 당일 시가 + (레인지 * k)
  *          - 필자들은 k=0.5 추천
  *      - 돌파에 성공한 가상화폐에 자산의 n분의 1 투입
+ *          - 이 전략에 2개 화폐를 투입한다면 자산의 2분의 1 투입
  * 매도 : 다음날 시가
- * 
- * 
- ## 변동성 돌파 전략의 핵심
-
-1. range 계산
-    - 원하는 가상화폐의 전일 고가 - 전일 저가
-    - 하루 안에 가상화폐가 움직인 최대폭
-2. 매수 기준
-    - 시가 기준으로 가격이 'range * k' 이상 상승하면 해당 가격에 매수
-    - k는 0.5 ~ 1 (0.5 추천)
-3. 매도 기준
-    - 그 날 종가에 판다.
-4. 시가, 종가, 고가, 저가의 기준
-    - 시가 : 필자는 주로 오전 0시나 1시
-    - 종가 : 시가에서 24시간 후의 가격
-    - 고가(저가): 24시간 동안 가장 높은 가격
-
-
-TODO : 
-    Form
-    다중 코인 적용
+ *
+ * 여기서는 날짜 기준이 아닌 코인 별로 적용
  */
 
+import { setMovingAverage } from "@app/scripts/components/backtest/movingAverage";
 import { volatilityBreakout } from "@app/scripts/components/backtest/volatility";
 import Control from "./Control";
 import Overview from "./Overview";
 import Table from "./Table";
 
-export default class AppBacktest5 extends HTMLElement {
+export default class AppBacktest6 extends HTMLElement {
     public markets: string[];
     public count: number;
     public totalInvestmentAmount: number;
@@ -66,9 +51,31 @@ export default class AppBacktest5 extends HTMLElement {
         this.tableCustomElement = this.querySelector("backtest-table") as Table;
     }
 
-    connectedCallback() {
+    async connectedCallback() {
+        // 각 화폐의 가격이 5일 이동 평균보다 높은 코인
+        // const markets = await this.checkMovingAverage();
+        // if (markets.length === 0) return;
         this.runBackTest();
     }
+
+    // private async checkMovingAverage() {
+    //     let obj: any = {};
+
+    //     const promises = this.markets.map(async (aMarket) => {
+    //         // market 별로 현재 기준 5개의 데이터 받아오기
+    //         const data = await this.fetchData(aMarket, "5");
+
+    //         // 각 화폐의 가격이 5일 이동 평균보다 높은지 여부 파악
+    //         const avergaeData = setMovingAverage(data);
+    //         const isOver = avergaeData
+    //             .slice(4)
+    //             .map((aData) => aData.trade_price > aData.moving_average_5)[0];
+    //         obj[aMarket] = isOver;
+    //     });
+    //     await Promise.all(promises);
+
+    //     return Object.keys(obj).filter((key) => obj[key] === true);
+    // }
 
     public async runBackTest() {
         for (const market of this.markets) {
@@ -77,7 +84,7 @@ export default class AppBacktest5 extends HTMLElement {
             try {
                 const data = await this.fetchData(
                     market,
-                    (this.count + 1).toString()
+                    (this.count + 4).toString()
                 );
 
                 const realprices = await this.getRealPrices(data);
@@ -85,7 +92,6 @@ export default class AppBacktest5 extends HTMLElement {
                 const result = this.backtest(data, realprices);
 
                 this.render(result, this.markets.indexOf(market));
-                // this.tradeData.push(result);
             } catch (error) {
                 console.error("Error in runBackTest:", error);
                 // 에러 처리 로직 추가 (예: 에러 발생시 재시도 또는 로그 저장 등)
@@ -94,17 +100,24 @@ export default class AppBacktest5 extends HTMLElement {
     }
 
     private backtest(fetchedData: ICandles5[], orginRealPrices: IRealPrice[]) {
-        const realPrices = orginRealPrices.slice(1);
-        const strategedData = this.strategy(fetchedData, realPrices);
+        const realPrices = orginRealPrices.slice(4);
+        const avereagedData = setMovingAverage(fetchedData);
+        const strategedData = this.strategy(avereagedData, realPrices);
         const calculatedData = this.calculateProfits(strategedData);
         return calculatedData;
     }
 
     private strategy(fetchedData: ICandles5[], realPrices: IRealPrice[]) {
         const result = fetchedData
-            .slice(1)
+            .slice(4)
             .map((aData: ICandles5, index: number) => {
-                const prevData = fetchedData[index];
+                // 5일 이동 평균선보다 높은지
+                const isAverageOver = aData.moving_average_5
+                    ? aData.trade_price > aData.moving_average_5
+                    : null;
+
+                // 실시간 가격 > 당일 시가 + (레인지 * k)
+                const prevData = fetchedData[index + 3];
                 const realPrice = realPrices[index].price;
 
                 const { range, standardPrice, buyCondition } =
@@ -120,8 +133,8 @@ export default class AppBacktest5 extends HTMLElement {
                     date: aData.candle_date_time_kst,
                     range,
                     standardPrice,
-                    buyCondition,
-                    action: buyCondition ? "Trade" : "Reserve",
+                    buyCondition: Boolean(isAverageOver && buyCondition),
+                    action: isAverageOver && buyCondition ? "Trade" : "Reserve",
                     buyPrice: realPrice,
                     sellPrice: aData.trade_price,
                 };

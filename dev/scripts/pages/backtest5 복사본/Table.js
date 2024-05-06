@@ -68,28 +68,28 @@ export default class BacktestTable extends HTMLElement {
         return cloned;
     }
     createItem(aData, index) {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c;
         const cloned = cloneTemplate(this.itemTemplate);
         const parseData = {
             index,
             date: aData.date.slice(0, 10),
-            range: (_a = aData.range) === null || _a === void 0 ? void 0 : _a.toLocaleString(),
+            range: aData.range.toLocaleString(),
             condition: aData.buyCondition.toString(),
-            action: (_b = aData.action) === null || _b === void 0 ? void 0 : _b.toString(),
-            standardPrice: (_c = aData.standardPrice) === null || _c === void 0 ? void 0 : _c.toLocaleString(),
+            action: (_a = aData.action) === null || _a === void 0 ? void 0 : _a.toString(),
+            standardPrice: aData.standardPrice.toLocaleString(),
             buyPrice: (aData.buyPrice &&
                 Math.round(aData.buyPrice).toLocaleString()) ||
                 "",
             sellPrice: (aData.sellPrice &&
                 Math.round(aData.sellPrice).toLocaleString()) ||
                 "",
-            rate: ((_d = (aData.rate && aData.rate * 100)) === null || _d === void 0 ? void 0 : _d.toFixed(2)) || "",
+            rate: ((_b = (aData.rate && aData.rate * 100)) === null || _b === void 0 ? void 0 : _b.toFixed(2)) || "",
             profit: (aData.profit && Math.round(aData.profit).toLocaleString()) ||
                 "",
             sumProfit: aData.sumProfit && Math.round(aData.sumProfit).toLocaleString(),
         };
         updateElementsTextWithData(parseData, cloned);
-        cloned.dataset.action = (_e = aData.action) === null || _e === void 0 ? void 0 : _e.toString();
+        cloned.dataset.action = (_c = aData.action) === null || _c === void 0 ? void 0 : _c.toString();
         return cloned;
     }
     hideDataTables() {

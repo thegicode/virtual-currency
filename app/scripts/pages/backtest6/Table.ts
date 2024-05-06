@@ -118,7 +118,7 @@ export default class BacktestTable extends HTMLElement {
             range: aData.range?.toLocaleString(),
             condition: aData.buyCondition.toString(),
             action: aData.action?.toString(),
-            standardPrice: aData.standardPrice?.toLocaleString(),
+            standardPrice: aData.standardPrice?.toLocaleString() || "",
             buyPrice:
                 (aData.buyPrice &&
                     Math.round(aData.buyPrice).toLocaleString()) ||
