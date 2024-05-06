@@ -304,8 +304,6 @@ export default class AppBacktest3 extends HTMLElement {
         index: number,
         date: string
     ) {
-        const tradeIndex = 30 + index;
-
         const prevTrades = index > 0 && this.tradeData[index - 1].tradeMarkets;
         const prevMarkets = Object.keys(prevTrades);
 
@@ -388,7 +386,6 @@ export default class AppBacktest3 extends HTMLElement {
         const selledProfits =
             formedTradeData.sellMarkets &&
             formedTradeData.sellMarkets.map((market: string) => {
-                const tradeIndex = 30 + index;
                 const buyPrice =
                     this.tradeData[index - 1].tradeMarkets[market].buy_price;
                 const aData = this.qqqData[market][30 + index];
@@ -437,6 +434,10 @@ export default class AppBacktest3 extends HTMLElement {
 
         const buyContainer = this.renderBuySell(tradeProfits);
         const sellContainer = this.renderBuySell(selledProfits);
+
+        if (selledProfits.length > 0) {
+            cloned.dataset.action = "Sell";
+        }
 
         cloned.querySelector(".tradeMarkets")?.appendChild(buyContainer);
         cloned.querySelector(".sellMarkets")?.appendChild(sellContainer);

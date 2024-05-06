@@ -180,7 +180,6 @@ export default class AppBacktest3 extends HTMLElement {
         return tradeData;
     }
     setTradeData(tradeData, index, date) {
-        const tradeIndex = 30 + index;
         const prevTrades = index > 0 && this.tradeData[index - 1].tradeMarkets;
         const prevMarkets = Object.keys(prevTrades);
         let tradeMarkets = {};
@@ -235,7 +234,6 @@ export default class AppBacktest3 extends HTMLElement {
         });
         const selledProfits = formedTradeData.sellMarkets &&
             formedTradeData.sellMarkets.map((market) => {
-                const tradeIndex = 30 + index;
                 const buyPrice = this.tradeData[index - 1].tradeMarkets[market].buy_price;
                 const aData = this.qqqData[market][30 + index];
                 const rate = (aData.trade_price - buyPrice) / buyPrice;
@@ -266,6 +264,9 @@ export default class AppBacktest3 extends HTMLElement {
         const cloned = cloneTemplate(this.template);
         const buyContainer = this.renderBuySell(tradeProfits);
         const sellContainer = this.renderBuySell(selledProfits);
+        if (selledProfits.length > 0) {
+            cloned.dataset.action = "Sell";
+        }
         (_a = cloned.querySelector(".tradeMarkets")) === null || _a === void 0 ? void 0 : _a.appendChild(buyContainer);
         (_b = cloned.querySelector(".sellMarkets")) === null || _b === void 0 ? void 0 : _b.appendChild(sellContainer);
         const data = {
