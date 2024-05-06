@@ -46,7 +46,7 @@ export default class AppBacktest4 extends HTMLElement {
 
         this.tradeData = [];
         this.market = "";
-        this.count = 60;
+        this.count = 30;
         this.marketSize = 5;
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
@@ -77,14 +77,14 @@ export default class AppBacktest4 extends HTMLElement {
         this.reset();
 
         for (let index = 0; index < this.count; index++) {
-            // console.log(index);
+            console.log(index);
 
             try {
                 const tradeData = await this.getTradeData(index);
 
                 this.tradeData.push(tradeData);
 
-                await this.delay(90);
+                await this.delay(100);
             } catch (error: any) {
                 console.error(
                     `Failed to process index ${index}:`,
@@ -98,11 +98,14 @@ export default class AppBacktest4 extends HTMLElement {
 
     private async getTradeData(index: number) {
         const toDate = `${this.getToDate(index)}+09:00`;
+        console.log(toDate);
 
         const fetchedData = await this.fetchData("60", "37", toDate);
 
-        const { makedData, afternoonData, sellPrice } =
-            this.makeTradeData(fetchedData);
+        const { makedData, afternoonData, sellPrice } = this.makeTradeData(
+            fetchedData,
+            toDate
+        );
 
         const actionedData = this.setTradingAction(makedData, index);
 
@@ -141,18 +144,30 @@ export default class AppBacktest4 extends HTMLElement {
     private getToDate(index: number) {
         const now = new Date();
         now.setMonth(now.getMonth());
-        now.setDate(now.getDate() - this.count + index);
+        now.setDate(now.getDate() - this.count + index + 1);
         now.setHours(22, 0, 0, 0);
         return now.toISOString().slice(0, 19);
     }
 
-    private makeTradeData(data: ICandlesMinutes[]) {
-        const lastData = data[24];
-        const date = lastData.candle_date_time_kst.slice(0, 10);
+    private makeTradeData(data: ICandlesMinutes[], date: string) {
+        const dates = data.map((d) => d.candle_date_time_kst);
+
+        const prevDate = new Date(date);
+        prevDate.setUTCDate(prevDate.getUTCDate() - 1);
+        const prevDateISOString = prevDate.toISOString().slice(0, 10);
+
+        // prev first index
+        const prevFirstIndex = dates.indexOf(prevDateISOString + "T00:00:00"); // It must be 0.
+
+        // prev mid index
+        const prevMidIndex = dates.indexOf(prevDateISOString + "T12:00:00"); // It must be 12.
+
+        // prev last index
+        const prevLastIndex = dates.indexOf(date.slice(0, 11) + "00:00:00"); // It must be 24.
 
         const prevDayData = {
-            morning: [data[0], data[12]],
-            afternoon: [data[12], lastData],
+            morning: [data[prevFirstIndex], data[prevMidIndex]],
+            afternoon: [data[prevMidIndex], data[prevLastIndex]],
         };
 
         // 오후 수익률
@@ -173,9 +188,9 @@ export default class AppBacktest4 extends HTMLElement {
         const condition = afternoonRate > 0 && afterVolume > moringVolume;
 
         const makedData = {
-            date,
+            date: date.slice(0, 10),
             condition,
-            trade_price: lastData.trade_price,
+            trade_price: data[prevLastIndex].trade_price,
         };
 
         return {
@@ -259,61 +274,3 @@ export default class AppBacktest4 extends HTMLElement {
         this.dataset.loading = "false";
     }
 }
-
-// private setProfit(data: ITradeData4, index: number, sellPrice: number) {
-//     const aData = JSON.parse(JSON.stringify(data));
-//     const prevTradeData = index > 0 && this.tradeData[index - 1];
-//     const buyData = index > 0 && this.tradeData[prevTradeData.buy_index];
-
-//     const getOrderAmount = () => {
-//         const percent = (this.target / buyData.volatility) * 100;
-//         const unitPercent = percent / this.marketSize;
-//         return (this.totalInvestmentPrice * unitPercent) / 100;
-//     };
-
-//     switch (aData.action) {
-//         case "Buy":
-//             return {
-//                 ...aData,
-//                 buy_index: index,
-//                 sum_profit: prevTradeData.sum_profit || 0,
-//                 unrealize_sum: prevTradeData.unrealize_sum || 0,
-//             };
-//         case "Hold":
-//             const unrealize_rate =
-//                 (aData.trade_price - buyData.trade_price) /
-//                 buyData.trade_price;
-//             const unrealize_profit = unrealize_rate * getOrderAmount();
-
-//             return {
-//                 ...aData,
-//                 buy_index: prevTradeData.buy_index,
-//                 sum_profit: prevTradeData.sum_profit || 0,
-//                 unrealize_rate,
-//                 unrealize_profit,
-//                 unrealize_sum:
-//                     prevTradeData.unrealize_sum + unrealize_profit,
-//             };
-//         case "Sell":
-//             const rate =
-//                 (sellPrice - buyData.trade_price) / buyData.trade_price;
-//             const profit = rate * getOrderAmount();
-//             const sum_profit = prevTradeData.sum_profit + profit;
-
-//             return {
-//                 ...aData,
-//                 rate,
-//                 profit,
-//                 sum_profit: sum_profit,
-//                 unrealize_sum: sum_profit,
-//             };
-
-//         case "Reserve": {
-//             return {
-//                 ...aData,
-//                 sum_profit: prevTradeData.sum_profit || 0,
-//                 unrealize_sum: prevTradeData.unrealize_sum || 0,
-//             };
-//         }
-//     }
-// }

@@ -36,7 +36,13 @@ export default class AppBacktest3 extends HTMLElement {
     constructor() {
         super();
 
-        this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
+        this.markets = [
+            "KRW-ONG",
+            "KRW-TFUEL",
+            "KRW-GLM",
+            "KRW-ONT",
+            "KRW-HBAR",
+        ];
         this.investmentPrice = 200000;
         this.data = [];
         this.qqqData = {};
@@ -80,7 +86,7 @@ export default class AppBacktest3 extends HTMLElement {
 
     private async setMarkets() {
         const marketAll = await this.getMarkets();
-        const idx = 20; // 20, 7%
+        const idx = 20; // 20, 13%
         // const idx = marketAll.length - 21;
         return marketAll.slice(idx, idx + 10).map((m: any) => m.market);
     }
@@ -446,6 +452,8 @@ export default class AppBacktest3 extends HTMLElement {
             ).toLocaleString(),
         };
         updateElementsTextWithData(data, cloned);
+
+        // cloned.dataset.
 
         this.containerElement.appendChild(cloned);
     }

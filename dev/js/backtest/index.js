@@ -47,7 +47,7 @@
     constructor() {
       super();
       this.data = [];
-      this.market = "KRW-STEEM";
+      this.market = "KRW-ONT";
       this.period = 30;
       this.investmentPrice = 2e5;
       this.fee = 139e-5;

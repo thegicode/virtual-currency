@@ -46,7 +46,13 @@
   var AppBacktest3 = class extends HTMLElement {
     constructor() {
       super();
-      this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
+      this.markets = [
+        "KRW-ONG",
+        "KRW-TFUEL",
+        "KRW-GLM",
+        "KRW-ONT",
+        "KRW-HBAR"
+      ];
       this.investmentPrice = 2e5;
       this.data = [];
       this.qqqData = {};

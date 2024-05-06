@@ -14,7 +14,7 @@ export default class AppBacktest4 extends HTMLElement {
         super();
         this.tradeData = [];
         this.market = "";
-        this.count = 60;
+        this.count = 30;
         this.marketSize = 5;
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
@@ -34,10 +34,11 @@ export default class AppBacktest4 extends HTMLElement {
         return __awaiter(this, void 0, void 0, function* () {
             this.reset();
             for (let index = 0; index < this.count; index++) {
+                console.log(index);
                 try {
                     const tradeData = yield this.getTradeData(index);
                     this.tradeData.push(tradeData);
-                    yield this.delay(90);
+                    yield this.delay(100);
                 }
                 catch (error) {
                     console.error(`Failed to process index ${index}:`, error.message);
@@ -49,8 +50,9 @@ export default class AppBacktest4 extends HTMLElement {
     getTradeData(index) {
         return __awaiter(this, void 0, void 0, function* () {
             const toDate = `${this.getToDate(index)}+09:00`;
+            console.log(toDate);
             const fetchedData = yield this.fetchData("60", "37", toDate);
-            const { makedData, afternoonData, sellPrice } = this.makeTradeData(fetchedData);
+            const { makedData, afternoonData, sellPrice } = this.makeTradeData(fetchedData, toDate);
             const actionedData = this.setTradingAction(makedData, index);
             const volatedData = this.setVolatility(actionedData, afternoonData);
             const enrichedData = this.getStrategy(volatedData, index, sellPrice);
@@ -82,16 +84,21 @@ export default class AppBacktest4 extends HTMLElement {
     getToDate(index) {
         const now = new Date();
         now.setMonth(now.getMonth());
-        now.setDate(now.getDate() - this.count + index);
+        now.setDate(now.getDate() - this.count + index + 1);
         now.setHours(22, 0, 0, 0);
         return now.toISOString().slice(0, 19);
     }
-    makeTradeData(data) {
-        const lastData = data[24];
-        const date = lastData.candle_date_time_kst.slice(0, 10);
+    makeTradeData(data, date) {
+        const dates = data.map((d) => d.candle_date_time_kst);
+        const prevDate = new Date(date);
+        prevDate.setUTCDate(prevDate.getUTCDate() - 1);
+        const prevDateISOString = prevDate.toISOString().slice(0, 10);
+        const prevFirstIndex = dates.indexOf(prevDateISOString + "T00:00:00");
+        const prevMidIndex = dates.indexOf(prevDateISOString + "T12:00:00");
+        const prevLastIndex = dates.indexOf(date.slice(0, 11) + "00:00:00");
         const prevDayData = {
-            morning: [data[0], data[12]],
-            afternoon: [data[12], lastData],
+            morning: [data[prevFirstIndex], data[prevMidIndex]],
+            afternoon: [data[prevMidIndex], data[prevLastIndex]],
         };
         const startPrice = prevDayData.afternoon[0].trade_price;
         const afternoonRate = (prevDayData.afternoon[1].trade_price - startPrice) / startPrice;
@@ -101,9 +108,9 @@ export default class AppBacktest4 extends HTMLElement {
             prevDayData.afternoon[0].candle_acc_trade_volume;
         const condition = afternoonRate > 0 && afterVolume > moringVolume;
         const makedData = {
-            date,
+            date: date.slice(0, 10),
             condition,
-            trade_price: lastData.trade_price,
+            trade_price: data[prevLastIndex].trade_price,
         };
         return {
             makedData,

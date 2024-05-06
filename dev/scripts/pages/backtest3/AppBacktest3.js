@@ -11,7 +11,13 @@ import { cloneTemplate, updateElementsTextWithData, } from "@app/scripts/utils/h
 export default class AppBacktest3 extends HTMLElement {
     constructor() {
         super();
-        this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
+        this.markets = [
+            "KRW-ONG",
+            "KRW-TFUEL",
+            "KRW-GLM",
+            "KRW-ONT",
+            "KRW-HBAR",
+        ];
         this.investmentPrice = 200000;
         this.data = [];
         this.qqqData = {};

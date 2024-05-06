@@ -12,7 +12,7 @@ export default class AppBacktest extends HTMLElement {
     constructor() {
         super();
         this.data = [];
-        this.market = "KRW-STEEM";
+        this.market = "KRW-ONT";
         this.period = 30;
         this.investmentPrice = 200000;
         this.fee = 0.00139;

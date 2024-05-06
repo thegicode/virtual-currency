@@ -43,6 +43,19 @@
             <h1>Backtest 5</h1>
             <section class="backtest">
                 <h2>투자방법5 : 다자 가상화폐 + 변동성 돌파</h2>
+                <dl class="guide">
+                    <dt>투자대상</dt>
+                    <dd>아무 가상화폐 몇 개 선택</dd>
+                    <dt>투자전략</dt>
+                    <dd>
+                        - 각 화폐의 레인지 계산 (전일 고가 - 저가) <br />
+                        - 매수 : 실시간 가격 > 당일 시가 + (레인지 * k) <br />
+                        - 필자들은 k=0.5 추천 <br />
+                        - 돌파에 성공한 가상화폐에 자산의 n분의 1 투입 <br />
+                    </dd>
+                    <dt>매도</dt>
+                    <dd>다음날 시가</dd>
+                </dl>
                 <backtest-control>
                     <form class="backtest-form">
                         <div class="col">
