@@ -56,6 +56,7 @@
       this.periodInput = this.querySelector("input[name=count]");
       this.selectElement = this.querySelector("select");
       this.formElement = this.querySelector("form");
+      this.investmentPriceElement = this.querySelector(".investmentPrice");
       this.onChangeMarket = this.onChangeMarket.bind(this);
       this.onOptionSubmit = this.onOptionSubmit.bind(this);
     }
@@ -72,7 +73,7 @@
     initialize() {
       this.market = this.selectElement.value;
       this.periodInput.value = this.period.toString();
-      this.querySelector(".investmentPrice").textContent = this.investmentPrice.toLocaleString();
+      this.investmentPriceElement.textContent = this.investmentPrice.toLocaleString();
     }
     loadAndRender() {
       return __awaiter(this, void 0, void 0, function* () {

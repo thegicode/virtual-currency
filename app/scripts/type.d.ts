@@ -167,6 +167,7 @@ interface ITradeData4 {
     buy_index?: number;
     condition: boolean;
     date: string;
+    order_amount?: number;
     profit?: number;
     rate?: number;
     sum_profit?: number;

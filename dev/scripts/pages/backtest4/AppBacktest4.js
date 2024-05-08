@@ -147,7 +147,7 @@ export default class AppBacktest4 extends HTMLElement {
     }
     getStrategy(data, index, sellPrice) {
         const result = this.tradeStrategy(data, index, sellPrice);
-        return Object.assign(Object.assign({}, data), { buy_index: result.buy_index, rate: result.rate, profit: result.profit, sum_profit: result.sum_profit, unrealize_rate: result.unrealize_rate, unrealize_profit: result.unrealize_profit, unrealize_sum: result.unrealize_sum });
+        return Object.assign(Object.assign({}, data), { buy_index: result.buy_index, order_amount: (data.action === "Buy" && result.orderAmount) || "", rate: result.rate, profit: result.profit, sum_profit: result.sum_profit, unrealize_rate: result.unrealize_rate, unrealize_profit: result.unrealize_profit, unrealize_sum: result.unrealize_sum });
     }
     tradeStrategy(data, index, sellPrice) {
         switch (data.action) {

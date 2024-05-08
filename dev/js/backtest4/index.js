@@ -60,6 +60,13 @@
         return 0;
       return this.prevData.unrealize_sum ? this.prevData.unrealize_sum : 0;
     }
+    get orderAmount() {
+      if (!this.data.volatility || this.data.volatility === 0)
+        return 0;
+      const percent = this.app.target / this.data.volatility * 100;
+      const unitPercent = percent / this.app.marketSize;
+      return this.app.totalInvestmentPrice * unitPercent / 100;
+    }
   };
   var HoldStrategy = class extends TradeStrategy {
     constructor(app, data, index) {
@@ -260,7 +267,7 @@
     }
     getStrategy(data, index, sellPrice) {
       const result = this.tradeStrategy(data, index, sellPrice);
-      return Object.assign(Object.assign({}, data), { buy_index: result.buy_index, rate: result.rate, profit: result.profit, sum_profit: result.sum_profit, unrealize_rate: result.unrealize_rate, unrealize_profit: result.unrealize_profit, unrealize_sum: result.unrealize_sum });
+      return Object.assign(Object.assign({}, data), { buy_index: result.buy_index, order_amount: data.action === "Buy" && result.orderAmount || "", rate: result.rate, profit: result.profit, sum_profit: result.sum_profit, unrealize_rate: result.unrealize_rate, unrealize_profit: result.unrealize_profit, unrealize_sum: result.unrealize_sum });
     }
     tradeStrategy(data, index, sellPrice) {
       switch (data.action) {
@@ -433,6 +440,7 @@
         index,
         date: aData.date,
         trade_price: aData.trade_price.toLocaleString(),
+        order_amount: aData.order_amount && Math.round(aData.order_amount).toLocaleString(),
         condition: aData.condition.toString(),
         action: aData.action,
         volatility: (_a = aData.volatility) === null || _a === void 0 ? void 0 : _a.toFixed(2),

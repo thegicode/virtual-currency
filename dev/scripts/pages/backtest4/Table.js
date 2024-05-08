@@ -24,6 +24,8 @@ export default class BacktestTable extends HTMLElement {
             index,
             date: aData.date,
             trade_price: aData.trade_price.toLocaleString(),
+            order_amount: aData.order_amount &&
+                Math.round(aData.order_amount).toLocaleString(),
             condition: aData.condition.toString(),
             action: aData.action,
             volatility: (_a = aData.volatility) === null || _a === void 0 ? void 0 : _a.toFixed(2),

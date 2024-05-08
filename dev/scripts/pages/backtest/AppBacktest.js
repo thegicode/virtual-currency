@@ -21,6 +21,7 @@ export default class AppBacktest extends HTMLElement {
         this.periodInput = this.querySelector("input[name=count]");
         this.selectElement = this.querySelector("select");
         this.formElement = this.querySelector("form");
+        this.investmentPriceElement = this.querySelector(".investmentPrice");
         this.onChangeMarket = this.onChangeMarket.bind(this);
         this.onOptionSubmit = this.onOptionSubmit.bind(this);
     }
@@ -37,7 +38,7 @@ export default class AppBacktest extends HTMLElement {
     initialize() {
         this.market = this.selectElement.value;
         this.periodInput.value = this.period.toString();
-        this.querySelector(".investmentPrice").textContent =
+        this.investmentPriceElement.textContent =
             this.investmentPrice.toLocaleString();
     }
     loadAndRender() {

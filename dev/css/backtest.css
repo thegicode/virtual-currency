@@ -37,6 +37,12 @@ h2 {
   font-size: 1.2rem;
 }
 
+.guide {
+  padding: 1rem;
+  line-height: 1.5;
+  background-color: #f8f8f8;
+}
+
 .backtest-options {
   display: flex;
   align-items: center;

@@ -239,9 +239,11 @@ export default class AppBacktest4 extends HTMLElement {
 
     private getStrategy(data: ITradeData4, index: number, sellPrice: number) {
         const result = this.tradeStrategy(data, index, sellPrice);
+
         return {
             ...data,
             buy_index: result.buy_index,
+            order_amount: (data.action === "Buy" && result.orderAmount) || "",
             rate: result.rate,
             profit: result.profit,
             sum_profit: result.sum_profit,

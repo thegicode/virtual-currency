@@ -22,7 +22,34 @@
         <app-backtest class="root">
             <h1>Backtest</h1>
             <section class="backtest">
-                <h2>투자방법 : 5일 이동평균</h2>
+                <h2>투자전략 : 이동 평균 + 현금 비중 80% 이상</h2>
+                <dl class="guide">
+                    <dt>투자대상</dt>
+                    <dd>아무 가상화폐 몇 개 선택</dd>
+                    <dt>투자전략</dt>
+                    <dd>
+                        <ul>
+                            <li>
+                                여러분이 선택한 가상화폐의 5일 이동평균을 1일
+                                1회 체크
+                            </li>
+                            <li>
+                                현재 가격이 이동평균보다 높으면 매수 또는 보유
+                            </li>
+                            <li>
+                                현재 가격이 이동평균보다 낮으면 매도 또는 투자
+                                볼퓨
+                            </li>
+                            <li>현금 비중은 80% 유지</li>
+                        </ul>
+                    </dd>
+                    <dt>자금관리</dt>
+                    <dd>
+                        가상화폐별 투입 금액은 자산의 20%/가상화퍠 수 <br />
+                        (5개의 화폐를 포함할 경우 각 화폐에 자산의 20%/5 = 4%
+                        투자)
+                    </dd>
+                </dl>
                 <form class="backtest-options">
                     <div class="option">
                         <span class="title">| Market : </span>

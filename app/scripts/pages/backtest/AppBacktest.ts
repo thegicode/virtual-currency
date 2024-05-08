@@ -1,4 +1,23 @@
 /**
+ * 투자전략 1 : 이동 평균 + 현금 비중 80% 이상
+ * 투자대상 : 아무 가상화폐 몇 개 선택
+ * 거래비용  : 0.2% 적용
+ * 투자전략 :
+ *      - 여러분이 선택한 가상화폐의 5일 이동평균을 1일 1회 체크
+ *      - 현재 가격이 이동평균보다 높으면 매수 또는 보유
+ *      - 현재 가격이 이동평균보다 낮으면 매도 또는 투자 볼퓨
+ *      - 현금 비중은 80% 유지
+ * 자금관리 : 가상화폐별 투입 금액은 자산의 20%/가상화퍠 수
+ *             (5개의 화폐를 포함할 경우 각 화폐에 자산의 20%/5 = 4% 투자)
+ * 
+ *
+ * 재료 : 전일 오후 (12시 ~ 24시) 수익률과
+ *       전일 오전 & 오후 거래량
+ *
+ * 하루 두 번 자정, 정오에 매수하는 전략도 ?
+ * 2018년 하락장에서도 이더리움은 수익
+
+
  * TODO
  * 수수료 적용
  * 현금비중 80% 유지
@@ -24,6 +43,7 @@ export default class AppBacktest extends HTMLElement {
     private periodInput: HTMLInputElement;
     private selectElement: HTMLSelectElement;
     private formElement: HTMLFormElement;
+    private investmentPriceElement: HTMLElement;
 
     constructor() {
         super();
@@ -42,6 +62,9 @@ export default class AppBacktest extends HTMLElement {
         ) as HTMLInputElement;
         this.selectElement = this.querySelector("select") as HTMLSelectElement;
         this.formElement = this.querySelector("form") as HTMLFormElement;
+        this.investmentPriceElement = this.querySelector(
+            ".investmentPrice"
+        ) as HTMLElement;
 
         this.onChangeMarket = this.onChangeMarket.bind(this);
         this.onOptionSubmit = this.onOptionSubmit.bind(this);
@@ -65,7 +88,7 @@ export default class AppBacktest extends HTMLElement {
     private initialize() {
         this.market = this.selectElement.value;
         this.periodInput.value = this.period.toString();
-        (this.querySelector(".investmentPrice") as HTMLElement).textContent =
+        this.investmentPriceElement.textContent =
             this.investmentPrice.toLocaleString();
     }
 

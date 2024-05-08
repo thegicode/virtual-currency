@@ -55,6 +55,13 @@ class BuyStrategy extends TradeStrategy {
             return 0;
         return this.prevData.unrealize_sum ? this.prevData.unrealize_sum : 0;
     }
+    get orderAmount() {
+        if (!this.data.volatility || this.data.volatility === 0)
+            return 0;
+        const percent = (this.app.target / this.data.volatility) * 100;
+        const unitPercent = percent / this.app.marketSize;
+        return (this.app.totalInvestmentPrice * unitPercent) / 100;
+    }
 }
 class HoldStrategy extends TradeStrategy {
     constructor(app, data, index) {
