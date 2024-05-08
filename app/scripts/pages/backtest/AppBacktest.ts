@@ -22,12 +22,14 @@ export default class AppBacktest extends HTMLElement {
     private summaryAllPrice: number;
     private allSumSize: number;
     private periodInput: HTMLInputElement;
+    private selectElement: HTMLSelectElement;
+    private formElement: HTMLFormElement;
 
     constructor() {
         super();
 
         this.data = [];
-        this.market = "KRW-ONT";
+        this.market = "";
         this.period = 30;
         this.investmentPrice = 200000;
         this.fee = 0.00139;
@@ -38,6 +40,8 @@ export default class AppBacktest extends HTMLElement {
         this.periodInput = this.querySelector(
             "input[name=count]"
         ) as HTMLInputElement;
+        this.selectElement = this.querySelector("select") as HTMLSelectElement;
+        this.formElement = this.querySelector("form") as HTMLFormElement;
 
         this.onChangeMarket = this.onChangeMarket.bind(this);
         this.onOptionSubmit = this.onOptionSubmit.bind(this);
@@ -47,20 +51,19 @@ export default class AppBacktest extends HTMLElement {
         this.initialize();
         this.loadAndRender();
 
-        this.querySelector("select")?.addEventListener(
-            "change",
-            this.onChangeMarket
-        );
-
-        this.querySelector("form")?.addEventListener(
-            "submit",
-            this.onOptionSubmit
-        );
+        this.selectElement.addEventListener("change", this.onChangeMarket);
+        this.formElement.addEventListener("submit", this.onOptionSubmit);
 
         // this.getMinutes();
     }
 
+    disconnectedCallback() {
+        this.selectElement.removeEventListener("change", this.onChangeMarket);
+        this.formElement.removeEventListener("submit", this.onOptionSubmit);
+    }
+
     private initialize() {
+        this.market = this.selectElement.value;
         this.periodInput.value = this.period.toString();
         (this.querySelector(".investmentPrice") as HTMLElement).textContent =
             this.investmentPrice.toLocaleString();

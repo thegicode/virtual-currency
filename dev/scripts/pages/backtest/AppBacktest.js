@@ -12,24 +12,30 @@ export default class AppBacktest extends HTMLElement {
     constructor() {
         super();
         this.data = [];
-        this.market = "KRW-ONT";
+        this.market = "";
         this.period = 30;
         this.investmentPrice = 200000;
         this.fee = 0.00139;
         this.summaryAllPrice = 0;
         this.allSumSize = 0;
         this.periodInput = this.querySelector("input[name=count]");
+        this.selectElement = this.querySelector("select");
+        this.formElement = this.querySelector("form");
         this.onChangeMarket = this.onChangeMarket.bind(this);
         this.onOptionSubmit = this.onOptionSubmit.bind(this);
     }
     connectedCallback() {
-        var _a, _b;
         this.initialize();
         this.loadAndRender();
-        (_a = this.querySelector("select")) === null || _a === void 0 ? void 0 : _a.addEventListener("change", this.onChangeMarket);
-        (_b = this.querySelector("form")) === null || _b === void 0 ? void 0 : _b.addEventListener("submit", this.onOptionSubmit);
+        this.selectElement.addEventListener("change", this.onChangeMarket);
+        this.formElement.addEventListener("submit", this.onOptionSubmit);
+    }
+    disconnectedCallback() {
+        this.selectElement.removeEventListener("change", this.onChangeMarket);
+        this.formElement.removeEventListener("submit", this.onOptionSubmit);
     }
     initialize() {
+        this.market = this.selectElement.value;
         this.periodInput.value = this.period.toString();
         this.querySelector(".investmentPrice").textContent =
             this.investmentPrice.toLocaleString();
