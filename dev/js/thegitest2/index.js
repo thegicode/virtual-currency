@@ -100,19 +100,19 @@
           const lowRate = (aData.low_price - buyPrice) / buyPrice;
           if (lowRate <= -0.2) {
             action = "AddBuy";
-            const thisQuantity = amount / aData.opening_price;
-            const newquantity = quantity + thisQuantity;
-            buyPrice = (buyPrice * quantity + aData.opening_price * thisQuantity) / newquantity;
-            quantity = newquantity;
+            rate = -0.2;
+            const thisBuyPrice = buyPrice + buyPrice * rate;
+            const thisQuantity = amount / thisBuyPrice;
+            buyPrice = (buyPrice * quantity + thisBuyPrice * thisQuantity) / (quantity + thisQuantity);
+            quantity = quantity + thisQuantity;
             amount = amount * 2;
-            rate = lowRate;
           } else if (highRate >= 0.1) {
             action = "Sell";
-            sellPrice = aData.opening_price;
-            profit = highRate * amount;
+            rate = 0.1;
+            sellPrice = buyPrice + rate * buyPrice;
+            profit = amount * rate;
             sumProfit += profit;
             buyPrice = 0;
-            rate = highRate;
           } else {
             action = "Hold";
           }

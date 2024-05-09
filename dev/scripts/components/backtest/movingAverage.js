@@ -4,8 +4,7 @@ function setMovingAverage(data, period = 5) {
             return aData;
         }
         const average = calculateMovingAverage(data, index, period);
-        aData[`moving_average_${period}`] = average;
-        return aData;
+        return Object.assign(Object.assign({}, aData), { [`moving_average_${period}`]: average });
     });
     return result;
 }

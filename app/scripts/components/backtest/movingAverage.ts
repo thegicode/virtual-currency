@@ -6,9 +6,10 @@ function setMovingAverage(data: any[], period = 5) {
 
         const average = calculateMovingAverage(data, index, period);
 
-        aData[`moving_average_${period}`] = average;
-
-        return aData;
+        return {
+            ...aData,
+            [`moving_average_${period}`]: average,
+        };
     });
 
     return result;
