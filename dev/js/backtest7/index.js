@@ -36,8 +36,12 @@
   function calculateVolatility(data) {
     return data.high_price - data.low_price;
   }
+  function volatilityRate(data) {
+    const range = calculateVolatility(data);
+    return range / data.opening_price * 100;
+  }
 
-  // dev/scripts/pages/backtest6/AppBacktest6.js
+  // dev/scripts/pages/backtest7/AppBacktest7.js
   var __awaiter = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
@@ -65,7 +69,7 @@
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
-  var AppBacktest6 = class extends HTMLElement {
+  var AppBacktest7 = class extends HTMLElement {
     constructor() {
       super();
       this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
@@ -73,6 +77,7 @@
       this.totalInvestmentAmount = 1e6;
       this.investmentAmount = this.totalInvestmentAmount / this.markets.length;
       this.k = 0.5;
+      this.targetRate = 2;
       this.overviewCustomElement = this.querySelector("backtest-overview");
       this.controlCustomElement = this.querySelector("backtest-control");
       this.tableCustomElement = this.querySelector("backtest-table");
@@ -110,15 +115,21 @@
         const prevData = fetchedData[index + 3];
         const realPrice = realPrices[index].price;
         const { range, standardPrice, buyCondition } = volatilityBreakout(prevData, realPrice, aData.opening_price, this.k);
+        const tradeCondition = Boolean(isAverageOver && buyCondition);
+        const prevVolatilityRate = volatilityRate(aData);
+        const buyRate = this.targetRate / prevVolatilityRate / this.markets.length;
+        const buyAmount = tradeCondition ? buyRate * this.totalInvestmentAmount : 0;
         return {
           market: aData.market,
           date: aData.candle_date_time_kst,
           range,
           standardPrice,
-          buyCondition: Boolean(isAverageOver && buyCondition),
-          action: isAverageOver && buyCondition ? "Trade" : "Reserve",
+          buyCondition: tradeCondition,
+          action: tradeCondition ? "Trade" : "Reserve",
+          volatilityRate: prevVolatilityRate,
           buyPrice: realPrice,
-          sellPrice: aData.trade_price
+          sellPrice: aData.trade_price,
+          buyAmount
         };
       });
       return result;
@@ -129,7 +140,7 @@
         switch (aData.action) {
           case "Trade":
             const rate = aData.sellPrice && aData.buyPrice ? (aData.sellPrice - aData.buyPrice) / aData.buyPrice : 0;
-            const profit = rate * this.investmentAmount;
+            const profit = aData.buyAmount ? rate * aData.buyAmount : 0;
             sumProfit += profit;
             return Object.assign(Object.assign({}, aData), {
               rate,
@@ -217,11 +228,11 @@
     });
   }
 
-  // dev/scripts/pages/backtest6/Overview.js
+  // dev/scripts/pages/backtest7/Overview.js
   var Overview = class extends HTMLElement {
     constructor() {
       super();
-      this.app = document.querySelector("app-backtest5");
+      this.app = document.querySelector("app-backtest7");
       this.data = [];
       this.profit = 0;
       this.totalSumPrice = 0;
@@ -296,11 +307,11 @@
     }
   };
 
-  // dev/scripts/pages/backtest6/Control.js
+  // dev/scripts/pages/backtest7/Control.js
   var Control = class extends HTMLElement {
     constructor() {
       super();
-      this.app = document.querySelector("app-backtest5");
+      this.app = document.querySelector("app-backtest7");
       this.formElement = this.querySelector("form");
       this.marketsInput = this.querySelector('input[name="markets"]');
       this.countInput = this.querySelector("input[name=count]");
@@ -335,7 +346,7 @@
     }
   };
 
-  // dev/scripts/pages/backtest6/Table.js
+  // dev/scripts/pages/backtest7/Table.js
   var BacktestTable = class extends HTMLElement {
     constructor() {
       super();
@@ -414,6 +425,8 @@
         standardPrice: ((_c = aData.standardPrice) === null || _c === void 0 ? void 0 : _c.toLocaleString()) || "",
         buyPrice: aData.buyPrice && Math.round(aData.buyPrice).toLocaleString() || "",
         sellPrice: aData.sellPrice && Math.round(aData.sellPrice).toLocaleString() || "",
+        buyAmount: aData.buyAmount && Math.round(aData.buyAmount).toLocaleString() || "",
+        volatilityRate: aData.volatilityRate && aData.volatilityRate.toFixed(2) || "",
         rate: ((_d = aData.rate && aData.rate * 100) === null || _d === void 0 ? void 0 : _d.toFixed(2)) || "",
         profit: aData.profit && Math.round(aData.profit).toLocaleString() || "",
         sumProfit: aData.sumProfit && Math.round(aData.sumProfit).toLocaleString()
@@ -442,10 +455,10 @@
     }
   };
 
-  // dev/scripts/pages/backtest6/index.js
+  // dev/scripts/pages/backtest7/index.js
   customElements.define("backtest-table", BacktestTable);
   customElements.define("backtest-control", Control);
   customElements.define("backtest-overview", Overview);
-  customElements.define("app-backtest5", AppBacktest6);
+  customElements.define("app-backtest7", AppBacktest7);
 })();
 //# sourceMappingURL=index.js.map

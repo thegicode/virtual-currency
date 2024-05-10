@@ -203,9 +203,11 @@ interface IBacktest5 {
     standardPrice: number | null;
     buyPrice: number | null;
     sellPrice: number | null;
+    buyAmount?: number;
     rate?: number;
     profit?: number;
     sumProfit?: number;
+    volatilityRate?: number;
 }
 
 interface IRealPrice {

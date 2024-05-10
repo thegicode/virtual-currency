@@ -2,7 +2,7 @@
 (() => {
   // app/scripts/components/backtest/volatility.ts
   function volatilityBreakout(prevData, realPrice, openingPrice, k) {
-    const range = prevData.high_price - prevData.low_price;
+    const range = calculateVolatility(prevData);
     const standardPrice = openingPrice + range * k;
     const buyCondition = realPrice > standardPrice;
     return {
@@ -10,6 +10,9 @@
       standardPrice,
       buyCondition
     };
+  }
+  function calculateVolatility(data) {
+    return data.high_price - data.low_price;
   }
 
   // dev/scripts/pages/backtest5/AppBacktest5.js
