@@ -37,12 +37,18 @@ export default class AppBacktest7 extends HTMLElement {
     constructor() {
         super();
 
-        this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
+        this.markets = [
+            "KRW-BTC",
+            "KRW-ETH",
+            "KRW-DOGE",
+            "KRW-SBD",
+            "KRW-NEAR",
+        ];
         this.count = 30;
         this.totalInvestmentAmount = 1000000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;
-        this.k = 0.5; // 추천 0.5
+        this.k = 0.1; // 추천 0.5
         this.targetRate = 2; // 목표 변동성
 
         this.overviewCustomElement = this.querySelector(

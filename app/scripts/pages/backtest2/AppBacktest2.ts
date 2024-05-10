@@ -46,7 +46,7 @@ export default class AppBacktest2 extends HTMLElement {
 
         this.data = [];
         this.market = "";
-        this.count = 60;
+        this.count = 30;
         this.marketSize = 5;
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
@@ -86,12 +86,15 @@ export default class AppBacktest2 extends HTMLElement {
 
     async loadAndRender() {
         const originData = await this.getCandles();
-        this.movingAverages(originData);
-        this.checkCondition();
-        this.setTradingAction();
-        this.setVolatility();
-        this.order();
-        this.setProfit();
+
+        const avreagedData = this.movingAverages(originData);
+        const conditiondData = this.checkCondition(avreagedData);
+        const actionedData = this.setTradingAction(conditiondData);
+        const volatedData = this.setVolatility(actionedData);
+        const orderedData = this.order(volatedData);
+        const profitedData = this.setProfit(orderedData);
+        this.data = profitedData.slice(19);
+
         this.render();
         this.renderSummary();
     }
@@ -99,7 +102,7 @@ export default class AppBacktest2 extends HTMLElement {
     private async getCandles() {
         const searchParams = new URLSearchParams({
             market: this.market,
-            count: this.count.toString(),
+            count: (this.count + 19).toString(),
         });
 
         const response = await fetch(`/fetchCandles?${searchParams}`);
@@ -109,71 +112,77 @@ export default class AppBacktest2 extends HTMLElement {
         return await response.json();
     }
 
-    private movingAverages(originData: ICandles[]) {
+    private movingAverages(originData: ICandles2[]) {
         let data = setMovingAverage(originData, 3);
         data = setMovingAverage(data, 5);
         data = setMovingAverage(data, 10);
         data = setMovingAverage(data, 20);
 
-        this.data = data;
+        return data;
     }
 
-    private checkCondition() {
-        this.data = this.data.map((aData, index) => {
-            if (
-                aData.trade_price > aData.moving_average_3 &&
-                aData.trade_price > aData.moving_average_5 &&
-                aData.trade_price > aData.moving_average_10 &&
-                aData.trade_price > aData.moving_average_20
-            )
-                aData.condition = true;
-            else aData.condition = false;
+    private checkCondition(dataList: ICandles2[]) {
+        return dataList.map((aData, index) => {
+            const bData = JSON.parse(JSON.stringify(aData));
 
-            return { ...aData };
+            if (
+                aData.trade_price > bData.moving_average_3 &&
+                bData.trade_price > bData.moving_average_5 &&
+                bData.trade_price > bData.moving_average_10 &&
+                bData.trade_price > bData.moving_average_20
+            )
+                bData.condition = true;
+            else bData.condition = false;
+
+            return { ...bData };
         });
     }
 
-    private setTradingAction() {
-        this.data = this.data.map((aData, index) => {
+    private setTradingAction(dataList: ICandles2[]) {
+        return dataList.map((aData, index) => {
+            const bData = JSON.parse(JSON.stringify(aData));
+
             let tradingAction = "";
             if (index === 0) {
-                tradingAction = aData.condition ? "Buy" : "Reserve";
+                tradingAction = bData.condition ? "Buy" : "Reserve";
             } else {
-                const prevCondition = this.data[index - 1].condition;
-                if (prevCondition !== aData.condition) {
-                    tradingAction = aData.condition ? "Buy" : "Sell";
+                const prevCondition = dataList[index - 1].condition;
+                if (prevCondition !== bData.condition) {
+                    tradingAction = bData.condition ? "Buy" : "Sell";
                 } else {
-                    tradingAction = aData.condition ? "Hold" : "Reserve";
+                    tradingAction = bData.condition ? "Hold" : "Reserve";
                 }
             }
 
             return {
-                ...aData,
+                ...bData,
                 tradingAction,
             };
         });
     }
 
-    private setVolatility() {
-        this.data = this.data.map((aData) => {
+    private setVolatility(dataList: ICandles2[]) {
+        const dailyData = dataList.map((aData) => {
             return {
                 ...aData,
                 daily_volatility: getDaliyVolatility(aData),
             };
         });
 
-        this.data = this.data.map((aData, index) => {
-            const volatility = getVolatility(this.data, aData, index);
+        const result = dailyData.map((aData, index) => {
+            const volatility = getVolatility(dailyData, aData, index);
             return {
                 ...aData,
                 volatility,
             };
         });
+
+        return result;
     }
 
-    private order() {
-        this.data = this.data.map((aData) => {
-            if (!aData.volatility) return aData;
+    private order(dataList: ICandles2[]) {
+        return dataList.map((aData) => {
+            if (!aData.volatility) return { ...aData };
 
             if (aData.tradingAction === "Buy") {
                 const percent = (this.target / aData.volatility) * 100;
@@ -182,11 +191,11 @@ export default class AppBacktest2 extends HTMLElement {
                 const result = (this.totalInvestmentPrice * unitPercent) / 100;
 
                 return { ...aData, order_price: Math.round(result) };
-            } else return aData;
+            } else return { ...aData };
         });
     }
 
-    private setProfit() {
+    private setProfit(dataList: ICandles2[]) {
         let buyTradePrice = 0;
         let orderPrice = 0;
         let profit = 0;
@@ -204,7 +213,8 @@ export default class AppBacktest2 extends HTMLElement {
         const getProfit = (aData: ICandles2) => orderPrice * getRate(aData);
         const getSumPrice = () => this.investmentPrice + sumProfit;
 
-        this.data = this.data.map((aData) => {
+        return dataList.map((oneData) => {
+            const aData = JSON.parse(JSON.stringify(oneData));
             switch (aData.tradingAction) {
                 case "Buy":
                     buyTradePrice = aData.trade_price;

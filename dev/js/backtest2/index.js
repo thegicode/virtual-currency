@@ -86,7 +86,7 @@
       super();
       this.data = [];
       this.market = "";
-      this.count = 60;
+      this.count = 30;
       this.marketSize = 5;
       this.totalInvestmentPrice = 1e6;
       this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
@@ -117,12 +117,13 @@
     loadAndRender() {
       return __awaiter(this, void 0, void 0, function* () {
         const originData = yield this.getCandles();
-        this.movingAverages(originData);
-        this.checkCondition();
-        this.setTradingAction();
-        this.setVolatility();
-        this.order();
-        this.setProfit();
+        const avreagedData = this.movingAverages(originData);
+        const conditiondData = this.checkCondition(avreagedData);
+        const actionedData = this.setTradingAction(conditiondData);
+        const volatedData = this.setVolatility(actionedData);
+        const orderedData = this.order(volatedData);
+        const profitedData = this.setProfit(orderedData);
+        this.data = profitedData.slice(19);
         this.render();
         this.renderSummary();
       });
@@ -131,7 +132,7 @@
       return __awaiter(this, void 0, void 0, function* () {
         const searchParams = new URLSearchParams({
           market: this.market,
-          count: this.count.toString()
+          count: (this.count + 19).toString()
         });
         const response = yield fetch(`/fetchCandles?${searchParams}`);
         if (!response.ok) {
@@ -145,56 +146,59 @@
       data = setMovingAverage(data, 5);
       data = setMovingAverage(data, 10);
       data = setMovingAverage(data, 20);
-      this.data = data;
+      return data;
     }
-    checkCondition() {
-      this.data = this.data.map((aData, index) => {
-        if (aData.trade_price > aData.moving_average_3 && aData.trade_price > aData.moving_average_5 && aData.trade_price > aData.moving_average_10 && aData.trade_price > aData.moving_average_20)
-          aData.condition = true;
+    checkCondition(dataList) {
+      return dataList.map((aData, index) => {
+        const bData = JSON.parse(JSON.stringify(aData));
+        if (aData.trade_price > bData.moving_average_3 && bData.trade_price > bData.moving_average_5 && bData.trade_price > bData.moving_average_10 && bData.trade_price > bData.moving_average_20)
+          bData.condition = true;
         else
-          aData.condition = false;
-        return Object.assign({}, aData);
+          bData.condition = false;
+        return Object.assign({}, bData);
       });
     }
-    setTradingAction() {
-      this.data = this.data.map((aData, index) => {
+    setTradingAction(dataList) {
+      return dataList.map((aData, index) => {
+        const bData = JSON.parse(JSON.stringify(aData));
         let tradingAction = "";
         if (index === 0) {
-          tradingAction = aData.condition ? "Buy" : "Reserve";
+          tradingAction = bData.condition ? "Buy" : "Reserve";
         } else {
-          const prevCondition = this.data[index - 1].condition;
-          if (prevCondition !== aData.condition) {
-            tradingAction = aData.condition ? "Buy" : "Sell";
+          const prevCondition = dataList[index - 1].condition;
+          if (prevCondition !== bData.condition) {
+            tradingAction = bData.condition ? "Buy" : "Sell";
           } else {
-            tradingAction = aData.condition ? "Hold" : "Reserve";
+            tradingAction = bData.condition ? "Hold" : "Reserve";
           }
         }
-        return Object.assign(Object.assign({}, aData), { tradingAction });
+        return Object.assign(Object.assign({}, bData), { tradingAction });
       });
     }
-    setVolatility() {
-      this.data = this.data.map((aData) => {
+    setVolatility(dataList) {
+      const dailyData = dataList.map((aData) => {
         return Object.assign(Object.assign({}, aData), { daily_volatility: getDaliyVolatility(aData) });
       });
-      this.data = this.data.map((aData, index) => {
-        const volatility = getVolatility(this.data, aData, index);
+      const result = dailyData.map((aData, index) => {
+        const volatility = getVolatility(dailyData, aData, index);
         return Object.assign(Object.assign({}, aData), { volatility });
       });
+      return result;
     }
-    order() {
-      this.data = this.data.map((aData) => {
+    order(dataList) {
+      return dataList.map((aData) => {
         if (!aData.volatility)
-          return aData;
+          return Object.assign({}, aData);
         if (aData.tradingAction === "Buy") {
           const percent = this.target / aData.volatility * 100;
           const unitPercent = percent / this.marketSize;
           const result = this.totalInvestmentPrice * unitPercent / 100;
           return Object.assign(Object.assign({}, aData), { order_price: Math.round(result) });
         } else
-          return aData;
+          return Object.assign({}, aData);
       });
     }
-    setProfit() {
+    setProfit(dataList) {
       let buyTradePrice = 0;
       let orderPrice = 0;
       let profit = 0;
@@ -207,7 +211,8 @@
       const getRate = (aData) => (aData.trade_price - buyTradePrice) / buyTradePrice;
       const getProfit = (aData) => orderPrice * getRate(aData);
       const getSumPrice = () => this.investmentPrice + sumProfit;
-      this.data = this.data.map((aData) => {
+      return dataList.map((oneData) => {
+        const aData = JSON.parse(JSON.stringify(oneData));
         switch (aData.tradingAction) {
           case "Buy":
             buyTradePrice = aData.trade_price;
