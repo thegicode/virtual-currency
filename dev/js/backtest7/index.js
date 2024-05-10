@@ -72,11 +72,17 @@
   var AppBacktest7 = class extends HTMLElement {
     constructor() {
       super();
-      this.markets = ["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-SBD", "KRW-XRP"];
+      this.markets = [
+        "KRW-BTC",
+        "KRW-ETH",
+        "KRW-DOGE",
+        "KRW-SBD",
+        "KRW-NEAR"
+      ];
       this.count = 30;
       this.totalInvestmentAmount = 1e6;
       this.investmentAmount = this.totalInvestmentAmount / this.markets.length;
-      this.k = 0.5;
+      this.k = 0.1;
       this.targetRate = 2;
       this.overviewCustomElement = this.querySelector("backtest-overview");
       this.controlCustomElement = this.querySelector("backtest-control");

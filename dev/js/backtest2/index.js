@@ -85,13 +85,14 @@
     constructor() {
       super();
       this.data = [];
-      this.market = "KRW-BTC";
-      this.count = 30;
+      this.market = "";
+      this.count = 60;
       this.marketSize = 5;
       this.totalInvestmentPrice = 1e6;
       this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
       this.summaryAllPrice = 0;
       this.allSumSize = 0;
+      this.target = 2;
       this.countElement = this.querySelector("input[name=count]");
       this.selectElement = this.querySelector("select");
       this.formElement = this.querySelector("form");
@@ -109,6 +110,7 @@
       this.formElement.removeEventListener("submit", this.onOptionSubmit);
     }
     initialize() {
+      this.market = this.selectElement.value;
       this.countElement.value = this.count.toString();
       this.querySelector(".investmentPrice").textContent = this.investmentPrice.toLocaleString();
     }
@@ -140,9 +142,9 @@
     }
     movingAverages(originData) {
       let data = setMovingAverage(originData, 3);
-      data = setMovingAverage(originData, 5);
-      data = setMovingAverage(originData, 10);
-      data = setMovingAverage(originData, 20);
+      data = setMovingAverage(data, 5);
+      data = setMovingAverage(data, 10);
+      data = setMovingAverage(data, 20);
       this.data = data;
     }
     checkCondition() {
@@ -180,12 +182,11 @@
       });
     }
     order() {
-      const target = 2;
       this.data = this.data.map((aData) => {
         if (!aData.volatility)
           return aData;
         if (aData.tradingAction === "Buy") {
-          const percent = target / aData.volatility * 100;
+          const percent = this.target / aData.volatility * 100;
           const unitPercent = percent / this.marketSize;
           const result = this.totalInvestmentPrice * unitPercent / 100;
           return Object.assign(Object.assign({}, aData), { order_price: Math.round(result) });
@@ -264,7 +265,6 @@
         trade_price: aData.trade_price.toLocaleString(),
         condition: aData.condition,
         tradingAction: aData.tradingAction,
-        daily_volatility: aData.daily_volatility && aData.daily_volatility,
         volatility: aData.volatility && aData.volatility || "",
         order_price: aData.order_price && aData.order_price.toLocaleString() || "",
         unrealize_rate: aData.unrealize_rate,

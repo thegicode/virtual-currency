@@ -36,6 +36,7 @@ export default class AppBacktest2 extends HTMLElement {
     private investmentPrice: number;
     private summaryAllPrice: number;
     private allSumSize: number;
+    private target: number;
     private countElement: HTMLInputElement;
     private selectElement: HTMLSelectElement;
     private formElement: HTMLFormElement;
@@ -44,13 +45,14 @@ export default class AppBacktest2 extends HTMLElement {
         super();
 
         this.data = [];
-        this.market = "KRW-BTC";
-        this.count = 30;
+        this.market = "";
+        this.count = 60;
         this.marketSize = 5;
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
         this.summaryAllPrice = 0;
         this.allSumSize = 0;
+        this.target = 2; // 2%
 
         this.countElement = this.querySelector(
             "input[name=count]"
@@ -76,6 +78,7 @@ export default class AppBacktest2 extends HTMLElement {
     }
 
     private initialize() {
+        this.market = this.selectElement.value;
         this.countElement.value = this.count.toString();
         (this.querySelector(".investmentPrice") as HTMLElement).textContent =
             this.investmentPrice.toLocaleString();
@@ -108,9 +111,9 @@ export default class AppBacktest2 extends HTMLElement {
 
     private movingAverages(originData: ICandles[]) {
         let data = setMovingAverage(originData, 3);
-        data = setMovingAverage(originData, 5);
-        data = setMovingAverage(originData, 10);
-        data = setMovingAverage(originData, 20);
+        data = setMovingAverage(data, 5);
+        data = setMovingAverage(data, 10);
+        data = setMovingAverage(data, 20);
 
         this.data = data;
     }
@@ -169,12 +172,11 @@ export default class AppBacktest2 extends HTMLElement {
     }
 
     private order() {
-        const target = 2; // 2%
         this.data = this.data.map((aData) => {
             if (!aData.volatility) return aData;
 
             if (aData.tradingAction === "Buy") {
-                const percent = (target / aData.volatility) * 100;
+                const percent = (this.target / aData.volatility) * 100;
                 const unitPercent = percent / this.marketSize;
 
                 const result = (this.totalInvestmentPrice * unitPercent) / 100;
@@ -301,7 +303,7 @@ export default class AppBacktest2 extends HTMLElement {
             condition: aData.condition,
             tradingAction: aData.tradingAction,
 
-            daily_volatility: aData.daily_volatility && aData.daily_volatility,
+            // daily_volatility: aData.daily_volatility && aData.daily_volatility,
             volatility: (aData.volatility && aData.volatility) || "",
             order_price:
                 (aData.order_price && aData.order_price.toLocaleString()) || "",
