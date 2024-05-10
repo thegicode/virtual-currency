@@ -7,15 +7,19 @@ function getDaliyVolatility(aData: any) {
     return Number(result.toFixed(2));
 }
 
-function getVolatility(data: any, aData: any, index: number) {
-    let sum = 0;
-
+function getVolatility(dataList: any, index: number) {
     if (index < 5) {
         return;
     }
 
-    for (let i = 5; i > 0; i--) {
-        sum += data[index - i].daily_volatility;
+    let sum = 0;
+
+    // for (let i = 5; i > 0; i--) {
+    //     sum += dataList[index - i].daily_volatility;
+    // }
+
+    for (let i = index - 5; i < index; i++) {
+        sum += dataList[i].daily_volatility;
     }
 
     return Number((sum / 5).toFixed(2));

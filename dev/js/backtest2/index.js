@@ -27,13 +27,13 @@
     const result = (aData.high_price - aData.low_price) / aData.opening_price * 100;
     return Number(result.toFixed(2));
   }
-  function getVolatility(data, aData, index) {
-    let sum = 0;
+  function getVolatility(dataList, index) {
     if (index < 5) {
       return;
     }
-    for (let i = 5; i > 0; i--) {
-      sum += data[index - i].daily_volatility;
+    let sum = 0;
+    for (let i = index - 5; i < index; i++) {
+      sum += dataList[i].daily_volatility;
     }
     return Number((sum / 5).toFixed(2));
   }
@@ -101,7 +101,7 @@
     }
     connectedCallback() {
       this.initialize();
-      this.loadAndRender();
+      this.loadAndProcessData();
       this.selectElement.addEventListener("change", this.onChangeMarket);
       this.formElement.addEventListener("submit", this.onOptionSubmit);
     }
@@ -114,21 +114,21 @@
       this.countElement.value = this.count.toString();
       this.querySelector(".investmentPrice").textContent = this.investmentPrice.toLocaleString();
     }
-    loadAndRender() {
+    loadAndProcessData() {
       return __awaiter(this, void 0, void 0, function* () {
-        const originData = yield this.getCandles();
-        const avreagedData = this.movingAverages(originData);
-        const conditiondData = this.checkCondition(avreagedData);
-        const actionedData = this.setTradingAction(conditiondData);
-        const volatedData = this.setVolatility(actionedData);
-        const orderedData = this.order(volatedData);
-        const profitedData = this.setProfit(orderedData);
-        this.data = profitedData.slice(19);
+        const rawData = yield this.fetchCandleData();
+        const movingAverageData = this.calculateMovingAverages(rawData);
+        const dataWithConditions = this.assessPriceAgainstAverages(movingAverageData);
+        const actionableData = this.determineTradeActions(dataWithConditions);
+        const dataWithVolatility = this.calculateVolatility(actionableData);
+        const orderedData = this.placeOrders(dataWithVolatility);
+        const dataWithProfits = this.calculateProfits(orderedData);
+        this.data = dataWithProfits.slice(19);
         this.render();
         this.renderSummary();
       });
     }
-    getCandles() {
+    fetchCandleData() {
       return __awaiter(this, void 0, void 0, function* () {
         const searchParams = new URLSearchParams({
           market: this.market,
@@ -141,64 +141,57 @@
         return yield response.json();
       });
     }
-    movingAverages(originData) {
+    calculateMovingAverages(originData) {
       let data = setMovingAverage(originData, 3);
       data = setMovingAverage(data, 5);
       data = setMovingAverage(data, 10);
       data = setMovingAverage(data, 20);
       return data;
     }
-    checkCondition(dataList) {
-      return dataList.map((aData, index) => {
-        const bData = JSON.parse(JSON.stringify(aData));
-        if (aData.trade_price > bData.moving_average_3 && bData.trade_price > bData.moving_average_5 && bData.trade_price > bData.moving_average_10 && bData.trade_price > bData.moving_average_20)
-          bData.condition = true;
-        else
-          bData.condition = false;
-        return Object.assign({}, bData);
+    assessPriceAgainstAverages(dataList) {
+      return dataList.map((data) => {
+        const isPriceAboveAverages = data.trade_price > data.moving_average_3 && data.trade_price > data.moving_average_5 && data.trade_price > data.moving_average_10 && data.trade_price > data.moving_average_20 ? true : false;
+        return Object.assign(Object.assign({}, data), { condition: isPriceAboveAverages });
       });
     }
-    setTradingAction(dataList) {
-      return dataList.map((aData, index) => {
-        const bData = JSON.parse(JSON.stringify(aData));
+    determineTradeActions(dataList) {
+      return dataList.map((data, index) => {
         let tradingAction = "";
         if (index === 0) {
-          tradingAction = bData.condition ? "Buy" : "Reserve";
+          tradingAction = data.condition ? "Buy" : "Reserve";
         } else {
           const prevCondition = dataList[index - 1].condition;
-          if (prevCondition !== bData.condition) {
-            tradingAction = bData.condition ? "Buy" : "Sell";
+          if (prevCondition !== data.condition) {
+            tradingAction = data.condition ? "Buy" : "Sell";
           } else {
-            tradingAction = bData.condition ? "Hold" : "Reserve";
+            tradingAction = data.condition ? "Hold" : "Reserve";
           }
         }
-        return Object.assign(Object.assign({}, bData), { tradingAction });
+        return Object.assign(Object.assign({}, data), { tradingAction });
       });
     }
-    setVolatility(dataList) {
+    calculateVolatility(dataList) {
       const dailyData = dataList.map((aData) => {
         return Object.assign(Object.assign({}, aData), { daily_volatility: getDaliyVolatility(aData) });
       });
       const result = dailyData.map((aData, index) => {
-        const volatility = getVolatility(dailyData, aData, index);
+        const volatility = getVolatility(dailyData, index);
         return Object.assign(Object.assign({}, aData), { volatility });
       });
       return result;
     }
-    order(dataList) {
+    placeOrders(dataList) {
       return dataList.map((aData) => {
-        if (!aData.volatility)
-          return Object.assign({}, aData);
-        if (aData.tradingAction === "Buy") {
+        if (aData.tradingAction === "Buy" && aData.volatility) {
           const percent = this.target / aData.volatility * 100;
           const unitPercent = percent / this.marketSize;
           const result = this.totalInvestmentPrice * unitPercent / 100;
           return Object.assign(Object.assign({}, aData), { order_price: Math.round(result) });
-        } else
-          return Object.assign({}, aData);
+        }
+        return Object.assign({}, aData);
       });
     }
-    setProfit(dataList) {
+    calculateProfits(dataList) {
       let buyTradePrice = 0;
       let orderPrice = 0;
       let profit = 0;
@@ -325,14 +318,14 @@
     onChangeMarket(event) {
       const target = event.target;
       this.market = target.value;
-      this.loadAndRender();
+      this.loadAndProcessData();
     }
     onOptionSubmit(event) {
       event === null || event === void 0 ? void 0 : event.preventDefault();
       const maxSize = Number(this.countElement.getAttribute("max"));
       this.count = Number(this.countElement.value) > maxSize ? maxSize : Number(this.countElement.value);
       this.countElement.value = this.count.toString();
-      this.loadAndRender();
+      this.loadAndProcessData();
     }
   };
 

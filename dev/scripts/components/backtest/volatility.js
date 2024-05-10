@@ -2,13 +2,13 @@ function getDaliyVolatility(aData) {
     const result = ((aData.high_price - aData.low_price) / aData.opening_price) * 100;
     return Number(result.toFixed(2));
 }
-function getVolatility(data, aData, index) {
-    let sum = 0;
+function getVolatility(dataList, index) {
     if (index < 5) {
         return;
     }
-    for (let i = 5; i > 0; i--) {
-        sum += data[index - i].daily_volatility;
+    let sum = 0;
+    for (let i = index - 5; i < index; i++) {
+        sum += dataList[i].daily_volatility;
     }
     return Number((sum / 5).toFixed(2));
 }

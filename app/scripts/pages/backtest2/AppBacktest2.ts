@@ -66,7 +66,7 @@ export default class AppBacktest2 extends HTMLElement {
 
     connectedCallback() {
         this.initialize();
-        this.loadAndRender();
+        this.loadAndProcessData();
 
         this.selectElement.addEventListener("change", this.onChangeMarket);
         this.formElement.addEventListener("submit", this.onOptionSubmit);
@@ -84,22 +84,31 @@ export default class AppBacktest2 extends HTMLElement {
             this.investmentPrice.toLocaleString();
     }
 
-    async loadAndRender() {
-        const originData = await this.getCandles();
+    async loadAndProcessData() {
+        // 원본 캔들 데이터 로드
+        const rawData = await this.fetchCandleData();
+        // 이동평균 계산
+        const movingAverageData = this.calculateMovingAverages(rawData);
+        // 거래 조건 검사
+        const dataWithConditions =
+            this.assessPriceAgainstAverages(movingAverageData);
+        // 거래 액션 결정 (매수, 매도 등)
+        const actionableData = this.determineTradeActions(dataWithConditions);
+        // 변동성 계산
+        const dataWithVolatility = this.calculateVolatility(actionableData);
+        // 주문 처리 (매수/매도 주문)
+        const orderedData = this.placeOrders(dataWithVolatility);
+        const dataWithProfits = this.calculateProfits(orderedData);
 
-        const avreagedData = this.movingAverages(originData);
-        const conditiondData = this.checkCondition(avreagedData);
-        const actionedData = this.setTradingAction(conditiondData);
-        const volatedData = this.setVolatility(actionedData);
-        const orderedData = this.order(volatedData);
-        const profitedData = this.setProfit(orderedData);
-        this.data = profitedData.slice(19);
+        // 20번째 데이터부터 사용 (20일선 적용된 데이터부터 시작)
+        this.data = dataWithProfits.slice(19);
 
+        // 데이터 렌더링
         this.render();
         this.renderSummary();
     }
 
-    private async getCandles() {
+    private async fetchCandleData() {
         const searchParams = new URLSearchParams({
             market: this.market,
             count: (this.count + 19).toString(),
@@ -112,7 +121,7 @@ export default class AppBacktest2 extends HTMLElement {
         return await response.json();
     }
 
-    private movingAverages(originData: ICandles2[]) {
+    private calculateMovingAverages(originData: ICandles2[]) {
         let data = setMovingAverage(originData, 3);
         data = setMovingAverage(data, 5);
         data = setMovingAverage(data, 10);
@@ -121,47 +130,43 @@ export default class AppBacktest2 extends HTMLElement {
         return data;
     }
 
-    private checkCondition(dataList: ICandles2[]) {
-        return dataList.map((aData, index) => {
-            const bData = JSON.parse(JSON.stringify(aData));
+    private assessPriceAgainstAverages(dataList: ICandles2[]) {
+        return dataList.map((data) => {
+            const isPriceAboveAverages =
+                data.trade_price > data.moving_average_3 &&
+                data.trade_price > data.moving_average_5 &&
+                data.trade_price > data.moving_average_10 &&
+                data.trade_price > data.moving_average_20
+                    ? true
+                    : false;
 
-            if (
-                aData.trade_price > bData.moving_average_3 &&
-                bData.trade_price > bData.moving_average_5 &&
-                bData.trade_price > bData.moving_average_10 &&
-                bData.trade_price > bData.moving_average_20
-            )
-                bData.condition = true;
-            else bData.condition = false;
-
-            return { ...bData };
+            return { ...data, condition: isPriceAboveAverages };
         });
     }
 
-    private setTradingAction(dataList: ICandles2[]) {
-        return dataList.map((aData, index) => {
-            const bData = JSON.parse(JSON.stringify(aData));
-
+    private determineTradeActions(dataList: ICandles2[]) {
+        return dataList.map((data, index) => {
             let tradingAction = "";
+
             if (index === 0) {
-                tradingAction = bData.condition ? "Buy" : "Reserve";
+                tradingAction = data.condition ? "Buy" : "Reserve";
             } else {
                 const prevCondition = dataList[index - 1].condition;
-                if (prevCondition !== bData.condition) {
-                    tradingAction = bData.condition ? "Buy" : "Sell";
+                if (prevCondition !== data.condition) {
+                    tradingAction = data.condition ? "Buy" : "Sell";
                 } else {
-                    tradingAction = bData.condition ? "Hold" : "Reserve";
+                    tradingAction = data.condition ? "Hold" : "Reserve";
                 }
             }
 
             return {
-                ...bData,
+                ...data,
                 tradingAction,
             };
         });
     }
 
-    private setVolatility(dataList: ICandles2[]) {
+    private calculateVolatility(dataList: ICandles2[]) {
         const dailyData = dataList.map((aData) => {
             return {
                 ...aData,
@@ -170,7 +175,7 @@ export default class AppBacktest2 extends HTMLElement {
         });
 
         const result = dailyData.map((aData, index) => {
-            const volatility = getVolatility(dailyData, aData, index);
+            const volatility = getVolatility(dailyData, index);
             return {
                 ...aData,
                 volatility,
@@ -180,22 +185,20 @@ export default class AppBacktest2 extends HTMLElement {
         return result;
     }
 
-    private order(dataList: ICandles2[]) {
+    private placeOrders(dataList: ICandles2[]) {
         return dataList.map((aData) => {
-            if (!aData.volatility) return { ...aData };
-
-            if (aData.tradingAction === "Buy") {
+            if (aData.tradingAction === "Buy" && aData.volatility) {
                 const percent = (this.target / aData.volatility) * 100;
                 const unitPercent = percent / this.marketSize;
-
                 const result = (this.totalInvestmentPrice * unitPercent) / 100;
 
                 return { ...aData, order_price: Math.round(result) };
-            } else return { ...aData };
+            }
+            return { ...aData };
         });
     }
 
-    private setProfit(dataList: ICandles2[]) {
+    private calculateProfits(dataList: ICandles2[]) {
         let buyTradePrice = 0;
         let orderPrice = 0;
         let profit = 0;
@@ -406,7 +409,7 @@ export default class AppBacktest2 extends HTMLElement {
     private onChangeMarket(event: Event) {
         const target = event.target as HTMLInputElement;
         this.market = target.value;
-        this.loadAndRender();
+        this.loadAndProcessData();
     }
 
     private onOptionSubmit(event: Event) {
@@ -420,6 +423,6 @@ export default class AppBacktest2 extends HTMLElement {
 
         this.countElement.value = this.count.toString();
 
-        this.loadAndRender();
+        this.loadAndProcessData();
     }
 }
