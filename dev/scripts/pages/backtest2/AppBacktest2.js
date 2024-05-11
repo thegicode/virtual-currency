@@ -141,8 +141,7 @@ export default class AppBacktest2 extends HTMLElement {
         const getRate = (aData) => (aData.trade_price - buyTradePrice) / buyTradePrice;
         const getProfit = (aData) => orderPrice * getRate(aData);
         const getSumPrice = () => this.investmentPrice + sumProfit;
-        return dataList.map((oneData) => {
-            const aData = JSON.parse(JSON.stringify(oneData));
+        return dataList.map((aData) => {
             switch (aData.tradingAction) {
                 case "Buy":
                     buyTradePrice = aData.trade_price;

@@ -34,7 +34,6 @@ function volatilityBreakout(
 ) {
     // 1. 전날 하루만에 움직인 최대폭
     const range = calculateVolatility(prevData);
-    // const range = prevData.high_price - prevData.low_price;
 
     // 2. 매수 기준 : 실시간 가격 > 당일 시가 + (레인지 * k)
     const standardPrice = openingPrice + range * k;
