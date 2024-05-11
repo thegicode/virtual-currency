@@ -27,18 +27,16 @@
     const range = calculateVolatility(prevData);
     const standardPrice = openingPrice + range * k;
     const buyCondition = realPrice > standardPrice;
+    const prevVolatilityRate = range / prevData.opening_price * 100;
     return {
       range,
       standardPrice,
-      buyCondition
+      buyCondition,
+      prevVolatilityRate
     };
   }
   function calculateVolatility(data) {
     return data.high_price - data.low_price;
-  }
-  function volatilityRate(data) {
-    const range = calculateVolatility(data);
-    return range / data.opening_price * 100;
   }
 
   // dev/scripts/pages/backtest7/AppBacktest7.js
@@ -77,13 +75,19 @@
         "KRW-ETH",
         "KRW-DOGE",
         "KRW-SBD",
+        "KRW-XRP",
+        "KRW-CTC",
+        "KRW-GRS",
+        "KRW-SOL",
+        "KRW-BCH",
         "KRW-NEAR"
       ];
-      this.count = 30;
-      this.totalInvestmentAmount = 1e6;
+      this.count = 60;
+      this.totalInvestmentAmount = 1e7;
       this.investmentAmount = this.totalInvestmentAmount / this.markets.length;
-      this.k = 0.1;
+      this.k = 0.5;
       this.targetRate = 2;
+      this.tradeCount = 0;
       this.overviewCustomElement = this.querySelector("backtest-overview");
       this.controlCustomElement = this.querySelector("backtest-control");
       this.tableCustomElement = this.querySelector("backtest-table");
@@ -109,22 +113,25 @@
       });
     }
     backtest(fetchedData, orginRealPrices) {
-      const realPrices = orginRealPrices.slice(4);
       const avereagedData = setMovingAverage(fetchedData);
-      const strategedData = this.strategy(avereagedData, realPrices);
+      const strategedData = this.strategy(avereagedData, orginRealPrices);
       const calculatedData = this.calculateProfits(strategedData);
       return calculatedData;
     }
     strategy(fetchedData, realPrices) {
-      const result = fetchedData.slice(4).map((aData, index) => {
+      const dataList = fetchedData.slice(4);
+      const result = dataList.map((aData, index) => {
         const isAverageOver = aData.moving_average_5 ? aData.trade_price > aData.moving_average_5 : null;
         const prevData = fetchedData[index + 3];
-        const realPrice = realPrices[index].price;
-        const { range, standardPrice, buyCondition } = volatilityBreakout(prevData, realPrice, aData.opening_price, this.k);
+        const realPrice = realPrices[index + 4].price;
+        if (aData.candle_date_time_kst.slice(0, 10) !== realPrices[index + 4].date.slice(0, 10)) {
+          console.error("\uB370\uC774\uD130 \uB0A0\uC9DC\uC640 \uC2E4\uC2DC\uAC00 \uAC00\uACA9 \uB0A0\uC9DC\uAC00 \uB2E4\uB985\uB2C8\uB2E4.");
+        }
+        const { range, standardPrice, buyCondition, prevVolatilityRate } = volatilityBreakout(prevData, realPrice, aData.opening_price, this.k);
         const tradeCondition = Boolean(isAverageOver && buyCondition);
-        const prevVolatilityRate = volatilityRate(aData);
         const buyRate = this.targetRate / prevVolatilityRate / this.markets.length;
         const buyAmount = tradeCondition ? buyRate * this.totalInvestmentAmount : 0;
+        const nextDayOpningPrice = realPrices[index + 5] ? realPrices[index + 5].price : null;
         return {
           market: aData.market,
           date: aData.candle_date_time_kst,
@@ -134,7 +141,7 @@
           action: tradeCondition ? "Trade" : "Reserve",
           volatilityRate: prevVolatilityRate,
           buyPrice: realPrice,
-          sellPrice: aData.trade_price,
+          sellPrice: nextDayOpningPrice,
           buyAmount
         };
       });
@@ -142,12 +149,14 @@
     }
     calculateProfits(data) {
       let sumProfit = 0;
+      let tradeCount = 0;
       const result = data.map((aData) => {
         switch (aData.action) {
           case "Trade":
             const rate = aData.sellPrice && aData.buyPrice ? (aData.sellPrice - aData.buyPrice) / aData.buyPrice : 0;
             const profit = aData.buyAmount ? rate * aData.buyAmount : 0;
             sumProfit += profit;
+            tradeCount++;
             return Object.assign(Object.assign({}, aData), {
               rate,
               profit,
@@ -157,6 +166,7 @@
             return Object.assign(Object.assign({}, aData), { buyPrice: null, sellPrice: null, sumProfit });
         }
       });
+      this.tradeCount = tradeCount;
       return result;
     }
     getRealPrices(data) {
@@ -164,11 +174,11 @@
         const realprices = [];
         for (const aData of data) {
           const date = aData.candle_date_time_kst;
-          const toDate = date.replace("T09:00:00", "T13:00:00+09:00");
+          const toDate = date.replace("T09:00:00", "T11:00:00+09:00");
           const response = yield this.fetchMinutes(aData.market, "60", "1", toDate);
           const price = response[0].opening_price;
           realprices.push({
-            date,
+            date: response[0].candle_date_time_kst,
             price
           });
           yield this.delay(100);
@@ -273,6 +283,7 @@
       const renderData = {
         market,
         period: this.app.count,
+        tradeCount: this.app.tradeCount,
         totalRate: `${rate.toFixed(2)}%`,
         totalProfit: ` ${Math.round(profit).toLocaleString()} \uC6D0`
       };

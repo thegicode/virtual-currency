@@ -11,13 +11,18 @@
  *      - 자금관리 : 가상화폐별 투입 금액은 (타깃 변동성 / 전일 변동성)/투자 대상 가상화폐 수
  *      - 전일 병동성 : 전일 고점  - 전일 저점 / 햔제가격)
  * 매도 : 다음날 시가
+ *
+ *
+ * 책에서는 자정에 거래하였으나 업비트는 일봉이 9시 기준으로 온다.
+ * 그래서 9시 기준으로 작업
+ * 데이터 사용 시간
+ * 일봉 : 오전 9시 데이터
+ * 실시간 가격 : 분봉 오전 10시
+ * 매도 : 다음날 분봉 오전 10시
  */
 
 import { setMovingAverage } from "@app/scripts/components/backtest/movingAverage";
-import {
-    volatilityBreakout,
-    volatilityRate,
-} from "@app/scripts/components/backtest/volatility";
+import { volatilityBreakout } from "@app/scripts/components/backtest/volatility";
 import Control from "./Control";
 import Overview from "./Overview";
 import Table from "./Table";
@@ -29,6 +34,7 @@ export default class AppBacktest7 extends HTMLElement {
     public investmentAmount: number;
     public k: number;
     private targetRate: number;
+    public tradeCount: number;
 
     private overviewCustomElement: Overview;
     private controlCustomElement: Control;
@@ -42,14 +48,20 @@ export default class AppBacktest7 extends HTMLElement {
             "KRW-ETH",
             "KRW-DOGE",
             "KRW-SBD",
+            "KRW-XRP",
+            "KRW-CTC",
+            "KRW-GRS",
+            "KRW-SOL",
+            "KRW-BCH",
             "KRW-NEAR",
         ];
-        this.count = 30;
-        this.totalInvestmentAmount = 1000000;
+        this.count = 60;
+        this.totalInvestmentAmount = 10000000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;
-        this.k = 0.1; // 추천 0.5
+        this.k = 0.5; // 추천 0.5
         this.targetRate = 2; // 목표 변동성
+        this.tradeCount = 0; // 목표 변동성
 
         this.overviewCustomElement = this.querySelector(
             "backtest-overview"
@@ -87,64 +99,75 @@ export default class AppBacktest7 extends HTMLElement {
     }
 
     private backtest(fetchedData: ICandles5[], orginRealPrices: IRealPrice[]) {
-        const realPrices = orginRealPrices.slice(4);
         const avereagedData = setMovingAverage(fetchedData);
-        const strategedData = this.strategy(avereagedData, realPrices);
+        const strategedData = this.strategy(avereagedData, orginRealPrices);
         const calculatedData = this.calculateProfits(strategedData);
         return calculatedData;
     }
 
     private strategy(fetchedData: ICandles5[], realPrices: IRealPrice[]) {
-        const result = fetchedData
-            .slice(4)
-            .map((aData: ICandles5, index: number) => {
-                // 5일 이동 평균선보다 높은지
-                const isAverageOver = aData.moving_average_5
-                    ? aData.trade_price > aData.moving_average_5
-                    : null;
+        const dataList = fetchedData.slice(4);
+        // const realPriceList = realPrices.slice(4);
+        const result = dataList.map((aData: ICandles5, index: number) => {
+            // 5일 이동 평균선보다 높은지 체크
+            const isAverageOver = aData.moving_average_5
+                ? aData.trade_price > aData.moving_average_5
+                : null;
 
-                // 실시간 가격 > 당일 시가 + (레인지 * k)
-                const prevData = fetchedData[index + 3];
-                const realPrice = realPrices[index].price;
+            // 돌파 가격 선정 (당일 시가 + (레인지 * k)), standardPrice
+            // 실시간 가격 >  돌파가격(당일 시가 + (레인지 * k)), buyCondition
+            const prevData = fetchedData[index + 3];
+            const realPrice = realPrices[index + 4].price;
 
-                const { range, standardPrice, buyCondition } =
-                    volatilityBreakout(
-                        prevData,
-                        realPrice,
-                        aData.opening_price,
-                        this.k
-                    );
+            if (
+                aData.candle_date_time_kst.slice(0, 10) !==
+                realPrices[index + 4].date.slice(0, 10)
+            ) {
+                console.error("데이터 날짜와 실시가 가격 날짜가 다릅니다.");
+            }
 
-                const tradeCondition = Boolean(isAverageOver && buyCondition);
+            const { range, standardPrice, buyCondition, prevVolatilityRate } =
+                volatilityBreakout(
+                    prevData,
+                    realPrice,
+                    aData.opening_price,
+                    this.k
+                );
 
-                // 자금관리 : 가상화폐별 투입 금액은 (타깃 변동성 / 전일 변동성)/투자 대상 가상화폐 수
-                const prevVolatilityRate = volatilityRate(aData);
-                const buyRate =
-                    this.targetRate / prevVolatilityRate / this.markets.length;
+            const tradeCondition = Boolean(isAverageOver && buyCondition);
 
-                const buyAmount = tradeCondition
-                    ? buyRate * this.totalInvestmentAmount
-                    : 0;
+            // 자금관리 : 가상화폐별 투입 금액은 (타깃 변동성 / 전일 변동성)/투자 대상 가상화폐 수
+            const buyRate =
+                this.targetRate / prevVolatilityRate / this.markets.length;
 
-                return {
-                    market: aData.market,
-                    date: aData.candle_date_time_kst,
-                    range,
-                    standardPrice,
-                    buyCondition: tradeCondition,
-                    action: tradeCondition ? "Trade" : "Reserve",
-                    volatilityRate: prevVolatilityRate,
-                    buyPrice: realPrice,
-                    sellPrice: aData.trade_price,
-                    buyAmount,
-                };
-            });
+            const buyAmount = tradeCondition
+                ? buyRate * this.totalInvestmentAmount
+                : 0;
+
+            const nextDayOpningPrice = realPrices[index + 5]
+                ? realPrices[index + 5].price
+                : null;
+
+            return {
+                market: aData.market,
+                date: aData.candle_date_time_kst,
+                range,
+                standardPrice,
+                buyCondition: tradeCondition,
+                action: tradeCondition ? "Trade" : "Reserve",
+                volatilityRate: prevVolatilityRate,
+                buyPrice: realPrice, // 당일 10시 가격에 매수
+                sellPrice: nextDayOpningPrice, // 다음날 10시 가격에 매도
+                buyAmount,
+            };
+        });
 
         return result;
     }
 
     private calculateProfits(data: IBacktest5[]) {
         let sumProfit = 0;
+        let tradeCount = 0;
 
         const result = data.map((aData) => {
             switch (aData.action) {
@@ -156,6 +179,7 @@ export default class AppBacktest7 extends HTMLElement {
                             : 0;
                     const profit = aData.buyAmount ? rate * aData.buyAmount : 0;
                     sumProfit += profit;
+                    tradeCount++;
 
                     return {
                         ...aData,
@@ -173,14 +197,17 @@ export default class AppBacktest7 extends HTMLElement {
                     };
             }
         });
+        // console.log("tradeCount", tradeCount);
+        this.tradeCount = tradeCount;
         return result;
     }
 
     private async getRealPrices(data: ICandles5[]) {
+        // 실시간 분봉 시간 : 오전 10시
         const realprices = [];
         for (const aData of data) {
             const date = aData.candle_date_time_kst;
-            const toDate = date.replace("T09:00:00", "T13:00:00+09:00");
+            const toDate = date.replace("T09:00:00", "T11:00:00+09:00");
             const response = await this.fetchMinutes(
                 aData.market,
                 "60",
@@ -190,7 +217,7 @@ export default class AppBacktest7 extends HTMLElement {
             const price = response[0].opening_price;
 
             realprices.push({
-                date,
+                date: response[0].candle_date_time_kst,
                 price,
             });
 
@@ -200,6 +227,7 @@ export default class AppBacktest7 extends HTMLElement {
     }
 
     private async fetchData(market: string, count: string) {
+        // 일봉 데이터 기준 시간 : 오전 9시
         const searchParams = new URLSearchParams({
             market: market,
             count,

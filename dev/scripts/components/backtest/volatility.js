@@ -16,18 +16,16 @@ function volatilityBreakout(prevData, realPrice, openingPrice, k) {
     const range = calculateVolatility(prevData);
     const standardPrice = openingPrice + range * k;
     const buyCondition = realPrice > standardPrice;
+    const prevVolatilityRate = (range / prevData.opening_price) * 100;
     return {
         range,
         standardPrice,
         buyCondition,
+        prevVolatilityRate,
     };
 }
 function calculateVolatility(data) {
     return data.high_price - data.low_price;
 }
-function volatilityRate(data) {
-    const range = calculateVolatility(data);
-    return (range / data.opening_price) * 100;
-}
-export { getDaliyVolatility, getVolatility, volatilityBreakout, volatilityRate, };
+export { getDaliyVolatility, getVolatility, volatilityBreakout };
 //# sourceMappingURL=volatility.js.map

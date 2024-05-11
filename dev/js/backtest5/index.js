@@ -5,10 +5,12 @@
     const range = calculateVolatility(prevData);
     const standardPrice = openingPrice + range * k;
     const buyCondition = realPrice > standardPrice;
+    const prevVolatilityRate = range / prevData.opening_price * 100;
     return {
       range,
       standardPrice,
-      buyCondition
+      buyCondition,
+      prevVolatilityRate
     };
   }
   function calculateVolatility(data) {

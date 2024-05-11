@@ -27,7 +27,7 @@ function getVolatility(dataList: any, index: number) {
 
 //
 function volatilityBreakout(
-    prevData: { high_price: number; low_price: number },
+    prevData: { high_price: number; low_price: number; opening_price: number },
     realPrice: number,
     openingPrice: number,
     k: number
@@ -35,15 +35,20 @@ function volatilityBreakout(
     // 1. 전날 하루만에 움직인 최대폭
     const range = calculateVolatility(prevData);
 
-    // 2. 매수 기준 : 실시간 가격 > 당일 시가 + (레인지 * k)
+    //  돌파 가격 : 당일 시가 + (레인지 * k)
     const standardPrice = openingPrice + range * k;
 
+    // 2. 매수 기준 : 실시간 가격 > 당일 시가 + (레인지 * k)
     const buyCondition = realPrice > standardPrice;
+
+    // 3. 전일 변동성
+    const prevVolatilityRate = (range / prevData.opening_price) * 100;
 
     return {
         range,
         standardPrice,
         buyCondition,
+        prevVolatilityRate,
     };
 }
 
@@ -51,14 +56,4 @@ function calculateVolatility(data: any) {
     return data.high_price - data.low_price;
 }
 
-function volatilityRate(data: any) {
-    const range = calculateVolatility(data);
-    return (range / data.opening_price) * 100; // 시가 기준 변동률
-}
-
-export {
-    getDaliyVolatility,
-    getVolatility,
-    volatilityBreakout,
-    volatilityRate,
-};
+export { getDaliyVolatility, getVolatility, volatilityBreakout };

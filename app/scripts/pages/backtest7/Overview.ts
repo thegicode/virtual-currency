@@ -66,6 +66,7 @@ export default class Overview extends HTMLElement {
         const renderData = {
             market,
             period: this.app.count,
+            tradeCount: this.app.tradeCount,
             totalRate: `${rate.toFixed(2)}%`,
             totalProfit: ` ${Math.round(profit).toLocaleString()} 원`,
         };

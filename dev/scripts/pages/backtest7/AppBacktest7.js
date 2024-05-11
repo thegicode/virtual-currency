@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { setMovingAverage } from "@app/scripts/components/backtest/movingAverage";
-import { volatilityBreakout, volatilityRate, } from "@app/scripts/components/backtest/volatility";
+import { volatilityBreakout } from "@app/scripts/components/backtest/volatility";
 export default class AppBacktest7 extends HTMLElement {
     constructor() {
         super();
@@ -17,14 +17,20 @@ export default class AppBacktest7 extends HTMLElement {
             "KRW-ETH",
             "KRW-DOGE",
             "KRW-SBD",
+            "KRW-XRP",
+            "KRW-CTC",
+            "KRW-GRS",
+            "KRW-SOL",
+            "KRW-BCH",
             "KRW-NEAR",
         ];
-        this.count = 30;
-        this.totalInvestmentAmount = 1000000;
+        this.count = 60;
+        this.totalInvestmentAmount = 10000000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;
-        this.k = 0.1;
+        this.k = 0.5;
         this.targetRate = 2;
+        this.tradeCount = 0;
         this.overviewCustomElement = this.querySelector("backtest-overview");
         this.controlCustomElement = this.querySelector("backtest-control");
         this.tableCustomElement = this.querySelector("backtest-table");
@@ -51,28 +57,32 @@ export default class AppBacktest7 extends HTMLElement {
         });
     }
     backtest(fetchedData, orginRealPrices) {
-        const realPrices = orginRealPrices.slice(4);
         const avereagedData = setMovingAverage(fetchedData);
-        const strategedData = this.strategy(avereagedData, realPrices);
+        const strategedData = this.strategy(avereagedData, orginRealPrices);
         const calculatedData = this.calculateProfits(strategedData);
         return calculatedData;
     }
     strategy(fetchedData, realPrices) {
-        const result = fetchedData
-            .slice(4)
-            .map((aData, index) => {
+        const dataList = fetchedData.slice(4);
+        const result = dataList.map((aData, index) => {
             const isAverageOver = aData.moving_average_5
                 ? aData.trade_price > aData.moving_average_5
                 : null;
             const prevData = fetchedData[index + 3];
-            const realPrice = realPrices[index].price;
-            const { range, standardPrice, buyCondition } = volatilityBreakout(prevData, realPrice, aData.opening_price, this.k);
+            const realPrice = realPrices[index + 4].price;
+            if (aData.candle_date_time_kst.slice(0, 10) !==
+                realPrices[index + 4].date.slice(0, 10)) {
+                console.error("데이터 날짜와 실시가 가격 날짜가 다릅니다.");
+            }
+            const { range, standardPrice, buyCondition, prevVolatilityRate } = volatilityBreakout(prevData, realPrice, aData.opening_price, this.k);
             const tradeCondition = Boolean(isAverageOver && buyCondition);
-            const prevVolatilityRate = volatilityRate(aData);
             const buyRate = this.targetRate / prevVolatilityRate / this.markets.length;
             const buyAmount = tradeCondition
                 ? buyRate * this.totalInvestmentAmount
                 : 0;
+            const nextDayOpningPrice = realPrices[index + 5]
+                ? realPrices[index + 5].price
+                : null;
             return {
                 market: aData.market,
                 date: aData.candle_date_time_kst,
@@ -82,7 +92,7 @@ export default class AppBacktest7 extends HTMLElement {
                 action: tradeCondition ? "Trade" : "Reserve",
                 volatilityRate: prevVolatilityRate,
                 buyPrice: realPrice,
-                sellPrice: aData.trade_price,
+                sellPrice: nextDayOpningPrice,
                 buyAmount,
             };
         });
@@ -90,6 +100,7 @@ export default class AppBacktest7 extends HTMLElement {
     }
     calculateProfits(data) {
         let sumProfit = 0;
+        let tradeCount = 0;
         const result = data.map((aData) => {
             switch (aData.action) {
                 case "Trade":
@@ -99,6 +110,7 @@ export default class AppBacktest7 extends HTMLElement {
                         : 0;
                     const profit = aData.buyAmount ? rate * aData.buyAmount : 0;
                     sumProfit += profit;
+                    tradeCount++;
                     return Object.assign(Object.assign({}, aData), { rate,
                         profit,
                         sumProfit });
@@ -106,6 +118,7 @@ export default class AppBacktest7 extends HTMLElement {
                     return Object.assign(Object.assign({}, aData), { buyPrice: null, sellPrice: null, sumProfit });
             }
         });
+        this.tradeCount = tradeCount;
         return result;
     }
     getRealPrices(data) {
@@ -113,11 +126,11 @@ export default class AppBacktest7 extends HTMLElement {
             const realprices = [];
             for (const aData of data) {
                 const date = aData.candle_date_time_kst;
-                const toDate = date.replace("T09:00:00", "T13:00:00+09:00");
+                const toDate = date.replace("T09:00:00", "T11:00:00+09:00");
                 const response = yield this.fetchMinutes(aData.market, "60", "1", toDate);
                 const price = response[0].opening_price;
                 realprices.push({
-                    date,
+                    date: response[0].candle_date_time_kst,
                     price,
                 });
                 yield this.delay(100);
