@@ -203,7 +203,7 @@ interface IBacktest5 {
     standardPrice: number | null;
     buyPrice: number | null;
     sellPrice: number | null;
-    buyAmount?: number;
+    investmentAmount?: number;
     rate?: number;
     profit?: number;
     sumProfit?: number;
@@ -213,4 +213,17 @@ interface IBacktest5 {
 interface IRealPrice {
     date: string;
     price: number;
+}
+
+interface ICandles8 {
+    candle_date_time_kst: string;
+    high_price: number;
+    low_price: number;
+    market: string;
+    opening_price: number;
+    trade_price: number;
+    moving_average_3?: number;
+    moving_average_5?: number;
+    moving_average_10?: number;
+    moving_average_20?: number;
 }

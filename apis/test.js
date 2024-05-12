@@ -8,6 +8,19 @@
 //     .then((response) => console.log(response))
 //     .catch((err) => console.error(err));
 
+const fn = require("./candles.js");
+
+const searchParams = {
+    market: "KRW-XRP",
+    count: "2",
+    // to: "2024-01-11T01:00:00+09:00",
+};
+
+async function test() {
+    const data = await fn.candles(searchParams);
+    // console.log("test", data);
+}
+
 /* const fn = require("./candlesMinutes.js");
 
 const searchParams = {
@@ -22,9 +35,9 @@ async function test() {
     console.log(data);
 } */
 
-const fn = require("./marketAll.js");
+/* const fn = require("./marketAll.js");
 async function test() {
     const data = await fn.marketAll();
     console.log(data);
-}
+} */
 test();

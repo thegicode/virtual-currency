@@ -23,20 +23,19 @@
   }
 
   // app/scripts/components/backtest/volatility.ts
-  function volatilityBreakout(prevData, realPrice, openingPrice, k) {
-    const range = calculateVolatility(prevData);
+  function volatilityBreakout(prevCandle, realPrice, openingPrice, k) {
+    const range = prevCandle.high_price - prevCandle.low_price;
     const standardPrice = openingPrice + range * k;
-    const buyCondition = realPrice > standardPrice;
-    const prevVolatilityRate = range / prevData.opening_price * 100;
+    const isBreakout = realPrice > standardPrice;
+    const prevVolatilityRate = range / prevCandle.opening_price * 100;
     return {
       range,
       standardPrice,
-      buyCondition,
+      buyCondition: isBreakout,
+      // to delete
+      isBreakout,
       prevVolatilityRate
     };
-  }
-  function calculateVolatility(data) {
-    return data.high_price - data.low_price;
   }
 
   // dev/scripts/pages/backtest6/AppBacktest6.js

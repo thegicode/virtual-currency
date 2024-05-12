@@ -83,8 +83,8 @@ export default class BacktestTable extends HTMLElement {
             sellPrice: (aData.sellPrice &&
                 Math.round(aData.sellPrice).toLocaleString()) ||
                 "",
-            buyAmount: (aData.buyAmount &&
-                Math.round(aData.buyAmount).toLocaleString()) ||
+            investmentAmount: (aData.investmentAmount &&
+                Math.round(aData.investmentAmount).toLocaleString()) ||
                 "",
             volatilityRate: (aData.volatilityRate && aData.volatilityRate.toFixed(2)) || "",
             rate: ((_d = (aData.rate && aData.rate * 100)) === null || _d === void 0 ? void 0 : _d.toFixed(2)) || "",
