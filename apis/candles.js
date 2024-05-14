@@ -29,7 +29,7 @@ async function candles(reqQuery) {
 
         const data = await response.json();
 
-        const result = data.reverse().map((aData) => {
+        const result = data.reverse().map((aData, index) => {
             const newDate = new Date(aData.candle_date_time_kst);
             const koreaTimeOffset = 9 * 60; // 한국은 UTC+9
             newDate.setMinutes(newDate.getMinutes() + koreaTimeOffset);
@@ -40,11 +40,12 @@ async function candles(reqQuery) {
             return {
                 market: aData.market,
                 candle_date_time_kst: aData.candle_date_time_kst,
-                date,
+                // date,
                 opening_price: Number(aData.opening_price),
                 trade_price: Number(aData.trade_price),
                 high_price: Number(aData.high_price),
                 low_price: Number(aData.low_price),
+                candle_acc_trade_volume: Number(aData.candle_acc_trade_volume),
             };
         });
 

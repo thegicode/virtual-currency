@@ -228,3 +228,33 @@ interface ICandles8 {
     moving_average_10?: number;
     moving_average_20?: number;
 }
+
+interface IBacktest9 {
+    market: string;
+    date: string;
+    openingPrice?: number;
+    range: number | null;
+    buyCondition: boolean;
+    action: string;
+    standardPrice: number | null;
+    buyPrice: number | null;
+    sellPrice: number | null;
+    investmentAmount?: number;
+    rate?: number;
+    profit?: number;
+    sumProfit?: number;
+    volatilityRate?: number;
+    volume?: number;
+}
+
+interface ICandles9 {
+    candle_date_time_kst: string;
+    high_price: number;
+    low_price: number;
+    market: string;
+    opening_price: number;
+    trade_price: number;
+    candle_acc_trade_volume: number;
+    moving_average_5?: number;
+    volume_average_5?: number;
+}

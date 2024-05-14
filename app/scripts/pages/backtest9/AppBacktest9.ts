@@ -1,13 +1,14 @@
 /**
- * 투자전략 6 : 다자 가상화폐 + 상승장 + 변동성 돌파
+ * 투자전략 : 5일 이동평균 & 5일 거래량 상승장 + 변동성 돌파 + 변동성 조절
  * 투자대상 : 아무 가상화폐 몇 개 선택
  * 거래비용  : 0.2% 적용
  * 투자전략 :
  *      - 각 화폐의 레인지 계산 (전일 고가 - 저가)
  *      - 각 화폐의 가격이 5일 이동 평균보다 높은지 여부 파악
- *          - 낮을 경우 투자 대상에서 제외
+ *      - 각 화폐의 전일 거래량이 5일 거래량 이동평균보다 많은지 여부 파악
+ *          - 둘 중 하나라도 낮을 경우 그날 투자 대상에서 제외
  *      - 매수 : 실시간 가격 > 당일 시가 + (레인지 * k)
- *          - 필자들은 k=0.5 추천
+ *          - 필자들은 k=0.7 추천
  *      - 자금관리 : 가상화폐별 투입 금액은 (타깃 변동성 / 전일 변동성)/투자 대상 가상화폐 수
  * 매도 : 다음날 시가
  *
@@ -20,13 +21,16 @@
  * 매도 : 다음날 일봉 오전 9시
  */
 
-import { setMovingAverage } from "@app/scripts/components/backtest/movingAverage";
+import {
+    setMovingAverage,
+    setVolumeAverage,
+} from "@app/scripts/components/backtest/movingAverage";
 import { volatilityBreakout } from "@app/scripts/components/backtest/volatility";
 import Control from "./Control";
 import Overview from "./Overview";
 import Table from "./Table";
 
-export default class AppBacktest7 extends HTMLElement {
+export default class AppBacktest9 extends HTMLElement {
     public markets: string[];
     public count: number;
     public totalInvestmentAmount: number;
@@ -44,25 +48,25 @@ export default class AppBacktest7 extends HTMLElement {
         super();
 
         this.markets = [
-            "KRW-BTC",
-            "KRW-ETH",
-            "KRW-DOGE",
+            // "KRW-BTC",
+            // "KRW-ETH",
+            // "KRW-DOGE",
             // "KRW-SBD",
-            "KRW-XRP",
+            // "KRW-XRP",
             // "KRW-CTC",
             // "KRW-GRS",
             // "KRW-SOL",
             // "KRW-BCH",
             "KRW-NEAR",
         ];
-        this.count = 30;
+        this.count = 200;
         this.totalInvestmentAmount = 100000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;
         this.targetRate = 2; // 목표 변동성
         this.tradeCount = 0; // 거래 횟수
         this.controlIndex = 4; // 데이터 컨트롤 위한 index
-        this.k = 0.5; // 추천 0.5
+        this.k = 0.1; // 추천 0.7
 
         this.overviewCustomElement = this.querySelector(
             "backtest-overview"
@@ -99,10 +103,13 @@ export default class AppBacktest7 extends HTMLElement {
         }
     }
 
-    private backtest(fetchedData: ICandles5[], orginRealPrices: IRealPrice[]) {
+    private backtest(fetchedData: ICandles9[], orginRealPrices: IRealPrice[]) {
         const avereagedData = setMovingAverage(fetchedData);
+
+        const volumedData = setVolumeAverage(avereagedData);
+
         const strategedData = this.processTradingDecisions(
-            avereagedData,
+            volumedData,
             orginRealPrices
         );
         const calculatedData = this.calculateProfits(strategedData);
@@ -110,18 +117,24 @@ export default class AppBacktest7 extends HTMLElement {
     }
 
     private processTradingDecisions(
-        fetchedData: ICandles5[],
+        fetchedData: ICandles9[],
         realPrices: IRealPrice[]
     ) {
         const relevantData = fetchedData.slice(this.controlIndex);
         const result = relevantData.map(
-            (candleData: ICandles5, index: number) => {
+            (candleData: ICandles9, index: number) => {
                 // 5일 이동 평균과 현재 가격 비교
                 const isOverMovingAverage =
                     this.checkOverMovingAverage(candleData);
 
                 const { previousCandle, nextCandle, currentRealPrice } =
                     this.getProcessData(fetchedData, realPrices, index);
+
+                // 전일 거래량이 5일 거래량 이동평균보다 많은지 여부 파악
+                const isVolumeAboveMovingAverage = this.checkOverVolumeAverage(
+                    candleData,
+                    previousCandle
+                );
 
                 // 날짜 일치 여부 확인
                 this.verifyDataConsistency(candleData, realPrices, index);
@@ -137,7 +150,9 @@ export default class AppBacktest7 extends HTMLElement {
                     );
 
                 const tradeCondition = Boolean(
-                    isOverMovingAverage && isBreakout
+                    isOverMovingAverage &&
+                        isVolumeAboveMovingAverage &&
+                        isBreakout
                 );
 
                 // 투자 금액 계산
@@ -146,22 +161,17 @@ export default class AppBacktest7 extends HTMLElement {
                     prevVolatilityRate
                 );
 
-                const nextDayOpningPrice = this.getNextDayOpeningPrice(
-                    realPrices,
-                    index
-                );
-
                 return {
                     market: candleData.market,
                     date: candleData.candle_date_time_kst,
                     openingPrice: candleData.opening_price,
+                    volume: candleData.candle_acc_trade_volume,
                     range,
                     standardPrice,
                     buyCondition: tradeCondition,
                     action: tradeCondition ? "Trade" : "Reserve",
                     volatilityRate: prevVolatilityRate,
                     buyPrice: currentRealPrice, // 당일 10시 가격에 매수
-                    // sellPrice: nextDayOpningPrice, // 다음날 10시 가격에 매도
                     sellPrice: nextCandle ? nextCandle.opening_price : null, // 다음날 9시 시가에 매도
                     investmentAmount,
                 };
@@ -171,13 +181,24 @@ export default class AppBacktest7 extends HTMLElement {
         return result;
     }
 
-    private checkOverMovingAverage(candleData: ICandles5) {
+    private checkOverMovingAverage(candleData: ICandles9) {
         if (!candleData.moving_average_5) return null;
         return candleData.trade_price > candleData.moving_average_5;
     }
 
+    private checkOverVolumeAverage(
+        candleData: ICandles9,
+        previousCandle: ICandles9
+    ) {
+        if (!candleData.volume_average_5) return null;
+
+        return (
+            previousCandle.candle_acc_trade_volume > candleData.volume_average_5
+        );
+    }
+
     private getProcessData(
-        fetchedData: ICandles5[],
+        fetchedData: ICandles9[],
         realPrices: IRealPrice[],
         index: number
     ) {
@@ -192,7 +213,7 @@ export default class AppBacktest7 extends HTMLElement {
     }
 
     private verifyDataConsistency(
-        candleData: ICandles5,
+        candleData: ICandles9,
         realPrices: IRealPrice[],
         index: number
     ) {
@@ -258,7 +279,7 @@ export default class AppBacktest7 extends HTMLElement {
         return result;
     }
 
-    private async getRealPrices(data: ICandles5[]) {
+    private async getRealPrices(data: ICandles9[]) {
         // 실시간 분봉 시간 : 오전 10시
         const realprices = [];
         for (const aData of data) {

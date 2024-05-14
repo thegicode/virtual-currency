@@ -33,4 +33,31 @@ function applyStandardMovingAverages<T>(data: T[]) {
     return result;
 }
 
-export { setMovingAverage, applyStandardMovingAverages };
+function setVolumeAverage(data: ICandles9[], period = 5) {
+    const result = data.map((aData, index) => {
+        if (index < period - 1) {
+            return aData;
+        }
+
+        const average = calculateVolumeAverage(data, index, period);
+
+        return {
+            ...aData,
+            [`volume_average_${period}`]: average,
+        };
+    });
+
+    return result;
+}
+
+function calculateVolumeAverage(data: ICandles9[], index: number, period = 5) {
+    let sum = 0;
+
+    for (let i = 0; i < period; i++) {
+        sum += data[index - i].candle_acc_trade_volume;
+    }
+
+    return sum / period;
+}
+
+export { setMovingAverage, applyStandardMovingAverages, setVolumeAverage };
