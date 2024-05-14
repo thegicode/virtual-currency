@@ -197,6 +197,7 @@ interface ICandles5 {
 interface IBacktest5 {
     market: string;
     date: string;
+    openingPrice: number;
     range: number | null;
     buyCondition: boolean;
     action: string;

@@ -7,9 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { setMovingAverage } from "@app/scripts/components/backtest/movingAverage";
+import { applyStandardMovingAverages } from "@app/scripts/components/backtest/movingAverage";
 import { volatilityBreakout } from "@app/scripts/components/backtest/volatility";
-export default class AppBacktest7 extends HTMLElement {
+export default class AppBacktest8 extends HTMLElement {
     constructor() {
         super();
         this.markets = [
@@ -20,13 +20,13 @@ export default class AppBacktest7 extends HTMLElement {
             "KRW-NEAR",
         ];
         this.count = 30;
-        this.totalInvestmentAmount = 100000;
+        this.totalInvestmentAmount = 1000000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;
         this.targetRate = 2;
         this.tradeCount = 0;
-        this.controlIndex = 4;
-        this.k = 0.5;
+        this.controlIndex = 19;
+        this.k = 0.1;
         this.overviewCustomElement = this.querySelector("backtest-overview");
         this.controlCustomElement = this.querySelector("backtest-control");
         this.tableCustomElement = this.querySelector("backtest-table");
@@ -53,8 +53,8 @@ export default class AppBacktest7 extends HTMLElement {
         });
     }
     backtest(fetchedData, orginRealPrices) {
-        const avereagedData = setMovingAverage(fetchedData);
-        const strategedData = this.processTradingDecisions(avereagedData, orginRealPrices);
+        const movingAverageData = applyStandardMovingAverages(fetchedData);
+        const strategedData = this.processTradingDecisions(movingAverageData, orginRealPrices);
         const calculatedData = this.calculateProfits(strategedData);
         return calculatedData;
     }
@@ -85,9 +85,18 @@ export default class AppBacktest7 extends HTMLElement {
         return result;
     }
     checkOverMovingAverage(candleData) {
-        if (!candleData.moving_average_5)
+        if (!candleData.moving_average_3 ||
+            !candleData.moving_average_5 ||
+            !candleData.moving_average_10 ||
+            !candleData.moving_average_20)
             return null;
-        return candleData.trade_price > candleData.moving_average_5;
+        const result = candleData.trade_price > candleData.moving_average_3 &&
+            candleData.trade_price > candleData.moving_average_5 &&
+            candleData.trade_price > candleData.moving_average_10 &&
+            candleData.trade_price > candleData.moving_average_20
+            ? true
+            : false;
+        return result;
     }
     getProcessData(fetchedData, realPrices, index) {
         const previousCandle = fetchedData[index + this.controlIndex - 1];
@@ -200,4 +209,4 @@ export default class AppBacktest7 extends HTMLElement {
         this.tableCustomElement.initialize();
     }
 }
-//# sourceMappingURL=AppBacktest7.js.map
+//# sourceMappingURL=AppBacktest8.js.map

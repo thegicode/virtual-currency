@@ -17,7 +17,7 @@
  * 총 투자금 입력
  **/
 
-import { setMovingAverage } from "@app/scripts/components/backtest/movingAverage";
+import { applyStandardMovingAverages } from "@app/scripts/components/backtest/movingAverage";
 import {
     getDaliyVolatility,
     getVolatility,
@@ -37,6 +37,8 @@ export default class AppBacktest2 extends HTMLElement {
     private summaryAllPrice: number;
     private allSumSize: number;
     private target: number;
+    private controlIndex: number;
+
     private countElement: HTMLInputElement;
     private selectElement: HTMLSelectElement;
     private formElement: HTMLFormElement;
@@ -53,6 +55,7 @@ export default class AppBacktest2 extends HTMLElement {
         this.summaryAllPrice = 0;
         this.allSumSize = 0;
         this.target = 2; // 2%
+        this.controlIndex = 19;
 
         this.countElement = this.querySelector(
             "input[name=count]"
@@ -87,21 +90,31 @@ export default class AppBacktest2 extends HTMLElement {
     async loadAndProcessData() {
         // 원본 캔들 데이터 로드
         const rawData = await this.fetchCandleData();
+
         // 이동평균 계산
-        const movingAverageData = this.calculateMovingAverages(rawData);
+        const movingAverageData =
+            applyStandardMovingAverages<ICandles2>(rawData);
+
+        // 19번째부터 사용
+        // const slicedData = movingAverageData.slice(this.controlIndex);
+
         // 거래 조건 검사
         const dataWithConditions =
             this.assessPriceAgainstAverages(movingAverageData);
+
         // 거래 액션 결정 (매수, 매도 등)
         const actionableData = this.determineTradeActions(dataWithConditions);
+
         // 변동성 계산
         const dataWithVolatility = this.calculateVolatility(actionableData);
+
         // 주문 처리 (매수/매도 주문)
         const orderedData = this.placeOrders(dataWithVolatility);
         const dataWithProfits = this.calculateProfits(orderedData);
 
         // 20번째 데이터부터 사용 (20일선 적용된 데이터부터 시작)
-        this.data = dataWithProfits.slice(19);
+        this.data = dataWithProfits.slice(this.controlIndex);
+        // this.data = dataWithProfits;
 
         // 데이터 렌더링
         this.render();
@@ -119,15 +132,6 @@ export default class AppBacktest2 extends HTMLElement {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return await response.json();
-    }
-
-    private calculateMovingAverages(originData: ICandles2[]) {
-        let data = setMovingAverage(originData, 3);
-        data = setMovingAverage(data, 5);
-        data = setMovingAverage(data, 10);
-        data = setMovingAverage(data, 20);
-
-        return data;
     }
 
     private assessPriceAgainstAverages(dataList: ICandles2[]) {

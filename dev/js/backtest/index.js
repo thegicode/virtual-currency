@@ -48,7 +48,7 @@
       super();
       this.data = [];
       this.market = "";
-      this.period = 15;
+      this.period = 30;
       this.investmentPrice = 2e5;
       this.fee = 139e-5;
       this.summaryAllPrice = 0;

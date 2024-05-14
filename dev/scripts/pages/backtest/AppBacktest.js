@@ -13,7 +13,7 @@ export default class AppBacktest extends HTMLElement {
         super();
         this.data = [];
         this.market = "";
-        this.period = 15;
+        this.period = 30;
         this.investmentPrice = 200000;
         this.fee = 0.00139;
         this.summaryAllPrice = 0;

@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>* Backtest7</title>
+        <title>Backtest8</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link
@@ -16,14 +16,14 @@
             type="image/x-icon"
         />
         <link rel="stylesheet" href="/css/backtest.css" />
-        <script type="module" src="/js/backtest7/index.js" async></script>
+        <script type="module" src="/js/backtest8/index.js" async></script>
         <style></style>
     </head>
     <body>
-        <app-backtest7>
-            <h1>Backtest 7</h1>
+        <app-backtest8>
+            <h1>Backtest 8</h1>
             <section class="backtest">
-                <h2>투자방법7 : 상승장 + 변동성 돌파 + 변동성 조절</h2>
+                <h2>투자방법8 : 상승장 + 변동성 돌파 + 변동성 조절</h2>
                 <dl class="guide">
                     <dt>투자대상</dt>
                     <dd>아무 가상화폐 몇 개 선택</dd>
@@ -32,8 +32,7 @@
                         <ul>
                             <li>각 화폐의 레인지 계산 (전일 고가 - 저가)</li>
                             <li>
-                                각 화폐의 가격이 5일 이동 평균보다 높은지 여부
-                                파악 <br />
+                                각 화폐의 가격이 3, 5, 10, 20일 이동 평균보다 높은지 여부 파악 <br />
                                 - 낮을 경우 투자 대상에서 제외
                             </li>
                             <li>
@@ -49,6 +48,8 @@
                     </dd>
                     <dt>매도</dt>
                     <dd>다음날 시가</dd>
+                    <dt>결과가 좋은 가상화폐</dt>
+                    <dd>도지코인, 니어프로토콜</dd>
                 </dl>
                 <backtest-control>
                     <form class="backtest-form">

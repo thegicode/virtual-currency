@@ -21,6 +21,13 @@
     }
     return sum / period;
   }
+  function applyStandardMovingAverages(data) {
+    let result = setMovingAverage(data, 3);
+    result = setMovingAverage(result, 5);
+    result = setMovingAverage(result, 10);
+    result = setMovingAverage(result, 20);
+    return result;
+  }
 
   // app/scripts/components/backtest/volatility.ts
   function volatilityBreakout(prevCandle, realPrice, openingPrice, k) {
@@ -38,7 +45,7 @@
     };
   }
 
-  // dev/scripts/pages/backtest7/AppBacktest7.js
+  // dev/scripts/pages/backtest8/AppBacktest8.js
   var __awaiter = function(thisArg, _arguments, P, generator) {
     function adopt(value) {
       return value instanceof P ? value : new P(function(resolve) {
@@ -66,7 +73,7 @@
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
-  var AppBacktest7 = class extends HTMLElement {
+  var AppBacktest8 = class extends HTMLElement {
     constructor() {
       super();
       this.markets = [
@@ -77,12 +84,12 @@
         "KRW-NEAR"
       ];
       this.count = 30;
-      this.totalInvestmentAmount = 1e5;
+      this.totalInvestmentAmount = 1e6;
       this.investmentAmount = this.totalInvestmentAmount / this.markets.length;
       this.targetRate = 2;
       this.tradeCount = 0;
-      this.controlIndex = 4;
-      this.k = 0.5;
+      this.controlIndex = 19;
+      this.k = 0.1;
       this.overviewCustomElement = this.querySelector("backtest-overview");
       this.controlCustomElement = this.querySelector("backtest-control");
       this.tableCustomElement = this.querySelector("backtest-table");
@@ -108,8 +115,8 @@
       });
     }
     backtest(fetchedData, orginRealPrices) {
-      const avereagedData = setMovingAverage(fetchedData);
-      const strategedData = this.processTradingDecisions(avereagedData, orginRealPrices);
+      const movingAverageData = applyStandardMovingAverages(fetchedData);
+      const strategedData = this.processTradingDecisions(movingAverageData, orginRealPrices);
       const calculatedData = this.calculateProfits(strategedData);
       return calculatedData;
     }
@@ -140,9 +147,10 @@
       return result;
     }
     checkOverMovingAverage(candleData) {
-      if (!candleData.moving_average_5)
+      if (!candleData.moving_average_3 || !candleData.moving_average_5 || !candleData.moving_average_10 || !candleData.moving_average_20)
         return null;
-      return candleData.trade_price > candleData.moving_average_5;
+      const result = candleData.trade_price > candleData.moving_average_3 && candleData.trade_price > candleData.moving_average_5 && candleData.trade_price > candleData.moving_average_10 && candleData.trade_price > candleData.moving_average_20 ? true : false;
+      return result;
     }
     getProcessData(fetchedData, realPrices, index) {
       const previousCandle = fetchedData[index + this.controlIndex - 1];
@@ -267,11 +275,11 @@
     });
   }
 
-  // dev/scripts/pages/backtest7/Overview.js
+  // dev/scripts/pages/backtest8/Overview.js
   var Overview = class extends HTMLElement {
     constructor() {
       super();
-      this.app = document.querySelector("app-backtest7");
+      this.app = document.querySelector("app-backtest8");
       this.data = [];
       this.profit = 0;
       this.totalSumPrice = 0;
@@ -347,11 +355,11 @@
     }
   };
 
-  // dev/scripts/pages/backtest7/Control.js
+  // dev/scripts/pages/backtest8/Control.js
   var Control = class extends HTMLElement {
     constructor() {
       super();
-      this.app = document.querySelector("app-backtest7");
+      this.app = document.querySelector("app-backtest8");
       this.formElement = this.querySelector("form");
       this.marketsInput = this.querySelector('input[name="markets"]');
       this.countInput = this.querySelector("input[name=count]");
@@ -386,7 +394,7 @@
     }
   };
 
-  // dev/scripts/pages/backtest7/Table.js
+  // dev/scripts/pages/backtest8/Table.js
   var BacktestTable = class extends HTMLElement {
     constructor() {
       super();
@@ -496,10 +504,10 @@
     }
   };
 
-  // dev/scripts/pages/backtest7/index.js
+  // dev/scripts/pages/backtest8/index.js
   customElements.define("backtest-table", BacktestTable);
   customElements.define("backtest-control", Control);
   customElements.define("backtest-overview", Overview);
-  customElements.define("app-backtest7", AppBacktest7);
+  customElements.define("app-backtest8", AppBacktest8);
 })();
 //# sourceMappingURL=index.js.map

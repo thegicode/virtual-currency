@@ -21,6 +21,13 @@
     }
     return sum / period;
   }
+  function applyStandardMovingAverages(data) {
+    let result = setMovingAverage(data, 3);
+    result = setMovingAverage(result, 5);
+    result = setMovingAverage(result, 10);
+    result = setMovingAverage(result, 20);
+    return result;
+  }
 
   // app/scripts/components/backtest/volatility.ts
   function getDaliyVolatility(aData) {
@@ -93,6 +100,7 @@
       this.summaryAllPrice = 0;
       this.allSumSize = 0;
       this.target = 2;
+      this.controlIndex = 19;
       this.countElement = this.querySelector("input[name=count]");
       this.selectElement = this.querySelector("select");
       this.formElement = this.querySelector("form");
@@ -117,13 +125,13 @@
     loadAndProcessData() {
       return __awaiter(this, void 0, void 0, function* () {
         const rawData = yield this.fetchCandleData();
-        const movingAverageData = this.calculateMovingAverages(rawData);
+        const movingAverageData = applyStandardMovingAverages(rawData);
         const dataWithConditions = this.assessPriceAgainstAverages(movingAverageData);
         const actionableData = this.determineTradeActions(dataWithConditions);
         const dataWithVolatility = this.calculateVolatility(actionableData);
         const orderedData = this.placeOrders(dataWithVolatility);
         const dataWithProfits = this.calculateProfits(orderedData);
-        this.data = dataWithProfits.slice(19);
+        this.data = dataWithProfits.slice(this.controlIndex);
         this.render();
         this.renderSummary();
       });
@@ -140,13 +148,6 @@
         }
         return yield response.json();
       });
-    }
-    calculateMovingAverages(originData) {
-      let data = setMovingAverage(originData, 3);
-      data = setMovingAverage(data, 5);
-      data = setMovingAverage(data, 10);
-      data = setMovingAverage(data, 20);
-      return data;
     }
     assessPriceAgainstAverages(dataList) {
       return dataList.map((data) => {

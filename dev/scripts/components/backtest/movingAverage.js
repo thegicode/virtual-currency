@@ -15,5 +15,12 @@ function calculateMovingAverage(data, index, period = 5) {
     }
     return sum / period;
 }
-export { setMovingAverage };
+function applyStandardMovingAverages(data) {
+    let result = setMovingAverage(data, 3);
+    result = setMovingAverage(result, 5);
+    result = setMovingAverage(result, 10);
+    result = setMovingAverage(result, 20);
+    return result;
+}
+export { setMovingAverage, applyStandardMovingAverages };
 //# sourceMappingURL=movingAverage.js.map

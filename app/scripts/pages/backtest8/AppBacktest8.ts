@@ -1,15 +1,14 @@
 /**
- * 투자전략 6 : 다자 가상화폐 + 상승장 + 변동성 돌파
+ * 투자전략 8 : 다자 가상화폐 + 상승장 + 변동성 돌파
  * 투자대상 : 아무 가상화폐 몇 개 선택
  * 거래비용  : 0.2% 적용
  * 투자전략 :
  *      - 각 화폐의 레인지 계산 (전일 고가 - 저가)
- *      - 각 화폐의 가격이 5일 이동 평균보다 높은지 여부 파악
+ *      - 각 화폐의 가격이 3, 5, 10, 20일 이동 평균보다 높은지 여부 파악
  *          - 낮을 경우 투자 대상에서 제외
  *      - 매수 : 실시간 가격 > 당일 시가 + (레인지 * k)
  *          - 필자들은 k=0.5 추천
  *      - 자금관리 : 가상화폐별 투입 금액은 (타깃 변동성 / 전일 변동성)/투자 대상 가상화폐 수
- *      - 전일 병동성 : 전일 고점  - 전일 저점 / 햔제가격)
  * 매도 : 다음날 시가
  *
  *
@@ -21,13 +20,13 @@
  * 매도 : 다음날 일봉 오전 9시
  */
 
-import { setMovingAverage } from "@app/scripts/components/backtest/movingAverage";
+import { applyStandardMovingAverages } from "@app/scripts/components/backtest/movingAverage";
 import { volatilityBreakout } from "@app/scripts/components/backtest/volatility";
 import Control from "./Control";
 import Overview from "./Overview";
 import Table from "./Table";
 
-export default class AppBacktest7 extends HTMLElement {
+export default class AppBacktest8 extends HTMLElement {
     public markets: string[];
     public count: number;
     public totalInvestmentAmount: number;
@@ -57,13 +56,13 @@ export default class AppBacktest7 extends HTMLElement {
             "KRW-NEAR",
         ];
         this.count = 30;
-        this.totalInvestmentAmount = 100000;
+        this.totalInvestmentAmount = 1000000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;
         this.targetRate = 2; // 목표 변동성
         this.tradeCount = 0; // 거래 횟수
-        this.controlIndex = 4; // 데이터 컨트롤 위한 index
-        this.k = 0.5; // 추천 0.5
+        this.controlIndex = 19; // 데이터 컨트롤 위한 index
+        this.k = 0.1; // 추천 0.5
 
         this.overviewCustomElement = this.querySelector(
             "backtest-overview"
@@ -101,9 +100,11 @@ export default class AppBacktest7 extends HTMLElement {
     }
 
     private backtest(fetchedData: ICandles5[], orginRealPrices: IRealPrice[]) {
-        const avereagedData = setMovingAverage(fetchedData);
+        const movingAverageData =
+            applyStandardMovingAverages<ICandles5>(fetchedData);
+
         const strategedData = this.processTradingDecisions(
-            avereagedData,
+            movingAverageData,
             orginRealPrices
         );
         const calculatedData = this.calculateProfits(strategedData);
@@ -117,7 +118,7 @@ export default class AppBacktest7 extends HTMLElement {
         const relevantData = fetchedData.slice(this.controlIndex);
         const result = relevantData.map(
             (candleData: ICandles5, index: number) => {
-                // 5일 이동 평균과 현재 가격 비교
+                // 이동 평균과 현재 가격 비교
                 const isOverMovingAverage =
                     this.checkOverMovingAverage(candleData);
 
@@ -152,6 +153,8 @@ export default class AppBacktest7 extends HTMLElement {
                     index
                 );
 
+                // console.log(index, nextCandle, nextCandle.opening_price);
+
                 return {
                     market: candleData.market,
                     date: candleData.candle_date_time_kst,
@@ -162,7 +165,6 @@ export default class AppBacktest7 extends HTMLElement {
                     action: tradeCondition ? "Trade" : "Reserve",
                     volatilityRate: prevVolatilityRate,
                     buyPrice: currentRealPrice, // 당일 10시 가격에 매수
-                    // sellPrice: nextDayOpningPrice, // 다음날 10시 가격에 매도
                     sellPrice: nextCandle ? nextCandle.opening_price : null, // 다음날 9시 시가에 매도
                     investmentAmount,
                 };
@@ -172,9 +174,24 @@ export default class AppBacktest7 extends HTMLElement {
         return result;
     }
 
-    private checkOverMovingAverage(candleData: ICandles5) {
-        if (!candleData.moving_average_5) return null;
-        return candleData.trade_price > candleData.moving_average_5;
+    private checkOverMovingAverage(candleData: ICandles8) {
+        if (
+            !candleData.moving_average_3 ||
+            !candleData.moving_average_5 ||
+            !candleData.moving_average_10 ||
+            !candleData.moving_average_20
+        )
+            return null;
+
+        const result =
+            candleData.trade_price > candleData.moving_average_3 &&
+            candleData.trade_price > candleData.moving_average_5 &&
+            candleData.trade_price > candleData.moving_average_10 &&
+            candleData.trade_price > candleData.moving_average_20
+                ? true
+                : false;
+
+        return result;
     }
 
     private getProcessData(

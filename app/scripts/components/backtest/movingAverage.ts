@@ -25,6 +25,12 @@ function calculateMovingAverage(data: any, index: number, period = 5) {
     return sum / period;
 }
 
-// checkMovingAverage
+function applyStandardMovingAverages<T>(data: T[]) {
+    let result = setMovingAverage(data, 3);
+    result = setMovingAverage(result, 5);
+    result = setMovingAverage(result, 10);
+    result = setMovingAverage(result, 20);
+    return result;
+}
 
-export { setMovingAverage };
+export { setMovingAverage, applyStandardMovingAverages };

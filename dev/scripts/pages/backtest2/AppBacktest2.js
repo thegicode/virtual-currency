@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { setMovingAverage } from "@app/scripts/components/backtest/movingAverage";
+import { applyStandardMovingAverages } from "@app/scripts/components/backtest/movingAverage";
 import { getDaliyVolatility, getVolatility, } from "@app/scripts/components/backtest/volatility";
 import { cloneTemplate, updateElementsTextWithData, } from "@app/scripts/utils/helpers";
 export default class AppBacktest2 extends HTMLElement {
@@ -22,6 +22,7 @@ export default class AppBacktest2 extends HTMLElement {
         this.summaryAllPrice = 0;
         this.allSumSize = 0;
         this.target = 2;
+        this.controlIndex = 19;
         this.countElement = this.querySelector("input[name=count]");
         this.selectElement = this.querySelector("select");
         this.formElement = this.querySelector("form");
@@ -47,13 +48,13 @@ export default class AppBacktest2 extends HTMLElement {
     loadAndProcessData() {
         return __awaiter(this, void 0, void 0, function* () {
             const rawData = yield this.fetchCandleData();
-            const movingAverageData = this.calculateMovingAverages(rawData);
+            const movingAverageData = applyStandardMovingAverages(rawData);
             const dataWithConditions = this.assessPriceAgainstAverages(movingAverageData);
             const actionableData = this.determineTradeActions(dataWithConditions);
             const dataWithVolatility = this.calculateVolatility(actionableData);
             const orderedData = this.placeOrders(dataWithVolatility);
             const dataWithProfits = this.calculateProfits(orderedData);
-            this.data = dataWithProfits.slice(19);
+            this.data = dataWithProfits.slice(this.controlIndex);
             this.render();
             this.renderSummary();
         });
@@ -70,13 +71,6 @@ export default class AppBacktest2 extends HTMLElement {
             }
             return yield response.json();
         });
-    }
-    calculateMovingAverages(originData) {
-        let data = setMovingAverage(originData, 3);
-        data = setMovingAverage(data, 5);
-        data = setMovingAverage(data, 10);
-        data = setMovingAverage(data, 20);
-        return data;
     }
     assessPriceAgainstAverages(dataList) {
         return dataList.map((data) => {
