@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.selectLowNoiseCryptos = void 0;
-const apis = require("../../../../apis/candles");
 const noise_1 = require("./noise");
 function selectLowNoiseCryptos(cryptos, n) {
     const cryptowithNoise = cryptos.map((crypto) => {

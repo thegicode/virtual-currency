@@ -114,6 +114,7 @@ backend/
 │ └── apiUtils.ts
 ├── index.ts
 └── ...
+services: 외부 API와 상호작용하거나 데이터베이스와 통신하는 로직을 포함
 strategies: 특정 투자 전략을 구현하는 모듈
 analysis: 투자 전략 분석 관련 모듈
 simulation: 투자 전략 시뮬레이션 관련 모듈

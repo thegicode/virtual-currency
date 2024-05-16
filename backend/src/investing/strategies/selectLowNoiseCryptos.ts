@@ -1,6 +1,6 @@
 // 노이즈 값이 가장 작은 n개 선정
 
-const apis = require("../../../../apis/candles");
+// const apis = require("../../../../apis/candles");
 import { calculateAverageNoise } from "./noise";
 
 function selectLowNoiseCryptos(cryptos: ICrypto[], n: number) {

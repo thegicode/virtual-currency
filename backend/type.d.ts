@@ -1,8 +1,11 @@
 interface ICandle {
-    high_price: number;
-    low_price: number;
+    market: string;
+    time: string;
     opening_price: number;
     trade_price: number;
+    high_price: number;
+    low_price: number;
+    candle_acc_trade_volume: number;
 }
 
 interface ICrypto {
