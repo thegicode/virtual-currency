@@ -53,3 +53,68 @@
     - 시가 : 필자는 주로 오전 0시나 1시
     - 종가 : 시가에서 24시간 후의 가격
     - 고가(저가): 24시간 동안 가장 높은 가격
+
+## backend 구조 참조
+
+my-project/
+│
+├── frontend/
+│ ├── src/
+│ │ ├── components/
+│ │ ├── styles/
+│ │ ├── strategies/
+│ │ ├── index.tsx
+│ │ └── ...
+│ └── dist/
+│ ├── components/
+│ ├── styles/
+│ ├── strategies/
+│ ├── index.js
+│ └── ...
+│
+├── backend/
+│ ├── src/
+│ │ ├── controllers/
+│ │ ├── models/
+│ │ ├── routes/
+│ │ ├── services/
+│ │ ├── investing/ // 새로운 투자 전략 폴더
+│ │ ├── index.ts
+│ │ └── ...
+│ └── dist/
+│ ├── controllers/
+│ ├── models/
+│ ├── routes/
+│ ├── services/
+│ ├── investing/ // 컴파일된 투자 전략 폴더
+│ ├── index.js
+│ └── ...
+
+backend/
+└── src/
+├── controllers/
+├── models/
+├── routes/
+├── services/
+├── investing/
+│ ├── strategies/
+│ │ ├── meanReversionStrategy.ts
+│ │ ├── momentumStrategy.ts
+│ │ └── volatilityBreakoutStrategy.ts
+│ ├── analysis/
+│ │ ├── backtesting.ts
+│ │ ├── performanceMetrics.ts
+│ │ └── riskManagement.ts
+│ ├── simulation/
+│ │ ├── runSimulation.ts
+│ │ └── simulateTrades.ts
+│ └── utils/
+│ ├── mathUtils.ts
+│ ├── dateUtils.ts
+│ └── apiUtils.ts
+├── index.ts
+└── ...
+strategies: 특정 투자 전략을 구현하는 모듈
+analysis: 투자 전략 분석 관련 모듈
+simulation: 투자 전략 시뮬레이션 관련 모듈
+utils: 투자 전략과 관련된 유틸리티 함수
