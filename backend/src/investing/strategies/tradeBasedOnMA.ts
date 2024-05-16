@@ -8,11 +8,10 @@ interface TradeDecision {
     action: "Buy" | "Sell" | "Hold";
 }
 
-export async function tradeBasedOnMA() {
-    const markets = ["KRW-BTC", "KRW-XRP"];
+export async function tradeBasedOnMA(markets: string[]) {
     const promises = markets.map(async (market) => {
         const data = await fetchMinutes(market, "240", "5");
-        console.log("data", data);
+        // console.log("data", data);
         const movingAverage = calculateMovingAverage(data);
         const aData = data[data.length - 1];
 
@@ -24,6 +23,8 @@ export async function tradeBasedOnMA() {
         return {
             market,
             time: aData.time,
+            tradePrice: aData.trade_price.toLocaleString(),
+            average: movingAverage[0].toLocaleString(),
             action,
         };
     });
@@ -33,7 +34,8 @@ export async function tradeBasedOnMA() {
 
 (async () => {
     try {
-        const decisions = await tradeBasedOnMA();
+        const markets = ["KRW-BTC", "KRW-XRP"];
+        const decisions = await tradeBasedOnMA(markets);
         console.log(decisions);
     } catch (error) {
         console.error("Error executing trading strategy:", error);

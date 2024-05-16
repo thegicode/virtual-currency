@@ -12,12 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.tradeBasedOnMA = void 0;
 const fetchMinutes_1 = require("../../services/api/fetchMinutes");
 const movingAverage_1 = require("./movingAverage");
-function tradeBasedOnMA() {
+function tradeBasedOnMA(markets) {
     return __awaiter(this, void 0, void 0, function* () {
-        const markets = ["KRW-BTC", "KRW-XRP"];
         const promises = markets.map((market) => __awaiter(this, void 0, void 0, function* () {
             const data = yield (0, fetchMinutes_1.fetchMinutes)(market, "240", "5");
-            console.log("data", data);
             const movingAverage = (0, movingAverage_1.calculateMovingAverage)(data);
             const aData = data[data.length - 1];
             const action = aData.trade_price > movingAverage[0]
@@ -26,6 +24,8 @@ function tradeBasedOnMA() {
             return {
                 market,
                 time: aData.time,
+                tradePrice: aData.trade_price.toLocaleString(),
+                average: movingAverage[0].toLocaleString(),
                 action,
             };
         }));
@@ -35,7 +35,8 @@ function tradeBasedOnMA() {
 exports.tradeBasedOnMA = tradeBasedOnMA;
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const decisions = yield tradeBasedOnMA();
+        const markets = ["KRW-BTC", "KRW-XRP"];
+        const decisions = yield tradeBasedOnMA(markets);
         console.log(decisions);
     }
     catch (error) {
