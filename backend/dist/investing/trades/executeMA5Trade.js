@@ -9,16 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.tradeBasedOnMA = void 0;
+exports.executeMA5Trade = void 0;
 const api_1 = require("../../services/api");
-const movingAverage_1 = require("../strategies/movingAverage");
+const strategies_1 = require("../strategies");
 const utils_1 = require("../utils");
-function tradeBasedOnMA(markets) {
+function executeMA5Trade(markets) {
     return __awaiter(this, void 0, void 0, function* () {
         const tickers = yield (0, api_1.fetchTicker)(markets.join(", "));
         const promises = markets.map((market) => __awaiter(this, void 0, void 0, function* () {
             const fetchData = yield (0, api_1.fetchMinutes)(market, "240", "5");
-            const movingAverage = (0, movingAverage_1.calculateMovingAverage)(fetchData)[0];
+            const movingAverage = (0, strategies_1.calculateMovingAverage)(fetchData)[0];
             const aCandle = fetchData[fetchData.length - 1];
             const aTicker = tickers.find((t) => t.market === market);
             if (!aTicker) {
@@ -39,21 +39,4 @@ function tradeBasedOnMA(markets) {
         return yield Promise.all(promises);
     });
 }
-exports.tradeBasedOnMA = tradeBasedOnMA;
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const markets = [
-            "KRW-BTC",
-            "KRW-ETH",
-            "KRW-DOGE",
-            "KRW-XRP",
-            "KRW-SBD",
-            "KRW-NEAR",
-        ];
-        const result = yield tradeBasedOnMA(markets);
-        console.log(result);
-    }
-    catch (error) {
-        console.error("Error executing trading strategy:", error);
-    }
-}))();
+exports.executeMA5Trade = executeMA5Trade;
