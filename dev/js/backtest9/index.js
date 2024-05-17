@@ -90,10 +90,12 @@
     constructor() {
       super();
       this.markets = [
+        "KRW-BTC",
+        "KRW-DOGE",
         "KRW-NEAR"
       ];
-      this.count = 200;
-      this.totalInvestmentAmount = 1e5;
+      this.count = 30;
+      this.totalInvestmentAmount = 1e6;
       this.investmentAmount = this.totalInvestmentAmount / this.markets.length;
       this.targetRate = 2;
       this.tradeCount = 0;

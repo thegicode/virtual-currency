@@ -48,9 +48,9 @@ export default class AppBacktest9 extends HTMLElement {
         super();
 
         this.markets = [
-            // "KRW-BTC",
+            "KRW-BTC",
             // "KRW-ETH",
-            // "KRW-DOGE",
+            "KRW-DOGE",
             // "KRW-SBD",
             // "KRW-XRP",
             // "KRW-CTC",
@@ -59,8 +59,8 @@ export default class AppBacktest9 extends HTMLElement {
             // "KRW-BCH",
             "KRW-NEAR",
         ];
-        this.count = 200;
-        this.totalInvestmentAmount = 100000;
+        this.count = 30;
+        this.totalInvestmentAmount = 1000000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;
         this.targetRate = 2; // 목표 변동성

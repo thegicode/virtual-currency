@@ -13,10 +13,6 @@ export default class AppBacktest7 extends HTMLElement {
     constructor() {
         super();
         this.markets = [
-            "KRW-BTC",
-            "KRW-ETH",
-            "KRW-DOGE",
-            "KRW-XRP",
             "KRW-NEAR",
         ];
         this.count = 30;

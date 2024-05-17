@@ -12,12 +12,12 @@
  * 매도 : 다음날 시가
  *
  *
- * 책에서는 자정에 거래하였으나 업비트는 일봉이 9시 기준으로 온다.
+ * 책에서는 자정에 거래하였으나 업비트는 일 데이터가 9시 기준으로 온다.
  * 그래서 9시 기준으로 작업
  * 데이터 사용 시간
- * 일봉 : 오전 9시 데이터
- * 실시간 가격 : 분봉 오전 10시
- * 매도 : 다음날 일봉 오전 9시
+ * 알 대아토 : 오전 9시 데이터
+ * 실시간 가격 : 분캰들 오전 10시
+ * 매도 : 다음날 일캔들 오전 9시
  */
 
 import { applyStandardMovingAverages } from "@app/scripts/components/backtest/movingAverage";
@@ -44,18 +44,18 @@ export default class AppBacktest8 extends HTMLElement {
         super();
 
         this.markets = [
-            "KRW-BTC",
-            "KRW-ETH",
-            "KRW-DOGE",
+            // "KRW-BTC",
+            // "KRW-ETH",
+            // "KRW-DOGE",
             // "KRW-SBD",
-            "KRW-XRP",
+            // "KRW-XRP",
             // "KRW-CTC",
             // "KRW-GRS",
             // "KRW-SOL",
             // "KRW-BCH",
             "KRW-NEAR",
         ];
-        this.count = 30;
+        this.count = 100;
         this.totalInvestmentAmount = 1000000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;

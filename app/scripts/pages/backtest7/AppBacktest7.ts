@@ -44,11 +44,11 @@ export default class AppBacktest7 extends HTMLElement {
         super();
 
         this.markets = [
-            "KRW-BTC",
-            "KRW-ETH",
-            "KRW-DOGE",
+            // "KRW-BTC",
+            // "KRW-ETH",
+            // "KRW-DOGE",
             // "KRW-SBD",
-            "KRW-XRP",
+            // "KRW-XRP",
             // "KRW-CTC",
             // "KRW-GRS",
             // "KRW-SOL",

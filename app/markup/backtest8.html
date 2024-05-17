@@ -23,7 +23,9 @@
         <app-backtest8>
             <h1>Backtest 8</h1>
             <section class="backtest">
-                <h2>투자방법8 : 4개 이동평균 상승장 + 변동성 돌파 + 변동성 조절</h2>
+                <h2>
+                    투자방법8 : 4개 이동평균 상승장 + 변동성 돌파 + 변동성 조절
+                </h2>
                 <dl class="guide">
                     <dt>투자대상</dt>
                     <dd>아무 가상화폐 몇 개 선택</dd>
@@ -32,7 +34,8 @@
                         <ul>
                             <li>각 화폐의 레인지 계산 (전일 고가 - 저가)</li>
                             <li>
-                                각 화폐의 가격이 3, 5, 10, 20일 이동 평균보다 높은지 여부 파악 <br />
+                                각 화폐의 가격이 3, 5, 10, 20일 이동 평균보다
+                                높은지 여부 파악 <br />
                                 - 낮을 경우 투자 대상에서 제외
                             </li>
                             <li>
@@ -50,6 +53,23 @@
                     <dd>다음날 시가</dd>
                     <dt>결과가 좋은 가상화폐</dt>
                     <dd>도지코인, 니어프로토콜</dd>
+                    <dt>개발 설명</dt>
+                    <dd>
+                        <ul>
+                            <li>
+                                책에서는 자정에 거래하였으나 업비트는 일봉이 9시
+                                기준으로 온다.
+                            </li>
+                            <li>그래서 9시 기준으로 작업</li>
+                            <li>
+                                데이터 사용 시간<br />
+                                - 일 데이터 : 오전 9시<br />
+                                - 실시간 가격 : 오전 10시<br />
+                                - 매도 : 다음날 오전 9시
+                            </li>
+                            <li>k=0.1</li>
+                        </ul>
+                    </dd>
                 </dl>
                 <backtest-control>
                     <form class="backtest-form">
@@ -107,7 +127,7 @@
                     <div class="dataTable"></div>
                 </backtest-table>
             </section>
-        </app-backtest7>
+        </app-backtest8>
 
         <template id="tp-table">
             <table>

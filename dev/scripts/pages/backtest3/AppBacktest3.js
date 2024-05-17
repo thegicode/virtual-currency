@@ -22,7 +22,7 @@ export default class AppBacktest3 extends HTMLElement {
         this.data = [];
         this.qqqData = {};
         this.tradeData = [];
-        this.count = 60;
+        this.count = 30;
         this.totalGain = 0;
         this.totalUnrealizeGain = 0;
         this.template = document.querySelector("#tp-item");
