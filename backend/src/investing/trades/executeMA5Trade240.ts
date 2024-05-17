@@ -5,8 +5,9 @@ import { formatTimestampToKoreanTime } from "../utils";
 // 4시간 캔들 기준으로 5 이동평균선을 구한 다음
 // 실시간 가격이 5 이동 평균선보다 높으면 매수 또는 보유
 // 5 이동평균선보다 낮으면 매도 또는 유보
+// 4시간마다 실행
 
-export async function executeMA5Trade(markets: string[]) {
+export async function executeMA5Trade240(markets: string[]) {
     // 실시간 가격 가져오기
     const tickers = await fetchTicker(markets.join(", "));
 
@@ -38,21 +39,39 @@ export async function executeMA5Trade(markets: string[]) {
 
     return await Promise.all(promises);
 }
-/* 
-    (async () => {
-        try {
-            const markets = [
-                "KRW-BTC",
-                "KRW-ETH",
-                "KRW-DOGE",
-                "KRW-XRP",
-                "KRW-SBD",
-                "KRW-NEAR",
-            ];
-            const result = await executeMA5Trade(markets);
-            console.log(result);
-        } catch (error) {
-            console.error("Error executing trading strategy:", error);
-        }
-    })();
+
+export async function scheduleMA5Trade240Execution(markets: string[]) {
+    let index = 0;
+
+    // 첫 번째 실행
+    const initialResult = await executeMA5Trade240(markets);
+    console.log(`Execution ${index}:`, initialResult);
+
+    // 240분마다 실행
+    const interval = 1000 * 60 * 240;
+    setInterval(
+        async () => {
+            const result = await executeMA5Trade240(markets);
+            console.log(`Execution ${++index}:`, result);
+        },
+        interval
+        // 3000
+    );
+}
+
+/* (() => {
+    try {
+        const markets = [
+            "KRW-BTC",
+            // "KRW-ETH",
+            // "KRW-DOGE",
+            // "KRW-XRP",
+            // "KRW-SBD",
+            // "KRW-NEAR",
+        ];
+        scheduleMA5Trade240Execution(markets);
+    } catch (error) {
+        console.error("Error executing trading strategy:", error);
+    }
+})();
  */

@@ -1,3 +1,6 @@
-import { executeMA5Trade } from "./executeMA5Trade";
+import {
+    executeMA5Trade240,
+    scheduleMA5Trade240Execution,
+} from "./executeMA5Trade240";
 
-export { executeMA5Trade };
+export { executeMA5Trade240, scheduleMA5Trade240Execution };

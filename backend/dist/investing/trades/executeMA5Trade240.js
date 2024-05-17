@@ -9,11 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.executeMA5Trade = void 0;
+exports.scheduleMA5Trade240Execution = exports.executeMA5Trade240 = void 0;
 const api_1 = require("../../services/api");
 const strategies_1 = require("../strategies");
 const utils_1 = require("../utils");
-function executeMA5Trade(markets) {
+function executeMA5Trade240(markets) {
     return __awaiter(this, void 0, void 0, function* () {
         const tickers = yield (0, api_1.fetchTicker)(markets.join(", "));
         const promises = markets.map((market) => __awaiter(this, void 0, void 0, function* () {
@@ -39,4 +39,17 @@ function executeMA5Trade(markets) {
         return yield Promise.all(promises);
     });
 }
-exports.executeMA5Trade = executeMA5Trade;
+exports.executeMA5Trade240 = executeMA5Trade240;
+function scheduleMA5Trade240Execution(markets) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let index = 0;
+        const initialResult = yield executeMA5Trade240(markets);
+        console.log(`Execution ${index}:`, initialResult);
+        const interval = 1000 * 60 * 240;
+        setInterval(() => __awaiter(this, void 0, void 0, function* () {
+            const result = yield executeMA5Trade240(markets);
+            console.log(`Execution ${++index}:`, result);
+        }), interval);
+    });
+}
+exports.scheduleMA5Trade240Execution = scheduleMA5Trade240Execution;
