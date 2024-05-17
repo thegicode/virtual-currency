@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tradeBasedOnMA = void 0;
 const fetchMinutes_1 = require("../../services/api/fetchMinutes");
-const movingAverage_1 = require("./movingAverage");
+const movingAverage_1 = require("../strategies/movingAverage");
 function tradeBasedOnMA(markets) {
     return __awaiter(this, void 0, void 0, function* () {
         const promises = markets.map((market) => __awaiter(this, void 0, void 0, function* () {

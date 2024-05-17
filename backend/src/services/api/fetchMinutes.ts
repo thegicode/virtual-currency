@@ -1,4 +1,4 @@
-const { URL } = require("../../config/URL");
+const { URL } = require("../../config");
 
 async function fetchMinutes(
     market: string,
