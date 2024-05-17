@@ -10,22 +10,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tradeBasedOnMA = void 0;
-const fetchMinutes_1 = require("../../services/api/fetchMinutes");
+const api_1 = require("../../services/api");
 const movingAverage_1 = require("../strategies/movingAverage");
+const utils_1 = require("../utils");
 function tradeBasedOnMA(markets) {
     return __awaiter(this, void 0, void 0, function* () {
+        const tickers = yield (0, api_1.fetchTicker)(markets.join(", "));
         const promises = markets.map((market) => __awaiter(this, void 0, void 0, function* () {
-            const data = yield (0, fetchMinutes_1.fetchMinutes)(market, "240", "5");
-            const movingAverage = (0, movingAverage_1.calculateMovingAverage)(data);
-            const aData = data[data.length - 1];
-            const action = aData.trade_price > movingAverage[0]
+            const fetchData = yield (0, api_1.fetchMinutes)(market, "240", "5");
+            const movingAverage = (0, movingAverage_1.calculateMovingAverage)(fetchData)[0];
+            const aCandle = fetchData[fetchData.length - 1];
+            const aTicker = tickers.find((t) => t.market === market);
+            if (!aTicker) {
+                throw new Error(`Ticker data for market ${market} not found`);
+            }
+            const action = aTicker.trade_price > movingAverage
                 ? "Buy | Hold"
                 : "Sell | Reserve";
             return {
                 market,
-                time: aData.time,
-                tradePrice: aData.trade_price.toLocaleString(),
-                average: movingAverage[0].toLocaleString(),
+                averageTime: aCandle.time,
+                averagePrice: movingAverage.toLocaleString(),
+                tickerItme: (0, utils_1.formatTimestampToKoreanTime)(aTicker.trade_timestamp),
+                ticekrTradePrice: aTicker.trade_price.toLocaleString(),
                 action,
             };
         }));
@@ -35,9 +42,16 @@ function tradeBasedOnMA(markets) {
 exports.tradeBasedOnMA = tradeBasedOnMA;
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const markets = ["KRW-BTC", "KRW-XRP"];
-        const decisions = yield tradeBasedOnMA(markets);
-        console.log(decisions);
+        const markets = [
+            "KRW-BTC",
+            "KRW-ETH",
+            "KRW-DOGE",
+            "KRW-XRP",
+            "KRW-SBD",
+            "KRW-NEAR",
+        ];
+        const result = yield tradeBasedOnMA(markets);
+        console.log(result);
     }
     catch (error) {
         console.error("Error executing trading strategy:", error);

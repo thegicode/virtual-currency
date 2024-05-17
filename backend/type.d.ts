@@ -12,3 +12,9 @@ interface ICrypto {
     symbol: string;
     candles: ICandle[];
 }
+
+interface ITicker {
+    market: string;
+    trade_price: number;
+    trade_timestamp: string;
+}
