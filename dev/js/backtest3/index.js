@@ -53,7 +53,7 @@
         "KRW-ONT",
         "KRW-HBAR"
       ];
-      this.investmentPrice = 2e5;
+      this.investmentPrice = 1e5;
       this.data = [];
       this.qqqData = {};
       this.tradeData = [];
@@ -84,7 +84,7 @@
     setMarkets() {
       return __awaiter(this, void 0, void 0, function* () {
         const marketAll = yield this.getMarkets();
-        const idx = 20;
+        const idx = 40;
         return marketAll.slice(idx, idx + 10).map((m) => m.market);
       });
     }

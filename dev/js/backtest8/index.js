@@ -79,7 +79,7 @@
       this.markets = [
         "KRW-NEAR"
       ];
-      this.count = 100;
+      this.count = 30;
       this.totalInvestmentAmount = 1e6;
       this.investmentAmount = this.totalInvestmentAmount / this.markets.length;
       this.targetRate = 2;

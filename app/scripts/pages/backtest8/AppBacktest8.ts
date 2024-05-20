@@ -55,7 +55,7 @@ export default class AppBacktest8 extends HTMLElement {
             // "KRW-BCH",
             "KRW-NEAR",
         ];
-        this.count = 100;
+        this.count = 30;
         this.totalInvestmentAmount = 1000000;
         this.investmentAmount =
             this.totalInvestmentAmount / this.markets.length;

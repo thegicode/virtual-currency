@@ -77,7 +77,7 @@ export default class AppBacktest4 extends HTMLElement {
         this.reset();
 
         for (let index = 0; index < this.count; index++) {
-            console.log(index);
+            // console.log(index);
 
             try {
                 const tradeData = await this.getTradeData(index);
@@ -98,7 +98,7 @@ export default class AppBacktest4 extends HTMLElement {
 
     private async getTradeData(index: number) {
         const toDate = `${this.getToDate(index)}+09:00`;
-        console.log(toDate);
+        // console.log(toDate);
 
         const fetchedData = await this.fetchData("60", "37", toDate);
 

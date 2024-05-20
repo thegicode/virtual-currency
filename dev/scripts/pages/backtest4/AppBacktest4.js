@@ -34,7 +34,6 @@ export default class AppBacktest4 extends HTMLElement {
         return __awaiter(this, void 0, void 0, function* () {
             this.reset();
             for (let index = 0; index < this.count; index++) {
-                console.log(index);
                 try {
                     const tradeData = yield this.getTradeData(index);
                     this.tradeData.push(tradeData);
@@ -50,7 +49,6 @@ export default class AppBacktest4 extends HTMLElement {
     getTradeData(index) {
         return __awaiter(this, void 0, void 0, function* () {
             const toDate = `${this.getToDate(index)}+09:00`;
-            console.log(toDate);
             const fetchedData = yield this.fetchData("60", "37", toDate);
             const { makedData, afternoonData, sellPrice } = this.makeTradeData(fetchedData, toDate);
             const actionedData = this.setTradingAction(makedData, index);

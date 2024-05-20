@@ -18,7 +18,7 @@ export default class AppBacktest3 extends HTMLElement {
             "KRW-ONT",
             "KRW-HBAR",
         ];
-        this.investmentPrice = 200000;
+        this.investmentPrice = 100000;
         this.data = [];
         this.qqqData = {};
         this.tradeData = [];
@@ -50,7 +50,7 @@ export default class AppBacktest3 extends HTMLElement {
     setMarkets() {
         return __awaiter(this, void 0, void 0, function* () {
             const marketAll = yield this.getMarkets();
-            const idx = 20;
+            const idx = 40;
             return marketAll.slice(idx, idx + 10).map((m) => m.market);
         });
     }
