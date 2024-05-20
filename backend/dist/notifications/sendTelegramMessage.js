@@ -12,12 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendMessagesToUsers = void 0;
+exports.sendTelegramMessageToChatId = exports.sendMessagesToUsers = void 0;
 const key_1 = __importDefault(require("../config/key"));
-const { TELEGRAM_BOT_TOKEN } = key_1.default;
+const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = key_1.default;
 function sendMessagesToUsers(message, chatIds) {
     return __awaiter(this, void 0, void 0, function* () {
-        const promises = chatIds.map((chatId) => sendTelegramMessageToChatId(chatId, message));
+        const promises = chatIds.map((chatId) => sendTelegramMessageToChatId(message, chatId));
         try {
             const results = yield Promise.all(promises);
             results.forEach((result) => {
@@ -35,7 +35,7 @@ function sendMessagesToUsers(message, chatIds) {
     });
 }
 exports.sendMessagesToUsers = sendMessagesToUsers;
-function sendTelegramMessageToChatId(chatId, message) {
+function sendTelegramMessageToChatId(message, chatId = TELEGRAM_CHAT_ID) {
     return __awaiter(this, void 0, void 0, function* () {
         const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
         try {
@@ -65,3 +65,4 @@ function sendTelegramMessageToChatId(chatId, message) {
         }
     });
 }
+exports.sendTelegramMessageToChatId = sendTelegramMessageToChatId;

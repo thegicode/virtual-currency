@@ -1,13 +1,13 @@
 import keys from "../config/key";
 import { getChatIds } from "./extractChatIds";
 
-const { TELEGRAM_BOT_TOKEN } = keys;
+const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = keys;
 
 export async function sendMessagesToUsers(message: string, chatIds: number[]) {
     // console.log("chatIds", chatIds);
 
     const promises = chatIds.map((chatId) =>
-        sendTelegramMessageToChatId(chatId, message)
+        sendTelegramMessageToChatId(message, chatId)
     );
 
     try {
@@ -31,7 +31,10 @@ export async function sendMessagesToUsers(message: string, chatIds: number[]) {
 }
 
 // Telegram 메시지를 chatId로 보내는 함수
-async function sendTelegramMessageToChatId(chatId: number, message: string) {
+export async function sendTelegramMessageToChatId(
+    message: string,
+    chatId: number = TELEGRAM_CHAT_ID
+) {
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
     try {

@@ -1,4 +1,7 @@
 import { getChatIds } from "./extractChatIds";
-import { sendMessagesToUsers } from "./sendTelegramMessage";
+import {
+    sendMessagesToUsers,
+    sendTelegramMessageToChatId,
+} from "./sendTelegramMessage";
 
-export { getChatIds, sendMessagesToUsers };
+export { getChatIds, sendTelegramMessageToChatId, sendMessagesToUsers };

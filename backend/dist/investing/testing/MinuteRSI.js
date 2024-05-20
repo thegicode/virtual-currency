@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const notifications_1 = require("../../notifications");
 const api_1 = require("../../services/api");
 function getCandles() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -27,36 +28,41 @@ function runBacktest() {
         calculateRSI(data, rsiPeriod);
         generateRSISignals(data, overbought, oversold);
         const initialCapital = 10000;
-        const { data: rsiResult, tradeCount } = backtestRSIStrategy(data, initialCapital);
-        const finalCapitalRSI = rsiResult[rsiResult.length - 1].capital;
-        const returnRateRSI = (finalCapitalRSI / initialCapital - 1) * 100;
-        const tradeData = rsiResult.filter((aData) => {
-            return aData.signal !== 0 && aData;
-        });
+        const { data: backtestedData, tradeCount } = backtestRSIStrategy(data, initialCapital);
+        const finalCapital = backtestedData[backtestedData.length - 1].capital;
+        const returnRate = (finalCapital / initialCapital - 1) * 100;
+        const tradeData = backtestedData.filter((aData) => aData.signal !== 0);
         console.log("RSI Strategy Results:");
-        console.log("Trade Data: ", tradeData.slice(-10));
-        console.log(`Final Capital: ${finalCapitalRSI}`);
-        console.log(`Return Rate: ${returnRateRSI.toFixed(2)}%`);
-        console.log(`Trade Count: ${tradeCount}`);
-        checkTodaySignal(rsiResult);
+        console.log(`Final Capital: ${finalCapital}`);
+        console.log(`Return Rate: ${returnRate.toFixed(2)}%`);
+        console.log(`Trade Count: ${tradeCount} \n`);
+        checkSignal(backtestedData);
     });
 }
-function checkTodaySignal(data) {
-    const latestDataPoint = data[data.length - 1];
-    const latestRSI = latestDataPoint.rsi;
-    const latestSignal = latestDataPoint.signal;
-    console.log("Latest Data Point:", latestDataPoint);
-    console.log("Latest RSI:", latestRSI);
-    console.log("Latest Signal:", latestSignal);
+function checkSignal(data) {
+    const latestData = data[data.length - 1];
+    const latestSignal = latestData.signal;
+    console.log("* Check Signal");
+    console.log(latestData);
+    console.log("");
+    let message = `* Check Signal
+ - Latest time: ${latestData.time}
+ - Latest trade_price: ${latestData.trade_price}
+ - Latest RSI: ${latestData.rsi}
+ - Latest Signal: ${latestSignal}
+    `;
     if (latestSignal === 1) {
-        console.log("매수 신호가 발생했습니다. 매수 고려.");
+        message += "매수 신호가 발생했습니다. 매수 고려.";
     }
     else if (latestSignal === -1) {
-        console.log("매도 신호가 발생했습니다. 매도 고려.");
+        message += "매도 신호가 발생했습니다. 매도 고려.";
     }
     else {
-        console.log("중립 신호입니다. 유지 또는 추가 관망.");
+        message += "중립 신호입니다. 유지 또는 추가 관망.";
     }
+    console.log(message);
+    if (latestSignal !== 0)
+        (0, notifications_1.sendTelegramMessageToChatId)(message);
 }
 function calculateRSI(data, period) {
     let gains = 0;
@@ -94,7 +100,6 @@ function generateRSISignals(data, overbought, oversold) {
             }
             else if (row.rsi < oversold) {
                 row.signal = 1;
-                console.log(row, row.trade_price);
             }
             else {
                 row.signal = 0;
@@ -106,18 +111,18 @@ function backtestRSIStrategy(data, initialCapital) {
     let capital = initialCapital;
     let position = 0;
     let tradeCount = 0;
-    data.forEach((row) => {
-        if (row.signal === 1 && capital > 0) {
-            position = capital / row.trade_price;
+    data.forEach((aData) => {
+        if (aData.signal === 1 && capital > 0) {
+            position = capital / aData.trade_price;
             capital = 0;
             tradeCount++;
         }
-        else if (row.signal === -1 && position > 0) {
-            capital = position * row.trade_price;
+        else if (aData.signal === -1 && position > 0) {
+            capital = position * aData.trade_price;
             position = 0;
             tradeCount++;
         }
-        row.capital = capital + position * row.trade_price;
+        aData.capital = capital + position * aData.trade_price;
     });
     return { data, tradeCount };
 }

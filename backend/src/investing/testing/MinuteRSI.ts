@@ -1,8 +1,9 @@
+import { sendTelegramMessageToChatId } from "../../notifications";
 import { fetchMinutes } from "../../services/api";
 
 interface DataPoint {
     market: string;
-    candle_date_time_kst: string;
+    time: string;
     trade_price: number;
     opening_price: number;
     high_price: number;
@@ -36,44 +37,52 @@ async function runBacktest() {
 
     // 백테스트
     const initialCapital = 10000; // 초기 자본
-    const { data: rsiResult, tradeCount } = backtestRSIStrategy(
+    const { data: backtestedData, tradeCount } = backtestRSIStrategy(
         data,
         initialCapital
     );
 
-    const finalCapitalRSI = rsiResult[rsiResult.length - 1].capital!;
-    const returnRateRSI = (finalCapitalRSI / initialCapital - 1) * 100;
-    const tradeData = rsiResult.filter((aData) => {
-        return aData.signal !== 0 && aData;
-    });
+    const finalCapital = backtestedData[backtestedData.length - 1].capital!;
+    const returnRate = (finalCapital / initialCapital - 1) * 100;
+    const tradeData = backtestedData.filter((aData) => aData.signal !== 0);
 
     console.log("RSI Strategy Results:");
-    // console.log(rsiResult.slice(-10));
-    console.log("Trade Data: ", tradeData.slice(-10));
-    console.log(`Final Capital: ${finalCapitalRSI}`);
-    console.log(`Return Rate: ${returnRateRSI.toFixed(2)}%`);
-    console.log(`Trade Count: ${tradeCount}`);
+    // console.log("Trade Data: ", tradeData.slice(-10));
+    console.log(`Final Capital: ${finalCapital}`);
+    console.log(`Return Rate: ${returnRate.toFixed(2)}%`);
+    console.log(`Trade Count: ${tradeCount} \n`);
 
     // 최신 신호 확인
-    checkTodaySignal(rsiResult);
+    checkSignal(backtestedData);
 }
 
-function checkTodaySignal(data: DataPoint[]): void {
-    const latestDataPoint = data[data.length - 1];
-    const latestRSI = latestDataPoint.rsi;
-    const latestSignal = latestDataPoint.signal;
+function checkSignal(data: DataPoint[]): void {
+    const latestData = data[data.length - 1];
+    const latestSignal = latestData.signal;
 
-    console.log("Latest Data Point:", latestDataPoint);
-    console.log("Latest RSI:", latestRSI);
-    console.log("Latest Signal:", latestSignal);
+    console.log("* Check Signal");
+    console.log(latestData);
+    console.log("");
+
+    let message = `* Check Signal
+ - Latest time: ${latestData.time}
+ - Latest trade_price: ${latestData.trade_price}
+ - Latest RSI: ${latestData.rsi}
+ - Latest Signal: ${latestSignal}
+    `;
 
     if (latestSignal === 1) {
-        console.log("매수 신호가 발생했습니다. 매수 고려.");
+        message += "매수 신호가 발생했습니다. 매수 고려.";
     } else if (latestSignal === -1) {
-        console.log("매도 신호가 발생했습니다. 매도 고려.");
+        message += "매도 신호가 발생했습니다. 매도 고려.";
     } else {
-        console.log("중립 신호입니다. 유지 또는 추가 관망.");
+        message += "중립 신호입니다. 유지 또는 추가 관망.";
     }
+
+    console.log(message);
+
+    // send message
+    if (latestSignal !== 0) sendTelegramMessageToChatId(message);
 }
 
 function calculateRSI(data: DataPoint[], period: number): void {
@@ -142,7 +151,7 @@ function generateRSISignals(
                 row.signal = -1; // 매도 신호
             } else if (row.rsi < oversold) {
                 row.signal = 1; // 매수 신호
-                console.log(row, row.trade_price);
+                // console.log(row, row.trade_price);
             } else {
                 row.signal = 0; // 중립
             }
@@ -158,19 +167,19 @@ function backtestRSIStrategy(
     let position = 0;
     let tradeCount = 0;
 
-    data.forEach((row) => {
-        if (row.signal === 1 && capital > 0) {
+    data.forEach((aData) => {
+        if (aData.signal === 1 && capital > 0) {
             // 매수
-            position = capital / row.trade_price;
+            position = capital / aData.trade_price;
             capital = 0;
             tradeCount++;
-        } else if (row.signal === -1 && position > 0) {
+        } else if (aData.signal === -1 && position > 0) {
             // 매도
-            capital = position * row.trade_price;
+            capital = position * aData.trade_price;
             position = 0;
             tradeCount++;
         }
-        row.capital = capital + position * row.trade_price; // 현재 자본 계산
+        aData.capital = capital + position * aData.trade_price; // 현재 자본 계산
     });
 
     return { data, tradeCount };
