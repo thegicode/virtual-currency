@@ -1,3 +1,4 @@
+import { getChatIds, sendMessagesToUsers } from "../../notifications";
 import { fetchMinutes, fetchTicker } from "../../services/api";
 import { calculateMovingAverage } from "../strategies";
 import { formatTimestampToKoreanTime } from "../utils";
@@ -42,21 +43,51 @@ export async function executeMA5Trade240(markets: string[]) {
 
 export async function scheduleMA5Trade240Execution(markets: string[]) {
     let index = 0;
+    const chatIds = (await getChatIds()) as number[];
 
     // 첫 번째 실행
-    const initialResult = await executeMA5Trade240(markets);
-    console.log(`Execution ${index}:`, initialResult);
+    await generateAndSendTradeInfo(markets, chatIds, index);
 
     // 240분마다 실행
-    const interval = 1000 * 60 * 240;
     setInterval(
         async () => {
-            const result = await executeMA5Trade240(markets);
-            console.log(`Execution ${++index}:`, result);
+            ++index;
+            await generateAndSendTradeInfo(markets, chatIds, index);
         },
-        interval
+        1000 * 60 * 240
         // 3000
     );
+}
+
+async function generateAndSendTradeInfo(
+    markets: string[],
+    chatIds: number[],
+    index: number
+) {
+    const tradeInfo = await executeMA5Trade240(markets);
+    const message = tradeInfo
+        .map(
+            (info) =>
+                `* ${info.market}
+- Average Time: 
+ ${info.averageTime}
+- Ticker Time:
+ ${info.tickerItme}
+- Average Price:
+ ${info.averagePrice}
+- Ticker Trade Price:
+ ${info.ticekrTradePrice}
+- Action:
+ ${info.action}
+`
+        )
+        .join("\n\n");
+
+    const resultMessage = `{index: ${index}}\n\n ${message}`;
+
+    sendMessagesToUsers(message, chatIds); // send telegram message
+
+    console.log(resultMessage);
 }
 
 /* (() => {

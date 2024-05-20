@@ -1,5 +1,5 @@
 import keys from "../config/key";
-import { getUpdates } from "./extractChatIds";
+import { getChatIds } from "./extractChatIds";
 
 const { TELEGRAM_BOT_TOKEN } = keys;
 
@@ -66,7 +66,7 @@ async function sendTelegramMessageToChatId(chatId: number, message: string) {
 }
 
 // (async () => {
-//     const chatIds = await getUpdates();
+//     const chatIds = await getChatIds();
 //     if (chatIds && Array.isArray(chatIds))
 //         sendMessagesToUsers("test~~", chatIds);
 // })();

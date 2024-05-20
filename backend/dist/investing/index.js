@@ -6,10 +6,7 @@ const trades_1 = require("./trades");
         const markets = [
             "KRW-BTC",
             "KRW-ETH",
-            "KRW-DOGE",
-            "KRW-XRP",
             "KRW-SBD",
-            "KRW-NEAR",
         ];
         (0, trades_1.scheduleMA5Trade240Execution)(markets);
     }

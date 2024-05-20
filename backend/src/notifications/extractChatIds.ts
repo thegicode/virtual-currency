@@ -1,7 +1,7 @@
 import keys from "../config/key";
 const { TELEGRAM_BOT_TOKEN } = keys;
 
-export async function getUpdates() {
+export async function getChatIds() {
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates`;
 
     try {

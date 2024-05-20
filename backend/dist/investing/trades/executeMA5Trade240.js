@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.scheduleMA5Trade240Execution = exports.executeMA5Trade240 = void 0;
+const notifications_1 = require("../../notifications");
 const api_1 = require("../../services/api");
 const strategies_1 = require("../strategies");
 const utils_1 = require("../utils");
@@ -43,13 +44,34 @@ exports.executeMA5Trade240 = executeMA5Trade240;
 function scheduleMA5Trade240Execution(markets) {
     return __awaiter(this, void 0, void 0, function* () {
         let index = 0;
-        const initialResult = yield executeMA5Trade240(markets);
-        console.log(`Execution ${index}:`, initialResult);
-        const interval = 1000 * 60 * 240;
+        const chatIds = (yield (0, notifications_1.getChatIds)());
+        yield generateAndSendTradeInfo(markets, chatIds, index);
         setInterval(() => __awaiter(this, void 0, void 0, function* () {
-            const result = yield executeMA5Trade240(markets);
-            console.log(`Execution ${++index}:`, result);
-        }), interval);
+            ++index;
+            yield generateAndSendTradeInfo(markets, chatIds, index);
+        }), 1000 * 60 * 240);
     });
 }
 exports.scheduleMA5Trade240Execution = scheduleMA5Trade240Execution;
+function generateAndSendTradeInfo(markets, chatIds, index) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const tradeInfo = yield executeMA5Trade240(markets);
+        const message = tradeInfo
+            .map((info) => `* ${info.market}
+- Average Time: 
+ ${info.averageTime}
+- Ticker Time:
+ ${info.tickerItme}
+- Average Price:
+ ${info.averagePrice}
+- Ticker Trade Price:
+ ${info.ticekrTradePrice}
+- Action:
+ ${info.action}
+`)
+            .join("\n\n");
+        const resultMessage = `{index: ${index}}\n\n ${message}`;
+        (0, notifications_1.sendMessagesToUsers)(message, chatIds);
+        console.log(resultMessage);
+    });
+}

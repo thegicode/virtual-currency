@@ -12,10 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUpdates = void 0;
+exports.getChatIds = void 0;
 const key_1 = __importDefault(require("../config/key"));
 const { TELEGRAM_BOT_TOKEN } = key_1.default;
-function getUpdates() {
+function getChatIds() {
     return __awaiter(this, void 0, void 0, function* () {
         const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates`;
         try {
@@ -33,7 +33,7 @@ function getUpdates() {
         }
     });
 }
-exports.getUpdates = getUpdates;
+exports.getChatIds = getChatIds;
 function extractChatIds(updates) {
     const chatIds = new Set();
     updates.forEach((update) => {
