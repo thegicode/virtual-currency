@@ -7,7 +7,7 @@
 
 import { sendTelegramMessageToChatId } from "../../notifications";
 import { fetchDailyCandles, fetchTicker } from "../../services/api";
-import { calculateMovingAverage } from "../strategies";
+import { calculateMovingAverage } from "../utils";
 
 export async function checkDailyMovingAverage(
     markets: string[],

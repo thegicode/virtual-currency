@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.selectLowNoiseCryptos = exports.calculateAverageNoise = exports.calculateMovingAverage = void 0;
-const movingAverage_1 = require("./movingAverage");
-Object.defineProperty(exports, "calculateMovingAverage", { enumerable: true, get: function () { return movingAverage_1.calculateMovingAverage; } });
-const noise_1 = require("./noise");
-Object.defineProperty(exports, "calculateAverageNoise", { enumerable: true, get: function () { return noise_1.calculateAverageNoise; } });
-const selectLowNoiseCryptos_1 = require("./selectLowNoiseCryptos");
-Object.defineProperty(exports, "selectLowNoiseCryptos", { enumerable: true, get: function () { return selectLowNoiseCryptos_1.selectLowNoiseCryptos; } });
+exports.scheduleMA5Trade240Execution = exports.executeMA5Trade240 = exports.checkDailyMovingAverage = void 0;
+const checkDailyMovingAverage_1 = require("./checkDailyMovingAverage");
+Object.defineProperty(exports, "checkDailyMovingAverage", { enumerable: true, get: function () { return checkDailyMovingAverage_1.checkDailyMovingAverage; } });
+const executeMA5Trade240_1 = require("./executeMA5Trade240");
+Object.defineProperty(exports, "executeMA5Trade240", { enumerable: true, get: function () { return executeMA5Trade240_1.executeMA5Trade240; } });
+Object.defineProperty(exports, "scheduleMA5Trade240Execution", { enumerable: true, get: function () { return executeMA5Trade240_1.scheduleMA5Trade240Execution; } });

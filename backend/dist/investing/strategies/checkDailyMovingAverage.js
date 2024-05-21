@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkDailyMovingAverage = void 0;
 const notifications_1 = require("../../notifications");
 const api_1 = require("../../services/api");
-const strategies_1 = require("../strategies");
+const utils_1 = require("../utils");
 function checkDailyMovingAverage(markets, unit = 3) {
     return __awaiter(this, void 0, void 0, function* () {
         const data = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () {
@@ -31,7 +31,7 @@ function checkMovingAverage(market, unit) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const fetchedData = yield (0, api_1.fetchDailyCandles)(market, unit.toString());
-            const movingAverages = (0, strategies_1.calculateMovingAverage)(fetchedData);
+            const movingAverages = (0, utils_1.calculateMovingAverage)(fetchedData);
             const currentPrice = (yield (0, api_1.fetchTicker)(market))[0].trade_price;
             const latestMovingAverage = movingAverages[movingAverages.length - 1];
             const signal = currentPrice > latestMovingAverage

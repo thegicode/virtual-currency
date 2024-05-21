@@ -1,5 +1,11 @@
-import { calculateMovingAverage } from "./movingAverage";
-import { calculateAverageNoise } from "./noise";
-import { selectLowNoiseCryptos } from "./selectLowNoiseCryptos";
+import { checkDailyMovingAverage } from "./checkDailyMovingAverage";
+import {
+    executeMA5Trade240,
+    scheduleMA5Trade240Execution,
+} from "./executeMA5Trade240";
 
-export { calculateMovingAverage, calculateAverageNoise, selectLowNoiseCryptos };
+export {
+    checkDailyMovingAverage,
+    executeMA5Trade240,
+    scheduleMA5Trade240Execution,
+};

@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.selectLowNoiseCryptos = void 0;
-const noise_1 = require("./noise");
+const utils_1 = require("../utils");
 function selectLowNoiseCryptos(cryptos, n) {
     const cryptowithNoise = cryptos.map((crypto) => {
-        const averageNoise = (0, noise_1.calculateAverageNoise)(crypto.candles);
+        const averageNoise = (0, utils_1.calculateAverageNoise)(crypto.candles);
         return Object.assign(Object.assign({}, crypto), { averageNoise });
     });
     cryptowithNoise.sort((a, b) => a.averageNoise - b.averageNoise);

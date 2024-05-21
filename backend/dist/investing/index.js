@@ -1,16 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const trades_1 = require("./trades");
+const strategies_1 = require("./strategies");
 (() => {
-    try {
-        const markets = [
-            "KRW-BTC",
-            "KRW-ETH",
-            "KRW-SBD",
-        ];
-        (0, trades_1.scheduleMA5Trade240Execution)(markets);
-    }
-    catch (error) {
-        console.error("Error executing trading strategy:", error);
-    }
+    (0, strategies_1.checkDailyMovingAverage)(["KRW-BTC", "KRW-ETH", "KRW-XRP", "KRW-SBD", "KRW-DOGE"], 5);
 })();

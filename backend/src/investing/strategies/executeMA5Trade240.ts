@@ -1,7 +1,6 @@
 import { getChatIds, sendMessagesToUsers } from "../../notifications";
 import { fetchMinutes, fetchTicker } from "../../services/api";
-import { calculateMovingAverage } from "../strategies";
-import { formatTimestampToKoreanTime } from "../utils";
+import { calculateMovingAverage, formatTimestampToKoreanTime } from "../utils";
 
 // 4시간 캔들 기준으로 5 이동평균선을 구한 다음
 // 실시간 가격이 5 이동 평균선보다 높으면 매수 또는 보유

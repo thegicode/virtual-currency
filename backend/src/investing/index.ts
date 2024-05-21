@@ -1,18 +1,13 @@
-import { scheduleMA5Trade240Execution } from "./trades";
+import { checkDailyMovingAverage } from "./strategies";
+import { scheduleMA5Trade240Execution } from "./strategies/executeMA5Trade240";
 
 (() => {
-    try {
-        const markets = [
-            "KRW-BTC",
-            "KRW-ETH",
-            // "KRW-DOGE",
-            // "KRW-XRP",
-            "KRW-SBD",
-            // "KRW-NEAR",
-        ];
+    // 240분캔들 기준 5 이동평균 확인
+    // scheduleMA5Trade240Execution(["KRW-BTC", "KRW-ETH", "KRW-SBD"]);
 
-        scheduleMA5Trade240Execution(markets);
-    } catch (error) {
-        console.error("Error executing trading strategy:", error);
-    }
+    // 일캔들 기준 5일 이동평균 확인
+    checkDailyMovingAverage(
+        ["KRW-BTC", "KRW-ETH", "KRW-XRP", "KRW-SBD", "KRW-DOGE"],
+        5
+    );
 })();

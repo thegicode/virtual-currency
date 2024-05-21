@@ -10,10 +10,25 @@ function calculateNoise(candle: ICandle) {
 }
 
 // 노이즈 평균 계산하기
-function calculateAverageNoise(candles: ICandle[]) {
+export function calculateAverageNoise(candles: ICandle[]) {
     const noiseValues = candles.map(calculateNoise);
     const totalNoise = noiseValues.reduce((sum, noise) => sum + noise, 0);
     return totalNoise / noiseValues.length;
+}
+
+// 노이즈 값이 가장 작은 n개 선정
+export function selectLowNoiseCryptos(cryptos: ICrypto[], n: number) {
+    const cryptowithNoise = cryptos.map((crypto) => {
+        const averageNoise = calculateAverageNoise(crypto.candles);
+        return {
+            ...crypto,
+            averageNoise,
+        };
+    });
+
+    cryptowithNoise.sort((a, b) => a.averageNoise - b.averageNoise);
+
+    return cryptowithNoise.slice(0, n);
 }
 
 /* async function test() {
@@ -28,5 +43,3 @@ function calculateAverageNoise(candles: ICandle[]) {
 }
 
 test(); */
-
-export { calculateAverageNoise };

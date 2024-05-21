@@ -6,7 +6,7 @@
     "scripts": {
         "start": "npm run tsc & npm run css & npm run html & npm run esbuild & npm run copy-assets & node server/app",
         "trade": "node trade",
-        "invest-dh": "node backend/dist/investing",
+        "invest": "node backend/dist/investing",
         "build": "npm run css-build & npm run html-build & npm run esbuild-build & npm run copy-assets-build & NODE_ENV=production node server/app",
         "tsc": "tsc -w & tsc --project ./backend -w",
         "css": "sass --watch ./app/sass/:./dev/css/ --style=expanded --source-map",

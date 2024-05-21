@@ -12,14 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.scheduleMA5Trade240Execution = exports.executeMA5Trade240 = void 0;
 const notifications_1 = require("../../notifications");
 const api_1 = require("../../services/api");
-const strategies_1 = require("../strategies");
 const utils_1 = require("../utils");
 function executeMA5Trade240(markets) {
     return __awaiter(this, void 0, void 0, function* () {
         const tickers = yield (0, api_1.fetchTicker)(markets.join(", "));
         const promises = markets.map((market) => __awaiter(this, void 0, void 0, function* () {
             const fetchData = yield (0, api_1.fetchMinutes)(market, "240", "5");
-            const movingAverage = (0, strategies_1.calculateMovingAverage)(fetchData)[0];
+            const movingAverage = (0, utils_1.calculateMovingAverage)(fetchData)[0];
             const aCandle = fetchData[fetchData.length - 1];
             const aTicker = tickers.find((t) => t.market === market);
             if (!aTicker) {
