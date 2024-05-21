@@ -26,7 +26,7 @@ interface ITicker {
     trade_timestamp: string;
 }
 
-interface ICheckMovingAverage {
+interface IMovingAverageCheckResult {
     market: string;
     movingAverage: number;
     currentPrice: number;

@@ -13,24 +13,23 @@ exports.checkDailyMovingAverage = void 0;
 const notifications_1 = require("../../notifications");
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
-function checkDailyMovingAverage(markets, unit = 3) {
+function checkDailyMovingAverage(markets, period = 3) {
     return __awaiter(this, void 0, void 0, function* () {
-        const data = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                return yield checkMovingAverage(market, unit);
-            }
-            catch (error) {
-                console.error(`Error checking moving average for market ${market}:`, error);
-            }
-        })));
-        makeMessageAndNotify(data, unit);
+        try {
+            const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () { return yield checkMovingAverage(market, period); })));
+            const validResults = results.filter((result) => result !== undefined);
+            notifyResults(validResults, period);
+        }
+        catch (error) {
+            console.error(`Error checking daily moving averages:`, error);
+        }
     });
 }
 exports.checkDailyMovingAverage = checkDailyMovingAverage;
-function checkMovingAverage(market, unit) {
+function checkMovingAverage(market, period) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const fetchedData = yield (0, api_1.fetchDailyCandles)(market, unit.toString());
+            const fetchedData = yield (0, api_1.fetchDailyCandles)(market, period.toString());
             const movingAverages = (0, utils_1.calculateMovingAverage)(fetchedData);
             const currentPrice = (yield (0, api_1.fetchTicker)(market))[0].trade_price;
             const latestMovingAverage = movingAverages[movingAverages.length - 1];
@@ -45,12 +44,12 @@ function checkMovingAverage(market, unit) {
             };
         }
         catch (error) {
-            console.error(`Error in checkMovingAverage for market ${market}:`, error);
+            console.error(`Error checking moving average for market ${market}:`, error);
         }
     });
 }
-function makeMessageAndNotify(data, unit) {
-    const messages = `${unit}일 이동평균 신호 확인 \n\n` +
+function notifyResults(data, peirod) {
+    const messages = `${peirod}일 이동평균 신호 확인 \n\n` +
         data
             .map((aData) => `[${aData.market}] 
 이동평균값: ${aData.movingAverage.toLocaleString()}

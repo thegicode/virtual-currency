@@ -11,27 +11,30 @@ import { calculateMovingAverage } from "../utils";
 
 export async function checkDailyMovingAverage(
     markets: string[],
-    unit: number = 3
+    period: number = 3
 ) {
-    const data = await Promise.all(
-        markets.map(async (market: string) => {
-            try {
-                return await checkMovingAverage(market, unit);
-            } catch (error) {
-                console.error(
-                    `Error checking moving average for market ${market}:`,
-                    error
-                );
-            }
-        })
-    );
+    try {
+        const results = await Promise.all(
+            markets.map(
+                async (market: string) =>
+                    await checkMovingAverage(market, period)
+            )
+        );
 
-    makeMessageAndNotify(data as ICheckMovingAverage[], unit);
+        const validResults = results.filter(
+            (result): result is IMovingAverageCheckResult =>
+                result !== undefined
+        );
+
+        notifyResults(validResults, period);
+    } catch (error) {
+        console.error(`Error checking daily moving averages:`, error);
+    }
 }
 
-async function checkMovingAverage(market: string, unit: number) {
+async function checkMovingAverage(market: string, period: number) {
     try {
-        const fetchedData = await fetchDailyCandles(market, unit.toString());
+        const fetchedData = await fetchDailyCandles(market, period.toString());
         const movingAverages = calculateMovingAverage(fetchedData);
         const currentPrice = (await fetchTicker(market))[0].trade_price;
         const latestMovingAverage = movingAverages[movingAverages.length - 1];
@@ -49,18 +52,18 @@ async function checkMovingAverage(market: string, unit: number) {
         };
     } catch (error) {
         console.error(
-            `Error in checkMovingAverage for market ${market}:`,
+            `Error checking moving average for market ${market}:`,
             error
         );
     }
 }
 
-function makeMessageAndNotify(data: ICheckMovingAverage[], unit: number) {
+function notifyResults(data: IMovingAverageCheckResult[], peirod: number) {
     const messages =
-        `${unit}일 이동평균 신호 확인 \n\n` +
+        `${peirod}일 이동평균 신호 확인 \n\n` +
         data
             .map(
-                (aData: any) =>
+                (aData) =>
                     `[${aData.market}] 
 이동평균값: ${aData.movingAverage.toLocaleString()}
 현재가격: ${aData.currentPrice.toLocaleString()}
