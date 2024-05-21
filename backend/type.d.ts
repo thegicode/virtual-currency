@@ -8,6 +8,12 @@ interface ICandle {
     candle_acc_trade_volume: number;
 }
 
+interface ICandleMinuteRSI extends ICandle {
+    rsi?: number;
+    signal?: number;
+    capital?: number;
+}
+
 interface ICrypto {
     symbol: string;
     candles: ICandle[];

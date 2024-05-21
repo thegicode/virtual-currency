@@ -1,91 +1,66 @@
 import { sendTelegramMessageToChatId } from "../../notifications";
 import { fetchMinutes } from "../../services/api";
 
-interface DataPoint {
-    market: string;
-    time: string;
-    trade_price: number;
-    opening_price: number;
-    high_price: number;
-    low_price: number;
-    candle_acc_trade_volume: number;
-    rsi?: number;
-    signal?: number;
-    capital?: number;
-}
-
-async function getCandles() {
-    return await fetchMinutes("KRW-SHIB", "1", "200");
-}
+const RSI_PERIOD = 14; // RSI 기간
+const OVERBOUGHT_THRESHOLD = 70; // 과매수 기준
+const OVERSOLD_THRESHOLD = 30; //  과매도 기준
+const INITIAL_CAPITAL = 10000; // 초기 자본
+const MARKETS = ["KRW-SHIB", "KRW-CTC"]; // 대상 코인 목록
 
 // 초기 실행
-runBacktest().catch((error) => console.error(error));
+runBacktests().catch((error) => console.error(error));
 
 // 1분마다 실행
-setInterval(runBacktest, 60 * 1000);
+setInterval(runBacktests, 60 * 1000);
 
-async function runBacktest() {
-    console.log("");
-    const data: DataPoint[] = await getCandles();
-
-    // RSI 계산 및 전략 적용
-    const rsiPeriod = 14; // RSI 기간
-    const overbought = 70; // 과매수 기준
-    const oversold = 30; // 과매도 기준
-    calculateRSI(data, rsiPeriod);
-    generateRSISignals(data, overbought, oversold);
-
-    // 백테스트
-    const initialCapital = 10000; // 초기 자본
-    const { data: backtestedData, tradeCount } = backtestRSIStrategy(
-        data,
-        initialCapital
-    );
-
-    const finalCapital = backtestedData[backtestedData.length - 1].capital!;
-    const returnRate = (finalCapital / initialCapital - 1) * 100;
-    const tradeData = backtestedData.filter((aData) => aData.signal !== 0);
-
-    console.log("RSI Strategy Results:");
-    // console.log("Trade Data: ", tradeData.slice(-10));
-    console.log(`Final Capital: ${finalCapital}`);
-    console.log(`Return Rate: ${returnRate.toFixed(2)}%`);
-    console.log(`Trade Count: ${tradeCount} \n`);
-
-    // 최신 신호 확인
-    checkSignal(backtestedData);
-}
-
-function checkSignal(data: DataPoint[]): void {
-    const latestData = data[data.length - 1];
-    const latestSignal = latestData.signal;
-
-    console.log("* Check Signal");
-    console.log(latestData);
-    console.log("");
-
-    let message = `* Check Signal
- - Latest time: ${latestData.time}
- - Latest trade_price: ${latestData.trade_price}
- - Latest RSI: ${latestData.rsi}
- - Latest Signal: ${latestSignal}
-    `;
-
-    if (latestSignal === 1) {
-        message += "매수 신호가 발생했습니다. 매수 고려.";
-    } else if (latestSignal === -1) {
-        message += "매도 신호가 발생했습니다. 매도 고려.";
-    } else {
-        message += "중립 신호입니다. 유지 또는 추가 관망.";
+async function runBacktests() {
+    for (const market of MARKETS) {
+        try {
+            await runBacktest(market);
+        } catch (error) {
+            console.error(
+                `Error running backtest for market ${market}:`,
+                error
+            );
+        }
     }
-
-    console.log(message);
-
-    // send message
-    if (latestSignal !== 0) sendTelegramMessageToChatId(message);
 }
 
-function calculateRSI(data: DataPoint[], period: number): void {
+async function runBacktest(market: string) {
+    try {
+        const data: ICandleMinuteRSI[] = await fetchCandleData(market);
+
+        // RSI 계산 및 전략 적용
+        calculateRSI(data);
+        generateRSISignals(data);
+
+        // 백테스트
+        const { data: backtestedData, tradeCount } = executeBacktest(data);
+        const finalCapital = backtestedData[backtestedData.length - 1].capital!;
+        const returnRate = (finalCapital / INITIAL_CAPITAL - 1) * 100;
+
+        logResults(market, finalCapital, returnRate, tradeCount);
+
+        // 최신 신호 확인
+        checkAndNotifyLatestSignal(backtestedData, market);
+    } catch (error) {
+        console.error(`Error in runBacktest for market ${market}:`, error);
+    }
+}
+
+async function fetchCandleData(market: string) {
+    try {
+        return await fetchMinutes(market, "1", "200");
+    } catch (error) {
+        console.warn(
+            `Failed to fetch candle data for market ${market} : `,
+            error instanceof Error ? error.message : error
+        );
+    }
+}
+
+function calculateRSI(data: ICandleMinuteRSI[]) {
+    const period = RSI_PERIOD;
     let gains = 0;
     let losses = 0;
 
@@ -117,8 +92,22 @@ function calculateRSI(data: DataPoint[], period: number): void {
     }
 }
 
+function generateRSISignals(data: ICandleMinuteRSI[]) {
+    data.forEach((aData) => {
+        if (aData.rsi !== undefined) {
+            if (aData.rsi > OVERBOUGHT_THRESHOLD) {
+                aData.signal = -1; // 매도 신호
+            } else if (aData.rsi < OVERSOLD_THRESHOLD) {
+                aData.signal = 1; // 매수 신호
+            } else {
+                aData.signal = 0; // 중립
+            }
+        }
+    });
+}
+
 /* function generateRSISignals(
-    data: DataPoint[],
+    data: ICandleMinuteRSI[],
     oversold: number,
     overbought: number
 ): void {
@@ -140,47 +129,71 @@ function calculateRSI(data: DataPoint[], period: number): void {
     });
 } */
 
-function generateRSISignals(
-    data: DataPoint[],
-    overbought: number,
-    oversold: number
-): void {
-    data.forEach((row, index) => {
-        if (row.rsi !== undefined) {
-            if (row.rsi > overbought) {
-                row.signal = -1; // 매도 신호
-            } else if (row.rsi < oversold) {
-                row.signal = 1; // 매수 신호
-                // console.log(row, row.trade_price);
-            } else {
-                row.signal = 0; // 중립
-            }
-        }
-    });
-}
-
-function backtestRSIStrategy(
-    data: DataPoint[],
-    initialCapital: number
-): { data: DataPoint[]; tradeCount: number } {
-    let capital = initialCapital;
-    let position = 0;
+function executeBacktest(data: ICandleMinuteRSI[]): {
+    data: ICandleMinuteRSI[];
+    tradeCount: number;
+} {
+    let capital = INITIAL_CAPITAL;
+    let holdingAmount = 0;
     let tradeCount = 0;
 
     data.forEach((aData) => {
         if (aData.signal === 1 && capital > 0) {
             // 매수
-            position = capital / aData.trade_price;
+            holdingAmount = capital / aData.trade_price;
             capital = 0;
             tradeCount++;
-        } else if (aData.signal === -1 && position > 0) {
+        } else if (aData.signal === -1 && holdingAmount > 0) {
             // 매도
-            capital = position * aData.trade_price;
-            position = 0;
+            capital = holdingAmount * aData.trade_price;
+            holdingAmount = 0;
             tradeCount++;
         }
-        aData.capital = capital + position * aData.trade_price; // 현재 자본 계산
+        aData.capital = capital + holdingAmount * aData.trade_price; // 현재 자본 계산
     });
 
     return { data, tradeCount };
+}
+
+function logResults(
+    market: string,
+    finalCapital: number,
+    returnRate: number,
+    tradeCount: number
+) {
+    console.log(`\n[${market}]`);
+    console.log("1 Minute RSI Strategy Backtest Results:");
+    console.log(`Final Capital: ${finalCapital}`);
+    console.log(`Return Rate: ${returnRate.toFixed(2)}%`);
+    console.log(`Trade Count: ${tradeCount} \n`);
+}
+
+function checkAndNotifyLatestSignal(data: ICandleMinuteRSI[], market: string) {
+    const latestData = data[data.length - 1];
+    const latestSignal = latestData.signal;
+
+    let message = `${market} Check Signal 
+ - time: ${latestData.time}
+ - trade_price: ${latestData.trade_price}
+ - RSI: ${latestData.rsi}
+ - Signal: ${latestSignal}
+    `;
+
+    let tradeMessage;
+    if (latestSignal === 1) {
+        tradeMessage = "매수 신호가 발생했습니다. 매수 고려.";
+    } else if (latestSignal === -1) {
+        tradeMessage = "매도 신호가 발생했습니다. 매도 고려.";
+    } else {
+        tradeMessage = "중립 신호입니다. 유지 또는 추가 관망.";
+    }
+
+    message += tradeMessage;
+
+    console.log("Check Signal");
+    console.log(latestData);
+    console.log(tradeMessage);
+
+    // send message
+    if (latestSignal !== 0) sendTelegramMessageToChatId(message);
 }
