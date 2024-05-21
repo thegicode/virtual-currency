@@ -1,4 +1,4 @@
-const { URL } = require("../../config");
+import { URL } from "../../config";
 
 async function fetchTicker(markets: string) {
     try {

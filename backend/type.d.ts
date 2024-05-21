@@ -1,6 +1,7 @@
 interface ICandle {
     market: string;
     time: string;
+    candle_date_time_kst: string;
     opening_price: number;
     trade_price: number;
     high_price: number;
@@ -23,4 +24,11 @@ interface ITicker {
     market: string;
     trade_price: number;
     trade_timestamp: string;
+}
+
+interface ICheckMovingAverage {
+    market: string;
+    movingAverage: number;
+    currentPrice: number;
+    signal: string;
 }

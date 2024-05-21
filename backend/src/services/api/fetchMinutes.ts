@@ -1,4 +1,4 @@
-const { URL } = require("../../config");
+import { URL } from "../../config";
 
 async function fetchMinutes(
     market: string,
@@ -28,7 +28,7 @@ async function fetchMinutes(
         }
 
         const data = await response.json();
-        return data.reverse().map((aData: any) => ({
+        return data.reverse().map((aData: ICandle) => ({
             market: aData.market,
             time: aData.candle_date_time_kst,
             opening_price: Number(aData.opening_price),

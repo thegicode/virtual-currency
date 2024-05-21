@@ -1,7 +1,7 @@
 // 5 이동평균선을 계산하는 함수
 export function calculateMovingAverage(
     data: ICandle[],
-    period: number = 5
+    period: number = 3
 ): number[] {
     const movingAverages: number[] = [];
 

@@ -10,14 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchTicker = void 0;
-const { URL } = require("../../config");
+const config_1 = require("../../config");
 function fetchTicker(markets) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const params = new URLSearchParams({
                 markets,
             });
-            const response = yield fetch(`${URL.ticker}?${params}`, {
+            const response = yield fetch(`${config_1.URL.ticker}?${params}`, {
                 method: "GET",
                 headers: { accept: "application/json" },
             });
