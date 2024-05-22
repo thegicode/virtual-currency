@@ -8,17 +8,19 @@
 import { fetchDailyCandles } from "../../services/api";
 import { calculateMovingAverage } from "../utils";
 
-const INITIAL_CAPITAL = 10000;
-
 export async function checkDailyMovingAverageBacktest(
     markets: string[],
-    period: number = 3
+    period: number = 3,
+    initialCapital: number
 ) {
     const results = await Promise.all(
         markets.map(
-            async (market: string) => await backtestMarket(market, period)
+            async (market: string) =>
+                await backtestMarket(market, period, initialCapital)
         )
     );
+
+    console.log("* Check Daily Moving Average backtest\n");
 
     results.forEach((result) => {
         console.log(`[${result.market}]`);
@@ -26,19 +28,25 @@ export async function checkDailyMovingAverageBacktest(
         console.log(`Total Trades: ${result.trades}`);
         console.log(`Return Rate: ${result.returnRate.toFixed(2)}%`);
         console.log(`Maximum Drawdown (MDD): ${result.mdd.toFixed(2)}%`);
+        console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
         // console.log("Trade Log:", result.log.join("\n"));
         console.log("");
     });
 }
 
-async function backtestMarket(market: string, period: number) {
+async function backtestMarket(
+    market: string,
+    period: number,
+    initialCapital: number
+) {
     const candles: ICandle[] = await fetchDailyCandles(market, "200");
     const movingAverages = calculateMovingAverage(candles);
 
-    let capital = INITIAL_CAPITAL;
+    let capital = initialCapital;
     let position = 0;
     let trades = 0;
-    let peak = INITIAL_CAPITAL;
+    let wins = 0;
+    let peak = initialCapital;
     let mdd = 0;
     const log: string[] = [];
 
@@ -54,9 +62,14 @@ async function backtestMarket(market: string, period: number) {
             log.push(`[${candle.time}] Buy at ${currentPrice}`);
         } else if (currentPrice < movingAverage && position > 0) {
             // Sell
-            capital = position * currentPrice;
+            const sellPrice = currentPrice;
+            const profit = sellPrice * position - position * movingAverage;
+            capital = position * sellPrice;
             position = 0;
             trades++;
+            if (profit > 0) {
+                wins++;
+            }
             log.push(`[${candle.time}] Sell at ${currentPrice}`);
         }
 
@@ -76,7 +89,8 @@ async function backtestMarket(market: string, period: number) {
     // Final capital calculation
     const finalCapital =
         capital + position * candles[candles.length - 1].trade_price;
-    const returnRate = (finalCapital / INITIAL_CAPITAL - 1) * 100;
+    const returnRate = (finalCapital / initialCapital - 1) * 100;
+    const winRate = trades > 0 ? (wins / trades) * 100 : 0;
 
     return {
         market,
@@ -85,5 +99,17 @@ async function backtestMarket(market: string, period: number) {
         log,
         mdd,
         returnRate,
+        winRate,
     };
 }
+
+// 실행 예제
+// (async () => {
+//     try {
+//         const markets = ["KRW-BTC", "KRW-ETH"];
+//         const period = 5; // 5 이동평균
+//         await checkDailyMovingAverageBacktest(markets, period);
+//     } catch (error) {
+//         console.error("Error during backtesting:", error);
+//     }
+// })();

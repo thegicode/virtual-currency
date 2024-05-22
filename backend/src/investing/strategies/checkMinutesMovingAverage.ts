@@ -7,7 +7,7 @@ import { calculateMovingAverage, formatTimestampToKoreanTime } from "../utils";
 // movingAveragePeriod 이동평균선보다 낮으면 매도 또는 유보
 // candleUnit 분마다 실행
 
-export async function scheduleMovingAverageTrades(
+export async function checkMinutesMovingAverage(
     markets: string[],
     candleUnit: TCandleUnit, // interval time, candle unit
     movingAveragePeriod: number // 이동평균선 수치
@@ -89,10 +89,7 @@ async function getTradeInfos(
             throw new Error(`Ticker data for market ${market} not found`);
         }
 
-        const signal =
-            ticker.trade_price > movingAverage
-                ? "매수 or 유지"
-                : "매도 or 유보";
+        const signal = ticker.trade_price > movingAverage ? "매수" : "매도";
 
         return {
             market,

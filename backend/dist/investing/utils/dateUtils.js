@@ -18,4 +18,3 @@ function formatTimestampToKoreanTime(trade_timestamp) {
 exports.formatTimestampToKoreanTime = formatTimestampToKoreanTime;
 const tradeTimestamp = 1672531199000;
 const formattedTime = formatTimestampToKoreanTime(tradeTimestamp);
-console.log(formattedTime);

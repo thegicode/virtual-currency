@@ -25,5 +25,5 @@ export function formatTimestampToKoreanTime(trade_timestamp: number): string {
 const tradeTimestamp = 1672531199000; // 예시 Unix Timestamp
 const formattedTime = formatTimestampToKoreanTime(tradeTimestamp);
 
-console.log(formattedTime);
+// console.log(formattedTime);
 // 결과 예시: 2024-05-22T20:00:00

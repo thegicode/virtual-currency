@@ -12,6 +12,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkDailyMovingAverageBacktest = void 0;
 const checkDailyMovingAverageBacktest_1 = require("./checkDailyMovingAverageBacktest");
 Object.defineProperty(exports, "checkDailyMovingAverageBacktest", { enumerable: true, get: function () { return checkDailyMovingAverageBacktest_1.checkDailyMovingAverageBacktest; } });
+const checkMinutesMovingAverageBacktest_1 = require("./checkMinutesMovingAverageBacktest");
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, checkDailyMovingAverageBacktest_1.checkDailyMovingAverageBacktest)(["KRW-BTC", "KRW-ETH", "KRW-DOGE", "KRW-XRP", "KRW-SBD"], 5);
+    try {
+        const markets = [
+            "KRW-BTC",
+            "KRW-ETH",
+            "KRW-DOGE",
+            "KRW-XRP",
+            "KRW-SBD",
+        ];
+        const initialCapital = 10000;
+        console.log("-----------------------------------------\n");
+        yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 240, 5, initialCapital);
+    }
+    catch (error) {
+        console.error("Error during backtesting: ", error);
+    }
 }))();

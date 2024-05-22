@@ -1,4 +1,4 @@
 import { checkDailyMovingAverage } from "./checkDailyMovingAverage";
-import { scheduleMovingAverageTrades } from "./scheduleMovingAverageTrades";
+import { checkMinutesMovingAverage } from "./checkMinutesMovingAverage";
 
-export { checkDailyMovingAverage, scheduleMovingAverageTrades };
+export { checkDailyMovingAverage, checkMinutesMovingAverage };

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.scheduleMovingAverageTrades = exports.checkDailyMovingAverage = void 0;
+exports.checkMinutesMovingAverage = exports.checkDailyMovingAverage = void 0;
 const checkDailyMovingAverage_1 = require("./checkDailyMovingAverage");
 Object.defineProperty(exports, "checkDailyMovingAverage", { enumerable: true, get: function () { return checkDailyMovingAverage_1.checkDailyMovingAverage; } });
-const scheduleMovingAverageTrades_1 = require("./scheduleMovingAverageTrades");
-Object.defineProperty(exports, "scheduleMovingAverageTrades", { enumerable: true, get: function () { return scheduleMovingAverageTrades_1.scheduleMovingAverageTrades; } });
+const checkMinutesMovingAverage_1 = require("./checkMinutesMovingAverage");
+Object.defineProperty(exports, "checkMinutesMovingAverage", { enumerable: true, get: function () { return checkMinutesMovingAverage_1.checkMinutesMovingAverage; } });
