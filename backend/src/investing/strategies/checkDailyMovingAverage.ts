@@ -11,7 +11,7 @@ import { calculateMovingAverage } from "../utils";
 
 export async function checkDailyMovingAverage(
     markets: string[],
-    period: number = 3
+    period: number = 3 // 이동 평균
 ) {
     try {
         const results = await Promise.all(
@@ -35,7 +35,7 @@ export async function checkDailyMovingAverage(
 async function checkMovingAverage(market: string, period: number) {
     try {
         const fetchedData = await fetchDailyCandles(market, period.toString());
-        const movingAverages = calculateMovingAverage(fetchedData, 5);
+        const movingAverages = calculateMovingAverage(fetchedData, period);
         const currentPrice = (await fetchTicker(market))[0].trade_price;
         const latestMovingAverage = movingAverages[movingAverages.length - 1];
 
@@ -71,5 +71,5 @@ function notifyResults(data: IMovingAverageCheckResult[], period: number) {
 
     console.log(messages);
 
-    sendTelegramMessageToChatId(messages);
+    // sendTelegramMessageToChatId(messages);
 }

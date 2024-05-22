@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkDailyMovingAverage = void 0;
-const notifications_1 = require("../../notifications");
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
 function checkDailyMovingAverage(markets, period = 3) {
@@ -30,7 +29,7 @@ function checkMovingAverage(market, period) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const fetchedData = yield (0, api_1.fetchDailyCandles)(market, period.toString());
-            const movingAverages = (0, utils_1.calculateMovingAverage)(fetchedData, 5);
+            const movingAverages = (0, utils_1.calculateMovingAverage)(fetchedData, period);
             const currentPrice = (yield (0, api_1.fetchTicker)(market))[0].trade_price;
             const latestMovingAverage = movingAverages[movingAverages.length - 1];
             const signal = currentPrice > latestMovingAverage ? "매수" : "매도";
@@ -56,5 +55,4 @@ function notifyResults(data, period) {
         .join("\n\n");
     const messages = `${title}${message}\n`;
     console.log(messages);
-    (0, notifications_1.sendTelegramMessageToChatId)(messages);
 }
