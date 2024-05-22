@@ -1,6 +1,6 @@
 interface ICandle {
     market: string;
-    date: string;
+    date_time: string;
     candle_date_time_kst: string;
     opening_price: number;
     trade_price: number;

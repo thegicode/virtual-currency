@@ -46,7 +46,7 @@ function backtestMarket(market, period, initialCapital) {
                 position = capital / currentPrice;
                 capital = 0;
                 trades++;
-                log.push(`[${candle.date}] Buy at ${currentPrice}`);
+                log.push(`[${candle.date_time}] Buy at ${currentPrice}`);
             }
             else if (currentPrice < movingAverage && position > 0) {
                 const sellPrice = currentPrice;
@@ -57,7 +57,7 @@ function backtestMarket(market, period, initialCapital) {
                 if (profit > 0) {
                     wins++;
                 }
-                log.push(`[${candle.date}] Sell at ${currentPrice}`);
+                log.push(`[${candle.date_time}] Sell at ${currentPrice}`);
             }
             const currentValue = capital + position * currentPrice;
             if (currentValue > peak) {

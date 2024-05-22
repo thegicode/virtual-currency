@@ -173,7 +173,7 @@ function checkAndNotifyLatestSignal(data: ICandleMinuteRSI[], market: string) {
     const latestSignal = latestData.signal;
 
     let message = `${market} Check Signal 
- - time: ${latestData.date}
+ - time: ${latestData.date_time}
  - trade_price: ${latestData.trade_price}
  - RSI: ${latestData.rsi}
  - Signal: ${latestSignal}

@@ -93,7 +93,7 @@ async function backtestMarket(
 
         const currentCapital = capital + position * currentPrice;
         trades.push({
-            date: candle.date,
+            date: candle.date_time,
             action,
             price: currentPrice,
             capital: currentCapital,
