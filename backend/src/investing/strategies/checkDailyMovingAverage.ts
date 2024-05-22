@@ -39,10 +39,7 @@ async function checkMovingAverage(market: string, period: number) {
         const currentPrice = (await fetchTicker(market))[0].trade_price;
         const latestMovingAverage = movingAverages[movingAverages.length - 1];
 
-        const signal =
-            currentPrice > latestMovingAverage
-                ? "매수 신호입니다."
-                : "매도 신호입니다.";
+        const signal = currentPrice > latestMovingAverage ? "매수" : "매도";
 
         return {
             market,
@@ -59,17 +56,18 @@ async function checkMovingAverage(market: string, period: number) {
 }
 
 function notifyResults(data: IMovingAverageCheckResult[], peirod: number) {
-    const messages =
-        `${peirod}일 이동평균 신호 확인 \n\n` +
-        data
-            .map(
-                (aData) =>
-                    `[${aData.market}] 
-현재가격: ${aData.currentPrice.toLocaleString()}
-이동평균값: ${aData.movingAverage.toLocaleString()}
-${aData.signal}`
-            )
-            .join("\n\n");
+    const title = `\n 🔔 일캔들 ${peirod}일 이동평균 신호 확인 🔔\n\n`;
+    const message = data
+        .map(
+            (aData) =>
+                `📈 [${aData.market}] 
+현재 가격: ${aData.currentPrice.toLocaleString()}원
+평균 가격: ${aData.movingAverage.toLocaleString()}원
+신호: ${aData.signal}`
+        )
+        .join("\n\n");
+
+    const messages = `${title}${message}\n`;
 
     console.log(messages);
 

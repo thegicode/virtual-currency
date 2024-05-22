@@ -5,3 +5,8 @@ const checkDailyMovingAverage_1 = require("./checkDailyMovingAverage");
 Object.defineProperty(exports, "checkDailyMovingAverage", { enumerable: true, get: function () { return checkDailyMovingAverage_1.checkDailyMovingAverage; } });
 const checkMinutesMovingAverage_1 = require("./checkMinutesMovingAverage");
 Object.defineProperty(exports, "checkMinutesMovingAverage", { enumerable: true, get: function () { return checkMinutesMovingAverage_1.checkMinutesMovingAverage; } });
+(() => {
+    const markets = ["KRW-BTC", "KRW-ETH", "KRW-SOL", "KRW-AVAX", "KRW-DOGE"];
+    (0, checkDailyMovingAverage_1.checkDailyMovingAverage)(markets, 5);
+    (0, checkMinutesMovingAverage_1.checkMinutesMovingAverage)(markets, 240, 5);
+})();

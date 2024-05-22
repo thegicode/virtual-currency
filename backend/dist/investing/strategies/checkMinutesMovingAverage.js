@@ -54,9 +54,9 @@ function getTradeInfos(markets, movingAveragePeriod, candleUnit) {
             return {
                 market,
                 averageTime: latestCandle.time,
-                averagePrice: movingAverage.toLocaleString(),
-                tickerTime: (0, utils_1.formatTimestampToKoreanTime)(ticker.trade_timestamp),
-                tickerTradePrice: ticker.trade_price.toLocaleString(),
+                averagePrice: movingAverage,
+                tickerTime: ticker.trade_timestamp,
+                tickerTradePrice: ticker.trade_price,
                 signal,
             };
         }));
@@ -64,13 +64,13 @@ function getTradeInfos(markets, movingAveragePeriod, candleUnit) {
     });
 }
 function formatTradeInfosMessage(tradeInfos, executionCount, candleUnit, movingAveragePeriod) {
-    const title = `\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod}이동평균 ${executionCount + 1}번째 전략 실행 🔔\n\n`;
+    const title = `\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod}이동평균 ${executionCount + 1}번째 실행 🔔\n\n`;
     const message = tradeInfos
         .map((info) => `📈 [${info.market}]
 평균 시간: ${info.averageTime}
-티커 시간: ${info.tickerTime}
-평균 가격: ${info.averagePrice} 원
-현재 가격: ${info.tickerTradePrice} 원
+티커 시간: ${(0, utils_1.formatTimestampToKoreanTime)(info.tickerTime)}
+평균 가격: ${info.averagePrice.toLocaleString()}원
+현재 가격: ${info.tickerTradePrice.toLocaleString()}원
 신호: ${info.signal}`)
         .join("\n\n");
     return `${title}${message}\n`;
