@@ -50,7 +50,7 @@ async function runBacktest(market: string) {
 
 async function fetchCandleData(market: string) {
     try {
-        return await fetchMinutes(market, "1", "200");
+        return await fetchMinutes(market, 1, 200);
     } catch (error) {
         console.warn(
             `Failed to fetch candle data for market ${market} : `,

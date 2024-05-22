@@ -20,7 +20,7 @@ function getCandlesMinutes(req, res) {
                 .json({ error: "Required query parameters: market, unit, count" });
         }
         try {
-            const candlesData = yield (0, fetchMinutes_1.fetchMinutes)(market, unit, count, to);
+            const candlesData = yield (0, fetchMinutes_1.fetchMinutes)(market, Number(unit), Number(count), to);
             res.json(candlesData);
         }
         catch (error) {

@@ -14,8 +14,8 @@ async function getCandlesMinutes(req: Request, res: Response) {
     try {
         const candlesData = await fetchMinutes(
             market as string,
-            unit as string,
-            count as string,
+            Number(unit) as TCandleUnit,
+            Number(count),
             to as string
         );
         res.json(candlesData);

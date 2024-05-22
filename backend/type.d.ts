@@ -32,3 +32,5 @@ interface IMovingAverageCheckResult {
     currentPrice: number;
     signal: string;
 }
+
+type TCandleUnit = 1 | 3 | 5 | 10 | 15 | 30 | 60 | 240;

@@ -2,19 +2,19 @@ import { URL } from "../../config";
 
 async function fetchMinutes(
     market: string,
-    unit: string,
-    count: string,
+    unit: TCandleUnit,
+    count: number,
     to?: string
 ) {
     try {
         const params = new URLSearchParams({
             market,
-            count: count,
+            count: count.toString(),
             ...(to && { to }),
         });
 
         const response = await fetch(
-            `${URL.candles_minutes}/${unit}?${params}`,
+            `${URL.candles_minutes}/${unit.toString()}?${params}`,
             {
                 method: "GET",
                 headers: {

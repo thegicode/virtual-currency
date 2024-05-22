@@ -14,8 +14,8 @@ const config_1 = require("../../config");
 function fetchMinutes(market, unit, count, to) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const params = new URLSearchParams(Object.assign({ market, count: count }, (to && { to })));
-            const response = yield fetch(`${config_1.URL.candles_minutes}/${unit}?${params}`, {
+            const params = new URLSearchParams(Object.assign({ market, count: count.toString() }, (to && { to })));
+            const response = yield fetch(`${config_1.URL.candles_minutes}/${unit.toString()}?${params}`, {
                 method: "GET",
                 headers: {
                     accept: "application/json",

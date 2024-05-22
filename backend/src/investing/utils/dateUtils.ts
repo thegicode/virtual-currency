@@ -6,25 +6,24 @@ export function formatTimestampToKoreanTime(trade_timestamp: number): string {
 
     // 한국 시간대(UTC+9)로 변환
     const options: Intl.DateTimeFormatOptions = {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
         timeZone: "Asia/Seoul",
-        timeZoneName: "short",
     };
 
-    // 한국 시간대 포맷팅
-    const koreanTime = new Intl.DateTimeFormat("ko-KR", options).format(date);
+    const koreanDate = new Intl.DateTimeFormat("ko-KR", options).format(date);
 
-    return koreanTime;
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
 
 // 예제 사용
-// const tradeTimestamp = 1672531199000; // 예시 Unix Timestamp
-// const formattedTime = formatTimestampToKoreanTime(tradeTimestamp);
+const tradeTimestamp = 1672531199000; // 예시 Unix Timestamp
+const formattedTime = formatTimestampToKoreanTime(tradeTimestamp);
 
-// console.log(formattedTime);
-// 결과 예시: 2023.01.01. 오후 12:59:59 KST
+console.log(formattedTime);
+// 결과 예시: 2024-05-22T20:00:00

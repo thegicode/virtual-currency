@@ -9,15 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.schedule4HourMA5TradeExecution = exports.execute4HourMA5Trade = void 0;
+exports.schedule4HourMA5TradeExecution = exports.execute4HourMATrade = void 0;
 const notifications_1 = require("../../notifications");
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
-function execute4HourMA5Trade(markets) {
+function execute4HourMATrade(markets, movingAvrageIndex) {
     return __awaiter(this, void 0, void 0, function* () {
         const tickers = yield (0, api_1.fetchTicker)(markets.join(", "));
         const promises = markets.map((market) => __awaiter(this, void 0, void 0, function* () {
-            const fetchData = yield (0, api_1.fetchMinutes)(market, "240", "5");
+            const fetchData = yield (0, api_1.fetchMinutes)(market, "240", movingAvrageIndex.toString());
             const movingAverage = (0, utils_1.calculateMovingAverage)(fetchData)[0];
             const aCandle = fetchData[fetchData.length - 1];
             const aTicker = tickers.find((t) => t.market === market);
@@ -39,22 +39,22 @@ function execute4HourMA5Trade(markets) {
         return yield Promise.all(promises);
     });
 }
-exports.execute4HourMA5Trade = execute4HourMA5Trade;
-function schedule4HourMA5TradeExecution(markets) {
+exports.execute4HourMATrade = execute4HourMATrade;
+function schedule4HourMA5TradeExecution(markets, movingAvrageIndex) {
     return __awaiter(this, void 0, void 0, function* () {
         let index = 0;
         const chatIds = (yield (0, notifications_1.getChatIds)());
-        yield generateAndSendTradeInfo(markets, chatIds, index);
+        yield generateAndSendTradeInfo(markets, chatIds, index, movingAvrageIndex);
         setInterval(() => __awaiter(this, void 0, void 0, function* () {
             ++index;
-            yield generateAndSendTradeInfo(markets, chatIds, index);
+            yield generateAndSendTradeInfo(markets, chatIds, index, movingAvrageIndex);
         }), 1000 * 60 * 240);
     });
 }
 exports.schedule4HourMA5TradeExecution = schedule4HourMA5TradeExecution;
-function generateAndSendTradeInfo(markets, chatIds, index) {
+function generateAndSendTradeInfo(markets, chatIds, index, movingAvrageIndex) {
     return __awaiter(this, void 0, void 0, function* () {
-        const tradeInfo = yield execute4HourMA5Trade(markets);
+        const tradeInfo = yield execute4HourMATrade(markets, movingAvrageIndex);
         const message = tradeInfo
             .map((info) => `[${info.market}]
 Average Time
@@ -69,7 +69,6 @@ Ticker Time
 | ${info.signal}`)
             .join("\n\n");
         const resultMessage = `240분 캔들의 5이동평균 전략\n\n{index: ${index}}\n\n ${message}`;
-        (0, notifications_1.sendMessagesToUsers)(message, chatIds);
         console.log(resultMessage);
     });
 }
