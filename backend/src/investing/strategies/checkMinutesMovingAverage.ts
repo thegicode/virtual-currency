@@ -93,7 +93,7 @@ async function getTradeInfos(
 
         return {
             market,
-            averageTime: latestCandle.time,
+            averageTime: latestCandle.date,
             averagePrice: movingAverage,
             tickerTime: ticker.trade_timestamp,
             tickerTradePrice: ticker.trade_price,
@@ -110,7 +110,7 @@ function formatTradeInfosMessage(
     candleUnit: TCandleUnit,
     movingAveragePeriod: number
 ) {
-    const title = `\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod}이동평균 ${
+    const title = `\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod} 이동평균 ${
         executionCount + 1
     }번째 실행 🔔\n\n`;
 

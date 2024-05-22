@@ -53,7 +53,7 @@ function getTradeInfos(markets, movingAveragePeriod, candleUnit) {
             const signal = ticker.trade_price > movingAverage ? "매수" : "매도";
             return {
                 market,
-                averageTime: latestCandle.time,
+                averageTime: latestCandle.date,
                 averagePrice: movingAverage,
                 tickerTime: ticker.trade_timestamp,
                 tickerTradePrice: ticker.trade_price,
@@ -64,7 +64,7 @@ function getTradeInfos(markets, movingAveragePeriod, candleUnit) {
     });
 }
 function formatTradeInfosMessage(tradeInfos, executionCount, candleUnit, movingAveragePeriod) {
-    const title = `\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod}이동평균 ${executionCount + 1}번째 실행 🔔\n\n`;
+    const title = `\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod} 이동평균 ${executionCount + 1}번째 실행 🔔\n\n`;
     const message = tradeInfos
         .map((info) => `📈 [${info.market}]
 평균 시간: ${info.averageTime}

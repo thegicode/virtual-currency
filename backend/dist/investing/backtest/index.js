@@ -15,16 +15,17 @@ Object.defineProperty(exports, "checkDailyMovingAverageBacktest", { enumerable: 
 const checkMinutesMovingAverageBacktest_1 = require("./checkMinutesMovingAverageBacktest");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const initialCapital = 10000;
         const markets = [
             "KRW-BTC",
             "KRW-ETH",
+            "KRW-SOL",
+            "KRW-AVAX",
             "KRW-DOGE",
-            "KRW-XRP",
-            "KRW-SBD",
         ];
-        const initialCapital = 10000;
-        console.log("-----------------------------------------\n");
-        yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 240, 5, initialCapital);
+        yield (0, checkDailyMovingAverageBacktest_1.checkDailyMovingAverageBacktest)(markets, 5, initialCapital);
+        console.log("-----------------------------------------");
+        yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 60, 10, initialCapital);
     }
     catch (error) {
         console.error("Error during backtesting: ", error);

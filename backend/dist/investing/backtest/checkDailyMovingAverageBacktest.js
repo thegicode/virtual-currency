@@ -15,9 +15,9 @@ const utils_1 = require("../utils");
 function checkDailyMovingAverageBacktest(markets, period = 3, initialCapital) {
     return __awaiter(this, void 0, void 0, function* () {
         const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () { return yield backtestMarket(market, period, initialCapital); })));
-        console.log("* Check Daily Moving Average backtest\n");
+        console.log(`\n 🔔 일캔들 ${period}일 이동평균 신호 확인 backtest 🔔\n`);
         results.forEach((result) => {
-            console.log(`[${result.market}]`);
+            console.log(`📈 [${result.market}]`);
             console.log(`Final Capital: ${result.capital}`);
             console.log(`Total Trades: ${result.trades}`);
             console.log(`Return Rate: ${result.returnRate.toFixed(2)}%`);
@@ -46,7 +46,7 @@ function backtestMarket(market, period, initialCapital) {
                 position = capital / currentPrice;
                 capital = 0;
                 trades++;
-                log.push(`[${candle.time}] Buy at ${currentPrice}`);
+                log.push(`[${candle.date}] Buy at ${currentPrice}`);
             }
             else if (currentPrice < movingAverage && position > 0) {
                 const sellPrice = currentPrice;
@@ -57,7 +57,7 @@ function backtestMarket(market, period, initialCapital) {
                 if (profit > 0) {
                     wins++;
                 }
-                log.push(`[${candle.time}] Sell at ${currentPrice}`);
+                log.push(`[${candle.date}] Sell at ${currentPrice}`);
             }
             const currentValue = capital + position * currentPrice;
             if (currentValue > peak) {

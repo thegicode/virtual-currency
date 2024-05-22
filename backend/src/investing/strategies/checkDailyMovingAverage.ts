@@ -55,8 +55,8 @@ async function checkMovingAverage(market: string, period: number) {
     }
 }
 
-function notifyResults(data: IMovingAverageCheckResult[], peirod: number) {
-    const title = `\n 🔔 일캔들 ${peirod}일 이동평균 신호 확인 🔔\n\n`;
+function notifyResults(data: IMovingAverageCheckResult[], period: number) {
+    const title = `\n 🔔 일캔들 ${period}일 이동평균 신호 확인 🔔\n\n`;
     const message = data
         .map(
             (aData) =>

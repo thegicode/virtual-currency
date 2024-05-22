@@ -28,7 +28,7 @@ export async function fetchDailyCandles(
         return data.reverse().map((aData: ICandle) => {
             return {
                 market: aData.market,
-                time: aData.candle_date_time_kst,
+                date: aData.candle_date_time_kst,
                 opening_price: Number(aData.opening_price),
                 trade_price: Number(aData.trade_price),
                 high_price: Number(aData.high_price),

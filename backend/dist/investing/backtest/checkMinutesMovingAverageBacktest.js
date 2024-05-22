@@ -15,14 +15,14 @@ const utils_1 = require("../utils");
 function checkMinutesMovingAverageBacktest(markets, candleUnit, movingAveragePeriod, initialCapital) {
     return __awaiter(this, void 0, void 0, function* () {
         const results = yield Promise.all(markets.map((market) => backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital)));
-        console.log("* Check Minutes Moving Average backtest\n");
+        console.log(`\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod} 이동평균 backtest 🔔\n`);
         results.forEach((result) => {
-            console.log(`[${result.market}]`);
+            console.log(`📈 [${result.market}]`);
             console.log(`Final Capital: ${Math.round(result.finalCapital).toLocaleString()}`);
             console.log(`Return Rate: ${result.returnRate.toFixed(2)}%`);
             console.log(`Trade Count: ${result.tradeCount}`);
             console.log(`Max Drawdown: ${result.maxDrawdown.toFixed(2)}%`);
-            console.log(`Win Rate: ${result.winRate.toFixed(2)}%\n`);
+            console.log(`Win Rate: ${result.winRate.toFixed(2)}%\n\n`);
         });
     });
 }
@@ -59,7 +59,7 @@ function backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital)
             }
             const currentCapital = capital + position * currentPrice;
             trades.push({
-                date: candle.candle_date_time_kst,
+                date: candle.date,
                 action,
                 price: currentPrice,
                 capital: currentCapital,

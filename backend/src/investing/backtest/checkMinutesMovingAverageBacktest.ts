@@ -39,16 +39,18 @@ export async function checkMinutesMovingAverageBacktest(
         )
     );
 
-    console.log("* Check Minutes Moving Average backtest\n");
+    console.log(
+        `\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod} 이동평균 backtest 🔔\n`
+    );
     results.forEach((result) => {
-        console.log(`[${result.market}]`);
+        console.log(`📈 [${result.market}]`);
         console.log(
             `Final Capital: ${Math.round(result.finalCapital).toLocaleString()}`
         );
         console.log(`Return Rate: ${result.returnRate.toFixed(2)}%`);
         console.log(`Trade Count: ${result.tradeCount}`);
         console.log(`Max Drawdown: ${result.maxDrawdown.toFixed(2)}%`);
-        console.log(`Win Rate: ${result.winRate.toFixed(2)}%\n`);
+        console.log(`Win Rate: ${result.winRate.toFixed(2)}%\n\n`);
     });
 }
 
@@ -91,7 +93,7 @@ async function backtestMarket(
 
         const currentCapital = capital + position * currentPrice;
         trades.push({
-            date: candle.candle_date_time_kst,
+            date: candle.date,
             action,
             price: currentPrice,
             capital: currentCapital,

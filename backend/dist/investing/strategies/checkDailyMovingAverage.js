@@ -46,8 +46,8 @@ function checkMovingAverage(market, period) {
         }
     });
 }
-function notifyResults(data, peirod) {
-    const title = `\n 🔔 일캔들 ${peirod}일 이동평균 신호 확인 🔔\n\n`;
+function notifyResults(data, period) {
+    const title = `\n 🔔 일캔들 ${period}일 이동평균 신호 확인 🔔\n\n`;
     const message = data
         .map((aData) => `📈 [${aData.market}] 
 현재 가격: ${aData.currentPrice.toLocaleString()}원

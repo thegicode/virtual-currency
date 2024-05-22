@@ -20,10 +20,10 @@ export async function checkDailyMovingAverageBacktest(
         )
     );
 
-    console.log("* Check Daily Moving Average backtest\n");
+    console.log(`\n 🔔 일캔들 ${period}일 이동평균 신호 확인 backtest 🔔\n`);
 
     results.forEach((result) => {
-        console.log(`[${result.market}]`);
+        console.log(`📈 [${result.market}]`);
         console.log(`Final Capital: ${result.capital}`);
         console.log(`Total Trades: ${result.trades}`);
         console.log(`Return Rate: ${result.returnRate.toFixed(2)}%`);
@@ -59,7 +59,7 @@ async function backtestMarket(
             position = capital / currentPrice;
             capital = 0;
             trades++;
-            log.push(`[${candle.time}] Buy at ${currentPrice}`);
+            log.push(`[${candle.date}] Buy at ${currentPrice}`);
         } else if (currentPrice < movingAverage && position > 0) {
             // Sell
             const sellPrice = currentPrice;
@@ -70,7 +70,7 @@ async function backtestMarket(
             if (profit > 0) {
                 wins++;
             }
-            log.push(`[${candle.time}] Sell at ${currentPrice}`);
+            log.push(`[${candle.date}] Sell at ${currentPrice}`);
         }
 
         // Calculate current total value
