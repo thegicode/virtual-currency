@@ -24,16 +24,16 @@ function executeMA5Trade240(markets) {
             if (!aTicker) {
                 throw new Error(`Ticker data for market ${market} not found`);
             }
-            const action = aTicker.trade_price > movingAverage
-                ? "Buy | Hold"
-                : "Sell | Reserve";
+            const signal = aTicker.trade_price > movingAverage
+                ? "매수 or 유지"
+                : "매도 or 유보";
             return {
                 market,
                 averageTime: aCandle.time,
                 averagePrice: movingAverage.toLocaleString(),
                 tickerItme: (0, utils_1.formatTimestampToKoreanTime)(aTicker.trade_timestamp),
                 ticekrTradePrice: aTicker.trade_price.toLocaleString(),
-                action,
+                signal,
             };
         }));
         return yield Promise.all(promises);
@@ -56,20 +56,19 @@ function generateAndSendTradeInfo(markets, chatIds, index) {
     return __awaiter(this, void 0, void 0, function* () {
         const tradeInfo = yield executeMA5Trade240(markets);
         const message = tradeInfo
-            .map((info) => `* ${info.market}
-- Average Time: 
- ${info.averageTime}
-- Ticker Time:
- ${info.tickerItme}
-- Average Price:
- ${info.averagePrice}
-- Ticker Trade Price:
- ${info.ticekrTradePrice}
-- Action:
- ${info.action}
-`)
+            .map((info) => `[${info.market}]
+Average Time
+| ${info.averageTime}
+Ticker Time
+| ${info.tickerItme}
+평균 가격
+| ${info.averagePrice}
+현재 가격
+| ${info.ticekrTradePrice}
+신호
+| ${info.signal}`)
             .join("\n\n");
-        const resultMessage = `{index: ${index}}\n\n ${message}`;
+        const resultMessage = `240분 캔들의 5이동평균 전략\n\n{index: ${index}}\n\n ${message}`;
         (0, notifications_1.sendMessagesToUsers)(message, chatIds);
         console.log(resultMessage);
     });

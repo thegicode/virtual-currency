@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const strategies_1 = require("./strategies");
+const executeMA5Trade240_1 = require("./strategies/executeMA5Trade240");
 (() => {
-    (0, strategies_1.checkDailyMovingAverage)(["KRW-BTC", "KRW-ETH", "KRW-XRP", "KRW-SBD", "KRW-DOGE"], 5);
+    (0, executeMA5Trade240_1.scheduleMA5Trade240Execution)(["KRW-BTC", "KRW-ETH", "KRW-SBD"]);
 })();

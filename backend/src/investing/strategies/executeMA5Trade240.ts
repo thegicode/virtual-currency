@@ -22,10 +22,10 @@ export async function executeMA5Trade240(markets: string[]) {
             throw new Error(`Ticker data for market ${market} not found`);
         }
 
-        const action =
+        const signal =
             aTicker.trade_price > movingAverage
-                ? "Buy | Hold"
-                : "Sell | Reserve";
+                ? "매수 or 유지"
+                : "매도 or 유보";
 
         return {
             market,
@@ -33,7 +33,7 @@ export async function executeMA5Trade240(markets: string[]) {
             averagePrice: movingAverage.toLocaleString(),
             tickerItme: formatTimestampToKoreanTime(aTicker.trade_timestamp),
             ticekrTradePrice: aTicker.trade_price.toLocaleString(),
-            action,
+            signal,
         };
     });
 
@@ -67,22 +67,21 @@ async function generateAndSendTradeInfo(
     const message = tradeInfo
         .map(
             (info) =>
-                `* ${info.market}
-- Average Time: 
- ${info.averageTime}
-- Ticker Time:
- ${info.tickerItme}
-- Average Price:
- ${info.averagePrice}
-- Ticker Trade Price:
- ${info.ticekrTradePrice}
-- Action:
- ${info.action}
-`
+                `[${info.market}]
+Average Time
+| ${info.averageTime}
+Ticker Time
+| ${info.tickerItme}
+평균 가격
+| ${info.averagePrice}
+현재 가격
+| ${info.ticekrTradePrice}
+신호
+| ${info.signal}`
         )
         .join("\n\n");
 
-    const resultMessage = `{index: ${index}}\n\n ${message}`;
+    const resultMessage = `240분 캔들의 5이동평균 전략\n\n{index: ${index}}\n\n ${message}`;
 
     sendMessagesToUsers(message, chatIds); // send telegram message
 
