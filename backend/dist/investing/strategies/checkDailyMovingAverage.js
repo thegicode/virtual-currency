@@ -30,7 +30,7 @@ function checkMovingAverage(market, period) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const fetchedData = yield (0, api_1.fetchDailyCandles)(market, period.toString());
-            const movingAverages = (0, utils_1.calculateMovingAverage)(fetchedData);
+            const movingAverages = (0, utils_1.calculateMovingAverage)(fetchedData, 5);
             const currentPrice = (yield (0, api_1.fetchTicker)(market))[0].trade_price;
             const latestMovingAverage = movingAverages[movingAverages.length - 1];
             const signal = currentPrice > latestMovingAverage
@@ -52,8 +52,8 @@ function notifyResults(data, peirod) {
     const messages = `${peirod}일 이동평균 신호 확인 \n\n` +
         data
             .map((aData) => `[${aData.market}] 
-이동평균값: ${aData.movingAverage.toLocaleString()}
 현재가격: ${aData.currentPrice.toLocaleString()}
+이동평균값: ${aData.movingAverage.toLocaleString()}
 ${aData.signal}`)
             .join("\n\n");
     console.log(messages);

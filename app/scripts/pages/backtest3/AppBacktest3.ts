@@ -86,7 +86,7 @@ export default class AppBacktest3 extends HTMLElement {
 
     private async setMarkets() {
         const marketAll = await this.getMarkets();
-        const idx = 40; // 40, 14%
+        const idx = 40; // 40, 6%
         // const idx = marketAll.length - 21;
         return marketAll.slice(idx, idx + 10).map((m: any) => m.market);
     }

@@ -2,7 +2,7 @@
  * checkDailyMovingAverage
  * 가상화폐의 5일 이동평균을 체크하고,
  * 그 결과에 따라 매수, 보유, 매도, 또는 유보를 결정
- * 일봉 데이터는 오전 9시 기준
+ * 일봉 데이터는 받는 데이터가 오전 9시 기준
  */
 
 import { sendTelegramMessageToChatId } from "../../notifications";
@@ -35,7 +35,7 @@ export async function checkDailyMovingAverage(
 async function checkMovingAverage(market: string, period: number) {
     try {
         const fetchedData = await fetchDailyCandles(market, period.toString());
-        const movingAverages = calculateMovingAverage(fetchedData);
+        const movingAverages = calculateMovingAverage(fetchedData, 5);
         const currentPrice = (await fetchTicker(market))[0].trade_price;
         const latestMovingAverage = movingAverages[movingAverages.length - 1];
 
@@ -65,8 +65,8 @@ function notifyResults(data: IMovingAverageCheckResult[], peirod: number) {
             .map(
                 (aData) =>
                     `[${aData.market}] 
-이동평균값: ${aData.movingAverage.toLocaleString()}
 현재가격: ${aData.currentPrice.toLocaleString()}
+이동평균값: ${aData.movingAverage.toLocaleString()}
 ${aData.signal}`
             )
             .join("\n\n");
