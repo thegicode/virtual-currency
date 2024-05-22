@@ -1,9 +1,9 @@
 import { checkDailyMovingAverage } from "./strategies";
-import { scheduleMA5Trade240Execution } from "./strategies/executeMA5Trade240";
+import { schedule4HourMA5TradeExecution } from "./strategies/execute4HourMA5Trade";
 
 (() => {
     // 240분캔들 기준 5 이동평균 확인
-    scheduleMA5Trade240Execution(["KRW-BTC", "KRW-ETH", "KRW-SBD"]);
+    schedule4HourMA5TradeExecution(["KRW-BTC", "KRW-ETH", "KRW-SBD"]);
 
     // 일캔들 기준 5일 이동평균 확인
     // checkDailyMovingAverage(

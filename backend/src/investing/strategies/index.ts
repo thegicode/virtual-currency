@@ -1,11 +1,11 @@
 import { checkDailyMovingAverage } from "./checkDailyMovingAverage";
 import {
-    executeMA5Trade240,
-    scheduleMA5Trade240Execution,
-} from "./executeMA5Trade240";
+    execute4HourMA5Trade,
+    schedule4HourMA5TradeExecution,
+} from "./execute4HourMA5Trade";
 
 export {
     checkDailyMovingAverage,
-    executeMA5Trade240,
-    scheduleMA5Trade240Execution,
+    execute4HourMA5Trade,
+    schedule4HourMA5TradeExecution,
 };

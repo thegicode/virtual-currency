@@ -7,7 +7,7 @@ import { calculateMovingAverage, formatTimestampToKoreanTime } from "../utils";
 // 5 이동평균선보다 낮으면 매도 또는 유보
 // 4시간마다 실행
 
-export async function executeMA5Trade240(markets: string[]) {
+export async function execute4HourMA5Trade(markets: string[]) {
     // 실시간 가격 가져오기
     const tickers = await fetchTicker(markets.join(", "));
 
@@ -40,7 +40,7 @@ export async function executeMA5Trade240(markets: string[]) {
     return await Promise.all(promises);
 }
 
-export async function scheduleMA5Trade240Execution(markets: string[]) {
+export async function schedule4HourMA5TradeExecution(markets: string[]) {
     let index = 0;
     const chatIds = (await getChatIds()) as number[];
 
@@ -63,7 +63,7 @@ async function generateAndSendTradeInfo(
     chatIds: number[],
     index: number
 ) {
-    const tradeInfo = await executeMA5Trade240(markets);
+    const tradeInfo = await execute4HourMA5Trade(markets);
     const message = tradeInfo
         .map(
             (info) =>
@@ -98,7 +98,7 @@ Ticker Time
             // "KRW-SBD",
             // "KRW-NEAR",
         ];
-        scheduleMA5Trade240Execution(markets);
+        schedule4HourMA5TradeExecution(markets);
     } catch (error) {
         console.error("Error executing trading strategy:", error);
     }
