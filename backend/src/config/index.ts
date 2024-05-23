@@ -1,3 +1,3 @@
-const { URL } = require("./URL");
+import { URL } from "./URL";
 
 export { URL };

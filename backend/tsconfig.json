@@ -5,7 +5,9 @@
         "module": "commonjs",
         "strict": true,
         "esModuleInterop": true,
+        "skipLibCheck": true,
         "removeComments": true,
+        "resolveJsonModule": true,
         "sourceMap": false,
         "rootDir": "./src",
         "outDir": "./dist"

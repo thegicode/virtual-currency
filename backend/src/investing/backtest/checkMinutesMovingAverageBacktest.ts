@@ -50,6 +50,9 @@ async function backtestMarket(
     let maxDrawdown = 0;
     let winCount = 0;
     let totalTrades = 0;
+    let buyPrice = 0;
+
+    // console.log(candles[0].date, candles[candles.length - 1].date);
 
     candles.forEach((candle: ICandle, index: number) => {
         if (index < movingAveragePeriod) return;
@@ -61,13 +64,15 @@ async function backtestMarket(
 
         if (currentPrice > movingAverage && capital > 0) {
             // 매수
+            buyPrice = currentPrice;
             position = capital / currentPrice;
             capital = 0;
             action = "매수";
         } else if (currentPrice < movingAverage && position > 0) {
             // 매도
             capital = position * currentPrice;
-            profit = capital - trades[trades.length - 1]?.capital!;
+            // profit = capital - trades[trades.length - 1]?.capital!;
+            profit = (currentPrice - buyPrice) * position;
             position = 0;
             action = "매도";
         }

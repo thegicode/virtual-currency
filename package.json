@@ -10,7 +10,7 @@
         "strategies": "node backend/dist/investing/strategies",
         "backtest": "node backend/dist/investing/backtest",
         "build": "npm run css-build & npm run html-build & npm run esbuild-build & npm run copy-assets-build & NODE_ENV=production node server/app",
-        "tsc": "tsc -w & tsc --project ./backend -w & tsc --project ./frontend -w",
+        "tsc": "tsc -w & tsc --project ./backend -w",
         "css": "sass --watch ./app/sass/:./dev/css/ --style=expanded --source-map",
         "css-build": "sass ./app/sass/:./static/css/ --style=compressed --no-source-map",
         "html": "nodemon --watch app/markup --ext html --exec \"npm run html-minify\"",
@@ -22,7 +22,7 @@
         "copy-assets-build": "ncp app/assets/ static/assets/",
         "eslint": "eslint app --ext .ts",
         "format": "prettier --write \"app/**/*.ts\"",
-        "test": "mocha --watch --recursive --require babel-core/register"
+        "test": "vitest"
     },
     "author": "thegicode",
     "license": "ISC",
@@ -52,6 +52,7 @@
         "sass": "^1.64.2",
         "ts-node": "^10.9.1",
         "typescript": "^5.1.6",
-        "uuid": "^9.0.1"
+        "uuid": "^9.0.1",
+        "vitest": "^1.6.0"
     }
 }
