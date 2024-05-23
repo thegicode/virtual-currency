@@ -1,5 +1,9 @@
-import { getChatIds, sendMessagesToUsers } from "../../notifications";
-import { fetchMinutes, fetchTicker } from "../../services/api";
+import {
+    getChatIds,
+    sendMessagesToUsers,
+    sendTelegramMessageToChatId,
+} from "../../notifications";
+import { fetchMinutesCandles, fetchTicker } from "../../services/api";
 import { calculateMovingAverage, formatTimestampToKoreanTime } from "../utils";
 
 // candleUnit분 캔들 기준으로 movingAveragePeriod 이동평균선을 구한 다음
@@ -57,15 +61,19 @@ async function executeAndNotify(
         movingAveragePeriod,
         candleUnit
     );
+
     const message = formatTradeInfosMessage(
         tradeInfos,
         executionCount,
         candleUnit,
         movingAveragePeriod
     );
+
     console.log(message);
+
     // send telegram message
     // sendMessagesToUsers(message, chatIds);
+    sendTelegramMessageToChatId(message);
 }
 
 async function getTradeInfos(
@@ -75,7 +83,7 @@ async function getTradeInfos(
 ) {
     // 5 이동평균과 실시간 가격 비교
     const promises = markets.map(async (market) => {
-        const candles = await fetchMinutes(
+        const candles = await fetchMinutesCandles(
             market,
             candleUnit,
             movingAveragePeriod
@@ -112,7 +120,7 @@ function formatTradeInfosMessage(
 ) {
     const title = `\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod} 이동평균 ${
         executionCount + 1
-    }번째 실행 🔔\n\n`;
+    }번째 실행\n\n`;
 
     const message = tradeInfos
         .map(

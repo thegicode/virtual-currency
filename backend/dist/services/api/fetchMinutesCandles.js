@@ -9,14 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchDailyCandles = void 0;
+exports.fetchMinutesCandles = void 0;
 const config_1 = require("../../config");
-function fetchDailyCandles(market, count, to) {
+function fetchMinutesCandles(market, unit, count, to) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const params = new URLSearchParams(Object.assign({ market,
-                count }, (to && { to })));
-            const response = yield fetch(`${config_1.URL.candles_days}?${params}`, {
+            const params = new URLSearchParams(Object.assign({ market, count: count.toString() }, (to && { to })));
+            const response = yield fetch(`${config_1.URL.candles_minutes}/${unit.toString()}?${params}`, {
                 method: "GET",
                 headers: {
                     accept: "application/json",
@@ -26,21 +25,20 @@ function fetchDailyCandles(market, count, to) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = yield response.json();
-            return data.reverse().map((aData) => {
-                return {
-                    market: aData.market,
-                    date_time: aData.candle_date_time_kst,
-                    opening_price: Number(aData.opening_price),
-                    trade_price: Number(aData.trade_price),
-                    high_price: Number(aData.high_price),
-                    low_price: Number(aData.low_price),
-                    candle_acc_trade_volume: Number(aData.candle_acc_trade_volume),
-                };
-            });
+            return data.reverse().map((aData) => ({
+                market: aData.market,
+                date: aData.candle_date_time_kst,
+                opening_price: Number(aData.opening_price),
+                trade_price: Number(aData.trade_price),
+                high_price: Number(aData.high_price),
+                low_price: Number(aData.low_price),
+                candle_acc_trade_volume: Number(aData.candle_acc_trade_volume),
+            }));
         }
         catch (error) {
-            console.warn("Error fetch daily candles:", error instanceof Error ? `${error.message} ${error.name}` : error);
+            console.error("Error fetching minutes:", error);
+            throw error;
         }
     });
 }
-exports.fetchDailyCandles = fetchDailyCandles;
+exports.fetchMinutesCandles = fetchMinutesCandles;

@@ -7,11 +7,17 @@ import { checkMinutesMovingAverageBacktest } from "./checkMinutesMovingAverageBa
     try {
         const initialCapital = 10000; // 초기 자본
         const markets = [
-            "KRW-BTC",
-            "KRW-ETH",
-            "KRW-SOL",
+            // "KRW-BTC",
+            // "KRW-ETH",
+            // "KRW-SOL",
+            // "KRW-AVAX",
+            // "KRW-DOGE",
+            "KRW-ZRX",
+            "KRW-NEAR",
+            "KRW-BTG",
+            "KRW-THETA",
             "KRW-AVAX",
-            "KRW-DOGE",
+            // "KRW-SHIB",
         ];
 
         // checkDailyMovingAverage

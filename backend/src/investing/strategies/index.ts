@@ -4,7 +4,22 @@ import { checkMinutesMovingAverage } from "./checkMinutesMovingAverage";
 export { checkDailyMovingAverage, checkMinutesMovingAverage };
 
 (() => {
-    const markets = ["KRW-BTC", "KRW-ETH", "KRW-SOL", "KRW-AVAX", "KRW-DOGE"];
+    const markets = [
+        // "KRW-BTC",
+        // "KRW-ETH",
+        // "KRW-DOGE",
+        // "KRW-SOL",
+        // "KRW-BCH",
+        // "KRW-XRP",
+        // "KRW-GRS",
+        // "KRW-CTC",
+        // "KRW-ZRX",
+        "KRW-NEAR",
+        "KRW-BTG",
+        "KRW-THETA",
+        "KRW-AVAX",
+        "KRW-SHIB",
+    ];
     // 일캔들 기준 5일 이동평균 확인
     checkDailyMovingAverage(markets, 5);
 

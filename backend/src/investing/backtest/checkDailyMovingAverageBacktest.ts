@@ -1,6 +1,6 @@
 /**
  * checkDailyMovingAverage backtest
- * 가상화폐의 5일 이동평균을 체크하고,
+ * 가상화폐의  이동평균을 체크하고,
  * 그 결과에 따라 매수, 보유, 매도, 또는 유보를 결정
  * 일봉 데이터는 받는 데이터가 오전 9시 기준
  */
@@ -20,18 +20,20 @@ export async function checkDailyMovingAverageBacktest(
         )
     );
 
-    console.log(`\n 🔔 일캔들 ${period}일 이동평균 신호 확인 backtest 🔔\n`);
+    console.log(`\n🔔 일 캔들 ${period}일 이동평균 backtest\n`);
 
     results.forEach((result) => {
         console.log(`📈 [${result.market}]`);
-        console.log(`Final Capital: ${result.capital}`);
         console.log(`Total Trades: ${result.trades}`);
+        console.log(`Final Capital: ${result.capital}원`);
         console.log(`Return Rate: ${result.returnRate.toFixed(2)}%`);
         console.log(`Maximum Drawdown (MDD): ${result.mdd.toFixed(2)}%`);
         console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
         // console.log("Trade Log:", result.log.join("\n"));
         console.log("");
     });
+
+    // return results;
 }
 
 async function backtestMarket(
@@ -48,29 +50,38 @@ async function backtestMarket(
     let wins = 0;
     let peak = initialCapital;
     let mdd = 0;
+    let buyPrice = 0;
     const log: string[] = [];
 
     candles.slice(period).forEach((candle, index) => {
+        // console.log("\nindex", index);
         const currentPrice = candle.trade_price;
         const movingAverage = movingAverages[index];
 
         if (currentPrice > movingAverage && capital > 0) {
             // Buy
+            buyPrice = currentPrice;
             position = capital / currentPrice;
             capital = 0;
             trades++;
-            log.push(`[${candle.date_time}] Buy at ${currentPrice}`);
+            log.push(
+                `${index} [${
+                    candle.date_time
+                }] Buy Price  ${currentPrice} | position ${position.toFixed(2)}`
+            );
         } else if (currentPrice < movingAverage && position > 0) {
             // Sell
             const sellPrice = currentPrice;
-            const profit = sellPrice * position - position * movingAverage;
+            const profit = (sellPrice - buyPrice) * position;
             capital = position * sellPrice;
             position = 0;
             trades++;
             if (profit > 0) {
                 wins++;
             }
-            log.push(`[${candle.date_time}] Sell at ${currentPrice}`);
+            log.push(
+                `${index} [${candle.date_time}] Sell Price ${currentPrice}`
+            );
         }
 
         // Calculate current total value

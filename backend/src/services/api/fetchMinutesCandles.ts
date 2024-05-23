@@ -1,6 +1,6 @@
 import { URL } from "../../config";
 
-async function fetchMinutes(
+export async function fetchMinutesCandles(
     market: string,
     unit: TCandleUnit,
     count: number,
@@ -42,5 +42,3 @@ async function fetchMinutes(
         throw error;
     }
 }
-
-export { fetchMinutes };

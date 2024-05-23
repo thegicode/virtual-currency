@@ -9,24 +9,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMinutesCandles = void 0;
-const fetchMinutes_1 = require("../services/api/fetchMinutes");
-function getMinutesCandles(req, res) {
+exports.handleGetMinutesCandles = void 0;
+const fetchMinutesCandles_1 = require("../services/api/fetchMinutesCandles");
+function handleGetMinutesCandles(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { market, unit, count, to } = req.query;
         if (!market || !unit || !count) {
-            return res
-                .status(400)
-                .json({ error: "Required query parameters: market, unit, count" });
+            res.status(400).json({
+                error: "Missing required query parameters: market, unit, count",
+            });
+            return;
         }
         try {
-            const candlesData = yield (0, fetchMinutes_1.fetchMinutes)(market, Number(unit), Number(count), to);
-            res.json(candlesData);
+            const candlesData = yield (0, fetchMinutesCandles_1.fetchMinutesCandles)(market, parseInt(unit), parseInt(count), to);
+            res.status(200).json(candlesData);
         }
         catch (error) {
-            console.error("Error in getMinutesCandles:", error);
+            console.error("Error in handleGetMinutesCandles:", error);
             res.status(500).json({ error: "Failed to fetch candles data" });
         }
     });
 }
-exports.getMinutesCandles = getMinutesCandles;
+exports.handleGetMinutesCandles = handleGetMinutesCandles;

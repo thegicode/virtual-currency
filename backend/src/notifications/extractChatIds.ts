@@ -34,3 +34,7 @@ function extractChatIds(updates: any[]) {
 
     return Array.from(chatIds);
 }
+
+(async () => {
+    const result = await getChatIds();
+})();

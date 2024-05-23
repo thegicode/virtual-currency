@@ -38,15 +38,17 @@ function executeAndNotify(movingAveragePeriod, executionCount, markets, candleUn
         const tradeInfos = yield getTradeInfos(markets, movingAveragePeriod, candleUnit);
         const message = formatTradeInfosMessage(tradeInfos, executionCount, candleUnit, movingAveragePeriod);
         console.log(message);
+        (0, notifications_1.sendTelegramMessageToChatId)(message);
     });
 }
 function getTradeInfos(markets, movingAveragePeriod, candleUnit) {
     return __awaiter(this, void 0, void 0, function* () {
         const promises = markets.map((market) => __awaiter(this, void 0, void 0, function* () {
-            const candles = yield (0, api_1.fetchMinutes)(market, candleUnit, movingAveragePeriod);
+            const candles = yield (0, api_1.fetchMinutesCandles)(market, candleUnit, movingAveragePeriod);
             const movingAverage = (0, utils_1.calculateMovingAverage)(candles)[0];
             const latestCandle = candles[candles.length - 1];
             const ticker = (yield (0, api_1.fetchTicker)(market))[0];
+            console.log(ticker);
             if (!ticker) {
                 throw new Error(`Ticker data for market ${market} not found`);
             }
@@ -64,7 +66,7 @@ function getTradeInfos(markets, movingAveragePeriod, candleUnit) {
     });
 }
 function formatTradeInfosMessage(tradeInfos, executionCount, candleUnit, movingAveragePeriod) {
-    const title = `\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod} 이동평균 ${executionCount + 1}번째 실행 🔔\n\n`;
+    const title = `\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod} 이동평균 ${executionCount + 1}번째 실행\n\n`;
     const message = tradeInfos
         .map((info) => `📈 [${info.market}]
 평균 시간: ${info.averageTime}

@@ -50,7 +50,7 @@ function runBacktest(market) {
 function fetchCandleData(market) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            return yield (0, api_1.fetchMinutes)(market, 1, 200);
+            return yield (0, api_1.fetchMinutesCandles)(market, 1, 200);
         }
         catch (error) {
             console.warn(`Failed to fetch candle data for market ${market} : `, error instanceof Error ? error.message : error);

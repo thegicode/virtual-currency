@@ -1,5 +1,5 @@
 import { fetchDailyCandles } from "./fetchDailyCandles";
-import { fetchMinutes } from "./fetchMinutes";
+import { fetchMinutesCandles } from "./fetchMinutesCandles";
 import { fetchTicker } from "./fetchTicker";
 
-export { fetchDailyCandles, fetchMinutes, fetchTicker };
+export { fetchDailyCandles, fetchMinutesCandles, fetchTicker };

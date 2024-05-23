@@ -17,11 +17,11 @@ const checkMinutesMovingAverageBacktest_1 = require("./checkMinutesMovingAverage
     try {
         const initialCapital = 10000;
         const markets = [
-            "KRW-BTC",
-            "KRW-ETH",
-            "KRW-SOL",
+            "KRW-ZRX",
+            "KRW-NEAR",
+            "KRW-BTG",
+            "KRW-THETA",
             "KRW-AVAX",
-            "KRW-DOGE",
         ];
         yield (0, checkDailyMovingAverageBacktest_1.checkDailyMovingAverageBacktest)(markets, 5, initialCapital);
         console.log("-----------------------------------------");

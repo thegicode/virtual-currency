@@ -15,12 +15,12 @@ const utils_1 = require("../utils");
 function checkMinutesMovingAverageBacktest(markets, candleUnit, movingAveragePeriod, initialCapital) {
     return __awaiter(this, void 0, void 0, function* () {
         const results = yield Promise.all(markets.map((market) => backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital)));
-        console.log(`\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod} 이동평균 backtest 🔔\n`);
+        console.log(`\n🔔 ${candleUnit}분캔들 ${movingAveragePeriod} 이동평균 backtest\n`);
         results.forEach((result) => {
             console.log(`📈 [${result.market}]`);
+            console.log(`Trade Count: ${result.tradeCount}`);
             console.log(`Final Capital: ${Math.round(result.finalCapital).toLocaleString()}`);
             console.log(`Return Rate: ${result.returnRate.toFixed(2)}%`);
-            console.log(`Trade Count: ${result.tradeCount}`);
             console.log(`Max Drawdown: ${result.maxDrawdown.toFixed(2)}%`);
             console.log(`Win Rate: ${result.winRate.toFixed(2)}%\n\n`);
         });
@@ -29,7 +29,7 @@ function checkMinutesMovingAverageBacktest(markets, candleUnit, movingAveragePer
 exports.checkMinutesMovingAverageBacktest = checkMinutesMovingAverageBacktest;
 function backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital) {
     return __awaiter(this, void 0, void 0, function* () {
-        const candles = yield (0, api_1.fetchMinutes)(market, candleUnit, 200);
+        const candles = yield (0, api_1.fetchMinutesCandles)(market, candleUnit, 200);
         const movingAverages = (0, utils_1.calculateMovingAverage)(candles);
         const trades = [];
         let capital = initialCapital;

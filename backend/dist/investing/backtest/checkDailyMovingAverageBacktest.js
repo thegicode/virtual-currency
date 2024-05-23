@@ -15,11 +15,11 @@ const utils_1 = require("../utils");
 function checkDailyMovingAverageBacktest(markets, period = 3, initialCapital) {
     return __awaiter(this, void 0, void 0, function* () {
         const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () { return yield backtestMarket(market, period, initialCapital); })));
-        console.log(`\n 🔔 일캔들 ${period}일 이동평균 신호 확인 backtest 🔔\n`);
+        console.log(`\n🔔 일 캔들 ${period}일 이동평균 backtest\n`);
         results.forEach((result) => {
             console.log(`📈 [${result.market}]`);
-            console.log(`Final Capital: ${result.capital}`);
             console.log(`Total Trades: ${result.trades}`);
+            console.log(`Final Capital: ${result.capital}원`);
             console.log(`Return Rate: ${result.returnRate.toFixed(2)}%`);
             console.log(`Maximum Drawdown (MDD): ${result.mdd.toFixed(2)}%`);
             console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
@@ -38,26 +38,28 @@ function backtestMarket(market, period, initialCapital) {
         let wins = 0;
         let peak = initialCapital;
         let mdd = 0;
+        let buyPrice = 0;
         const log = [];
         candles.slice(period).forEach((candle, index) => {
             const currentPrice = candle.trade_price;
             const movingAverage = movingAverages[index];
             if (currentPrice > movingAverage && capital > 0) {
+                buyPrice = currentPrice;
                 position = capital / currentPrice;
                 capital = 0;
                 trades++;
-                log.push(`[${candle.date_time}] Buy at ${currentPrice}`);
+                log.push(`${index} [${candle.date_time}] Buy Price  ${currentPrice} | position ${position.toFixed(2)}`);
             }
             else if (currentPrice < movingAverage && position > 0) {
                 const sellPrice = currentPrice;
-                const profit = sellPrice * position - position * movingAverage;
+                const profit = (sellPrice - buyPrice) * position;
                 capital = position * sellPrice;
                 position = 0;
                 trades++;
                 if (profit > 0) {
                     wins++;
                 }
-                log.push(`[${candle.date_time}] Sell at ${currentPrice}`);
+                log.push(`${index} [${candle.date_time}] Sell Price ${currentPrice}`);
             }
             const currentValue = capital + position * currentPrice;
             if (currentValue > peak) {

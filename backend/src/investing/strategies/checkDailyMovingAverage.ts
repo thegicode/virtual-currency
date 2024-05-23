@@ -22,7 +22,7 @@ export async function checkDailyMovingAverage(
         );
 
         const validResults = results.filter(
-            (result): result is IMovingAverageCheckResult =>
+            (result): result is IDailyMovingAverageResult =>
                 result !== undefined
         );
 
@@ -55,7 +55,7 @@ async function checkMovingAverage(market: string, period: number) {
     }
 }
 
-function notifyResults(data: IMovingAverageCheckResult[], period: number) {
+function notifyResults(data: IDailyMovingAverageResult[], period: number) {
     const title = `\n 🔔 일캔들 ${period}일 이동평균 신호 확인 🔔\n\n`;
     const message = data
         .map(

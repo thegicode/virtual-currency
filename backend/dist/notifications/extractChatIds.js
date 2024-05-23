@@ -46,3 +46,6 @@ function extractChatIds(updates) {
     });
     return Array.from(chatIds);
 }
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield getChatIds();
+}))();

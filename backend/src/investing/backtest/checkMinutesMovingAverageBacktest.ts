@@ -1,26 +1,7 @@
 // backend/investing/backtest/movingAverageTradeBacktest.ts
 
-import { fetchMinutes } from "../../services/api";
+import { fetchMinutesCandles } from "../../services/api";
 import { calculateMovingAverage } from "../utils";
-
-interface BacktestResult {
-    market: string;
-    trades: Trade[];
-    finalCapital: number;
-    tradeCount: number;
-    returnRate: number;
-    maxDrawdown: number;
-    winRate: number;
-}
-
-interface Trade {
-    date: string;
-    action: string;
-    price: number;
-    capital: number;
-    position: number;
-    profit?: number;
-}
 
 export async function checkMinutesMovingAverageBacktest(
     markets: string[],
@@ -40,15 +21,15 @@ export async function checkMinutesMovingAverageBacktest(
     );
 
     console.log(
-        `\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod} 이동평균 backtest 🔔\n`
+        `\n🔔 ${candleUnit}분캔들 ${movingAveragePeriod} 이동평균 backtest\n`
     );
     results.forEach((result) => {
         console.log(`📈 [${result.market}]`);
+        console.log(`Trade Count: ${result.tradeCount}`);
         console.log(
             `Final Capital: ${Math.round(result.finalCapital).toLocaleString()}`
         );
         console.log(`Return Rate: ${result.returnRate.toFixed(2)}%`);
-        console.log(`Trade Count: ${result.tradeCount}`);
         console.log(`Max Drawdown: ${result.maxDrawdown.toFixed(2)}%`);
         console.log(`Win Rate: ${result.winRate.toFixed(2)}%\n\n`);
     });
@@ -59,10 +40,10 @@ async function backtestMarket(
     candleUnit: TCandleUnit,
     movingAveragePeriod: number,
     initialCapital: number
-): Promise<BacktestResult> {
-    const candles = await fetchMinutes(market, candleUnit, 200);
+) {
+    const candles = await fetchMinutesCandles(market, candleUnit, 200);
     const movingAverages = calculateMovingAverage(candles);
-    const trades: Trade[] = [];
+    const trades: IMinutesMovingAverageBacktestTrade[] = [];
     let capital = initialCapital;
     let position = 0;
     let maxCapital = initialCapital;

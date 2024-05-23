@@ -9,28 +9,37 @@ interface ICandle {
     candle_acc_trade_volume: number;
 }
 
-interface ICandleMinuteRSI extends ICandle {
+interface ICrypto {
+    symbol: string;
+    candles: ICandle[];
+}
+
+interface IDailyMovingAverageResult {
+    market: string;
+    movingAverage: number;
+    currentPrice: number;
+    signal: string;
+}
+
+interface IMinutesCandleRSI extends ICandle {
     rsi?: number;
     signal?: number;
     capital?: number;
 }
 
-interface ICrypto {
-    symbol: string;
-    candles: ICandle[];
+interface IMinutesMovingAverageBacktestTrade {
+    date: string;
+    action: string;
+    price: number;
+    capital: number;
+    position: number;
+    profit?: number;
 }
 
 interface ITicker {
     market: string;
     trade_price: number;
     trade_timestamp: string;
-}
-
-interface IMovingAverageCheckResult {
-    market: string;
-    movingAverage: number;
-    currentPrice: number;
-    signal: string;
 }
 
 type TCandleUnit = 1 | 3 | 5 | 10 | 15 | 30 | 60 | 240;

@@ -1,5 +1,5 @@
 import { sendTelegramMessageToChatId } from "../../notifications";
-import { fetchMinutes } from "../../services/api";
+import { fetchMinutesCandles } from "../../services/api";
 
 const RSI_PERIOD = 14; // RSI 기간
 const OVERBOUGHT_THRESHOLD = 70; // 과매수 기준
@@ -28,7 +28,7 @@ async function runBacktests() {
 
 async function runBacktest(market: string) {
     try {
-        const data: ICandleMinuteRSI[] = await fetchCandleData(market);
+        const data: IMinutesCandleRSI[] = await fetchCandleData(market);
 
         // RSI 계산 및 전략 적용
         calculateRSI(data);
@@ -50,7 +50,7 @@ async function runBacktest(market: string) {
 
 async function fetchCandleData(market: string) {
     try {
-        return await fetchMinutes(market, 1, 200);
+        return await fetchMinutesCandles(market, 1, 200);
     } catch (error) {
         console.warn(
             `Failed to fetch candle data for market ${market} : `,
@@ -59,7 +59,7 @@ async function fetchCandleData(market: string) {
     }
 }
 
-function calculateRSI(data: ICandleMinuteRSI[]) {
+function calculateRSI(data: IMinutesCandleRSI[]) {
     const period = RSI_PERIOD;
     let gains = 0;
     let losses = 0;
@@ -92,7 +92,7 @@ function calculateRSI(data: ICandleMinuteRSI[]) {
     }
 }
 
-function generateRSISignals(data: ICandleMinuteRSI[]) {
+function generateRSISignals(data: IMinutesCandleRSI[]) {
     data.forEach((aData) => {
         if (aData.rsi !== undefined) {
             if (aData.rsi > OVERBOUGHT_THRESHOLD) {
@@ -107,7 +107,7 @@ function generateRSISignals(data: ICandleMinuteRSI[]) {
 }
 
 /* function generateRSISignals(
-    data: ICandleMinuteRSI[],
+    data: IMinutesCandleRSI[],
     oversold: number,
     overbought: number
 ): void {
@@ -129,8 +129,8 @@ function generateRSISignals(data: ICandleMinuteRSI[]) {
     });
 } */
 
-function executeBacktest(data: ICandleMinuteRSI[]): {
-    data: ICandleMinuteRSI[];
+function executeBacktest(data: IMinutesCandleRSI[]): {
+    data: IMinutesCandleRSI[];
     tradeCount: number;
 } {
     let capital = INITIAL_CAPITAL;
@@ -168,7 +168,7 @@ function logResults(
     console.log(`Trade Count: ${tradeCount} \n`);
 }
 
-function checkAndNotifyLatestSignal(data: ICandleMinuteRSI[], market: string) {
+function checkAndNotifyLatestSignal(data: IMinutesCandleRSI[], market: string) {
     const latestData = data[data.length - 1];
     const latestSignal = latestData.signal;
 
