@@ -6,8 +6,9 @@ import {
 import { fetchMinutesCandles, fetchTicker } from "../../services/api";
 import {
     calculateMovingAverage,
+    formatDateString,
     formatPrice,
-    formatTimestampToKoreanTime,
+    formatTimeString,
 } from "../utils";
 
 // candleUnit분 캔들 기준으로 movingAveragePeriod 이동평균선을 구한 다음
@@ -97,7 +98,10 @@ async function getTradeInfos(
         const latestCandle = candles[candles.length - 1];
         const ticker = (await fetchTicker(market))[0];
 
-        // console.log("ticker", ticker);
+        const tickerDate =
+            formatDateString(ticker.trade_date_kst) +
+            "T" +
+            formatTimeString(ticker.trade_time_kst);
 
         if (!ticker) {
             throw new Error(`Ticker data for market ${market} not found`);
@@ -109,7 +113,7 @@ async function getTradeInfos(
             market,
             averageTime: latestCandle.date,
             averagePrice: movingAverage,
-            tickerTime: ticker.trade_timestamp,
+            tickerDate,
             tickerTradePrice: ticker.trade_price,
             signal,
         };
@@ -132,7 +136,7 @@ function formatTradeInfosMessage(
         .map((info) => {
             return `📈 [${info.market}]
 평균 시간: ${info.averageTime}
-티커 시간: ${formatTimestampToKoreanTime(info.tickerTime)}
+티커 시간: ${info.tickerDate}
 평균 가격: ${formatPrice(info.averagePrice)}원
 현재 가격: ${formatPrice(info.tickerTradePrice)}원
 신호: ${info.signal}`;

@@ -47,6 +47,9 @@ function getTradeInfos(markets, movingAveragePeriod, candleUnit) {
             const movingAverage = (0, utils_1.calculateMovingAverage)(candles)[0];
             const latestCandle = candles[candles.length - 1];
             const ticker = (yield (0, api_1.fetchTicker)(market))[0];
+            const tickerDate = (0, utils_1.formatDateString)(ticker.trade_date_kst) +
+                "T" +
+                (0, utils_1.formatTimeString)(ticker.trade_time_kst);
             if (!ticker) {
                 throw new Error(`Ticker data for market ${market} not found`);
             }
@@ -55,7 +58,7 @@ function getTradeInfos(markets, movingAveragePeriod, candleUnit) {
                 market,
                 averageTime: latestCandle.date,
                 averagePrice: movingAverage,
-                tickerTime: ticker.trade_timestamp,
+                tickerDate,
                 tickerTradePrice: ticker.trade_price,
                 signal,
             };
@@ -69,7 +72,7 @@ function formatTradeInfosMessage(tradeInfos, executionCount, candleUnit, movingA
         .map((info) => {
         return `📈 [${info.market}]
 평균 시간: ${info.averageTime}
-티커 시간: ${(0, utils_1.formatTimestampToKoreanTime)(info.tickerTime)}
+티커 시간: ${info.tickerDate}
 평균 가격: ${(0, utils_1.formatPrice)(info.averagePrice)}원
 현재 가격: ${(0, utils_1.formatPrice)(info.tickerTradePrice)}원
 신호: ${info.signal}`;

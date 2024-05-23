@@ -1,20 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.formatTimestampToKoreanTime = void 0;
-function formatTimestampToKoreanTime(trade_timestamp) {
-    const date = new Date(trade_timestamp);
-    const options = {
-        timeZone: "Asia/Seoul",
-    };
-    const koreanDate = new Intl.DateTimeFormat("ko-KR", options).format(date);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+exports.formatTimeString = exports.formatDateString = void 0;
+function formatDateString(dateString) {
+    if (dateString.length !== 8 || !/^\d{8}$/.test(dateString)) {
+        throw new Error("Invalid date string format");
+    }
+    const year = dateString.slice(0, 4);
+    const month = dateString.slice(4, 6);
+    const day = dateString.slice(6, 8);
+    return `${year}-${month}-${day}`;
 }
-exports.formatTimestampToKoreanTime = formatTimestampToKoreanTime;
-const tradeTimestamp = 1672531199000;
-const formattedTime = formatTimestampToKoreanTime(tradeTimestamp);
+exports.formatDateString = formatDateString;
+function formatTimeString(timeString) {
+    if (timeString.length !== 6 || !/^\d{6}$/.test(timeString)) {
+        throw new Error("Invalid time string format");
+    }
+    const hours = timeString.slice(0, 2);
+    const minutes = timeString.slice(2, 4);
+    const seconds = timeString.slice(4, 6);
+    return `${hours}:${minutes}:${seconds}`;
+}
+exports.formatTimeString = formatTimeString;

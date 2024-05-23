@@ -1,29 +1,25 @@
 // backend/investing/utils/dateUtils.ts
 
-export function formatTimestampToKoreanTime(trade_timestamp: number): string {
-    // Unix Timestamp를 밀리초로 변환
-    const date = new Date(trade_timestamp);
+export function formatDateString(dateString: string): string {
+    if (dateString.length !== 8 || !/^\d{8}$/.test(dateString)) {
+        throw new Error("Invalid date string format");
+    }
 
-    // 한국 시간대(UTC+9)로 변환
-    const options: Intl.DateTimeFormatOptions = {
-        timeZone: "Asia/Seoul",
-    };
+    const year = dateString.slice(0, 4);
+    const month = dateString.slice(4, 6);
+    const day = dateString.slice(6, 8);
 
-    const koreanDate = new Intl.DateTimeFormat("ko-KR", options).format(date);
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    return `${year}-${month}-${day}`;
 }
 
-// 예제 사용
-const tradeTimestamp = 1672531199000; // 예시 Unix Timestamp
-const formattedTime = formatTimestampToKoreanTime(tradeTimestamp);
+export function formatTimeString(timeString: string): string {
+    if (timeString.length !== 6 || !/^\d{6}$/.test(timeString)) {
+        throw new Error("Invalid time string format");
+    }
 
-// console.log(formattedTime);
-// 결과 예시: 2024-05-22T20:00:00
+    const hours = timeString.slice(0, 2);
+    const minutes = timeString.slice(2, 4);
+    const seconds = timeString.slice(4, 6);
+
+    return `${hours}:${minutes}:${seconds}`;
+}
