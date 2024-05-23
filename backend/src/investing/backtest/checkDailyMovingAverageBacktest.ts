@@ -33,7 +33,7 @@ export async function checkDailyMovingAverageBacktest(
         console.log("");
     });
 
-    // return results;
+    return results;
 }
 
 async function backtestMarket(
@@ -52,9 +52,9 @@ async function backtestMarket(
     let mdd = 0;
     let buyPrice = 0;
     const log: string[] = [];
+    const tradeData = [];
 
     candles.slice(period).forEach((candle, index) => {
-        // console.log("\nindex", index);
         const currentPrice = candle.trade_price;
         const movingAverage = movingAverages[index];
 
@@ -80,7 +80,7 @@ async function backtestMarket(
                 wins++;
             }
             log.push(
-                `${index} [${candle.date_time}] Sell Price ${currentPrice}`
+                `${index} [${candle.date_time}] Sell Price ${currentPrice} | capital ${capital}`
             );
         }
 

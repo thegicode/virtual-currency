@@ -25,6 +25,7 @@ function checkDailyMovingAverageBacktest(markets, period = 3, initialCapital) {
             console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
             console.log("");
         });
+        return results;
     });
 }
 exports.checkDailyMovingAverageBacktest = checkDailyMovingAverageBacktest;
@@ -40,6 +41,7 @@ function backtestMarket(market, period, initialCapital) {
         let mdd = 0;
         let buyPrice = 0;
         const log = [];
+        const tradeData = [];
         candles.slice(period).forEach((candle, index) => {
             const currentPrice = candle.trade_price;
             const movingAverage = movingAverages[index];
@@ -59,7 +61,7 @@ function backtestMarket(market, period, initialCapital) {
                 if (profit > 0) {
                     wins++;
                 }
-                log.push(`${index} [${candle.date_time}] Sell Price ${currentPrice}`);
+                log.push(`${index} [${candle.date_time}] Sell Price ${currentPrice} | capital ${capital}`);
             }
             const currentValue = capital + position * currentPrice;
             if (currentValue > peak) {

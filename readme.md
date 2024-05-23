@@ -62,34 +62,18 @@ my-project/
 │ ├── src/
 │ │ ├── components/
 │ │ ├── styles/
-│ │ ├── strategies/
+│ │ ├── scripts/
+│ │ │ ├── components/
+│ │ │ ├── pages/
 │ │ ├── index.tsx
 │ │ └── ...
 │ └── dist/
-│ ├── components/
-│ ├── styles/
-│ ├── strategies/
-│ ├── index.js
-│ └── ...
+│ | ├── components/
+│ | ├── styles/
+│ | ├── js/
+│ | ├── index.js
+│ | └── ...
 │
-├── backend/
-│ ├── src/
-│ │ ├── controllers/
-│ │ ├── models/
-│ │ ├── routes/
-│ │ ├── services/
-│ │ ├── investing/ // 새로운 투자 전략 폴더
-│ │ ├── index.ts
-│ │ └── ...
-│ └── dist/
-│ ├── controllers/
-│ ├── models/
-│ ├── routes/
-│ ├── services/
-│ ├── investing/ // 컴파일된 투자 전략 폴더
-│ ├── index.js
-│ └── ...
-
 backend/
 └── src/
 ├── controllers/
@@ -97,23 +81,15 @@ backend/
 ├── routes/
 ├── services/
 ├── investing/
+│ ├── backtest/
 │ ├── strategies/
-│ │ ├── meanReversionStrategy.ts
-│ │ ├── momentumStrategy.ts
-│ │ └── volatilityBreakoutStrategy.ts
-│ ├── analysis/
-│ │ ├── backtesting.ts
-│ │ ├── performanceMetrics.ts
-│ │ └── riskManagement.ts
-│ ├── simulation/
-│ │ ├── runSimulation.ts
-│ │ └── simulateTrades.ts
 │ └── utils/
-│ ├── mathUtils.ts
-│ ├── dateUtils.ts
-│ └── apiUtils.ts
+│ | ├── mathUtils.ts
+│ | ├── dateUtils.ts
+│ | └── apiUtils.ts
 ├── index.ts
 └── ...
+
 services: 외부 API와 상호작용하거나 데이터베이스와 통신하는 로직을 포함
 strategies: 특정 투자 전략을 구현하는 모듈
 analysis: 투자 전략 분석 관련 모듈

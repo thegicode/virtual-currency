@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 import { fetchMinutesCandles } from "../services/api/fetchMinutesCandles";
 
-async function handleGetMinutesCandles(req: Request, res: Response) {
+export async function handleGetMinutesCandles(req: Request, res: Response) {
     const { market, unit, count, to } = req.query;
 
     if (!market || !unit || !count) {
@@ -26,5 +26,3 @@ async function handleGetMinutesCandles(req: Request, res: Response) {
         res.status(500).json({ error: "Failed to fetch candles data" });
     }
 }
-
-export { handleGetMinutesCandles };

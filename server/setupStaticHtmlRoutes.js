@@ -16,7 +16,9 @@ const setupStaticHtmlRoutes = (app, staticPath) => {
         "backtest9",
         "thegitest",
         "thegitest2",
+        "daily-ma-backtest",
     ];
+
     routes.forEach((route) => {
         app.get(`/${route}`, (req, res) => {
             const htmlPath = path.join(staticPath, "html", `${route}.html`);

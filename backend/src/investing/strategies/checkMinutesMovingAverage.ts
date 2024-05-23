@@ -4,7 +4,11 @@ import {
     sendTelegramMessageToChatId,
 } from "../../notifications";
 import { fetchMinutesCandles, fetchTicker } from "../../services/api";
-import { calculateMovingAverage, formatTimestampToKoreanTime } from "../utils";
+import {
+    calculateMovingAverage,
+    formatPrice,
+    formatTimestampToKoreanTime,
+} from "../utils";
 
 // candleUnit분 캔들 기준으로 movingAveragePeriod 이동평균선을 구한 다음
 // 실시간 가격이 movingAveragePeriod 이동 평균선보다 높으면 매수 또는 보유
@@ -73,7 +77,7 @@ async function executeAndNotify(
 
     // send telegram message
     // sendMessagesToUsers(message, chatIds);
-    sendTelegramMessageToChatId(message);
+    // sendTelegramMessageToChatId(message);
 }
 
 async function getTradeInfos(
@@ -92,6 +96,8 @@ async function getTradeInfos(
         const movingAverage = calculateMovingAverage(candles)[0];
         const latestCandle = candles[candles.length - 1];
         const ticker = (await fetchTicker(market))[0];
+
+        // console.log("ticker", ticker);
 
         if (!ticker) {
             throw new Error(`Ticker data for market ${market} not found`);
@@ -123,15 +129,14 @@ function formatTradeInfosMessage(
     }번째 실행\n\n`;
 
     const message = tradeInfos
-        .map(
-            (info) =>
-                `📈 [${info.market}]
+        .map((info) => {
+            return `📈 [${info.market}]
 평균 시간: ${info.averageTime}
 티커 시간: ${formatTimestampToKoreanTime(info.tickerTime)}
-평균 가격: ${info.averagePrice.toLocaleString()}원
-현재 가격: ${info.tickerTradePrice.toLocaleString()}원
-신호: ${info.signal}`
-        )
+평균 가격: ${formatPrice(info.averagePrice)}원
+현재 가격: ${formatPrice(info.tickerTradePrice)}원
+신호: ${info.signal}`;
+        })
         .join("\n\n");
 
     return `${title}${message}\n`;

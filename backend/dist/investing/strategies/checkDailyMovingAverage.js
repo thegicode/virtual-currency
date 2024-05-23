@@ -49,8 +49,8 @@ function notifyResults(data, period) {
     const title = `\n 🔔 일캔들 ${period}일 이동평균 신호 확인 🔔\n\n`;
     const message = data
         .map((aData) => `📈 [${aData.market}] 
-현재 가격: ${aData.currentPrice.toLocaleString()}원
-평균 가격: ${aData.movingAverage.toLocaleString()}원
+현재 가격: ${(0, utils_1.formatPrice)(aData.currentPrice)}원
+평균 가격: ${(0, utils_1.formatPrice)(aData.movingAverage)}원
 신호: ${aData.signal}`)
         .join("\n\n");
     const messages = `${title}${message}\n`;

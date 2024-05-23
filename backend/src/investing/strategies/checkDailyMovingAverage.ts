@@ -7,7 +7,7 @@
 
 import { sendTelegramMessageToChatId } from "../../notifications";
 import { fetchDailyCandles, fetchTicker } from "../../services/api";
-import { calculateMovingAverage } from "../utils";
+import { calculateMovingAverage, formatPrice } from "../utils";
 
 export async function checkDailyMovingAverage(
     markets: string[],
@@ -61,8 +61,8 @@ function notifyResults(data: IDailyMovingAverageResult[], period: number) {
         .map(
             (aData) =>
                 `📈 [${aData.market}] 
-현재 가격: ${aData.currentPrice.toLocaleString()}원
-평균 가격: ${aData.movingAverage.toLocaleString()}원
+현재 가격: ${formatPrice(aData.currentPrice)}원
+평균 가격: ${formatPrice(aData.movingAverage)}원
 신호: ${aData.signal}`
         )
         .join("\n\n");
