@@ -11,23 +11,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchMinutesCandles = void 0;
 const config_1 = require("../../config");
+const utils_1 = require("../../investing/utils");
 function fetchMinutesCandles(market, unit, count, to) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const params = new URLSearchParams(Object.assign({ market, count: count.toString() }, (to && { to })));
-            const response = yield fetch(`${config_1.URL.candles_minutes}/${unit.toString()}?${params}`, {
+            const url = `${config_1.URL.candles_minutes}/${unit.toString()}?${params}`;
+            const options = {
                 method: "GET",
                 headers: {
                     accept: "application/json",
                 },
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            };
+            const response = yield (0, utils_1.retryFetch)(url, options);
             const data = yield response.json();
             return data.reverse().map((aData) => ({
                 market: aData.market,
-                date: aData.candle_date_time_kst,
+                date_time: aData.candle_date_time_kst,
                 opening_price: Number(aData.opening_price),
                 trade_price: Number(aData.trade_price),
                 high_price: Number(aData.high_price),

@@ -1,4 +1,5 @@
 import { URL } from "../../config";
+import { retryFetch } from "../../investing/utils";
 
 export async function fetchMinutesCandles(
     market: string,
@@ -13,7 +14,7 @@ export async function fetchMinutesCandles(
             ...(to && { to }),
         });
 
-        const response = await fetch(
+        /* const response = await fetch(
             `${URL.candles_minutes}/${unit.toString()}?${params}`,
             {
                 method: "GET",
@@ -25,12 +26,21 @@ export async function fetchMinutesCandles(
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        } */
 
+        const url = `${URL.candles_minutes}/${unit.toString()}?${params}`;
+        const options = {
+            method: "GET",
+            headers: {
+                accept: "application/json",
+            },
+        };
+        const response = await retryFetch(url, options);
         const data = await response.json();
+
         return data.reverse().map((aData: ICandle) => ({
             market: aData.market,
-            date: aData.candle_date_time_kst,
+            date_time: aData.candle_date_time_kst,
             opening_price: Number(aData.opening_price),
             trade_price: Number(aData.trade_price),
             high_price: Number(aData.high_price),

@@ -52,7 +52,6 @@ async function backtestMarket(
     let mdd = 0;
     let buyPrice = 0;
     const log: string[] = [];
-    const tradeData = [];
 
     candles.slice(period).forEach((candle, index) => {
         const currentPrice = candle.trade_price;

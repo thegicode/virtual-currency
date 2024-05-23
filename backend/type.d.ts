@@ -36,6 +36,13 @@ interface IMinutesMovingAverageBacktestTrade {
     profit?: number;
 }
 
+interface IMovingAverages {
+    ma3: number;
+    ma5: number;
+    ma10: number;
+    ma20: number;
+}
+
 interface ITicker {
     market: string;
     trade_price: number;

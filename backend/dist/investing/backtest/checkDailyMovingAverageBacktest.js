@@ -41,7 +41,6 @@ function backtestMarket(market, period, initialCapital) {
         let mdd = 0;
         let buyPrice = 0;
         const log = [];
-        const tradeData = [];
         candles.slice(period).forEach((candle, index) => {
             const currentPrice = candle.trade_price;
             const movingAverage = movingAverages[index];

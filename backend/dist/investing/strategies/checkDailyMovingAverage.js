@@ -17,7 +17,7 @@ function checkDailyMovingAverage(markets, period = 3) {
         try {
             const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () { return yield checkMovingAverage(market, period); })));
             const validResults = results.filter((result) => result !== undefined);
-            notifyResults(validResults, period);
+            return makeMessages(validResults, period);
         }
         catch (error) {
             console.error(`Error checking daily moving averages:`, error);
@@ -45,14 +45,13 @@ function checkMovingAverage(market, period) {
         }
     });
 }
-function notifyResults(data, period) {
-    const title = `\n 🔔 일캔들 ${period}일 이동평균 신호 확인 🔔\n\n`;
+function makeMessages(data, period) {
+    const title = `\n 🔔 일캔들 ${period}일 이동평균 신호 확인\n\n`;
     const message = data
         .map((aData) => `📈 [${aData.market}] 
 현재 가격: ${(0, utils_1.formatPrice)(aData.currentPrice)}원
 평균 가격: ${(0, utils_1.formatPrice)(aData.movingAverage)}원
 신호: ${aData.signal}`)
         .join("\n\n");
-    const messages = `${title}${message}\n`;
-    console.log(messages);
+    return `${title}${message}\n`;
 }

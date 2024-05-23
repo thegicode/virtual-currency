@@ -56,7 +56,7 @@ function getTradeInfos(markets, movingAveragePeriod, candleUnit) {
             const signal = ticker.trade_price > movingAverage ? "매수" : "매도";
             return {
                 market,
-                averageTime: latestCandle.date,
+                averageTime: latestCandle.date_time,
                 averagePrice: movingAverage,
                 tickerDate,
                 tickerTradePrice: ticker.trade_price,

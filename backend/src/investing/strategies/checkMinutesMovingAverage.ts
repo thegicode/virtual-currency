@@ -111,7 +111,7 @@ async function getTradeInfos(
 
         return {
             market,
-            averageTime: latestCandle.date,
+            averageTime: latestCandle.date_time,
             averagePrice: movingAverage,
             tickerDate,
             tickerTradePrice: ticker.trade_price,

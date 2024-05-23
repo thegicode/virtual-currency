@@ -26,7 +26,7 @@ export async function checkDailyMovingAverage(
                 result !== undefined
         );
 
-        notifyResults(validResults, period);
+        return makeMessages(validResults, period);
     } catch (error) {
         console.error(`Error checking daily moving averages:`, error);
     }
@@ -55,8 +55,8 @@ async function checkMovingAverage(market: string, period: number) {
     }
 }
 
-function notifyResults(data: IDailyMovingAverageResult[], period: number) {
-    const title = `\n 🔔 일캔들 ${period}일 이동평균 신호 확인 🔔\n\n`;
+function makeMessages(data: IDailyMovingAverageResult[], period: number) {
+    const title = `\n 🔔 일캔들 ${period}일 이동평균 신호 확인\n\n`;
     const message = data
         .map(
             (aData) =>
@@ -67,9 +67,7 @@ function notifyResults(data: IDailyMovingAverageResult[], period: number) {
         )
         .join("\n\n");
 
-    const messages = `${title}${message}\n`;
-
-    console.log(messages);
+    return `${title}${message}\n`;
 
     // sendTelegramMessageToChatId(messages);
 }
