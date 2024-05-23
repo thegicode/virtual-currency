@@ -36,7 +36,7 @@ exports.checkMinutesMovingAverage = checkMinutesMovingAverage;
 function executeAndNotify(movingAveragePeriod, executionCount, markets, candleUnit, chatIds) {
     return __awaiter(this, void 0, void 0, function* () {
         const tradeInfos = yield getTradeInfos(markets, movingAveragePeriod, candleUnit);
-        const message = formatTradeInfosMessage(tradeInfos, executionCount, candleUnit, movingAveragePeriod);
+        const message = createMessage(tradeInfos, executionCount, candleUnit, movingAveragePeriod);
         console.log(message);
     });
 }
@@ -66,7 +66,7 @@ function getTradeInfos(markets, movingAveragePeriod, candleUnit) {
         return Promise.all(promises);
     });
 }
-function formatTradeInfosMessage(tradeInfos, executionCount, candleUnit, movingAveragePeriod) {
+function createMessage(tradeInfos, executionCount, candleUnit, movingAveragePeriod) {
     const title = `\n 🔔 ${candleUnit}분캔들의 ${movingAveragePeriod} 이동평균 ${executionCount + 1}번째 실행\n\n`;
     const message = tradeInfos
         .map((info) => {

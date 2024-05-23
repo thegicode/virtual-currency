@@ -17,11 +17,11 @@ Object.defineProperty(exports, "checkMinutesMovingAverage", { enumerable: true, 
 const movingAverageAndVolatility_1 = require("./movingAverageAndVolatility");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const markets = [
-        "KRW-NEAR",
-        "KRW-BTG",
-        "KRW-THETA",
-        "KRW-AVAX",
-        "KRW-SHIB",
+        "KRW-BTC",
+        "KRW-ETH",
+        "KRW-DOGE",
+        "KRW-SOL",
+        "KRW-BCH",
     ];
     const result1 = yield (0, checkDailyMovingAverage_1.checkDailyMovingAverage)(markets, 5);
     console.log(result1);

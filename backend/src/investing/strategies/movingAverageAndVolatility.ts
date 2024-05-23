@@ -22,22 +22,30 @@ export async function executeMovingAverageAndVolatility(
 ) {
     const results = await Promise.all(
         markets.map(async (market) => {
-            const { movingAverages, currentPrice, volatility } =
+            const { isSignal, currentPrice, volatility } =
                 await fetchMarketData(market);
 
-            return makeInvestmentDecision(
+            const capital =
+                (targetVolatility / volatility / markets.length) *
+                initialCapital;
+
+            const { signal, position } = makeInvestmentDecision(
+                isSignal,
+                currentPrice,
+                capital
+            );
+
+            return {
                 market,
-                movingAverages,
                 currentPrice,
                 volatility,
-                initialCapital,
-                targetVolatility,
-                markets.length
-            );
+                signal,
+                position,
+            };
         })
     );
 
-    return makeMessage(results);
+    return createMessage(results);
 }
 
 async function fetchMarketData(market: string) {
@@ -53,50 +61,38 @@ async function fetchMarketData(market: string) {
     const currentPrice = candles.slice(-1)[0].trade_price;
     const volatility = calculateVolatility(candles.slice(-5));
 
+    const isSignal =
+        currentPrice > movingAverages.ma3 &&
+        currentPrice > movingAverages.ma5 &&
+        currentPrice > movingAverages.ma10 &&
+        currentPrice > movingAverages.ma20;
+
     return {
-        movingAverages,
+        isSignal,
         currentPrice,
         volatility,
     };
 }
 
 function makeInvestmentDecision(
-    market: string,
-    movingAverages: IMovingAverages,
+    isSignal: boolean,
     currentPrice: number,
-    volatility: number,
-    initialCapital: number,
-    targetVolatility: number,
-    marketCount: number
+    capital: number
 ) {
-    let allocatedCapital = 0;
     let position = 0;
     let signal = "보유";
 
-    if (
-        currentPrice > movingAverages.ma3 &&
-        currentPrice > movingAverages.ma5 &&
-        currentPrice > movingAverages.ma10 &&
-        currentPrice > movingAverages.ma20
-    ) {
+    if (isSignal) {
         // 매수 또는 보유
-        allocatedCapital =
-            (targetVolatility / volatility / marketCount) * initialCapital;
-        position = allocatedCapital / currentPrice;
+        position = capital / currentPrice;
         signal = "매수";
     } else {
         // 매도 또는 보류
-        allocatedCapital = 0;
         position = 0;
         signal = "매도";
     }
 
-    return {
-        market,
-        currentPrice,
-        volatility,
-        signal,
-    };
+    return { signal, position };
 }
 
 interface IResult {
@@ -106,7 +102,7 @@ interface IResult {
     signal: string;
 }
 
-function makeMessage(results: IResult[]) {
+function createMessage(results: IResult[]) {
     const title = `\n 🔔 슈퍼 상승장(3, 5, 10, 20 이동평균) + 변동성 조절\n\n`;
     const message = results
         .map(

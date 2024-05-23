@@ -67,7 +67,7 @@ async function executeAndNotify(
         candleUnit
     );
 
-    const message = formatTradeInfosMessage(
+    const message = createMessage(
         tradeInfos,
         executionCount,
         candleUnit,
@@ -122,7 +122,7 @@ async function getTradeInfos(
     return Promise.all(promises);
 }
 
-function formatTradeInfosMessage(
+function createMessage(
     tradeInfos: any[],
     executionCount: number,
     candleUnit: TCandleUnit,

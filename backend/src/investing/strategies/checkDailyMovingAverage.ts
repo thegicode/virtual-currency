@@ -26,7 +26,7 @@ export async function checkDailyMovingAverage(
                 result !== undefined
         );
 
-        return makeMessages(validResults, period);
+        return createMessage(validResults, period);
     } catch (error) {
         console.error(`Error checking daily moving averages:`, error);
     }
@@ -55,7 +55,7 @@ async function checkMovingAverage(market: string, period: number) {
     }
 }
 
-function makeMessages(data: IDailyMovingAverageResult[], period: number) {
+function createMessage(data: IDailyMovingAverageResult[], period: number) {
     const title = `\n 🔔 일캔들 ${period}일 이동평균 신호 확인\n\n`;
     const message = data
         .map(
