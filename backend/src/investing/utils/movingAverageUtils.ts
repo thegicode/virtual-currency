@@ -18,3 +18,19 @@ export function calculateMovingAverage(
 
     return movingAverages;
 }
+
+// 모든 MovingAverage 반환
+export function calculateAllMovingAverages(
+    candles: ICandle[],
+    periods: number[]
+) {
+    const movingAverages: Record<string, number> = {};
+    periods.forEach((period) => {
+        movingAverages[`ma${period}`] = calculateMovingAverage(
+            candles,
+            period
+        ).slice(-1)[0];
+    });
+
+    return movingAverages;
+}

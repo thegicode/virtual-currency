@@ -10,6 +10,7 @@
 
 import { fetchDailyCandles } from "../../services/api";
 import {
+    calculateAllMovingAverages,
     calculateMovingAverage,
     calculateVolatility,
     formatPrice,
@@ -51,14 +52,7 @@ export async function executeMovingAverageAndVolatility(
 
 async function fetchMarketData(market: string) {
     const candles: ICandle[] = await fetchDailyCandles(market, "20");
-
-    const movingAverages = {
-        ma3: calculateMovingAverage(candles, 3).slice(-1)[0],
-        ma5: calculateMovingAverage(candles, 5).slice(-1)[0],
-        ma10: calculateMovingAverage(candles, 10).slice(-1)[0],
-        ma20: calculateMovingAverage(candles, 20).slice(-1)[0],
-    };
-
+    const movingAverages = calculateAllMovingAverages(candles, [3, 5, 10, 20]);
     const currentPrice = candles.slice(-1)[0].trade_price;
     const volatility = calculateVolatility(candles.slice(-5));
 

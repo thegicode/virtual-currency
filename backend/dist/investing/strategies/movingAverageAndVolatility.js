@@ -35,12 +35,7 @@ exports.executeMovingAverageAndVolatility = executeMovingAverageAndVolatility;
 function fetchMarketData(market) {
     return __awaiter(this, void 0, void 0, function* () {
         const candles = yield (0, api_1.fetchDailyCandles)(market, "20");
-        const movingAverages = {
-            ma3: (0, utils_1.calculateMovingAverage)(candles, 3).slice(-1)[0],
-            ma5: (0, utils_1.calculateMovingAverage)(candles, 5).slice(-1)[0],
-            ma10: (0, utils_1.calculateMovingAverage)(candles, 10).slice(-1)[0],
-            ma20: (0, utils_1.calculateMovingAverage)(candles, 20).slice(-1)[0],
-        };
+        const movingAverages = (0, utils_1.calculateAllMovingAverages)(candles, [3, 5, 10, 20]);
         const currentPrice = candles.slice(-1)[0].trade_price;
         const volatility = (0, utils_1.calculateVolatility)(candles.slice(-5));
         const isSignal = currentPrice > movingAverages.ma3 &&

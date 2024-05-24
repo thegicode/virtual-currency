@@ -2,53 +2,23 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const vitest_1 = require("vitest");
 const utils_1 = require("../../../investing/utils");
-(0, vitest_1.describe)("movingAverageUtils", () => {
+(0, vitest_1.describe)("calculateMovingAverage", () => {
     (0, vitest_1.it)("should calculate the moving average correctly for a given period", () => {
         const data = [
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-14T09:00:00",
-                opening_price: 705.8,
                 trade_price: 700,
-                high_price: 719,
-                low_price: 697.6,
-                candle_acc_trade_volume: 112331857.18313108,
             },
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-15T09:00:00",
-                opening_price: 703.4,
                 trade_price: 710,
-                high_price: 723.3,
-                low_price: 699,
-                candle_acc_trade_volume: 149875795.27671877,
             },
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-16T09:00:00",
-                opening_price: 721.3,
                 trade_price: 720,
-                high_price: 726,
-                low_price: 714.1,
-                candle_acc_trade_volume: 113982848.58127575,
             },
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-17T09:00:00",
-                opening_price: 721.3,
                 trade_price: 730,
-                high_price: 726,
-                low_price: 714.1,
-                candle_acc_trade_volume: 113982848.58127575,
             },
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-18T09:00:00",
-                opening_price: 721.3,
                 trade_price: 740,
-                high_price: 726,
-                low_price: 714.1,
-                candle_acc_trade_volume: 113982848.58127575,
             },
         ];
         const period = 3;
@@ -62,22 +32,10 @@ const utils_1 = require("../../../investing/utils");
     (0, vitest_1.it)("should return an empty array if the data length is less than the period", () => {
         const data = [
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-14T09:00:00",
-                opening_price: 705.8,
                 trade_price: 700,
-                high_price: 719,
-                low_price: 697.6,
-                candle_acc_trade_volume: 112331857.18313108,
             },
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-15T09:00:00",
-                opening_price: 703.4,
                 trade_price: 710,
-                high_price: 723.3,
-                low_price: 699,
-                candle_acc_trade_volume: 149875795.27671877,
             },
         ];
         const period = 3;
@@ -93,31 +51,13 @@ const utils_1 = require("../../../investing/utils");
     (0, vitest_1.it)("should handle a period of 1", () => {
         const data = [
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-14T09:00:00",
-                opening_price: 705.8,
                 trade_price: 700,
-                high_price: 719,
-                low_price: 697.6,
-                candle_acc_trade_volume: 112331857.18313108,
             },
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-15T09:00:00",
-                opening_price: 703.4,
                 trade_price: 710,
-                high_price: 723.3,
-                low_price: 699,
-                candle_acc_trade_volume: 149875795.27671877,
             },
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-16T09:00:00",
-                opening_price: 721.3,
                 trade_price: 720,
-                high_price: 726,
-                low_price: 714.1,
-                candle_acc_trade_volume: 113982848.58127575,
             },
         ];
         const period = 1;
@@ -127,35 +67,92 @@ const utils_1 = require("../../../investing/utils");
     (0, vitest_1.it)("should handle a period equal to the length of the data array", () => {
         const data = [
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-14T09:00:00",
-                opening_price: 705.8,
                 trade_price: 700,
-                high_price: 719,
-                low_price: 697.6,
-                candle_acc_trade_volume: 112331857.18313108,
             },
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-15T09:00:00",
-                opening_price: 703.4,
                 trade_price: 710,
-                high_price: 723.3,
-                low_price: 699,
-                candle_acc_trade_volume: 149875795.27671877,
             },
             {
-                market: "KRW-XRP",
-                date_time: "2024-05-16T09:00:00",
-                opening_price: 721.3,
                 trade_price: 720,
-                high_price: 726,
-                low_price: 714.1,
-                candle_acc_trade_volume: 113982848.58127575,
             },
         ];
         const period = 3;
         const result = (0, utils_1.calculateMovingAverage)(data, period);
         (0, vitest_1.expect)(result).toEqual([(700 + 710 + 720) / 3]);
+    });
+});
+(0, vitest_1.describe)("calculateAllMovingAverages", () => {
+    (0, vitest_1.it)("should return correct moving averages for given periods ", () => {
+        const mockCandles = [
+            {
+                trade_price: 100,
+            },
+            {
+                trade_price: 105,
+            },
+            {
+                trade_price: 110,
+            },
+            {
+                trade_price: 115,
+            },
+            {
+                trade_price: 120,
+            },
+            {
+                trade_price: 100,
+            },
+            {
+                trade_price: 105,
+            },
+            {
+                trade_price: 110,
+            },
+            {
+                trade_price: 115,
+            },
+            {
+                trade_price: 120,
+            },
+        ];
+        const periods = [3, 5, 10];
+        const expected = {
+            ma3: (120 + 115 + 110) / 3,
+            ma5: (120 + 115 + 110 + 105 + 100) / 5,
+            ma10: (120 + 115 + 110 + 105 + 100 + 120 + 115 + 110 + 105 + 100) /
+                10,
+        };
+        const result = (0, utils_1.calculateAllMovingAverages)(mockCandles, periods);
+        (0, vitest_1.expect)(result).toEqual(expected);
+    });
+    (0, vitest_1.it)("should handle an empty candles array", () => {
+        const mockCandles = [];
+        const periods = [3, 5, 10];
+        const expected = {
+            ma3: undefined,
+            ma5: undefined,
+            ma10: undefined,
+        };
+        const result = (0, utils_1.calculateAllMovingAverages)(mockCandles, periods);
+        (0, vitest_1.expect)(result).toEqual(expected);
+    });
+    (0, vitest_1.it)("should handle a single period", () => {
+        const mockCandles = [
+            {
+                trade_price: 100,
+            },
+            {
+                trade_price: 105,
+            },
+            {
+                trade_price: 110,
+            },
+        ];
+        const periods = [3];
+        const expected = {
+            ma3: (100 + 105 + 110) / 3,
+        };
+        const result = (0, utils_1.calculateAllMovingAverages)(mockCandles, periods);
+        (0, vitest_1.expect)(result).toEqual(expected);
     });
 });

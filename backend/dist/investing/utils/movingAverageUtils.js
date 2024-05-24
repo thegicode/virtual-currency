@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateMovingAverage = void 0;
+exports.calculateAllMovingAverages = exports.calculateMovingAverage = void 0;
 function calculateMovingAverage(data, period = 3) {
     const movingAverages = [];
     for (let i = 0; i <= data.length - period; i++) {
@@ -11,3 +11,11 @@ function calculateMovingAverage(data, period = 3) {
     return movingAverages;
 }
 exports.calculateMovingAverage = calculateMovingAverage;
+function calculateAllMovingAverages(candles, periods) {
+    const movingAverages = {};
+    periods.forEach((period) => {
+        movingAverages[`ma${period}`] = calculateMovingAverage(candles, period).slice(-1)[0];
+    });
+    return movingAverages;
+}
+exports.calculateAllMovingAverages = calculateAllMovingAverages;
