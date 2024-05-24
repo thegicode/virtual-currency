@@ -1,3 +1,4 @@
+// checkMinutesMovingAverage
 import {
     getChatIds,
     sendMessagesToUsers,
