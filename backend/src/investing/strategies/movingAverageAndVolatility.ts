@@ -41,6 +41,7 @@ export async function executeMovingAverageAndVolatility(
                 volatility,
                 signal,
                 position,
+                capital,
             };
         })
     );
@@ -100,6 +101,7 @@ interface IResult {
     currentPrice: number;
     volatility: number;
     signal: string;
+    capital: number;
 }
 
 function createMessage(results: IResult[]) {
@@ -110,6 +112,7 @@ function createMessage(results: IResult[]) {
                 `📈 [${result.market}] 
 현재 가격: ${formatPrice(result.currentPrice)}원
 변동성: ${result.volatility.toFixed(2)}%
+매수 자금: ${Math.round(result.capital).toLocaleString()}원
 신호: ${result.signal}`
         )
         .join("\n\n");

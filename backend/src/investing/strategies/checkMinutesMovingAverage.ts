@@ -19,30 +19,34 @@ import {
 export async function checkMinutesMovingAverage(
     markets: string[],
     candleUnit: TCandleUnit, // interval time, candle unit
-    movingAveragePeriod: number // 이동평균선 수치
+    movingAveragePeriod: number, // 이동평균선 수치
+    callback: (message: string) => void
 ) {
     let executionCount = 0;
     const chatIds = (await getChatIds()) as number[];
 
-    // 첫 번째 실행
+    // 첫 번째 실행이후 candleUnit분 간격 실행
     await executeAndNotifyInterval();
 
     // candleUnit분마다 실행
-    setInterval(
-        executeAndNotifyInterval,
+    /* setInterval(
+        async () => {
+            await executeAndNotifyInterval();
+        },
         1000 * 60 * candleUnit
         // 3000
     );
-
+ */
     async function executeAndNotifyInterval() {
         try {
-            await executeAndNotify(
+            const message = await executeAndNotify(
                 movingAveragePeriod,
                 executionCount,
                 markets,
                 candleUnit,
                 chatIds
             );
+            callback(message);
             executionCount++;
         } catch (error) {
             console.error(
@@ -50,6 +54,9 @@ export async function checkMinutesMovingAverage(
                     error instanceof Error ? error.message : error
                 }`
             );
+        } finally {
+            // candleUnit분 후에 다시 실행
+            setTimeout(executeAndNotifyInterval, 1000 * 60 * candleUnit);
         }
     }
 }
@@ -74,11 +81,11 @@ async function executeAndNotify(
         movingAveragePeriod
     );
 
-    console.log(message);
-
     // send telegram message
     // sendMessagesToUsers(message, chatIds);
     // sendTelegramMessageToChatId(message);
+
+    return message;
 }
 
 async function getTradeInfos(

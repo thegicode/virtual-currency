@@ -25,6 +25,7 @@ function executeMovingAverageAndVolatility(markets, initialCapital, targetVolati
                 volatility,
                 signal,
                 position,
+                capital,
             };
         })));
         return createMessage(results);
@@ -72,6 +73,7 @@ function createMessage(results) {
         .map((result) => `📈 [${result.market}] 
 현재 가격: ${(0, utils_1.formatPrice)(result.currentPrice)}원
 변동성: ${result.volatility.toFixed(2)}%
+매수 자금: ${Math.round(result.capital).toLocaleString()}원
 신호: ${result.signal}`)
         .join("\n\n");
     return `${title}${message}\n`;

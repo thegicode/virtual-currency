@@ -23,9 +23,10 @@ const movingAverageAndVolatility_1 = require("./movingAverageAndVolatility");
         "KRW-SOL",
         "KRW-BCH",
     ];
+    const initialCapital = 1000000;
     const result1 = yield (0, checkDailyMovingAverage_1.checkDailyMovingAverage)(markets, 5);
     console.log(result1);
-    yield (0, checkMinutesMovingAverage_1.checkMinutesMovingAverage)(markets, 60, 10);
-    const results3 = yield (0, movingAverageAndVolatility_1.executeMovingAverageAndVolatility)(markets, 10000, 2);
+    yield (0, checkMinutesMovingAverage_1.checkMinutesMovingAverage)(markets, 60, 10, (message) => console.log(message));
+    const results3 = yield (0, movingAverageAndVolatility_1.executeMovingAverageAndVolatility)(markets, initialCapital, 2);
     console.log(results3);
 }))();

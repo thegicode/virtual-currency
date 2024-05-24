@@ -13,20 +13,23 @@ exports.checkMinutesMovingAverage = void 0;
 const notifications_1 = require("../../notifications");
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
-function checkMinutesMovingAverage(markets, candleUnit, movingAveragePeriod) {
+function checkMinutesMovingAverage(markets, candleUnit, movingAveragePeriod, callback) {
     return __awaiter(this, void 0, void 0, function* () {
         let executionCount = 0;
         const chatIds = (yield (0, notifications_1.getChatIds)());
         yield executeAndNotifyInterval();
-        setInterval(executeAndNotifyInterval, 1000 * 60 * candleUnit);
         function executeAndNotifyInterval() {
             return __awaiter(this, void 0, void 0, function* () {
                 try {
-                    yield executeAndNotify(movingAveragePeriod, executionCount, markets, candleUnit, chatIds);
+                    const message = yield executeAndNotify(movingAveragePeriod, executionCount, markets, candleUnit, chatIds);
+                    callback(message);
                     executionCount++;
                 }
                 catch (error) {
                     console.error(`Error during interval execution: ${error instanceof Error ? error.message : error}`);
+                }
+                finally {
+                    setTimeout(executeAndNotifyInterval, 1000 * 60 * candleUnit);
                 }
             });
         }
@@ -37,7 +40,7 @@ function executeAndNotify(movingAveragePeriod, executionCount, markets, candleUn
     return __awaiter(this, void 0, void 0, function* () {
         const tradeInfos = yield getTradeInfos(markets, movingAveragePeriod, candleUnit);
         const message = createMessage(tradeInfos, executionCount, candleUnit, movingAveragePeriod);
-        console.log(message);
+        return message;
     });
 }
 function getTradeInfos(markets, movingAveragePeriod, candleUnit) {
