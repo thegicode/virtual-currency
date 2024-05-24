@@ -19,7 +19,7 @@ function executeMovingAverageAndVolatility(markets, initialCapital, targetVolati
             const movingAverages = (0, utils_1.calculateAllMovingAverages)(candles, [3, 5, 10, 20]);
             const currentPrice = candles[candles.length - 1].trade_price;
             const volatility = (0, utils_1.calculateVolatility)(candles.slice(-5));
-            const shouldBuy = (0, utils_1.shouldBuyBasedOnMovingAverages)(currentPrice, movingAverages);
+            const shouldBuy = (0, utils_1.isAboveAllMovingAverages)(currentPrice, movingAverages);
             const capitalAllocation = calculateCapitalAllocation(targetVolatility, volatility, markets.length, initialCapital);
             const investmentDecision = makeInvestmentDecision(shouldBuy, currentPrice, capitalAllocation);
             return Object.assign(Object.assign({ market,

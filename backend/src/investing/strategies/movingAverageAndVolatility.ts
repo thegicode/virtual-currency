@@ -14,7 +14,7 @@ import {
     calculateAllMovingAverages,
     calculateVolatility,
     formatPrice,
-    shouldBuyBasedOnMovingAverages,
+    isAboveAllMovingAverages,
 } from "../utils";
 
 export async function executeMovingAverageAndVolatility(
@@ -35,7 +35,7 @@ export async function executeMovingAverageAndVolatility(
 
             const volatility = calculateVolatility(candles.slice(-5));
 
-            const shouldBuy = shouldBuyBasedOnMovingAverages(
+            const shouldBuy = isAboveAllMovingAverages(
                 currentPrice,
                 movingAverages
             );

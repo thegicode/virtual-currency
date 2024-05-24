@@ -36,7 +36,7 @@ export function calculateAllMovingAverages(
 }
 
 // 모든 이동평균보다 위에 있는가
-export function shouldBuyBasedOnMovingAverages(
+export function isAboveAllMovingAverages(
     currentPrice: number,
     movingAverages: Record<string, number>
 ): boolean {

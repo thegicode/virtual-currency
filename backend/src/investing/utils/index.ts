@@ -3,7 +3,7 @@ import { formatDateString, formatTimeString } from "./dateUtils";
 import {
     calculateAllMovingAverages,
     calculateMovingAverage,
-    shouldBuyBasedOnMovingAverages,
+    isAboveAllMovingAverages,
 } from "./movingAverageUtils";
 import { calculateAverageNoise } from "./noiseUtils";
 import { formatPrice } from "./priceUtils";
@@ -20,7 +20,7 @@ export {
     // movingAverageUtils
     calculateAllMovingAverages,
     calculateMovingAverage,
-    shouldBuyBasedOnMovingAverages,
+    isAboveAllMovingAverages,
 
     // noiseUtils
     calculateAverageNoise,

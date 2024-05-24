@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
     calculateAllMovingAverages,
     calculateMovingAverage,
-    shouldBuyBasedOnMovingAverages,
+    isAboveAllMovingAverages,
 } from "../../../investing/utils";
 
 describe("calculateMovingAverage", () => {
@@ -193,7 +193,7 @@ describe("calculateAllMovingAverages", () => {
     });
 });
 
-describe("shouldBuyBasedOnMovingAverages", () => {
+describe("isAboveAllMovingAverages", () => {
     it("should return true if the current price is above all moving averages", () => {
         const currentPrice = 150;
         const movingAverages = {
@@ -203,10 +203,7 @@ describe("shouldBuyBasedOnMovingAverages", () => {
             ma20: 110,
         };
 
-        const result = shouldBuyBasedOnMovingAverages(
-            currentPrice,
-            movingAverages
-        );
+        const result = isAboveAllMovingAverages(currentPrice, movingAverages);
         expect(result).toBe(true);
     });
 
@@ -219,10 +216,7 @@ describe("shouldBuyBasedOnMovingAverages", () => {
             ma20: 110,
         };
 
-        const result = shouldBuyBasedOnMovingAverages(
-            currentPrice,
-            movingAverages
-        );
+        const result = isAboveAllMovingAverages(currentPrice, movingAverages);
         expect(result).toBe(false);
     });
 
@@ -235,10 +229,7 @@ describe("shouldBuyBasedOnMovingAverages", () => {
             ma20: 110,
         };
 
-        const result = shouldBuyBasedOnMovingAverages(
-            currentPrice,
-            movingAverages
-        );
+        const result = isAboveAllMovingAverages(currentPrice, movingAverages);
         expect(result).toBe(false);
     });
 });
