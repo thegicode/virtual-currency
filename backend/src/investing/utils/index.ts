@@ -1,5 +1,6 @@
 import { retryFetch } from "./apiUtils";
 import { formatDateString, formatTimeString } from "./dateUtils";
+import { calculateRiskAdjustedCapital } from "./financialUtils";
 import {
     calculateAllMovingAverages,
     calculateMovingAverage,
@@ -16,6 +17,9 @@ export {
     // dateUtils
     formatDateString,
     formatTimeString,
+
+    // financialUtils
+    calculateRiskAdjustedCapital,
 
     // movingAverageUtils
     calculateAllMovingAverages,

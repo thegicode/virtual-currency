@@ -12,6 +12,7 @@
 import { fetchDailyCandles } from "../../services/api";
 import {
     calculateAllMovingAverages,
+    calculateRiskAdjustedCapital,
     calculateVolatility,
     formatPrice,
     isAboveAllMovingAverages,
@@ -40,7 +41,7 @@ export async function executeMovingAverageAndVolatility(
                 movingAverages
             );
 
-            const capitalAllocation = calculateCapitalAllocation(
+            const capitalAllocation = calculateRiskAdjustedCapital(
                 targetVolatility,
                 volatility,
                 markets.length,
@@ -66,15 +67,7 @@ export async function executeMovingAverageAndVolatility(
     return createMessage(results);
 }
 
-function calculateCapitalAllocation(
-    targetVolatility: number,
-    volatility: number,
-    count: number,
-    initialCapital: number
-): number {
-    return (targetVolatility / volatility / count) * initialCapital;
-}
-
+// 테스트 필요
 function makeInvestmentDecision(
     isSignal: boolean,
     currentPrice: number,

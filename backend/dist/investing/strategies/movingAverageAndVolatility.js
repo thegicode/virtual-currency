@@ -20,7 +20,7 @@ function executeMovingAverageAndVolatility(markets, initialCapital, targetVolati
             const currentPrice = candles[candles.length - 1].trade_price;
             const volatility = (0, utils_1.calculateVolatility)(candles.slice(-5));
             const shouldBuy = (0, utils_1.isAboveAllMovingAverages)(currentPrice, movingAverages);
-            const capitalAllocation = calculateCapitalAllocation(targetVolatility, volatility, markets.length, initialCapital);
+            const capitalAllocation = (0, utils_1.calculateRiskAdjustedCapital)(targetVolatility, volatility, markets.length, initialCapital);
             const investmentDecision = makeInvestmentDecision(shouldBuy, currentPrice, capitalAllocation);
             return Object.assign(Object.assign({ market,
                 currentPrice,
@@ -30,9 +30,6 @@ function executeMovingAverageAndVolatility(markets, initialCapital, targetVolati
     });
 }
 exports.executeMovingAverageAndVolatility = executeMovingAverageAndVolatility;
-function calculateCapitalAllocation(targetVolatility, volatility, count, initialCapital) {
-    return (targetVolatility / volatility / count) * initialCapital;
-}
 function makeInvestmentDecision(isSignal, currentPrice, capital) {
     let position = 0;
     let signal = "보유";
