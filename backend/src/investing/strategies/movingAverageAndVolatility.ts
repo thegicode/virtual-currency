@@ -48,7 +48,7 @@ export async function executeMovingAverageAndVolatility(
                 initialCapital
             );
 
-            const investmentDecision = makeInvestmentDecision(
+            const investmentDecision = determineInvestmentAction(
                 shouldBuy,
                 currentPrice,
                 capitalAllocation
@@ -68,7 +68,7 @@ export async function executeMovingAverageAndVolatility(
 }
 
 // 테스트 필요
-function makeInvestmentDecision(
+export function determineInvestmentAction(
     isSignal: boolean,
     currentPrice: number,
     capital: number
@@ -76,7 +76,7 @@ function makeInvestmentDecision(
     let position = 0;
     let signal = "보유";
 
-    if (isSignal) {
+    if (isSignal && currentPrice > 0) {
         // 매수 또는 보유
         position = capital / currentPrice;
         signal = "매수";
@@ -97,7 +97,8 @@ function createMessage(results: IMovingAverageAndVolatilityResult[]) {
                 `📈 [${result.market}] 
 현재 가격: ${formatPrice(result.currentPrice)}원
 변동성: ${result.volatility.toFixed(2)}%
-매수 자금: ${Math.round(result.capitalAllocation).toLocaleString()}원
+투자 금액: ${Math.round(result.capitalAllocation).toLocaleString()}원
+매수 수량: ${result.position}
 신호: ${result.signal}`
         )
         .join("\n\n");

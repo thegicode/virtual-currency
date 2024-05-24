@@ -41,6 +41,7 @@ interface IMovingAverageAndVolatilityResult {
     currentPrice: number;
     volatility: number;
     signal: string;
+    position: number;
     capitalAllocation: number;
 }
 

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.executeMovingAverageAndVolatility = void 0;
+exports.determineInvestmentAction = exports.executeMovingAverageAndVolatility = void 0;
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
 function executeMovingAverageAndVolatility(markets, initialCapital, targetVolatility = 2) {
@@ -21,7 +21,7 @@ function executeMovingAverageAndVolatility(markets, initialCapital, targetVolati
             const volatility = (0, utils_1.calculateVolatility)(candles.slice(-5));
             const shouldBuy = (0, utils_1.isAboveAllMovingAverages)(currentPrice, movingAverages);
             const capitalAllocation = (0, utils_1.calculateRiskAdjustedCapital)(targetVolatility, volatility, markets.length, initialCapital);
-            const investmentDecision = makeInvestmentDecision(shouldBuy, currentPrice, capitalAllocation);
+            const investmentDecision = determineInvestmentAction(shouldBuy, currentPrice, capitalAllocation);
             return Object.assign(Object.assign({ market,
                 currentPrice,
                 volatility }, investmentDecision), { capitalAllocation });
@@ -30,10 +30,10 @@ function executeMovingAverageAndVolatility(markets, initialCapital, targetVolati
     });
 }
 exports.executeMovingAverageAndVolatility = executeMovingAverageAndVolatility;
-function makeInvestmentDecision(isSignal, currentPrice, capital) {
+function determineInvestmentAction(isSignal, currentPrice, capital) {
     let position = 0;
     let signal = "보유";
-    if (isSignal) {
+    if (isSignal && currentPrice > 0) {
         position = capital / currentPrice;
         signal = "매수";
     }
@@ -43,13 +43,15 @@ function makeInvestmentDecision(isSignal, currentPrice, capital) {
     }
     return { signal, position };
 }
+exports.determineInvestmentAction = determineInvestmentAction;
 function createMessage(results) {
     const title = `\n 🔔 슈퍼 상승장(3, 5, 10, 20 이동평균) + 변동성 조절\n\n`;
     const message = results
         .map((result) => `📈 [${result.market}] 
 현재 가격: ${(0, utils_1.formatPrice)(result.currentPrice)}원
 변동성: ${result.volatility.toFixed(2)}%
-매수 자금: ${Math.round(result.capitalAllocation).toLocaleString()}원
+투자 금액: ${Math.round(result.capitalAllocation).toLocaleString()}원
+매수 수량: ${result.position}
 신호: ${result.signal}`)
         .join("\n\n");
     return `${title}${message}\n`;
