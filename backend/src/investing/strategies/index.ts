@@ -2,7 +2,11 @@ import { checkDailyMovingAverage } from "./checkDailyMovingAverage";
 import { checkMinutesMovingAverage } from "./checkMinutesMovingAverage";
 import { executeMovingAverageAndVolatility } from "./movingAverageAndVolatility";
 
-export { checkDailyMovingAverage, checkMinutesMovingAverage };
+export {
+    checkDailyMovingAverage,
+    checkMinutesMovingAverage,
+    executeMovingAverageAndVolatility,
+};
 
 (async () => {
     const markets = [

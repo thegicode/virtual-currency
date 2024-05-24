@@ -36,6 +36,14 @@ interface IMinutesMovingAverageBacktestTrade {
     profit?: number;
 }
 
+interface IMovingAverageAndVolatilityResult {
+    market: string;
+    currentPrice: number;
+    volatility: number;
+    signal: string;
+    capitalAllocation: number;
+}
+
 interface IMovingAverages {
     ma3: number;
     ma5: number;

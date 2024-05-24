@@ -1,3 +1,4 @@
+// movingAverageAndVolatility
 /**
  * 투자전략 : 3, 5, 10, 20일 이동평균 + 변동성 조절
  * 이동평균선 1일 1회 체크
@@ -11,7 +12,6 @@
 import { fetchDailyCandles } from "../../services/api";
 import {
     calculateAllMovingAverages,
-    calculateMovingAverage,
     calculateVolatility,
     formatPrice,
 } from "../utils";
@@ -23,26 +23,41 @@ export async function executeMovingAverageAndVolatility(
 ) {
     const results = await Promise.all(
         markets.map(async (market) => {
-            const { isSignal, currentPrice, volatility } =
-                await fetchMarketData(market);
+            const candles: ICandle[] = await fetchDailyCandles(market, "20");
 
-            const capital =
-                (targetVolatility / volatility / markets.length) *
-                initialCapital;
+            const movingAverages = calculateAllMovingAverages(
+                candles,
+                [3, 5, 10, 20]
+            );
 
-            const { signal, position } = makeInvestmentDecision(
-                isSignal,
+            const currentPrice = candles[candles.length - 1].trade_price;
+
+            const volatility = calculateVolatility(candles.slice(-5));
+
+            const shouldBuy = shouldBuyBasedOnMovingAverages(
                 currentPrice,
-                capital
+                movingAverages
+            );
+
+            const capitalAllocation = calculateCapitalAllocation(
+                targetVolatility,
+                volatility,
+                markets.length,
+                initialCapital
+            );
+
+            const investmentDecision = makeInvestmentDecision(
+                shouldBuy,
+                currentPrice,
+                capitalAllocation
             );
 
             return {
                 market,
                 currentPrice,
                 volatility,
-                signal,
-                position,
-                capital,
+                ...investmentDecision,
+                capitalAllocation,
             };
         })
     );
@@ -50,30 +65,32 @@ export async function executeMovingAverageAndVolatility(
     return createMessage(results);
 }
 
-async function fetchMarketData(market: string) {
-    const candles: ICandle[] = await fetchDailyCandles(market, "20");
-    const movingAverages = calculateAllMovingAverages(candles, [3, 5, 10, 20]);
-    const currentPrice = candles.slice(-1)[0].trade_price;
-    const volatility = calculateVolatility(candles.slice(-5));
-
-    const isSignal =
+function shouldBuyBasedOnMovingAverages(
+    currentPrice: number,
+    movingAverages: Record<string, number>
+): boolean {
+    return (
         currentPrice > movingAverages.ma3 &&
         currentPrice > movingAverages.ma5 &&
         currentPrice > movingAverages.ma10 &&
-        currentPrice > movingAverages.ma20;
+        currentPrice > movingAverages.ma20
+    );
+}
 
-    return {
-        isSignal,
-        currentPrice,
-        volatility,
-    };
+function calculateCapitalAllocation(
+    targetVolatility: number,
+    volatility: number,
+    count: number,
+    initialCapital: number
+): number {
+    return (targetVolatility / volatility / count) * initialCapital;
 }
 
 function makeInvestmentDecision(
     isSignal: boolean,
     currentPrice: number,
     capital: number
-) {
+): { signal: string; position: number } {
     let position = 0;
     let signal = "보유";
 
@@ -90,15 +107,7 @@ function makeInvestmentDecision(
     return { signal, position };
 }
 
-interface IResult {
-    market: string;
-    currentPrice: number;
-    volatility: number;
-    signal: string;
-    capital: number;
-}
-
-function createMessage(results: IResult[]) {
+function createMessage(results: IMovingAverageAndVolatilityResult[]) {
     const title = `\n 🔔 슈퍼 상승장(3, 5, 10, 20 이동평균) + 변동성 조절\n\n`;
     const message = results
         .map(
@@ -106,7 +115,7 @@ function createMessage(results: IResult[]) {
                 `📈 [${result.market}] 
 현재 가격: ${formatPrice(result.currentPrice)}원
 변동성: ${result.volatility.toFixed(2)}%
-매수 자금: ${Math.round(result.capital).toLocaleString()}원
+매수 자금: ${Math.round(result.capitalAllocation).toLocaleString()}원
 신호: ${result.signal}`
         )
         .join("\n\n");

@@ -9,12 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkMinutesMovingAverage = exports.checkDailyMovingAverage = void 0;
+exports.executeMovingAverageAndVolatility = exports.checkMinutesMovingAverage = exports.checkDailyMovingAverage = void 0;
 const checkDailyMovingAverage_1 = require("./checkDailyMovingAverage");
 Object.defineProperty(exports, "checkDailyMovingAverage", { enumerable: true, get: function () { return checkDailyMovingAverage_1.checkDailyMovingAverage; } });
 const checkMinutesMovingAverage_1 = require("./checkMinutesMovingAverage");
 Object.defineProperty(exports, "checkMinutesMovingAverage", { enumerable: true, get: function () { return checkMinutesMovingAverage_1.checkMinutesMovingAverage; } });
 const movingAverageAndVolatility_1 = require("./movingAverageAndVolatility");
+Object.defineProperty(exports, "executeMovingAverageAndVolatility", { enumerable: true, get: function () { return movingAverageAndVolatility_1.executeMovingAverageAndVolatility; } });
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const markets = [
         "KRW-BTC",

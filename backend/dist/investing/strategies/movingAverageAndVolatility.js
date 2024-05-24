@@ -15,39 +15,29 @@ const utils_1 = require("../utils");
 function executeMovingAverageAndVolatility(markets, initialCapital, targetVolatility = 2) {
     return __awaiter(this, void 0, void 0, function* () {
         const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () {
-            const { isSignal, currentPrice, volatility } = yield fetchMarketData(market);
-            const capital = (targetVolatility / volatility / markets.length) *
-                initialCapital;
-            const { signal, position } = makeInvestmentDecision(isSignal, currentPrice, capital);
-            return {
-                market,
+            const candles = yield (0, api_1.fetchDailyCandles)(market, "20");
+            const movingAverages = (0, utils_1.calculateAllMovingAverages)(candles, [3, 5, 10, 20]);
+            const currentPrice = candles[candles.length - 1].trade_price;
+            const volatility = (0, utils_1.calculateVolatility)(candles.slice(-5));
+            const shouldBuy = shouldBuyBasedOnMovingAverages(currentPrice, movingAverages);
+            const capitalAllocation = calculateCapitalAllocation(targetVolatility, volatility, markets.length, initialCapital);
+            const investmentDecision = makeInvestmentDecision(shouldBuy, currentPrice, capitalAllocation);
+            return Object.assign(Object.assign({ market,
                 currentPrice,
-                volatility,
-                signal,
-                position,
-                capital,
-            };
+                volatility }, investmentDecision), { capitalAllocation });
         })));
         return createMessage(results);
     });
 }
 exports.executeMovingAverageAndVolatility = executeMovingAverageAndVolatility;
-function fetchMarketData(market) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const candles = yield (0, api_1.fetchDailyCandles)(market, "20");
-        const movingAverages = (0, utils_1.calculateAllMovingAverages)(candles, [3, 5, 10, 20]);
-        const currentPrice = candles.slice(-1)[0].trade_price;
-        const volatility = (0, utils_1.calculateVolatility)(candles.slice(-5));
-        const isSignal = currentPrice > movingAverages.ma3 &&
-            currentPrice > movingAverages.ma5 &&
-            currentPrice > movingAverages.ma10 &&
-            currentPrice > movingAverages.ma20;
-        return {
-            isSignal,
-            currentPrice,
-            volatility,
-        };
-    });
+function shouldBuyBasedOnMovingAverages(currentPrice, movingAverages) {
+    return (currentPrice > movingAverages.ma3 &&
+        currentPrice > movingAverages.ma5 &&
+        currentPrice > movingAverages.ma10 &&
+        currentPrice > movingAverages.ma20);
+}
+function calculateCapitalAllocation(targetVolatility, volatility, count, initialCapital) {
+    return (targetVolatility / volatility / count) * initialCapital;
 }
 function makeInvestmentDecision(isSignal, currentPrice, capital) {
     let position = 0;
@@ -68,7 +58,7 @@ function createMessage(results) {
         .map((result) => `📈 [${result.market}] 
 현재 가격: ${(0, utils_1.formatPrice)(result.currentPrice)}원
 변동성: ${result.volatility.toFixed(2)}%
-매수 자금: ${Math.round(result.capital).toLocaleString()}원
+매수 자금: ${Math.round(result.capitalAllocation).toLocaleString()}원
 신호: ${result.signal}`)
         .join("\n\n");
     return `${title}${message}\n`;
