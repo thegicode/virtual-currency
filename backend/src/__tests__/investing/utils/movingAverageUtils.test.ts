@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
     calculateAllMovingAverages,
     calculateMovingAverage,
+    shouldBuyBasedOnMovingAverages,
 } from "../../../investing/utils";
 
 describe("calculateMovingAverage", () => {
@@ -189,5 +190,55 @@ describe("calculateAllMovingAverages", () => {
         );
 
         expect(result).toEqual(expected);
+    });
+});
+
+describe("shouldBuyBasedOnMovingAverages", () => {
+    it("should return true if the current price is above all moving averages", () => {
+        const currentPrice = 150;
+        const movingAverages = {
+            ma3: 140,
+            ma5: 130,
+            ma10: 120,
+            ma20: 110,
+        };
+
+        const result = shouldBuyBasedOnMovingAverages(
+            currentPrice,
+            movingAverages
+        );
+        expect(result).toBe(true);
+    });
+
+    it("should return false if the current price is below any of the moving averages", () => {
+        const currentPrice = 115;
+        const movingAverages = {
+            ma3: 140,
+            ma5: 130,
+            ma10: 120,
+            ma20: 110,
+        };
+
+        const result = shouldBuyBasedOnMovingAverages(
+            currentPrice,
+            movingAverages
+        );
+        expect(result).toBe(false);
+    });
+
+    it("should return false if the current price is equal to any of the moving averages", () => {
+        const currentPrice = 120;
+        const movingAverages = {
+            ma3: 140,
+            ma5: 130,
+            ma10: 120,
+            ma20: 110,
+        };
+
+        const result = shouldBuyBasedOnMovingAverages(
+            currentPrice,
+            movingAverages
+        );
+        expect(result).toBe(false);
     });
 });

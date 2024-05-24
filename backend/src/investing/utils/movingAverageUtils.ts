@@ -34,3 +34,16 @@ export function calculateAllMovingAverages(
 
     return movingAverages;
 }
+
+// 모든 이동평균보다 위에 있는가
+export function shouldBuyBasedOnMovingAverages(
+    currentPrice: number,
+    movingAverages: Record<string, number>
+): boolean {
+    return (
+        currentPrice > movingAverages.ma3 &&
+        currentPrice > movingAverages.ma5 &&
+        currentPrice > movingAverages.ma10 &&
+        currentPrice > movingAverages.ma20
+    );
+}

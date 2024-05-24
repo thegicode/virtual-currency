@@ -14,6 +14,7 @@ import {
     calculateAllMovingAverages,
     calculateVolatility,
     formatPrice,
+    shouldBuyBasedOnMovingAverages,
 } from "../utils";
 
 export async function executeMovingAverageAndVolatility(
@@ -63,18 +64,6 @@ export async function executeMovingAverageAndVolatility(
     );
 
     return createMessage(results);
-}
-
-function shouldBuyBasedOnMovingAverages(
-    currentPrice: number,
-    movingAverages: Record<string, number>
-): boolean {
-    return (
-        currentPrice > movingAverages.ma3 &&
-        currentPrice > movingAverages.ma5 &&
-        currentPrice > movingAverages.ma10 &&
-        currentPrice > movingAverages.ma20
-    );
 }
 
 function calculateCapitalAllocation(
