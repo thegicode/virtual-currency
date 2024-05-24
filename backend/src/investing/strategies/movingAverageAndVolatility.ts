@@ -67,7 +67,6 @@ export async function executeMovingAverageAndVolatility(
     return createMessage(results);
 }
 
-// 테스트 필요
 export function determineInvestmentAction(
     isSignal: boolean,
     currentPrice: number,
