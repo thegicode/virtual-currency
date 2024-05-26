@@ -27,10 +27,12 @@ export async function checkMinutesMovingAverageBacktest(
         console.log(`📈 [${result.market}]`);
         console.log(`Trade Count: ${result.tradeCount}`);
         console.log(
-            `Final Capital: ${Math.round(result.finalCapital).toLocaleString()}`
+            `Final Capital: ${Math.round(
+                result.finalCapital
+            ).toLocaleString()}원`
         );
-        console.log(`Return Rate: ${result.returnRate.toFixed(2)}%`);
-        console.log(`Max Drawdown: ${result.maxDrawdown.toFixed(2)}%`);
+        console.log(`Performance: ${result.performance.toFixed(2)}%`);
+        console.log(`MDD: ${result.mdd.toFixed(2)}%`);
         console.log(`Win Rate: ${result.winRate.toFixed(2)}%\n\n`);
     });
 }
@@ -106,7 +108,7 @@ async function backtestMarket(
 
     const finalCapital =
         capital + position * candles[candles.length - 1].trade_price;
-    const returnRate = ((finalCapital - initialCapital) / initialCapital) * 100;
+    const performance = (finalCapital / initialCapital - 1) * 100;
     const tradeCount = trades.filter((trade) => trade.action !== "유보").length;
     const winRate = totalTrades > 0 ? (winCount / totalTrades) * 100 : 0;
 
@@ -115,8 +117,8 @@ async function backtestMarket(
         trades,
         finalCapital,
         tradeCount,
-        returnRate,
-        maxDrawdown,
+        performance,
+        mdd: maxDrawdown,
         winRate,
     };
 }

@@ -19,9 +19,9 @@ function checkDailyMovingAverageBacktest(markets, period = 3, initialCapital) {
         results.forEach((result) => {
             console.log(`📈 [${result.market}]`);
             console.log(`Total Trades: ${result.trades}`);
-            console.log(`Final Capital: ${result.capital}원`);
-            console.log(`Return Rate: ${result.returnRate.toFixed(2)}%`);
-            console.log(`Maximum Drawdown (MDD): ${result.mdd.toFixed(2)}%`);
+            console.log(`Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원`);
+            console.log(`Performance: ${result.performance.toFixed(2)}%`);
+            console.log(`MDD: ${result.mdd.toFixed(2)}%`);
             console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
             console.log("");
         });
@@ -72,15 +72,15 @@ function backtestMarket(market, period, initialCapital) {
             }
         });
         const finalCapital = capital + position * candles[candles.length - 1].trade_price;
-        const returnRate = (finalCapital / initialCapital - 1) * 100;
+        const performance = (finalCapital / initialCapital - 1) * 100;
         const winRate = trades > 0 ? (wins / trades) * 100 : 0;
         return {
             market,
-            capital: Math.round(finalCapital).toLocaleString(),
+            finalCapital,
             trades,
             log,
             mdd,
-            returnRate,
+            performance,
             winRate,
         };
     });
