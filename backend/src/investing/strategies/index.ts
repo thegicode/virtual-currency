@@ -1,3 +1,4 @@
+import { sendTelegramMessageToChatId } from "../../notifications";
 import { checkDailyMovingAverage } from "./checkDailyMovingAverage";
 import { checkMinutesMovingAverage } from "./checkMinutesMovingAverage";
 import { executeMovingAverageAndVolatility } from "./movingAverageAndVolatility";
@@ -12,18 +13,23 @@ export {
     const markets = [
         "KRW-BTC",
         "KRW-ETH",
-        "KRW-DOGE",
         "KRW-SOL",
-        "KRW-BCH",
-        // "KRW-XRP",
-        // "KRW-GRS",
-        // "KRW-CTC",
-        // "KRW-ZRX",
-        // "KRW-NEAR",
-        // "KRW-BTG",
-        // "KRW-THETA",
-        // "KRW-AVAX",
-        // "KRW-SHIB",
+        "KRW-XRP",
+        "KRW-DOGE",
+        // "KRW-ADA",
+        "KRW-AVAX",
+        "KRW-SHIB",
+        // "KRW-DOT",
+        // "KRW-LINK",
+        // "KRW-TRX",
+        // "KRW-BCH",
+        "KRW-NEAR",
+
+        "KRW-GRS",
+        "KRW-CTC",
+        "KRW-ZRX",
+        "KRW-BTG",
+        "KRW-THETA",
     ];
 
     const initialCapital = 1000000;
@@ -31,6 +37,7 @@ export {
     // 일캔들 기준 5일 이동평균 확인
     const result1 = await checkDailyMovingAverage(markets, 5);
     console.log(result1);
+    // sendTelegramMessageToChatId(result1 as string);
 
     // 분캔들 기준 이동평균 확인 - interval
     await checkMinutesMovingAverage(

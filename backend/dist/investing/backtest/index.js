@@ -18,14 +18,19 @@ const movingAverageAndVolatilityBacktest_1 = require("./movingAverageAndVolatili
     try {
         const initialCapital = 10000;
         const markets = [
-            "KRW-NEAR",
+            "KRW-DOGE",
         ];
+        const apiCounts = 30;
+        console.log("-----------------------------------------");
         console.log("initialCapital : ", initialCapital);
-        yield (0, checkDailyMovingAverageBacktest_1.checkDailyMovingAverageBacktest)(markets, 5, initialCapital);
         console.log("-----------------------------------------");
-        yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 60, 10, initialCapital);
+        yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 60, 10, initialCapital, apiCounts);
         console.log("-----------------------------------------");
-        yield (0, movingAverageAndVolatilityBacktest_1.movingAverageAndVolatilityBacktest)(markets, initialCapital);
+        yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 240, 10, initialCapital, apiCounts);
+        console.log("-----------------------------------------");
+        yield (0, checkDailyMovingAverageBacktest_1.checkDailyMovingAverageBacktest)(markets, 5, initialCapital, apiCounts);
+        console.log("-----------------------------------------");
+        yield (0, movingAverageAndVolatilityBacktest_1.movingAverageAndVolatilityBacktest)(markets, initialCapital, apiCounts);
     }
     catch (error) {
         console.error("Error during backtesting: ", error);

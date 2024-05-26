@@ -5,15 +5,14 @@ import {
     calculateAllMovingAverages,
     calculateRiskAdjustedCapital,
     calculateVolatility,
-    formatPrice,
     isAboveAllMovingAverages,
 } from "../utils";
 
 export async function movingAverageAndVolatilityBacktest(
     markets: string[],
     initialCapital: number,
-    targetVolatility: number = 2,
-    days: number = 200
+    days: number = 200,
+    targetVolatility: number = 2
 ) {
     const results = await Promise.all(
         markets.map((market) =>
@@ -27,13 +26,13 @@ export async function movingAverageAndVolatilityBacktest(
         )
     );
 
-    console.log(
-        `\n🔔 3, 5, 10, 20일 이동평균 + 변동성 조절 backtest - ${days}일\n`
-    );
+    console.log(`\n🔔 3, 5, 10, 20일 이동평균 + 변동성 조절 backtest\n`);
 
     results.forEach((result) => {
         console.log(`📈 [${result.market}]`);
-        console.log(`Trade Count: ${result.trades}`);
+        console.log(`첫째 날: ${result.firstDate}`);
+        console.log(`마지막 날: ${result.lastDate}`);
+        console.log(`Trade Count: ${result.trades}번`);
         console.log(
             `Final Capital: ${Math.round(
                 result.finalCapital
@@ -59,9 +58,16 @@ async function backtestMarket(
     let wins = 0;
     let peakCapital = initialCapital;
     let maxDrawdown = 0;
+    let firstDate;
+    let lastDate;
 
     for (let i = 20; i < candles.length; i++) {
         const currentCandles = candles.slice(i - 20, i);
+        const currentCandle = candles[i];
+
+        if (i === 20) firstDate = candles[i].date_time;
+        if (i === candles.length - 1) lastDate = candles[i].date_time;
+
         const movingAverages = calculateAllMovingAverages(
             currentCandles,
             [3, 5, 10, 20]
@@ -113,6 +119,8 @@ async function backtestMarket(
 
     return {
         market,
+        firstDate,
+        lastDate,
         finalCapital,
         trades,
         winRate,

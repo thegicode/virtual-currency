@@ -11,12 +11,13 @@ import { calculateMovingAverage } from "../utils";
 export async function checkDailyMovingAverageBacktest(
     markets: string[],
     period: number = 3,
-    initialCapital: number
+    initialCapital: number,
+    days: number
 ) {
     const results = await Promise.all(
         markets.map(
             async (market: string) =>
-                await backtestMarket(market, period, initialCapital)
+                await backtestMarket(market, period, initialCapital, days)
         )
     );
 
@@ -24,7 +25,9 @@ export async function checkDailyMovingAverageBacktest(
 
     results.forEach((result) => {
         console.log(`📈 [${result.market}]`);
-        console.log(`Total Trades: ${result.trades}`);
+        console.log(`첫째 날: ${result.firstDate}`);
+        console.log(`마지막 날: ${result.lastDate}`);
+        console.log(`Total Trades: ${result.trades}번`);
         console.log(
             `Final Capital: ${Math.round(
                 result.finalCapital
@@ -43,9 +46,13 @@ export async function checkDailyMovingAverageBacktest(
 async function backtestMarket(
     market: string,
     period: number,
-    initialCapital: number
+    initialCapital: number,
+    apiCounts: number
 ) {
-    const candles: ICandle[] = await fetchDailyCandles(market, "200");
+    const candles: ICandle[] = await fetchDailyCandles(
+        market,
+        apiCounts.toString()
+    );
     const movingAverages = calculateMovingAverage(candles);
 
     let capital = initialCapital;
@@ -55,9 +62,18 @@ async function backtestMarket(
     let peak = initialCapital;
     let mdd = 0;
     let buyPrice = 0;
+    let firstDate;
+    let lastDate;
     const log: string[] = [];
 
     candles.slice(period).forEach((candle, index) => {
+        if (index === 0) firstDate = candle.date_time;
+
+        // console.log(index, candles.length - period - 1);
+        if (index === candles.length - period - 1) {
+            lastDate = candle.date_time;
+        }
+
         const currentPrice = candle.trade_price;
         const movingAverage = movingAverages[index];
 
@@ -108,6 +124,8 @@ async function backtestMarket(
 
     return {
         market,
+        firstDate,
+        lastDate,
         finalCapital,
         trades,
         log,

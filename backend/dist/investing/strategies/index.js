@@ -20,9 +20,17 @@ Object.defineProperty(exports, "executeMovingAverageAndVolatility", { enumerable
     const markets = [
         "KRW-BTC",
         "KRW-ETH",
-        "KRW-DOGE",
         "KRW-SOL",
-        "KRW-BCH",
+        "KRW-XRP",
+        "KRW-DOGE",
+        "KRW-AVAX",
+        "KRW-SHIB",
+        "KRW-NEAR",
+        "KRW-GRS",
+        "KRW-CTC",
+        "KRW-ZRX",
+        "KRW-BTG",
+        "KRW-THETA",
     ];
     const initialCapital = 1000000;
     const result1 = yield (0, checkDailyMovingAverage_1.checkDailyMovingAverage)(markets, 5);

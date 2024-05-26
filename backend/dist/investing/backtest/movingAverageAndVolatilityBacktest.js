@@ -13,13 +13,15 @@ exports.movingAverageAndVolatilityBacktest = void 0;
 const api_1 = require("../../services/api");
 const movingAverageAndVolatility_1 = require("../strategies/movingAverageAndVolatility");
 const utils_1 = require("../utils");
-function movingAverageAndVolatilityBacktest(markets, initialCapital, targetVolatility = 2, days = 200) {
+function movingAverageAndVolatilityBacktest(markets, initialCapital, days = 200, targetVolatility = 2) {
     return __awaiter(this, void 0, void 0, function* () {
         const results = yield Promise.all(markets.map((market) => backtestMarket(market, days, targetVolatility, markets, initialCapital)));
-        console.log(`\n🔔 3, 5, 10, 20일 이동평균 + 변동성 조절 backtest - ${days}일\n`);
+        console.log(`\n🔔 3, 5, 10, 20일 이동평균 + 변동성 조절 backtest\n`);
         results.forEach((result) => {
             console.log(`📈 [${result.market}]`);
-            console.log(`Trade Count: ${result.trades}`);
+            console.log(`첫째 날: ${result.firstDate}`);
+            console.log(`마지막 날: ${result.lastDate}`);
+            console.log(`Trade Count: ${result.trades}번`);
             console.log(`Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원`);
             console.log(`Performance: ${result.performance.toFixed(2)}%`);
             console.log(`MDD: ${result.mdd.toFixed(2)}%`);
@@ -37,8 +39,15 @@ function backtestMarket(market, days, targetVolatility, markets, initialCapital)
         let wins = 0;
         let peakCapital = initialCapital;
         let maxDrawdown = 0;
+        let firstDate;
+        let lastDate;
         for (let i = 20; i < candles.length; i++) {
             const currentCandles = candles.slice(i - 20, i);
+            const currentCandle = candles[i];
+            if (i === 20)
+                firstDate = candles[i].date_time;
+            if (i === candles.length - 1)
+                lastDate = candles[i].date_time;
             const movingAverages = (0, utils_1.calculateAllMovingAverages)(currentCandles, [3, 5, 10, 20]);
             const currentPrice = candles[i].trade_price;
             const volatility = (0, utils_1.calculateVolatility)(currentCandles.slice(-5));
@@ -72,6 +81,8 @@ function backtestMarket(market, days, targetVolatility, markets, initialCapital)
         const winRate = (wins / trades) * 100;
         return {
             market,
+            firstDate,
+            lastDate,
             finalCapital,
             trades,
             winRate,

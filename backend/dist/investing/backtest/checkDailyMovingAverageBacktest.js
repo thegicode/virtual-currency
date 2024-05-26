@@ -12,13 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkDailyMovingAverageBacktest = void 0;
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
-function checkDailyMovingAverageBacktest(markets, period = 3, initialCapital) {
+function checkDailyMovingAverageBacktest(markets, period = 3, initialCapital, days) {
     return __awaiter(this, void 0, void 0, function* () {
-        const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () { return yield backtestMarket(market, period, initialCapital); })));
+        const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () { return yield backtestMarket(market, period, initialCapital, days); })));
         console.log(`\n🔔 일 캔들 ${period}일 이동평균 backtest\n`);
         results.forEach((result) => {
             console.log(`📈 [${result.market}]`);
-            console.log(`Total Trades: ${result.trades}`);
+            console.log(`첫째 날: ${result.firstDate}`);
+            console.log(`마지막 날: ${result.lastDate}`);
+            console.log(`Total Trades: ${result.trades}번`);
             console.log(`Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원`);
             console.log(`Performance: ${result.performance.toFixed(2)}%`);
             console.log(`MDD: ${result.mdd.toFixed(2)}%`);
@@ -29,9 +31,9 @@ function checkDailyMovingAverageBacktest(markets, period = 3, initialCapital) {
     });
 }
 exports.checkDailyMovingAverageBacktest = checkDailyMovingAverageBacktest;
-function backtestMarket(market, period, initialCapital) {
+function backtestMarket(market, period, initialCapital, apiCounts) {
     return __awaiter(this, void 0, void 0, function* () {
-        const candles = yield (0, api_1.fetchDailyCandles)(market, "200");
+        const candles = yield (0, api_1.fetchDailyCandles)(market, apiCounts.toString());
         const movingAverages = (0, utils_1.calculateMovingAverage)(candles);
         let capital = initialCapital;
         let position = 0;
@@ -40,8 +42,15 @@ function backtestMarket(market, period, initialCapital) {
         let peak = initialCapital;
         let mdd = 0;
         let buyPrice = 0;
+        let firstDate;
+        let lastDate;
         const log = [];
         candles.slice(period).forEach((candle, index) => {
+            if (index === 0)
+                firstDate = candle.date_time;
+            if (index === candles.length - period - 1) {
+                lastDate = candle.date_time;
+            }
             const currentPrice = candle.trade_price;
             const movingAverage = movingAverages[index];
             if (currentPrice > movingAverage && capital > 0) {
@@ -76,6 +85,8 @@ function backtestMarket(market, period, initialCapital) {
         const winRate = trades > 0 ? (wins / trades) * 100 : 0;
         return {
             market,
+            firstDate,
+            lastDate,
             finalCapital,
             trades,
             log,

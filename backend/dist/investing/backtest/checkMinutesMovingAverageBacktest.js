@@ -12,13 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkMinutesMovingAverageBacktest = void 0;
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
-function checkMinutesMovingAverageBacktest(markets, candleUnit, movingAveragePeriod, initialCapital) {
+function checkMinutesMovingAverageBacktest(markets, candleUnit, movingAveragePeriod, initialCapital, apiCounts) {
     return __awaiter(this, void 0, void 0, function* () {
-        const results = yield Promise.all(markets.map((market) => backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital)));
+        const results = yield Promise.all(markets.map((market) => backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital, apiCounts)));
         console.log(`\n🔔 ${candleUnit}분캔들 ${movingAveragePeriod} 이동평균 backtest\n`);
         results.forEach((result) => {
             console.log(`📈 [${result.market}]`);
-            console.log(`Trade Count: ${result.tradeCount}`);
+            console.log(`first Time: ${result.firstTime}`);
+            console.log(`last Time: ${result.lastTime}`);
+            console.log(`Trade Count: ${result.tradeCount}번`);
             console.log(`Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원`);
             console.log(`Performance: ${result.performance.toFixed(2)}%`);
             console.log(`MDD: ${result.mdd.toFixed(2)}%`);
@@ -27,9 +29,9 @@ function checkMinutesMovingAverageBacktest(markets, candleUnit, movingAveragePer
     });
 }
 exports.checkMinutesMovingAverageBacktest = checkMinutesMovingAverageBacktest;
-function backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital) {
+function backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital, apiCounts) {
     return __awaiter(this, void 0, void 0, function* () {
-        const candles = yield (0, api_1.fetchMinutesCandles)(market, candleUnit, 200);
+        const candles = yield (0, api_1.fetchMinutesCandles)(market, candleUnit, apiCounts);
         const movingAverages = (0, utils_1.calculateMovingAverage)(candles);
         const trades = [];
         let capital = initialCapital;
@@ -39,9 +41,15 @@ function backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital)
         let winCount = 0;
         let totalTrades = 0;
         let buyPrice = 0;
-        candles.forEach((candle, index) => {
-            if (index < movingAveragePeriod)
-                return;
+        let firstTime;
+        let lastTime;
+        candles
+            .slice(movingAveragePeriod)
+            .forEach((candle, index) => {
+            if (index === 0)
+                firstTime = candle.date_time;
+            if (index === candles.length - movingAveragePeriod - 1)
+                lastTime = candle.date_time;
             const currentPrice = candle.trade_price;
             const movingAverage = movingAverages[index - movingAveragePeriod];
             let action = "유보";
@@ -87,6 +95,8 @@ function backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital)
         const winRate = totalTrades > 0 ? (winCount / totalTrades) * 100 : 0;
         return {
             market,
+            firstTime,
+            lastTime,
             trades,
             finalCapital,
             tradeCount,
