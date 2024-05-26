@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchTicker = exports.fetchMinutesCandles = exports.fetchDailyCandles = void 0;
+exports.fetchMarketAll = exports.fetchTicker = exports.fetchMinutesCandles = exports.fetchDailyCandles = void 0;
 const fetchDailyCandles_1 = require("./fetchDailyCandles");
 Object.defineProperty(exports, "fetchDailyCandles", { enumerable: true, get: function () { return fetchDailyCandles_1.fetchDailyCandles; } });
+const fetchMarkeAll_1 = require("./fetchMarkeAll");
+Object.defineProperty(exports, "fetchMarketAll", { enumerable: true, get: function () { return fetchMarkeAll_1.fetchMarketAll; } });
 const fetchMinutesCandles_1 = require("./fetchMinutesCandles");
 Object.defineProperty(exports, "fetchMinutesCandles", { enumerable: true, get: function () { return fetchMinutesCandles_1.fetchMinutesCandles; } });
 const fetchTicker_1 = require("./fetchTicker");

@@ -57,7 +57,7 @@
       this.data = [];
       this.qqqData = {};
       this.tradeData = [];
-      this.count = 30;
+      this.count = 100;
       this.totalGain = 0;
       this.totalUnrealizeGain = 0;
       this.template = document.querySelector("#tp-item");

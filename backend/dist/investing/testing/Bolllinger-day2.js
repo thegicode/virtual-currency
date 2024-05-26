@@ -25,13 +25,13 @@ function bollingerBandsBacktest(market, initialCapital, days = 200, period = 20)
         for (let i = 0; i < upperBand.length; i++) {
             const currentPrice = candles[period - 1 + i].trade_price;
             if (currentPrice < lowerBand[i]) {
-                const investment = capital * 0.2;
+                const investment = capital * 0.4;
                 position += investment / currentPrice;
                 capital -= investment;
                 trades++;
             }
             else if (currentPrice < middleBand[i]) {
-                const investment = capital * 0.1;
+                const investment = capital * 0.5;
                 position += investment / currentPrice;
                 capital -= investment;
                 trades++;
@@ -71,7 +71,7 @@ exports.bollingerBandsBacktest = bollingerBandsBacktest;
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const market = "KRW-DOGE";
     const initialCapital = 1000000;
-    const days = 200;
+    const days = 100;
     const backtestResult = yield bollingerBandsBacktest(market, initialCapital, days);
     console.log(backtestResult);
 }))();

@@ -40,13 +40,13 @@ export async function bollingerBandsBacktest(
 
         if (currentPrice < lowerBand[i]) {
             // 2차 매수 신호
-            const investment = capital * 0.2; // 20% 자본 사용
+            const investment = capital * 0.4; // 20% 자본 사용
             position += investment / currentPrice;
             capital -= investment;
             trades++;
         } else if (currentPrice < middleBand[i]) {
             // 1차 매수 신호
-            const investment = capital * 0.1; // 10% 자본 사용
+            const investment = capital * 0.5; // 10% 자본 사용
             position += investment / currentPrice;
             capital -= investment;
             trades++;
@@ -91,7 +91,7 @@ export async function bollingerBandsBacktest(
 (async () => {
     const market = "KRW-DOGE";
     const initialCapital = 1000000;
-    const days = 200;
+    const days = 100;
 
     const backtestResult = await bollingerBandsBacktest(
         market,

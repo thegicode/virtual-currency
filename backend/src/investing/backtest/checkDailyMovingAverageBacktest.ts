@@ -68,8 +68,6 @@ async function backtestMarket(
 
     candles.slice(period).forEach((candle, index) => {
         if (index === 0) firstDate = candle.date_time;
-
-        // console.log(index, candles.length - period - 1);
         if (index === candles.length - period - 1) {
             lastDate = candle.date_time;
         }

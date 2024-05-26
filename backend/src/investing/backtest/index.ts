@@ -21,7 +21,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             // "KRW-AVAX",
             // "KRW-SHIB",
         ];
-        const apiCounts = 30;
+        const apiCounts = 100;
 
         console.log("-----------------------------------------");
 
@@ -30,7 +30,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         console.log("-----------------------------------------");
 
         // checkMinutesMovingAverage;
-        await checkMinutesMovingAverageBacktest(
+        /*  await checkMinutesMovingAverageBacktest(
             markets,
             60, // candleUnit, 인터벌 시간 단위
             10, //  movingAveragePeriod, 이동평균 단위
@@ -38,7 +38,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             apiCounts
         );
 
-        console.log("-----------------------------------------");
+        console.log("-----------------------------------------"); */
 
         // checkMinutesMovingAverage
         await checkMinutesMovingAverageBacktest(

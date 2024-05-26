@@ -21,6 +21,13 @@ interface IDailyMovingAverageResult {
     signal: string;
 }
 
+interface IMarket {
+    market: string;
+    korean_name: string;
+    english_name: string;
+    market_warning: string;
+}
+
 interface IMinutesCandleRSI extends ICandle {
     rsi?: number;
     signal?: number;
