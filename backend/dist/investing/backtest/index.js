@@ -20,6 +20,7 @@ const movingAverageAndVolatilityBacktest_1 = require("./movingAverageAndVolatili
         const initialCapital = 10000;
         const markets = [
             "KRW-BTC",
+            "KRW-SBD",
         ];
         const apiCounts = 100;
         console.log("-----------------------------------------");
@@ -32,7 +33,7 @@ const movingAverageAndVolatilityBacktest_1 = require("./movingAverageAndVolatili
         console.log("-----------------------------------------");
         yield (0, movingAverageAndVolatilityBacktest_1.movingAverageAndVolatilityBacktest)(markets, initialCapital, apiCounts);
         console.log("-----------------------------------------");
-        yield (0, afternoonRiseStrategyBacktest_1.multiCryptoAfternoonRiseMorningInvestmentBacktest)(markets, initialCapital, apiCounts);
+        yield (0, afternoonRiseStrategyBacktest_1.afternoonRiseMorningInvestmentBacktest)(markets, initialCapital, apiCounts);
     }
     catch (error) {
         console.error("Error during backtesting: ", error);

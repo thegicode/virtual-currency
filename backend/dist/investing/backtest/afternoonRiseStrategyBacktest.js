@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.multiCryptoAfternoonRiseMorningInvestmentBacktest = void 0;
+exports.afternoonRiseMorningInvestmentBacktest = void 0;
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
-function multiCryptoAfternoonRiseMorningInvestmentBacktest(markets, initialCapital, period, targetVolatility = 2) {
+function afternoonRiseMorningInvestmentBacktest(markets, initialCapital, period, targetVolatility = 2) {
     return __awaiter(this, void 0, void 0, function* () {
         const transactionFee = 0.001;
         const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () {
@@ -33,7 +33,7 @@ function multiCryptoAfternoonRiseMorningInvestmentBacktest(markets, initialCapit
         return results;
     });
 }
-exports.multiCryptoAfternoonRiseMorningInvestmentBacktest = multiCryptoAfternoonRiseMorningInvestmentBacktest;
+exports.afternoonRiseMorningInvestmentBacktest = afternoonRiseMorningInvestmentBacktest;
 function backtest(markets, market, period, targetVolatility, initialCapital, transactionFee) {
     return __awaiter(this, void 0, void 0, function* () {
         let capital = initialCapital;

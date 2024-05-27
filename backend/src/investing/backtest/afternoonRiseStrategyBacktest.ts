@@ -19,7 +19,7 @@
 import { fetchMinutesCandles, fetchTicker } from "../../services/api";
 import { calculateVolatility } from "../utils";
 
-export async function multiCryptoAfternoonRiseMorningInvestmentBacktest(
+export async function afternoonRiseMorningInvestmentBacktest(
     markets: string[],
     initialCapital: number,
     period: number,

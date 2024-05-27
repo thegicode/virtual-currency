@@ -1,4 +1,4 @@
-import { multiCryptoAfternoonRiseMorningInvestmentBacktest } from "./afternoonRiseStrategyBacktest";
+import { afternoonRiseMorningInvestmentBacktest } from "./afternoonRiseStrategyBacktest";
 import { checkDailyMovingAverageBacktest } from "./checkDailyMovingAverageBacktest";
 import { checkMinutesMovingAverageBacktest } from "./checkMinutesMovingAverageBacktest";
 import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatilityBacktest";
@@ -21,6 +21,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             // "KRW-THETA",
             // "KRW-AVAX",
             // "KRW-SHIB",
+            "KRW-SBD",
         ];
         const apiCounts = 100;
 
@@ -64,6 +65,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         console.log("-----------------------------------------");
 
         // checkDailyMovingAverage
+        // KRW-BTC
         await checkDailyMovingAverageBacktest(
             markets, // markets
             5, // period
@@ -83,9 +85,9 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
 
         console.log("-----------------------------------------");
 
-        // multiCryptoAfternoonRiseMorningInvestmentBacktest
-
-        await multiCryptoAfternoonRiseMorningInvestmentBacktest(
+        // afternoonRiseMorningInvestmentBacktest
+        // KRW-DOGE
+        await afternoonRiseMorningInvestmentBacktest(
             markets,
             initialCapital,
             apiCounts
