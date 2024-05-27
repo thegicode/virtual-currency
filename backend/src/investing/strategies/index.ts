@@ -16,13 +16,10 @@ export {
         "KRW-SOL",
         "KRW-XRP",
         "KRW-DOGE",
-        // "KRW-ADA",
+        "KRW-SBD",
+
         "KRW-AVAX",
         "KRW-SHIB",
-        // "KRW-DOT",
-        // "KRW-LINK",
-        // "KRW-TRX",
-        // "KRW-BCH",
         "KRW-NEAR",
 
         "KRW-GRS",
@@ -37,12 +34,19 @@ export {
     // 일캔들 기준 5일 이동평균 확인
     const result1 = await checkDailyMovingAverage(markets, 5);
     console.log(result1);
-    // sendTelegramMessageToChatId(result1 as string);
+    sendTelegramMessageToChatId(result1 as string);
 
     // 분캔들 기준 이동평균 확인 - interval
-    await checkMinutesMovingAverage(
+    /* await checkMinutesMovingAverage(
         markets,
         60, // candleUnit minute(단위 분)
+        10, // movingAveragePeriod
+        (message) => console.log(message)
+    ); */
+
+    await checkMinutesMovingAverage(
+        markets,
+        240, // candleUnit minute(단위 분)
         10, // movingAveragePeriod
         (message) => console.log(message)
     );
@@ -55,3 +59,5 @@ export {
     );
     console.log(results3);
 })();
+
+//  240 불린저 상한선, 하한선
