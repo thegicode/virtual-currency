@@ -1,3 +1,4 @@
+import { multiCryptoAfternoonRiseMorningInvestmentBacktest } from "./afternoonRiseStrategyBacktest";
 import { checkDailyMovingAverageBacktest } from "./checkDailyMovingAverageBacktest";
 import { checkMinutesMovingAverageBacktest } from "./checkMinutesMovingAverageBacktest";
 import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatilityBacktest";
@@ -13,6 +14,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             // "KRW-SOL",
             // "KRW-AVAX",
             "KRW-DOGE",
+            // "KRW-XRP",
 
             // "KRW-ZRX",
             // "KRW-NEAR",
@@ -21,7 +23,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             // "KRW-AVAX",
             // "KRW-SHIB",
         ];
-        const apiCounts = 100;
+        const apiCounts = 200;
 
         console.log("-----------------------------------------");
 
@@ -49,6 +51,17 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             apiCounts
         );
 
+        // console.log("-----------------------------------------");
+
+        // checkMinutesMovingAverage
+        await checkMinutesMovingAverageBacktest(
+            markets,
+            240, // candleUnit, 인터벌 시간 단위
+            5, //  movingAveragePeriod, 이동평균 단위
+            initialCapital, // 초기 자본
+            apiCounts
+        );
+
         console.log("-----------------------------------------");
 
         // checkDailyMovingAverage
@@ -67,6 +80,17 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             initialCapital,
             apiCounts
             // targetVolatility: number = 2,
+        );
+
+        console.log("-----------------------------------------");
+
+        // multiCryptoAfternoonRiseMorningInvestmentBacktest
+
+        await multiCryptoAfternoonRiseMorningInvestmentBacktest(
+            markets,
+            initialCapital,
+            apiCounts
+            // 2 // targetVolatility = 2
         );
     } catch (error) {
         console.error("Error during backtesting: ", error);
