@@ -47,8 +47,12 @@ export async function multiCryptoAfternoonRiseMorningInvestmentBacktest(
 
     results.forEach((result) => {
         console.log(`📈 [${result.market}]`);
-        // console.log(`첫째 날: ${result.firstDate}`);
-        // console.log(`마지막 날: ${result.lastDate}`);
+        console.log(`첫째 날: ${result.tradeData[0].currentDate}`);
+        console.log(
+            `마지막 날: ${
+                result.tradeData[result.tradeData.length - 1].currentDate
+            }`
+        );
         console.log(`Total Trades: ${result.trades}번`);
         console.log(
             `Final Capital: ${Math.round(
@@ -59,7 +63,7 @@ export async function multiCryptoAfternoonRiseMorningInvestmentBacktest(
         console.log(`MDD: ${result.maxDrawdown.toFixed(2)}%`);
         console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
         // console.log("Trade Log:", result.log.join("\n"));
-        console.table(result.tradeData);
+        // console.table(result.tradeData);
         console.log("");
     });
 

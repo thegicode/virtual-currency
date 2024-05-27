@@ -9,13 +9,12 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
     try {
         const initialCapital = 10000; // 초기 자본
         const markets = [
-            // "KRW-BTC",
+            "KRW-BTC",
             // "KRW-ETH",
             // "KRW-SOL",
             // "KRW-AVAX",
-            "KRW-DOGE",
+            // "KRW-DOGE",
             // "KRW-XRP",
-
             // "KRW-ZRX",
             // "KRW-NEAR",
             // "KRW-BTG",
@@ -23,7 +22,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             // "KRW-AVAX",
             // "KRW-SHIB",
         ];
-        const apiCounts = 200;
+        const apiCounts = 100;
 
         console.log("-----------------------------------------");
 

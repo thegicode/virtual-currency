@@ -139,7 +139,7 @@
       super();
       this.tradeData = [];
       this.market = "";
-      this.count = 200;
+      this.count = 100;
       this.marketSize = 5;
       this.totalInvestmentPrice = 1e6;
       this.investmentPrice = this.totalInvestmentPrice / this.marketSize;

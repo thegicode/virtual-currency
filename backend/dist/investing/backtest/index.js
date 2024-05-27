@@ -19,9 +19,9 @@ const movingAverageAndVolatilityBacktest_1 = require("./movingAverageAndVolatili
     try {
         const initialCapital = 10000;
         const markets = [
-            "KRW-DOGE",
+            "KRW-BTC",
         ];
-        const apiCounts = 200;
+        const apiCounts = 100;
         console.log("-----------------------------------------");
         console.log("initialCapital : ", initialCapital);
         console.log("-----------------------------------------");

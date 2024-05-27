@@ -21,12 +21,13 @@ function multiCryptoAfternoonRiseMorningInvestmentBacktest(markets, initialCapit
         console.log(`\n🔔 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절 backtest\n`);
         results.forEach((result) => {
             console.log(`📈 [${result.market}]`);
+            console.log(`첫째 날: ${result.tradeData[0].currentDate}`);
+            console.log(`마지막 날: ${result.tradeData[result.tradeData.length - 1].currentDate}`);
             console.log(`Total Trades: ${result.trades}번`);
             console.log(`Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원`);
             console.log(`Performance: ${result.performance.toFixed(2)}%`);
             console.log(`MDD: ${result.maxDrawdown.toFixed(2)}%`);
             console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
-            console.table(result.tradeData);
             console.log("");
         });
         return results;
