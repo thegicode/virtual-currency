@@ -15,7 +15,7 @@ export async function bollingerBandsBacktest(
     market: string,
     initialCapital: number,
     candleUnit: TCandleUnit = 240, // 240분봉
-    days: number = 60, // 60일
+    days: number, // 60일
     period: number = 20 // 20기간
 ): Promise<IBacktestResult> {
     const candles: ICandle[] = await fetchMinutesCandles(
@@ -23,6 +23,7 @@ export async function bollingerBandsBacktest(
         candleUnit,
         ((24 * 60) / candleUnit) * days
     );
+
     const { middleBand, upperBand, lowerBand } = calculateBollingerBands(
         candles,
         period
@@ -40,14 +41,26 @@ export async function bollingerBandsBacktest(
 
         if (currentPrice < lowerBand[i]) {
             // 매수 신호
-            const investment = capital * 0.1; // 10% 자본 사용
+            const investment = capital * 0.3; // 10% 자본 사용
             position += investment / currentPrice;
             capital -= investment;
+            // console.log(
+            //     "buy",
+            //     candles[period - 1 + i].date_time,
+            //     currentPrice,
+            //     Math.round(capital).toLocaleString()
+            // );
             trades++;
         } else if (currentPrice > upperBand[i] && position > 0) {
             // 매도 신호
             capital += position * currentPrice;
             position = 0;
+            // console.log(
+            //     "sell",
+            //     candles[period - 1 + i].date_time,
+            //     currentPrice,
+            //     Math.round(capital).toLocaleString()
+            // );
             trades++;
             if (capital > initialCapital) {
                 wins++;

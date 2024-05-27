@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.bollingerBandsBacktest = void 0;
 const api_1 = require("../../services/api");
 const investmentUtils_1 = require("../utils/investmentUtils");
-function bollingerBandsBacktest(market, initialCapital, candleUnit = 240, days = 60, period = 20) {
+function bollingerBandsBacktest(market, initialCapital, candleUnit = 240, days, period = 20) {
     return __awaiter(this, void 0, void 0, function* () {
         const candles = yield (0, api_1.fetchMinutesCandles)(market, candleUnit, ((24 * 60) / candleUnit) * days);
         const { middleBand, upperBand, lowerBand } = (0, investmentUtils_1.calculateBollingerBands)(candles, period);
@@ -25,7 +25,7 @@ function bollingerBandsBacktest(market, initialCapital, candleUnit = 240, days =
         for (let i = 0; i < upperBand.length; i++) {
             const currentPrice = candles[period - 1 + i].trade_price;
             if (currentPrice < lowerBand[i]) {
-                const investment = capital * 0.1;
+                const investment = capital * 0.3;
                 position += investment / currentPrice;
                 capital -= investment;
                 trades++;
