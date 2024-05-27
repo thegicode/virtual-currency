@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { checkDailyMovingAverageBacktest } from "../investing/backtest";
 
 export async function handleDailyMABacktest(req: Request, res: Response) {
-    const { markets, period, initialCapital } = req.query;
+    const { markets, period, initialCapital, days } = req.query;
 
     const marketsArray = (markets as string).split(",").map((m) => m.trim());
 
@@ -17,7 +17,8 @@ export async function handleDailyMABacktest(req: Request, res: Response) {
         const backtestData = await checkDailyMovingAverageBacktest(
             marketsArray,
             parseInt(period as string),
-            parseInt(initialCapital as string)
+            parseInt(initialCapital as string),
+            parseInt(days as string)
         );
 
         res.status(200).json(backtestData);

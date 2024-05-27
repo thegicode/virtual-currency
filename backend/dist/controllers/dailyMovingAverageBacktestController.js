@@ -13,7 +13,7 @@ exports.handleDailyMABacktest = void 0;
 const backtest_1 = require("../investing/backtest");
 function handleDailyMABacktest(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { markets, period, initialCapital } = req.query;
+        const { markets, period, initialCapital, days } = req.query;
         const marketsArray = markets.split(",").map((m) => m.trim());
         if (!markets || !period || !initialCapital) {
             res.status(400).json({
@@ -22,7 +22,7 @@ function handleDailyMABacktest(req, res) {
             return;
         }
         try {
-            const backtestData = yield (0, backtest_1.checkDailyMovingAverageBacktest)(marketsArray, parseInt(period), parseInt(initialCapital));
+            const backtestData = yield (0, backtest_1.checkDailyMovingAverageBacktest)(marketsArray, parseInt(period), parseInt(initialCapital), parseInt(days));
             res.status(200).json(backtestData);
         }
         catch (error) {
