@@ -67,8 +67,8 @@ function calculateDailyMetrics(afternoonCandles, morningCandles) {
     const afternoonOpenPrice = afternoonCandles[0].opening_price;
     const afternoonClosePrice = afternoonCandles[afternoonCandles.length - 1].trade_price;
     const afternoonReturnRate = (afternoonClosePrice - afternoonOpenPrice) / afternoonOpenPrice;
-    const morningVolume = morningCandles.reduce((acc, cur) => acc + cur.candle_acc_trade_volume, 0);
-    const afternoonVolume = afternoonCandles.reduce((acc, cur) => acc + cur.candle_acc_trade_volume, 0);
+    const morningVolume = (0, utils_1.calculateVolume)(morningCandles);
+    const afternoonVolume = (0, utils_1.calculateVolume)(afternoonCandles);
     const volatility = (0, utils_1.calculateVolatility)(afternoonCandles);
     return { afternoonReturnRate, morningVolume, afternoonVolume, volatility };
 }

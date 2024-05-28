@@ -1,7 +1,7 @@
 // afternoonRiseMorningInvestment
 
 import { fetchMinutesCandles } from "../../services/api";
-import { calculateVolatility, formatPrice } from "../utils";
+import { calculateVolatility, calculateVolume, formatPrice } from "../utils";
 
 /**
  * 투자전략  : 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
@@ -145,16 +145,10 @@ function calculateDailyMetrics(
     // console.log("afternoonReturnRate", afternoonReturnRate * 100);
 
     // 1-2. 전일 오전 (0시 ~ 12시) 거래량
-    const morningVolume = morningCandles.reduce(
-        (acc: number, cur: ICandle) => acc + cur.candle_acc_trade_volume,
-        0
-    );
+    const morningVolume = calculateVolume(morningCandles);
 
     // 1-3. 전일 오후 (12시 ~ 24시) 거래량
-    const afternoonVolume = afternoonCandles.reduce(
-        (acc: number, cur: ICandle) => acc + cur.candle_acc_trade_volume,
-        0
-    );
+    const afternoonVolume = calculateVolume(afternoonCandles);
 
     // 1-4. 전일 오후 변동성
     const volatility = calculateVolatility(afternoonCandles);

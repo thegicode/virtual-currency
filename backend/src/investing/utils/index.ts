@@ -1,15 +1,16 @@
 import { retryFetch } from "./apiUtils";
 import { formatDateString, formatTimeString } from "./dateUtils";
-import { calculateRiskAdjustedCapital } from "./financialUtils";
-import { calculateBollingerBands } from "./investmentUtils";
 import {
     calculateAllMovingAverages,
     calculateMovingAverage,
+    calculateRiskAdjustedCapital,
+    calculateVolatility,
+    calculateVolume,
     isAboveAllMovingAverages,
-} from "./movingAverageUtils";
-import { calculateAverageNoise } from "./noiseUtils";
+} from "./financialUtils";
+import { calculateBollingerBands } from "./investmentUtils";
 import { formatPrice } from "./priceUtils";
-import { calculateVolatility } from "./volatilityUtils";
+import { calculateAverageNoise } from "./tradingUtils";
 
 export {
     // apiUtils
@@ -20,22 +21,21 @@ export {
     formatTimeString,
 
     // financialUtils
+    calculateAllMovingAverages,
+    calculateMovingAverage,
     calculateRiskAdjustedCapital,
+    calculateVolatility,
+    calculateVolume,
+    isAboveAllMovingAverages,
 
     // investmentUtils
     calculateBollingerBands,
 
     // movingAverageUtils
-    calculateAllMovingAverages,
-    calculateMovingAverage,
-    isAboveAllMovingAverages,
-
-    // noiseUtils
-    calculateAverageNoise,
 
     // priceUtils
     formatPrice,
 
-    // volatilityUtils
-    calculateVolatility,
+    // tradingUtils
+    calculateAverageNoise,
 };

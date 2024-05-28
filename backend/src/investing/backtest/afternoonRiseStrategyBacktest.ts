@@ -19,9 +19,8 @@
  * 캔들 오류 => 계산 수정 할 것
  */
 
-import { aD } from "vitest/dist/reporters-yx5ZTtEV";
 import { fetchMinutesCandles } from "../../services/api";
-import { calculateVolatility } from "../utils";
+import { calculateVolatility, calculateVolume } from "../utils";
 
 export async function afternoonRiseMorningInvestmentBacktest(
     markets: string[],
@@ -236,18 +235,10 @@ function calculateDailyMetrics(
     // console.log("afternoonReturnRate", afternoonReturnRate * 100);
 
     // 1-2. 전일 오전 (0시 ~ 12시) 거래량
-    const morningVolume = morningCandles.reduce(
-        (acc: number, cur: ICandle) => acc + cur.candle_acc_trade_volume,
-        0
-    );
-    // console.log("morningVolume", morningVolume);
+    const morningVolume = calculateVolume(morningCandles);
 
     // 1-3. 전일 오후 (12시 ~ 24시) 거래량
-    const afternoonVolume = afternoonCandles.reduce(
-        (acc: number, cur: ICandle) => acc + cur.candle_acc_trade_volume,
-        0
-    );
-    // console.log("afternoonVolume", afternoonVolume);
+    const afternoonVolume = calculateVolume(afternoonCandles);
 
     // 1-4. 전일 오후 변동성
     const volatility = calculateVolatility(afternoonCandles);
