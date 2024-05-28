@@ -34,14 +34,9 @@ function checkMovingAverage(market, period) {
             const currentPrice = (yield (0, api_1.fetchTicker)(market))[0].trade_price;
             const prevMovingAverage = movingAverages[movingAverages.length - 2];
             const latestMovingAverage = movingAverages[movingAverages.length - 1];
-            const isPrevBuy = prevPrice > prevMovingAverage;
-            let signal;
-            if (isPrevBuy) {
-                signal = currentPrice > latestMovingAverage ? "매수 유지" : "매도";
-            }
-            else {
-                signal = currentPrice > latestMovingAverage ? "매수" : "유보";
-            }
+            const signal = currentPrice > latestMovingAverage
+                ? "매수 또는 유지"
+                : "매도 또는 유보";
             return {
                 market,
                 movingAverage: latestMovingAverage,

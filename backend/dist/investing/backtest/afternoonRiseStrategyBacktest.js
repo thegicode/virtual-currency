@@ -28,6 +28,7 @@ function afternoonRiseMorningInvestmentBacktest(markets, initialCapital, period,
             console.log(`Performance: ${result.performance.toFixed(2)}%`);
             console.log(`MDD: ${result.maxDrawdown.toFixed(2)}%`);
             console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
+            console.table(result.tradeData);
             console.log("");
         });
         return results;

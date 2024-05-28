@@ -22,6 +22,7 @@ function bollingerBandsBacktest(market, initialCapital, candleUnit = 240, days =
         let wins = 0;
         let peakCapital = initialCapital;
         let maxDrawdown = 0;
+        let tardeData = [];
         for (let i = 0; i < upperBand.length; i++) {
             const currentPrice = candles[period - 1 + i].trade_price;
             if (currentPrice < lowerBand[i]) {
@@ -29,12 +30,14 @@ function bollingerBandsBacktest(market, initialCapital, candleUnit = 240, days =
                 position += investment / currentPrice;
                 capital -= investment;
                 trades++;
+                tardeData.push({ i, currentPrice, capital, investment, trades });
             }
             else if (currentPrice < middleBand[i]) {
                 const investment = capital * 0.1;
                 position += investment / currentPrice;
                 capital -= investment;
                 trades++;
+                tardeData.push({ i, currentPrice, capital, investment, trades });
             }
             else if (currentPrice > upperBand[i] && position > 0) {
                 capital += position * currentPrice;
@@ -43,6 +46,7 @@ function bollingerBandsBacktest(market, initialCapital, candleUnit = 240, days =
                 if (capital > initialCapital) {
                     wins++;
                 }
+                tardeData.push({ i, currentPrice, capital, wins, trades });
             }
             const currentTotal = capital + position * currentPrice;
             if (currentTotal > peakCapital) {
@@ -69,10 +73,10 @@ function bollingerBandsBacktest(market, initialCapital, candleUnit = 240, days =
 }
 exports.bollingerBandsBacktest = bollingerBandsBacktest;
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const market = "KRW-DOGE";
+    const market = "KRW-SBD";
     const initialCapital = 1000000;
     const candleUnit = 240;
-    const days = 200;
+    const days = 100;
     const backtestResult = yield bollingerBandsBacktest(market, initialCapital, candleUnit, days);
     console.log(backtestResult);
 }))();

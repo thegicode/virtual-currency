@@ -79,9 +79,9 @@ function calculateBollingerBands(candles, period = 20) {
     return { middleBand, upperBand, lowerBand };
 }
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const market = "KRW-DOGE";
+    const market = "KRW-SBD";
     const initialCapital = 1000000;
-    const days = 200;
+    const days = 100;
     const backtestResult = yield bollingerBandsBacktest(market, initialCapital, days);
     console.log(backtestResult);
 }))();

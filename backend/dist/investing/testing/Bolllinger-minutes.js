@@ -63,10 +63,10 @@ function bollingerBandsBacktest(market, initialCapital, candleUnit = 240, days, 
 }
 exports.bollingerBandsBacktest = bollingerBandsBacktest;
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const market = "KRW-DOGE";
+    const market = "KRW-SBD";
     const initialCapital = 1000000;
     const candleUnit = 240;
-    const days = 200;
+    const days = 100;
     const backtestResult = yield bollingerBandsBacktest(market, initialCapital, candleUnit, days);
     console.log(backtestResult);
 }))();

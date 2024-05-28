@@ -25,6 +25,7 @@ Object.defineProperty(exports, "executeMovingAverageAndVolatility", { enumerable
         "KRW-XRP",
         "KRW-DOGE",
         "KRW-SBD",
+        "KRW-BCH",
         "KRW-AVAX",
         "KRW-SHIB",
         "KRW-NEAR",

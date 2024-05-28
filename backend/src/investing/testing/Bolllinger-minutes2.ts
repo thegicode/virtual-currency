@@ -39,6 +39,7 @@ export async function bollingerBandsBacktest(
     let wins = 0;
     let peakCapital = initialCapital;
     let maxDrawdown = 0;
+    let tardeData = [];
 
     for (let i = 0; i < upperBand.length; i++) {
         const currentPrice = candles[period - 1 + i].trade_price;
@@ -49,12 +50,14 @@ export async function bollingerBandsBacktest(
             position += investment / currentPrice;
             capital -= investment;
             trades++;
+            tardeData.push({ i, currentPrice, capital, investment, trades });
         } else if (currentPrice < middleBand[i]) {
             // 1차 매수 신호
             const investment = capital * 0.1; // 10% 자본 사용
             position += investment / currentPrice;
             capital -= investment;
             trades++;
+            tardeData.push({ i, currentPrice, capital, investment, trades });
         } else if (currentPrice > upperBand[i] && position > 0) {
             // 매도 신호
             capital += position * currentPrice;
@@ -63,6 +66,7 @@ export async function bollingerBandsBacktest(
             if (capital > initialCapital) {
                 wins++;
             }
+            tardeData.push({ i, currentPrice, capital, wins, trades });
         }
 
         // 최대 낙폭 계산
@@ -94,10 +98,10 @@ export async function bollingerBandsBacktest(
 
 // 실행 예제
 (async () => {
-    const market = "KRW-DOGE";
+    const market = "KRW-SBD";
     const initialCapital = 1000000;
     const candleUnit = 240; // 240분봉
-    const days = 200;
+    const days = 100;
 
     const backtestResult = await bollingerBandsBacktest(
         market,

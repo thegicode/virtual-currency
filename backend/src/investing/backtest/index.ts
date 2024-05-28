@@ -9,19 +9,20 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
     try {
         const initialCapital = 10000; // 초기 자본
         const markets = [
-            "KRW-BTC",
+            // "KRW-BTC",
             // "KRW-ETH",
             // "KRW-SOL",
             // "KRW-AVAX",
             // "KRW-DOGE",
-            // "KRW-XRP",
+            "KRW-BCH",
             // "KRW-ZRX",
+            // "KRW-THETA",
+            // "KRW-CTC",
             // "KRW-NEAR",
             // "KRW-BTG",
-            // "KRW-THETA",
             // "KRW-AVAX",
             // "KRW-SHIB",
-            "KRW-SBD",
+            // "KRW-SBD",
         ];
         const apiCounts = 100;
 
@@ -65,7 +66,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         console.log("-----------------------------------------");
 
         // checkDailyMovingAverage
-        // KRW-BTC
+        // KRW-BTC, "KRW-SBD",  "KRW-CTC", "KRW-ZRX", "KRW-BTG", "KRW-THETA",
         await checkDailyMovingAverageBacktest(
             markets, // markets
             5, // period
@@ -86,7 +87,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         console.log("-----------------------------------------");
 
         // afternoonRiseMorningInvestmentBacktest
-        // KRW-DOGE
+        // KRW-DOGE,  "KRW-SBD",
         await afternoonRiseMorningInvestmentBacktest(
             markets,
             initialCapital,
