@@ -14,9 +14,12 @@
  *
  * 하루 두 번 자정, 정오에 매수하는 전략도 ?
  * 2018년 하락장에서도 이더리움은 수익
+ *
+ *
+ * 캔들 오류 => 계산 수정 할 것
  */
 
-import { fetchMinutesCandles, fetchTicker } from "../../services/api";
+import { fetchMinutesCandles } from "../../services/api";
 import { calculateVolatility } from "../utils";
 
 export async function afternoonRiseMorningInvestmentBacktest(
@@ -63,7 +66,7 @@ export async function afternoonRiseMorningInvestmentBacktest(
         console.log(`MDD: ${result.maxDrawdown.toFixed(2)}%`);
         console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
         // console.log("Trade Log:", result.log.join("\n"));
-        // console.table(result.tradeData);
+        console.table(result.tradeData);
         console.log("");
     });
 

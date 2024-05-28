@@ -47,7 +47,7 @@ exports.determineInvestmentAction = determineInvestmentAction;
 function createMessage(results) {
     const title = `\n 🔔 슈퍼 상승장(3, 5, 10, 20 이동평균) + 변동성 조절\n\n`;
     const message = results
-        .map((result) => `📈 [${result.market}] 
+        .map((result) => `📈 [${result.market && result.market}] 
 현재 가격: ${(0, utils_1.formatPrice)(result.currentPrice)}원
 변동성: ${result.volatility.toFixed(2)}%
 투자 금액: ${Math.round(result.capitalAllocation).toLocaleString()}원

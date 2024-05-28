@@ -13,8 +13,8 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             // "KRW-ETH",
             // "KRW-SOL",
             // "KRW-AVAX",
-            // "KRW-DOGE",
-            "KRW-BCH",
+            "KRW-DOGE",
+            // "KRW-BCH",
             // "KRW-ZRX",
             // "KRW-THETA",
             // "KRW-CTC",
@@ -24,7 +24,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             // "KRW-SHIB",
             // "KRW-SBD",
         ];
-        const apiCounts = 100;
+        const apiCounts = 30;
 
         console.log("-----------------------------------------");
 
@@ -33,24 +33,24 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         console.log("-----------------------------------------");
 
         // checkMinutesMovingAverage;
-        /*  await checkMinutesMovingAverageBacktest(
+        await checkMinutesMovingAverageBacktest(
             markets,
             60, // candleUnit, 인터벌 시간 단위
-            10, //  movingAveragePeriod, 이동평균 단위
+            5, //  movingAveragePeriod, 이동평균 단위
             initialCapital, // 초기 자본
             apiCounts
         );
 
-        console.log("-----------------------------------------"); */
+        console.log("-----------------------------------------");
 
         // checkMinutesMovingAverage
-        await checkMinutesMovingAverageBacktest(
+        /* await checkMinutesMovingAverageBacktest(
             markets,
             240, // candleUnit, 인터벌 시간 단위
             10, //  movingAveragePeriod, 이동평균 단위
             initialCapital, // 초기 자본
             apiCounts
-        );
+        ); */
 
         // console.log("-----------------------------------------");
 

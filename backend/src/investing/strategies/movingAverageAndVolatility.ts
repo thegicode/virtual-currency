@@ -93,7 +93,7 @@ function createMessage(results: IMovingAverageAndVolatilityResult[]) {
     const message = results
         .map(
             (result) =>
-                `📈 [${result.market}] 
+                `📈 [${result.market && result.market}] 
 현재 가격: ${formatPrice(result.currentPrice)}원
 변동성: ${result.volatility.toFixed(2)}%
 투자 금액: ${Math.round(result.capitalAllocation).toLocaleString()}원
