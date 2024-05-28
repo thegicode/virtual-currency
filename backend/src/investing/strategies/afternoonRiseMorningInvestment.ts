@@ -35,31 +35,38 @@ export async function afternoonRiseMorningInvestment(
         return createMessage(results);
     } catch (error) {
         console.error("Error afternoonRiseMorningInvestment: ", error);
+        return "Error in executing the strategy.";
     }
 }
 
+/**
+ * 특정 시장에 대한 거래 신호를 생성
+ */
 async function generateMarketTradeSignal(
     market: string,
     targetVolatility: number,
     initialCapital: number,
     size: number
 ) {
-    // console.log(`\n *** market: ${market}`);
-
     // 0. get data
     const currentDate = getDate();
     // console.log("currentDate: ", currentDate); // 2024-05-26T00:00:00
 
     const candles = await fetchData(market, currentDate);
 
-    const { morningCandles, afternoonCandles } = splitDayCandles(
-        market,
-        candles
-    );
+    const { morningCandles, afternoonCandles } = splitDayCandles(candles);
+    // console.log("morningCandles: ", morningCandles);
+    // console.log("afternoonCandles: ", afternoonCandles);
 
     // 1. 전일 수익률과 거래량, 변동성
     const { afternoonReturnRate, morningVolume, afternoonVolume, volatility } =
         calculateDailyMetrics(afternoonCandles, morningCandles);
+
+    // console.log("\nmarket: ", market);
+    // console.log("afternoonReturnRate", (afternoonReturnRate * 100).toFixed(2));
+    // console.log("morningVolume", morningVolume.toLocaleString());
+    // console.log("afternoonVolume", afternoonVolume.toLocaleString());
+    // console.log("volatility", volatility.toFixed(2));
 
     // 2. 매수 판단: 전일 오후 수익률 > 0, 전일 오후 거래량 > 오전 거래량
     const tradeSignal = generateTradeSignal(
@@ -72,32 +79,40 @@ async function generateMarketTradeSignal(
         size
     );
 
-    const result = {
+    return {
         market,
         date: currentDate,
         ...tradeSignal,
     };
-
-    return result;
 }
 
+/**
+ * 현재 날짜와 시간을 "yyyy-MM-ddTHH:mm:ss" 형식으로 반환
+ */
 function getDate() {
     // "2024-05-26T16:00:00"
     const date = new Date();
-    if (date.getHours() < 24) date.setDate(date.getDate() - 1);
+    if (date.getHours() < 24) date.setDate(date.getDate() - 2);
     date.setHours(25, 0, 0, 0);
     return date.toISOString().slice(0, 19);
 }
 
+/**
+ * 특정 시장에 대한 데이터를 가져옴
+ */
 async function fetchData(market: string, currentDate: string) {
     try {
         return await fetchMinutesCandles(market, 60, 25, currentDate);
     } catch (error) {
         console.error(`Error fetching  candles market ${market}:`, error);
+        throw error;
     }
 }
 
-function splitDayCandles(marekt: string, candles: ICandle[]) {
+/**
+ * 주어진 분봉 데이터를 오전과 오후로 분할
+ */
+function splitDayCandles(candles: ICandle[]) {
     const morningCandles = candles.slice(0, 12); // 전날 오전 0시 ~ 12시
     const afternoonCandles = candles.slice(12, 24); // 전날 오후 12시 ~ 24시
 
@@ -113,6 +128,9 @@ function splitDayCandles(marekt: string, candles: ICandle[]) {
     };
 }
 
+/**
+ * 전일 오후 수익률, 전일 오전 및 오후 거래량, 전일 오후 변동성 계산
+ */
 function calculateDailyMetrics(
     afternoonCandles: ICandle[],
     morningCandles: ICandle[]
@@ -132,8 +150,6 @@ function calculateDailyMetrics(
         0
     );
 
-    // console.log("morningVolume", morningVolume);
-
     // 1-3. 전일 오후 (12시 ~ 24시) 거래량
     const afternoonVolume = afternoonCandles.reduce(
         (acc: number, cur: ICandle) => acc + cur.candle_acc_trade_volume,
@@ -146,6 +162,9 @@ function calculateDailyMetrics(
     return { afternoonReturnRate, morningVolume, afternoonVolume, volatility };
 }
 
+/**
+ * 매수 또는 매도 신호를 생성
+ */
 function generateTradeSignal(
     afternoonReturnRate: number,
     afternoonVolume: number,
@@ -156,7 +175,7 @@ function generateTradeSignal(
     size: number
 ) {
     if (afternoonReturnRate > 0 && afternoonVolume > morningVolume) {
-        const rate = targetVolatility / volatility / 100;
+        const rate = targetVolatility / volatility;
         const unitRate = rate / size;
         const investment = unitRate * initialCapital;
         return {
@@ -170,22 +189,34 @@ function generateTradeSignal(
     }
 }
 
-function createMessage(data: any[]) {
+{
+}
+interface IResult {
+    market: string;
+    date: string;
+    signal: string;
+    investment?: number;
+}
+function createMessage(results: IResult[]) {
     const title = `\n 🔔 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절\n`;
     const memo = `- 매일 자정에 확인, 매도는 다음 날 정오\n\n`;
-    const message = data
-        .map(
-            (aData) =>
-                `📈 [${aData.market}] 
-날    짜 : ${aData.date.slice(0, 10)}
-신    호 : ${aData.signal}
-매수금액 : ${formatPrice(Math.round(aData.investment))}원`
-        )
+
+    const message = results
+        .map((result) => {
+            const investmentMessage = result.investment
+                ? `매수금액 : ${formatPrice(Math.round(result.investment))}원`
+                : "";
+
+            return `📈 [${result.market}] 
+날    짜 : ${result.date.slice(0, 10)}
+신    호 : ${result.signal}
+${investmentMessage}`;
+        })
         .join("\n\n");
     return `${title}${memo}${message}\n`;
 }
-/* 
-(async () => {
+
+/* (async () => {
     const markets = ["KRW-DOGE"];
     const result = await afternoonRiseMorningInvestment(
         markets,

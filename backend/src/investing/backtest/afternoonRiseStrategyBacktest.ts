@@ -19,6 +19,7 @@
  * 캔들 오류 => 계산 수정 할 것
  */
 
+import { aD } from "vitest/dist/reporters-yx5ZTtEV";
 import { fetchMinutesCandles } from "../../services/api";
 import { calculateVolatility } from "../utils";
 
@@ -44,33 +45,8 @@ export async function afternoonRiseMorningInvestmentBacktest(
         )
     );
 
-    console.log(
-        `\n🔔 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절 backtest\n`
-    );
-
-    results.forEach((result) => {
-        console.log(`📈 [${result.market}]`);
-        console.log(`첫째 날: ${result.tradeData[0].currentDate}`);
-        console.log(
-            `마지막 날: ${
-                result.tradeData[result.tradeData.length - 1].currentDate
-            }`
-        );
-        console.log(`Total Trades: ${result.trades}번`);
-        console.log(
-            `Final Capital: ${Math.round(
-                result.finalCapital
-            ).toLocaleString()}원`
-        );
-        console.log(`Performance: ${result.performance.toFixed(2)}%`);
-        console.log(`MDD: ${result.maxDrawdown.toFixed(2)}%`);
-        console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
-        // console.log("Trade Log:", result.log.join("\n"));
-        console.table(result.tradeData);
-        console.log("");
-    });
-
-    return results;
+    const messages = createMessage(results);
+    console.log(messages);
 }
 
 async function backtest(
@@ -142,6 +118,7 @@ async function backtest(
                 trades,
                 initialCapital
             ));
+
             tradeData.push({
                 day,
                 currentDate,
@@ -195,6 +172,18 @@ async function backtest(
     const performance = (finalCapital / initialCapital - 1) * 100;
     const winRate = trades > 0 ? (wins / trades) * 100 : 0;
 
+    tradeData = tradeData.map((aData) => {
+        return {
+            ...aData,
+            currentDate: aData.currentDate.slice(0, 10),
+            capital: Math.round(aData.capital).toLocaleString(),
+            position: aData.position > 0 ? aData.position.toFixed(2) : "",
+            investment: aData.investment
+                ? Math.round(aData.investment).toLocaleString()
+                : "",
+        };
+    });
+
     return {
         market,
         finalCapital,
@@ -238,10 +227,11 @@ function calculateDailyMetrics(
     morningCandles: ICandle[]
 ) {
     // 1-1. 전일 오후 (12시 ~ 24시) 수익률
+    const afternoonOpenPrice = afternoonCandles[0].opening_price;
+    const afternoonClosePrice =
+        afternoonCandles[afternoonCandles.length - 1].trade_price;
     const afternoonReturnRate =
-        (afternoonCandles[afternoonCandles.length - 1].trade_price -
-            afternoonCandles[0].trade_price) /
-        afternoonCandles[0].trade_price;
+        (afternoonClosePrice - afternoonOpenPrice) / afternoonOpenPrice;
 
     // console.log("afternoonReturnRate", afternoonReturnRate * 100);
 
@@ -302,6 +292,7 @@ function executeBuy(
         position += amountToBuy;
         trades++;
         signal = "매수";
+
         // console.log("Buy: ");
         // console.log("trades", trades);
         // console.log("currentPrice ", tradePrice);
@@ -377,6 +368,24 @@ function calculateMaxDrawdown(
     }
 
     return { peakCapital, maxDrawdown };
+}
+
+function createMessage(results: any[]) {
+    const title = `\n🔔 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절 backtest\n`;
+    const messages = results.map((result) => {
+        console.table(result.tradeData);
+
+        return `📈 [${result.market}]
+첫째 날: ${result.tradeData[0].currentDate}
+마지막 날: ${result.tradeData[result.tradeData.length - 1].currentDate}
+Total Trades: ${result.trades}번
+Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원
+Performance: ${result.performance.toFixed(2)}%
+MDD: ${result.maxDrawdown.toFixed(2)}%
+Win Rate: ${result.winRate.toFixed(2)}%\n\n`;
+    });
+
+    return `${title}${messages}`;
 }
 
 // 실행 예제

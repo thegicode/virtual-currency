@@ -1,4 +1,4 @@
-import { sendTelegramMessageToChatId } from "../../notifications";
+// import { sendTelegramMessageToChatId } from "../../notifications";
 import { afternoonRiseMorningInvestment } from "./afternoonRiseMorningInvestment";
 import { checkDailyMovingAverage } from "./checkDailyMovingAverage";
 import { checkMinutesMovingAverage } from "./checkMinutesMovingAverage";
@@ -15,8 +15,8 @@ export {
         "KRW-BTC",
         "KRW-ETH",
         "KRW-SOL",
-        // "KRW-XRP",
-        // "KRW-DOGE",
+        "KRW-XRP",
+        "KRW-DOGE",
         // "KRW-SBD",
 
         /*  "KRW-BCH",
@@ -31,16 +31,9 @@ export {
         "KRW-THETA", */
     ];
 
-    const initialCapital = 100000;
+    const initialCapital = 1000000;
     console.log("---------------------------------------------------");
-    console.log("*** initialCapital: ", initialCapital);
-    console.log("---------------------------------------------------");
-
-    // 일캔들 기준 5일 이동평균 확인
-    const result1 = await checkDailyMovingAverage(markets, 5);
-    console.log(result1);
-    // sendTelegramMessageToChatId(result1 as string);
-
+    console.log("*** initialCapital: ", initialCapital.toLocaleString() + "원");
     console.log("---------------------------------------------------");
 
     // 분캔들 기준 이동평균 확인 - interval
@@ -60,21 +53,28 @@ export {
 
     console.log("---------------------------------------------------");
 
+    // 일캔들 기준 5일 이동평균 확인
+    const result1 = await checkDailyMovingAverage(markets, 5);
+    console.log(result1);
+    // sendTelegramMessageToChatId(result1 as string);
+
+    console.log("---------------------------------------------------");
+
     // 슈퍼상승장(3, 5, 10, 20일 이동평균) + 변동성 조절
-    const results3 = await executeMovingAverageAndVolatility(
+    const results2 = await executeMovingAverageAndVolatility(
         markets,
         initialCapital,
         2
     );
-    console.log(results3);
+    console.log(results2);
 
     console.log("---------------------------------------------------");
 
     // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
-    const results4 = await afternoonRiseMorningInvestment(
+    const results3 = await afternoonRiseMorningInvestment(
         markets,
         initialCapital
         // 2 // targetVolatility
     );
-    console.log(results4);
+    console.log(results3);
 })();

@@ -7,7 +7,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
 
 (async () => {
     try {
-        const initialCapital = 10000; // 초기 자본
+        const initialCapital = 100000; // 초기 자본
         const markets = [
             // "KRW-BTC",
             // "KRW-ETH",

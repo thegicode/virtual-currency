@@ -22,20 +22,22 @@ Object.defineProperty(exports, "executeMovingAverageAndVolatility", { enumerable
         "KRW-BTC",
         "KRW-ETH",
         "KRW-SOL",
+        "KRW-XRP",
+        "KRW-DOGE",
     ];
-    const initialCapital = 100000;
+    const initialCapital = 1000000;
     console.log("---------------------------------------------------");
-    console.log("*** initialCapital: ", initialCapital);
-    console.log("---------------------------------------------------");
-    const result1 = yield (0, checkDailyMovingAverage_1.checkDailyMovingAverage)(markets, 5);
-    console.log(result1);
+    console.log("*** initialCapital: ", initialCapital.toLocaleString() + "원");
     console.log("---------------------------------------------------");
     yield (0, checkMinutesMovingAverage_1.checkMinutesMovingAverage)(markets, 60, 10, (message) => console.log(message));
     yield (0, checkMinutesMovingAverage_1.checkMinutesMovingAverage)(markets, 240, 10, (message) => console.log(message));
     console.log("---------------------------------------------------");
-    const results3 = yield (0, movingAverageAndVolatility_1.executeMovingAverageAndVolatility)(markets, initialCapital, 2);
-    console.log(results3);
+    const result1 = yield (0, checkDailyMovingAverage_1.checkDailyMovingAverage)(markets, 5);
+    console.log(result1);
     console.log("---------------------------------------------------");
-    const results4 = yield (0, afternoonRiseMorningInvestment_1.afternoonRiseMorningInvestment)(markets, initialCapital);
-    console.log(results4);
+    const results2 = yield (0, movingAverageAndVolatility_1.executeMovingAverageAndVolatility)(markets, initialCapital, 2);
+    console.log(results2);
+    console.log("---------------------------------------------------");
+    const results3 = yield (0, afternoonRiseMorningInvestment_1.afternoonRiseMorningInvestment)(markets, initialCapital);
+    console.log(results3);
 }))();
