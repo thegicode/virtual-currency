@@ -27,6 +27,24 @@ export function calculateAllMovingAverages(
     return movingAverages;
 }
 
+// candles 수익률 계산
+export function calculateCandleReturnRate(candles: ICandle[]): number {
+    const openPrice = candles[0].opening_price;
+    const closePrice = candles[candles.length - 1].trade_price;
+    return (closePrice - openPrice) / openPrice;
+}
+
+export function calculateInvestmentAmount(
+    targetVolatility: number,
+    volatility: number,
+    size: number,
+    initialCapital: number
+) {
+    const rate = targetVolatility / volatility;
+    const unitRate = rate / size;
+    return unitRate * initialCapital;
+}
+
 // 이동평균선을 계산하는 함수
 export function calculateMovingAverage(
     data: ICandle[],

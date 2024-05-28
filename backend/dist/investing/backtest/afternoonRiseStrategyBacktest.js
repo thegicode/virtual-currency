@@ -121,9 +121,7 @@ function fetchAndSplitDailyCandles(market, currentDate) {
     });
 }
 function calculateDailyMetrics(afternoonCandles, morningCandles) {
-    const afternoonOpenPrice = afternoonCandles[0].opening_price;
-    const afternoonClosePrice = afternoonCandles[afternoonCandles.length - 1].trade_price;
-    const afternoonReturnRate = (afternoonClosePrice - afternoonOpenPrice) / afternoonOpenPrice;
+    const afternoonReturnRate = (0, utils_1.calculateCandleReturnRate)(afternoonCandles);
     const morningVolume = (0, utils_1.calculateVolume)(morningCandles);
     const afternoonVolume = (0, utils_1.calculateVolume)(afternoonCandles);
     const volatility = (0, utils_1.calculateVolatility)(afternoonCandles);
@@ -135,9 +133,7 @@ function shouldBuyBasedOnMetrics(afternoonReturnRate, afternoonVolume, morningVo
 function executeBuy(markets, afternoonCandles, targetVolatility, volatility, capital, position, trades, initialCapital) {
     const tradePrice = afternoonCandles[afternoonCandles.length - 1].trade_price;
     const buyPrice = tradePrice;
-    const rate = targetVolatility / volatility;
-    const unitRate = rate / markets.length;
-    const investment = unitRate * initialCapital;
+    const investment = (0, utils_1.calculateInvestmentAmount)(targetVolatility, volatility, markets.length, initialCapital);
     let signal = "";
     const amountToBuy = investment / tradePrice;
     if (capital >= investment) {

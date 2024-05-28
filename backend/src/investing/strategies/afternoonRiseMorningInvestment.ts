@@ -1,7 +1,13 @@
 // afternoonRiseMorningInvestment
 
 import { fetchMinutesCandles } from "../../services/api";
-import { calculateVolatility, calculateVolume, formatPrice } from "../utils";
+import {
+    calculateCandleReturnRate,
+    calculateInvestmentAmount,
+    calculateVolatility,
+    calculateVolume,
+    formatPrice,
+} from "../utils";
 
 /**
  * 투자전략  : 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
@@ -136,13 +142,7 @@ function calculateDailyMetrics(
     morningCandles: ICandle[]
 ) {
     // 1-1. 전일 오후 (12시 ~ 24시) 수익률
-    const afternoonOpenPrice = afternoonCandles[0].opening_price;
-    const afternoonClosePrice =
-        afternoonCandles[afternoonCandles.length - 1].trade_price;
-    const afternoonReturnRate =
-        (afternoonClosePrice - afternoonOpenPrice) / afternoonOpenPrice;
-
-    // console.log("afternoonReturnRate", afternoonReturnRate * 100);
+    const afternoonReturnRate = calculateCandleReturnRate(afternoonCandles);
 
     // 1-2. 전일 오전 (0시 ~ 12시) 거래량
     const morningVolume = calculateVolume(morningCandles);
@@ -169,9 +169,13 @@ function generateTradeSignal(
     size: number
 ) {
     if (afternoonReturnRate > 0 && afternoonVolume > morningVolume) {
-        const rate = targetVolatility / volatility;
-        const unitRate = rate / size;
-        const investment = unitRate * initialCapital;
+        const investment = calculateInvestmentAmount(
+            targetVolatility,
+            volatility,
+            size,
+            initialCapital
+        );
+
         return {
             signal: "매수 또는 유지",
             investment,
@@ -183,8 +187,6 @@ function generateTradeSignal(
     }
 }
 
-{
-}
 interface IResult {
     market: string;
     date: string;

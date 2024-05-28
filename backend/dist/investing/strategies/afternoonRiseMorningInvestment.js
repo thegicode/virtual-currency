@@ -64,9 +64,7 @@ function splitDayCandles(candles) {
     };
 }
 function calculateDailyMetrics(afternoonCandles, morningCandles) {
-    const afternoonOpenPrice = afternoonCandles[0].opening_price;
-    const afternoonClosePrice = afternoonCandles[afternoonCandles.length - 1].trade_price;
-    const afternoonReturnRate = (afternoonClosePrice - afternoonOpenPrice) / afternoonOpenPrice;
+    const afternoonReturnRate = (0, utils_1.calculateCandleReturnRate)(afternoonCandles);
     const morningVolume = (0, utils_1.calculateVolume)(morningCandles);
     const afternoonVolume = (0, utils_1.calculateVolume)(afternoonCandles);
     const volatility = (0, utils_1.calculateVolatility)(afternoonCandles);
@@ -74,9 +72,7 @@ function calculateDailyMetrics(afternoonCandles, morningCandles) {
 }
 function generateTradeSignal(afternoonReturnRate, afternoonVolume, morningVolume, targetVolatility, volatility, initialCapital, size) {
     if (afternoonReturnRate > 0 && afternoonVolume > morningVolume) {
-        const rate = targetVolatility / volatility;
-        const unitRate = rate / size;
-        const investment = unitRate * initialCapital;
+        const investment = (0, utils_1.calculateInvestmentAmount)(targetVolatility, volatility, size, initialCapital);
         return {
             signal: "매수 또는 유지",
             investment,
@@ -87,8 +83,6 @@ function generateTradeSignal(afternoonReturnRate, afternoonVolume, morningVolume
             signal: "매도 또는 유보",
         };
     }
-}
-{
 }
 function createMessage(results) {
     const title = `\n 🔔 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절\n`;

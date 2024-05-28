@@ -20,7 +20,12 @@
  */
 
 import { fetchMinutesCandles } from "../../services/api";
-import { calculateVolatility, calculateVolume } from "../utils";
+import {
+    calculateCandleReturnRate,
+    calculateInvestmentAmount,
+    calculateVolatility,
+    calculateVolume,
+} from "../utils";
 
 export async function afternoonRiseMorningInvestmentBacktest(
     markets: string[],
@@ -226,13 +231,7 @@ function calculateDailyMetrics(
     morningCandles: ICandle[]
 ) {
     // 1-1. 전일 오후 (12시 ~ 24시) 수익률
-    const afternoonOpenPrice = afternoonCandles[0].opening_price;
-    const afternoonClosePrice =
-        afternoonCandles[afternoonCandles.length - 1].trade_price;
-    const afternoonReturnRate =
-        (afternoonClosePrice - afternoonOpenPrice) / afternoonOpenPrice;
-
-    // console.log("afternoonReturnRate", afternoonReturnRate * 100);
+    const afternoonReturnRate = calculateCandleReturnRate(afternoonCandles);
 
     // 1-2. 전일 오전 (0시 ~ 12시) 거래량
     const morningVolume = calculateVolume(morningCandles);
@@ -269,12 +268,13 @@ function executeBuy(
     const tradePrice =
         afternoonCandles[afternoonCandles.length - 1].trade_price;
     const buyPrice = tradePrice;
-    // const investment =
-    //     ((targetVolatility / volatility) * initialCapital) / markets.length;
+    const investment = calculateInvestmentAmount(
+        targetVolatility,
+        volatility,
+        markets.length,
+        initialCapital
+    );
 
-    const rate = targetVolatility / volatility;
-    const unitRate = rate / markets.length;
-    const investment = unitRate * initialCapital;
     let signal = "";
 
     const amountToBuy = investment / tradePrice;
