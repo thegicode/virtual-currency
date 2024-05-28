@@ -1,5 +1,5 @@
 import { fetchDailyCandles } from "../../services/api";
-import { calculateBollingerBands } from "../utils/investmentUtils";
+import { calculateBollingerBands } from "../utils";
 
 interface ICandle {
     trade_price: number;

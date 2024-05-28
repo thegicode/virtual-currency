@@ -1,5 +1,5 @@
-import { retryFetch } from "./apiUtils";
-import { formatDateString, formatTimeString } from "./dateUtils";
+import { retryFetch } from "./ApiUtils";
+import { formatDateString, formatTimeString } from "./DateUtils";
 import {
     calculateAllMovingAverages,
     calculateMovingAverage,
@@ -7,10 +7,10 @@ import {
     calculateVolatility,
     calculateVolume,
     isAboveAllMovingAverages,
-} from "./financialUtils";
-import { calculateBollingerBands } from "./investmentUtils";
-import { formatPrice } from "./priceUtils";
-import { calculateAverageNoise } from "./tradingUtils";
+} from "./FinancialUtils";
+import { calculateBollingerBands } from "./InvestmentUtils";
+import { formatPrice } from "./PriceUtils";
+import { calculateAverageNoise } from "./TradingUtils";
 
 export {
     // apiUtils

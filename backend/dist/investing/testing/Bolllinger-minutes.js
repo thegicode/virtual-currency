@@ -11,11 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bollingerBandsBacktest = void 0;
 const api_1 = require("../../services/api");
-const investmentUtils_1 = require("../utils/investmentUtils");
+const utils_1 = require("../utils");
 function bollingerBandsBacktest(market, initialCapital, candleUnit = 240, days, period = 20) {
     return __awaiter(this, void 0, void 0, function* () {
         const candles = yield (0, api_1.fetchMinutesCandles)(market, candleUnit, ((24 * 60) / candleUnit) * days);
-        const { middleBand, upperBand, lowerBand } = (0, investmentUtils_1.calculateBollingerBands)(candles, period);
+        const { middleBand, upperBand, lowerBand } = (0, utils_1.calculateBollingerBands)(candles, period);
         let capital = initialCapital;
         let position = 0;
         let trades = 0;

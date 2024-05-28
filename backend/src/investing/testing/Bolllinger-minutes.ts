@@ -1,5 +1,5 @@
 import { fetchMinutesCandles } from "../../services/api";
-import { calculateBollingerBands } from "../utils/investmentUtils";
+import { calculateBollingerBands } from "../utils";
 
 interface IBacktestResult {
     market: string;
