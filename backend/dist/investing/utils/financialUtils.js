@@ -16,9 +16,8 @@ function calculateCandleReturnRate(candles) {
 }
 exports.calculateCandleReturnRate = calculateCandleReturnRate;
 function calculateInvestmentAmount(targetVolatility, volatility, size, initialCapital) {
-    const rate = targetVolatility / volatility;
-    const unitRate = rate / size;
-    return unitRate * initialCapital;
+    const percent = targetVolatility / volatility / size;
+    return (percent * initialCapital) / 100;
 }
 exports.calculateInvestmentAmount = calculateInvestmentAmount;
 function calculateMovingAverage(data, period = 3) {

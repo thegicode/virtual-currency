@@ -85,6 +85,9 @@ async function backtest(
             await fetchAndSplitDailyCandles(market, currentDate);
         candles = allCandles;
 
+        // console.log("morningCandles: ", morningCandles);
+        // console.log("afternoonCandles: ", afternoonCandles);
+
         // 1. 전일 수익률과 거래량, 변동성
         const {
             afternoonReturnRate,
@@ -92,6 +95,8 @@ async function backtest(
             afternoonVolume,
             volatility,
         } = calculateDailyMetrics(afternoonCandles, morningCandles);
+
+        // console.log("volatility", market, volatility.toFixed(2));
 
         // 2. 매수 판단
         const shouldBuy = shouldBuyBasedOnMetrics(
@@ -131,6 +136,7 @@ async function backtest(
                 position,
                 currentPrice,
                 buyPrice,
+                volatility,
                 trades,
                 investment,
             });
@@ -155,6 +161,7 @@ async function backtest(
                 position,
                 currentPrice,
                 buyPrice,
+                volatility,
                 trades,
                 wins,
             });
@@ -182,6 +189,7 @@ async function backtest(
             currentDate: aData.currentDate.slice(0, 10),
             capital: Math.round(aData.capital).toLocaleString(),
             position: aData.position > 0 ? aData.position.toFixed(2) : "",
+            volatility: aData.volatility.toFixed(2),
             investment: aData.investment
                 ? Math.round(aData.investment).toLocaleString()
                 : "",

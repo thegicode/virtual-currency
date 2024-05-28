@@ -34,20 +34,21 @@ function generateMarketTradeSignal(market, targetVolatility, initialCapital, siz
         const { morningCandles, afternoonCandles } = splitDayCandles(candles);
         const { afternoonReturnRate, morningVolume, afternoonVolume, volatility } = calculateDailyMetrics(afternoonCandles, morningCandles);
         const tradeSignal = generateTradeSignal(afternoonReturnRate, afternoonVolume, morningVolume, targetVolatility, volatility, initialCapital, size);
-        return Object.assign({ market, date: currentDate }, tradeSignal);
+        return Object.assign({ market, date: currentDate, volatility }, tradeSignal);
     });
 }
 function getDate() {
     const date = new Date();
     if (date.getHours() < 24)
-        date.setDate(date.getDate() - 2);
-    date.setHours(25, 0, 0, 0);
-    return date.toISOString().slice(0, 19);
+        date.setDate(date.getDate() - 1);
+    date.setHours(9, 0, 0, 0);
+    const newDate = date.toISOString().slice(0, 19);
+    return `${newDate}+09:00`;
 }
 function fetchData(market, currentDate) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            return yield (0, api_1.fetchMinutesCandles)(market, 60, 25, currentDate);
+            return yield (0, api_1.fetchMinutesCandles)(market, 60, 24, currentDate);
         }
         catch (error) {
             console.error(`Error fetching  candles market ${market}:`, error);
@@ -95,6 +96,7 @@ function createMessage(results) {
         return `📈 [${result.market}] 
 날    짜 : ${result.date.slice(0, 10)}
 신    호 : ${result.signal}
+volatility : ${result.volatility.toFixed(2)}
 ${investmentMessage}`;
     })
         .join("\n\n");

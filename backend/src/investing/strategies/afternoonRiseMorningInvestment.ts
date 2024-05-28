@@ -56,7 +56,7 @@ async function generateMarketTradeSignal(
 ) {
     // 0. get data
     const currentDate = getDate();
-    // console.log("currentDate: ", currentDate); // 2024-05-26T00:00:00
+    // console.log("currentDate: ", currentDate);
 
     const candles = await fetchData(market, currentDate);
 
@@ -72,7 +72,7 @@ async function generateMarketTradeSignal(
     // console.log("afternoonReturnRate", (afternoonReturnRate * 100).toFixed(2));
     // console.log("morningVolume", morningVolume.toLocaleString());
     // console.log("afternoonVolume", afternoonVolume.toLocaleString());
-    // console.log("volatility", volatility.toFixed(2));
+    // console.log("volatility", market, volatility.toFixed(2));
 
     // 2. 매수 판단: 전일 오후 수익률 > 0, 전일 오후 거래량 > 오전 거래량
     const tradeSignal = generateTradeSignal(
@@ -88,6 +88,7 @@ async function generateMarketTradeSignal(
     return {
         market,
         date: currentDate,
+        volatility,
         ...tradeSignal,
     };
 }
@@ -96,11 +97,12 @@ async function generateMarketTradeSignal(
  * 현재 날짜와 시간을 "yyyy-MM-ddTHH:mm:ss" 형식으로 반환
  */
 function getDate() {
-    // "2024-05-26T16:00:00"
+    // 2024-05-27T00:00:00+09:00
     const date = new Date();
-    if (date.getHours() < 24) date.setDate(date.getDate() - 2);
-    date.setHours(25, 0, 0, 0);
-    return date.toISOString().slice(0, 19);
+    if (date.getHours() < 24) date.setDate(date.getDate() - 1);
+    date.setHours(9, 0, 0, 0);
+    const newDate = date.toISOString().slice(0, 19);
+    return `${newDate}+09:00`;
 }
 
 /**
@@ -108,7 +110,7 @@ function getDate() {
  */
 async function fetchData(market: string, currentDate: string) {
     try {
-        return await fetchMinutesCandles(market, 60, 25, currentDate);
+        return await fetchMinutesCandles(market, 60, 24, currentDate);
     } catch (error) {
         console.error(`Error fetching  candles market ${market}:`, error);
         throw error;
@@ -191,6 +193,7 @@ interface IResult {
     market: string;
     date: string;
     signal: string;
+    volatility: number;
     investment?: number;
 }
 function createMessage(results: IResult[]) {
@@ -206,6 +209,7 @@ function createMessage(results: IResult[]) {
             return `📈 [${result.market}] 
 날    짜 : ${result.date.slice(0, 10)}
 신    호 : ${result.signal}
+volatility : ${result.volatility.toFixed(2)}
 ${investmentMessage}`;
         })
         .join("\n\n");

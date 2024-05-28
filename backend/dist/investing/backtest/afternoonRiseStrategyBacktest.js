@@ -60,6 +60,7 @@ function backtest(markets, market, period, targetVolatility, initialCapital, tra
                     position,
                     currentPrice,
                     buyPrice,
+                    volatility,
                     trades,
                     investment,
                 });
@@ -75,6 +76,7 @@ function backtest(markets, market, period, targetVolatility, initialCapital, tra
                     position,
                     currentPrice,
                     buyPrice,
+                    volatility,
                     trades,
                     wins,
                 });
@@ -85,7 +87,7 @@ function backtest(markets, market, period, targetVolatility, initialCapital, tra
         const performance = (finalCapital / initialCapital - 1) * 100;
         const winRate = trades > 0 ? (wins / trades) * 100 : 0;
         tradeData = tradeData.map((aData) => {
-            return Object.assign(Object.assign({}, aData), { currentDate: aData.currentDate.slice(0, 10), capital: Math.round(aData.capital).toLocaleString(), position: aData.position > 0 ? aData.position.toFixed(2) : "", investment: aData.investment
+            return Object.assign(Object.assign({}, aData), { currentDate: aData.currentDate.slice(0, 10), capital: Math.round(aData.capital).toLocaleString(), position: aData.position > 0 ? aData.position.toFixed(2) : "", volatility: aData.volatility.toFixed(2), investment: aData.investment
                     ? Math.round(aData.investment).toLocaleString()
                     : "" });
         });
