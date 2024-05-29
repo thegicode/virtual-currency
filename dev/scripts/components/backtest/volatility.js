@@ -1,6 +1,6 @@
 function getDaliyVolatility(aData) {
     const result = ((aData.high_price - aData.low_price) / aData.opening_price) * 100;
-    return Number(result.toFixed(2));
+    return result;
 }
 function getVolatility(dataList, index) {
     if (index < 5) {
@@ -10,7 +10,7 @@ function getVolatility(dataList, index) {
     for (let i = index - 5; i < index; i++) {
         sum += dataList[i].daily_volatility;
     }
-    return Number((sum / 5).toFixed(2));
+    return sum / 5;
 }
 function volatilityBreakout(prevCandle, realPrice, openingPrice, k) {
     const range = prevCandle.high_price - prevCandle.low_price;

@@ -32,7 +32,7 @@
   // app/scripts/components/backtest/volatility.ts
   function getDaliyVolatility(aData) {
     const result = (aData.high_price - aData.low_price) / aData.opening_price * 100;
-    return Number(result.toFixed(2));
+    return result;
   }
   function getVolatility(dataList, index) {
     if (index < 5) {
@@ -42,7 +42,7 @@
     for (let i = index - 5; i < index; i++) {
       sum += dataList[i].daily_volatility;
     }
-    return Number((sum / 5).toFixed(2));
+    return sum / 5;
   }
 
   // app/scripts/utils/helpers.ts
@@ -94,8 +94,8 @@
       this.data = [];
       this.market = "";
       this.count = 30;
-      this.marketSize = 5;
-      this.totalInvestmentPrice = 1e6;
+      this.marketSize = 2;
+      this.totalInvestmentPrice = 2e5;
       this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
       this.summaryAllPrice = 0;
       this.allSumSize = 0;
@@ -184,9 +184,7 @@
     placeOrders(dataList) {
       return dataList.map((aData) => {
         if (aData.tradingAction === "Buy" && aData.volatility) {
-          const percent = this.target / aData.volatility * 100;
-          const unitPercent = percent / this.marketSize;
-          const result = this.totalInvestmentPrice * unitPercent / 100;
+          const result = this.target / aData.volatility / this.marketSize * this.totalInvestmentPrice;
           return Object.assign(Object.assign({}, aData), { order_price: Math.round(result) });
         }
         return Object.assign({}, aData);

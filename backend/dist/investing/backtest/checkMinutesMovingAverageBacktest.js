@@ -12,26 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkMinutesMovingAverageBacktest = void 0;
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
-function checkMinutesMovingAverageBacktest(markets, candleUnit, movingAveragePeriod, initialCapital, apiCounts) {
+function checkMinutesMovingAverageBacktest(markets, candleUnit, movingAveragePeriod, initialCapital, resultCounts) {
     return __awaiter(this, void 0, void 0, function* () {
-        const results = yield Promise.all(markets.map((market) => backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital, apiCounts)));
-        console.log(`\n🔔 ${candleUnit}분캔들 ${movingAveragePeriod} 이동평균 backtest\n`);
-        results.forEach((result) => {
-            console.log(`📈 [${result.market}]`);
-            console.log(`first Time: ${result.firstTime}`);
-            console.log(`last Time: ${result.lastTime}`);
-            console.log(`Trade Count: ${result.tradeCount}번`);
-            console.log(`Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원`);
-            console.log(`Performance: ${result.performance.toFixed(2)}%`);
-            console.log(`MDD: ${result.mdd.toFixed(2)}%`);
-            console.log(`Win Rate: ${result.winRate.toFixed(2)}%\n\n`);
-        });
+        const results = yield Promise.all(markets.map((market) => backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital, resultCounts)));
+        logResults(results, candleUnit, movingAveragePeriod);
     });
 }
 exports.checkMinutesMovingAverageBacktest = checkMinutesMovingAverageBacktest;
-function backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital, apiCounts) {
+function backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital, resultCounts) {
     return __awaiter(this, void 0, void 0, function* () {
-        const candles = yield (0, api_1.fetchMinutesCandles)(market, candleUnit, apiCounts);
+        const adjustedApiCounts = (0, utils_1.adjustApiCounts)(resultCounts, movingAveragePeriod);
+        const candles = yield (0, api_1.fetchMinutesCandles)(market, candleUnit, adjustedApiCounts);
         const movingAverages = (0, utils_1.calculateMovingAverage)(candles);
         const tradesData = [];
         let capital = initialCapital;
@@ -101,5 +92,18 @@ function backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital,
             mdd: maxDrawdown,
             winRate,
         };
+    });
+}
+function logResults(results, candleUnit, movingAveragePeriod) {
+    console.log(`\n🔔 ${candleUnit}분캔들 ${movingAveragePeriod} 이동평균 backtest\n`);
+    results.forEach((result) => {
+        console.log(`📈 [${result.market}]`);
+        console.log(`first Time: ${result.firstTime}`);
+        console.log(`last Time: ${result.lastTime}`);
+        console.log(`Trade Count: ${result.tradeCount}번`);
+        console.log(`Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원`);
+        console.log(`Performance: ${result.performance.toFixed(2)}%`);
+        console.log(`MDD: ${result.mdd.toFixed(2)}%`);
+        console.log(`Win Rate: ${result.winRate.toFixed(2)}%\n\n`);
     });
 }

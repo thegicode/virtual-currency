@@ -1,3 +1,11 @@
+export function adjustApiCounts(
+    apiCounts: number,
+    increment: number,
+    maxLimit: number = 200
+): number {
+    return apiCounts + increment > maxLimit ? maxLimit : apiCounts + increment;
+}
+
 export async function retryFetch(
     url: string,
     options: RequestInit,

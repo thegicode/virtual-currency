@@ -1,4 +1,4 @@
-import { retryFetch } from "./ApiUtils";
+import { adjustApiCounts, retryFetch } from "./ApiUtils";
 import { formatDateString, formatTimeString } from "./DateUtils";
 import {
     calculateAllMovingAverages,
@@ -16,6 +16,7 @@ import { calculateAverageNoise } from "./TradingUtils";
 
 export {
     // apiUtils
+    adjustApiCounts,
     retryFetch,
 
     // dateUtils

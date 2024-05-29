@@ -9,7 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.retryFetch = void 0;
+exports.retryFetch = exports.adjustApiCounts = void 0;
+function adjustApiCounts(apiCounts, increment, maxLimit = 200) {
+    return apiCounts + increment > maxLimit ? maxLimit : apiCounts + increment;
+}
+exports.adjustApiCounts = adjustApiCounts;
 function retryFetch(url, options, retries = 5, delay = 1000) {
     return __awaiter(this, void 0, void 0, function* () {
         for (let i = 0; i < retries; i++) {

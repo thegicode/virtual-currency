@@ -32,14 +32,14 @@ function executeMovingAverageAndVolatility(markets, initialCapital, targetVolati
 exports.executeMovingAverageAndVolatility = executeMovingAverageAndVolatility;
 function determineInvestmentAction(isSignal, currentPrice, capital) {
     let position = 0;
-    let signal = "보유";
+    let signal = "";
     if (isSignal && currentPrice > 0) {
         position = capital / currentPrice;
-        signal = "매수";
+        signal = "Buy";
     }
     else {
         position = 0;
-        signal = "매도";
+        signal = "Sell";
     }
     return { signal, position };
 }

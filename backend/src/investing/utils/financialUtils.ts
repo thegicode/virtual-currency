@@ -68,13 +68,14 @@ export function calculateMovingAverage(
 export function calculateRiskAdjustedCapital(
     targetVolatility: number,
     volatility: number,
-    count: number,
+    size: number,
     initialCapital: number
 ): number {
-    if (volatility === 0 || count === 0) {
+    if (volatility === 0 || size === 0) {
         return 0;
     }
-    return (targetVolatility / volatility / count) * initialCapital;
+
+    return (targetVolatility / volatility / size) * initialCapital;
 }
 
 export function calculateVolatility(candles: ICandle[]) {

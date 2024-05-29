@@ -4,7 +4,7 @@ function getDaliyVolatility(aData: any) {
     const result =
         ((aData.high_price - aData.low_price) / aData.opening_price) * 100;
 
-    return Number(result.toFixed(2));
+    return result;
 }
 
 function getVolatility(dataList: any, index: number) {
@@ -22,7 +22,7 @@ function getVolatility(dataList: any, index: number) {
         sum += dataList[i].daily_volatility;
     }
 
-    return Number((sum / 5).toFixed(2));
+    return sum / 5;
 }
 
 // 5, 6, 7

@@ -30,11 +30,11 @@ function calculateMovingAverage(data, period = 3) {
     return movingAverages;
 }
 exports.calculateMovingAverage = calculateMovingAverage;
-function calculateRiskAdjustedCapital(targetVolatility, volatility, count, initialCapital) {
-    if (volatility === 0 || count === 0) {
+function calculateRiskAdjustedCapital(targetVolatility, volatility, size, initialCapital) {
+    if (volatility === 0 || size === 0) {
         return 0;
     }
-    return (targetVolatility / volatility / count) * initialCapital;
+    return (targetVolatility / volatility / size) * initialCapital;
 }
 exports.calculateRiskAdjustedCapital = calculateRiskAdjustedCapital;
 function calculateVolatility(candles) {

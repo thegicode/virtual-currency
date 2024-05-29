@@ -6,7 +6,11 @@
  */
 
 import { fetchDailyCandles } from "../../services/api";
-import { calculateMovingAverage, calculateMDD } from "../utils";
+import {
+    calculateMovingAverage,
+    calculateMDD,
+    adjustApiCounts,
+} from "../utils";
 
 export async function checkDailyMovingAverageBacktest(
     markets: string[],
@@ -26,36 +30,17 @@ export async function checkDailyMovingAverageBacktest(
     return results;
 }
 
-function logResults(results: any[], period: number) {
-    console.log(`\n🔔 일 캔들 ${period}일 이동평균 backtest\n`);
-
-    results.forEach((result) => {
-        console.log(`📈 [${result.market}]`);
-        console.log(`첫째 날: ${result.firstDate}`);
-        console.log(`마지막 날: ${result.lastDate}`);
-        console.log(`Total Trades: ${result.trades}번`);
-        console.log(
-            `Final Capital: ${Math.round(
-                result.finalCapital
-            ).toLocaleString()}원`
-        );
-        console.log(`Performance: ${result.performance.toFixed(2)}%`);
-        console.log(`MDD: ${result.mdd.toFixed(2)}%`);
-        console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
-        // console.log("Trade Log:", result.log.join("\n"));
-        console.log("");
-    });
-}
-
 async function backtestMarket(
     market: string,
     period: number,
     initialCapital: number,
     apiCounts: number
 ) {
+    const adjustedApiCounts = adjustApiCounts(apiCounts, period);
+
     const candles: ICandle[] = await fetchDailyCandles(
         market,
-        apiCounts.toString()
+        adjustedApiCounts.toString()
     );
     const movingAverages = calculateMovingAverage(candles);
 
@@ -78,15 +63,17 @@ async function backtestMarket(
         const currentPrice = candle.trade_price;
         const movingAverage = movingAverages[index];
 
+        let thisTradeData: any = {};
+
         if (currentPrice > movingAverage && capital > 0) {
             // Buy
             buyPrice = currentPrice;
             position = capital / currentPrice;
 
-            tradeData.push({
+            thisTradeData = {
                 capital,
                 signal: "Buy",
-            });
+            };
             mddPrices.push(candle.trade_price);
             capital = 0;
         } else if (currentPrice < movingAverage && position > 0) {
@@ -100,22 +87,34 @@ async function backtestMarket(
                 wins++;
             }
 
-            tradeData.push({
+            thisTradeData = {
                 capital,
                 signal: "Sell",
                 profit,
-            });
+            };
 
             mddPrices.push(candle.trade_price);
         } else {
-            tradeData.push({
+            thisTradeData = {
                 signal: "",
-            });
+            };
 
             if (position > 0) {
                 mddPrices.push(candle.trade_price);
             }
         }
+
+        tradeData.push({
+            date: candle.date_time.slice(0, 10),
+            price: currentPrice,
+            movingAverage: movingAverage.toFixed(2),
+            signal: thisTradeData.signal,
+            position: position.toFixed(2),
+            profit: Math.ceil(thisTradeData.profit ?? 0).toLocaleString(),
+            capital: Math.ceil(thisTradeData.capital ?? 0).toLocaleString(),
+            trades,
+            wins,
+        });
 
         tradeData[index] = {
             date: candle.date_time.slice(0, 10),
@@ -151,6 +150,27 @@ async function backtestMarket(
         performance,
         winRate,
     };
+}
+
+function logResults(results: any[], period: number) {
+    console.log(`\n🔔 일 캔들 ${period}일 이동평균 backtest\n`);
+
+    results.forEach((result) => {
+        console.log(`📈 [${result.market}]`);
+        console.log(`첫째 날: ${result.firstDate}`);
+        console.log(`마지막 날: ${result.lastDate}`);
+        console.log(`Total Trades: ${result.trades}번`);
+        console.log(
+            `Final Capital: ${Math.round(
+                result.finalCapital
+            ).toLocaleString()}원`
+        );
+        console.log(`Performance: ${result.performance.toFixed(2)}%`);
+        console.log(`MDD: ${result.mdd.toFixed(2)}%`);
+        console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
+        // console.log("Trade Log:", result.log.join("\n"));
+        console.log("");
+    });
 }
 
 // 실행 예제

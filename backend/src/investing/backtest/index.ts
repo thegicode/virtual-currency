@@ -13,7 +13,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             // "KRW-ETH",
             // "KRW-SOL",
             // "KRW-AVAX",
-            // "KRW-DOGE",
+            "KRW-DOGE",
             // "KRW-BCH",
             // "KRW-ZRX",
             // "KRW-THETA",
@@ -21,15 +21,15 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             // "KRW-NEAR",
             // "KRW-BTG",
             // "KRW-AVAX",
-            "KRW-SHIB",
+            // "KRW-SHIB",
             // "KRW-SBD",
         ];
-        const apiCounts = 200;
+        const resultCounts = 100;
 
         console.log("-----------------------------------------");
 
         console.log("initialCapital : ", initialCapital);
-        console.log("apiCounts : ", apiCounts);
+        console.log("resultCounts : ", resultCounts);
 
         console.log("-----------------------------------------");
 
@@ -39,7 +39,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             60, // candleUnit, 인터벌 시간 단위
             5, //  movingAveragePeriod, 이동평균 단위
             initialCapital, // 초기 자본
-            apiCounts
+            resultCounts
         );
 
         // checkMinutesMovingAverage
@@ -48,7 +48,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             240, // candleUnit, 인터벌 시간 단위
             10, //  movingAveragePeriod, 이동평균 단위
             initialCapital, // 초기 자본
-            apiCounts
+            resultCounts
         );
 
         console.log("-----------------------------------------");
@@ -58,7 +58,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             markets, // markets
             5, // period
             initialCapital,
-            apiCounts
+            resultCounts
         );
 
         console.log("-----------------------------------------");
@@ -67,19 +67,19 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         await movingAverageAndVolatilityBacktest(
             markets,
             initialCapital,
-            apiCounts
+            resultCounts
             // targetVolatility: number = 2,
         );
 
         console.log("-----------------------------------------");
 
         // afternoonRiseMorningInvestmentBacktest
-        /*  await afternoonRiseMorningInvestmentBacktest(
+        await afternoonRiseMorningInvestmentBacktest(
             markets,
             initialCapital,
-            apiCounts,
+            resultCounts,
             2 // targetVolatility = 2
-        ); */
+        );
     } catch (error) {
         console.error("Error during backtesting: ", error);
     }

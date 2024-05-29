@@ -73,16 +73,16 @@ export function determineInvestmentAction(
     capital: number
 ): { signal: string; position: number } {
     let position = 0;
-    let signal = "보유";
+    let signal = "";
 
     if (isSignal && currentPrice > 0) {
         // 매수 또는 보유
         position = capital / currentPrice;
-        signal = "매수";
+        signal = "Buy";
     } else {
         // 매도 또는 보류
         position = 0;
-        signal = "매도";
+        signal = "Sell";
     }
 
     return { signal, position };

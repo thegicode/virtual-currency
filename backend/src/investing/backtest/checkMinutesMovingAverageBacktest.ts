@@ -1,14 +1,18 @@
 // checkMinutesMovingAverageBacktest.ts
 
 import { fetchMinutesCandles } from "../../services/api";
-import { calculateMDD, calculateMovingAverage } from "../utils";
+import {
+    adjustApiCounts,
+    calculateMDD,
+    calculateMovingAverage,
+} from "../utils";
 
 export async function checkMinutesMovingAverageBacktest(
     markets: string[],
     candleUnit: TCandleUnit,
     movingAveragePeriod: number,
     initialCapital: number,
-    apiCounts: number
+    resultCounts: number
 ) {
     const results = await Promise.all(
         markets.map((market) =>
@@ -17,29 +21,12 @@ export async function checkMinutesMovingAverageBacktest(
                 candleUnit,
                 movingAveragePeriod,
                 initialCapital,
-                apiCounts
+                resultCounts
             )
         )
     );
 
-    console.log(
-        `\n🔔 ${candleUnit}분캔들 ${movingAveragePeriod} 이동평균 backtest\n`
-    );
-
-    results.forEach((result) => {
-        console.log(`📈 [${result.market}]`);
-        console.log(`first Time: ${result.firstTime}`);
-        console.log(`last Time: ${result.lastTime}`);
-        console.log(`Trade Count: ${result.tradeCount}번`);
-        console.log(
-            `Final Capital: ${Math.round(
-                result.finalCapital
-            ).toLocaleString()}원`
-        );
-        console.log(`Performance: ${result.performance.toFixed(2)}%`);
-        console.log(`MDD: ${result.mdd.toFixed(2)}%`);
-        console.log(`Win Rate: ${result.winRate.toFixed(2)}%\n\n`);
-    });
+    logResults(results, candleUnit, movingAveragePeriod);
 }
 
 async function backtestMarket(
@@ -47,9 +34,17 @@ async function backtestMarket(
     candleUnit: TCandleUnit,
     movingAveragePeriod: number,
     initialCapital: number,
-    apiCounts: number
+    resultCounts: number
 ) {
-    const candles = await fetchMinutesCandles(market, candleUnit, apiCounts);
+    const adjustedApiCounts = adjustApiCounts(
+        resultCounts,
+        movingAveragePeriod
+    );
+    const candles = await fetchMinutesCandles(
+        market,
+        candleUnit,
+        adjustedApiCounts
+    );
     const movingAverages = calculateMovingAverage(candles);
 
     const tradesData: any[] = [];
@@ -144,6 +139,31 @@ async function backtestMarket(
         mdd: maxDrawdown,
         winRate,
     };
+}
+
+function logResults(
+    results: any[],
+    candleUnit: number,
+    movingAveragePeriod: number
+) {
+    console.log(
+        `\n🔔 ${candleUnit}분캔들 ${movingAveragePeriod} 이동평균 backtest\n`
+    );
+
+    results.forEach((result) => {
+        console.log(`📈 [${result.market}]`);
+        console.log(`first Time: ${result.firstTime}`);
+        console.log(`last Time: ${result.lastTime}`);
+        console.log(`Trade Count: ${result.tradeCount}번`);
+        console.log(
+            `Final Capital: ${Math.round(
+                result.finalCapital
+            ).toLocaleString()}원`
+        );
+        console.log(`Performance: ${result.performance.toFixed(2)}%`);
+        console.log(`MDD: ${result.mdd.toFixed(2)}%`);
+        console.log(`Win Rate: ${result.winRate.toFixed(2)}%\n\n`);
+    });
 }
 
 // 실행 예제

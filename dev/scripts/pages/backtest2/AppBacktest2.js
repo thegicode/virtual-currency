@@ -16,8 +16,8 @@ export default class AppBacktest2 extends HTMLElement {
         this.data = [];
         this.market = "";
         this.count = 30;
-        this.marketSize = 5;
-        this.totalInvestmentPrice = 1000000;
+        this.marketSize = 2;
+        this.totalInvestmentPrice = 200000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;
         this.summaryAllPrice = 0;
         this.allSumSize = 0;
@@ -114,9 +114,8 @@ export default class AppBacktest2 extends HTMLElement {
     placeOrders(dataList) {
         return dataList.map((aData) => {
             if (aData.tradingAction === "Buy" && aData.volatility) {
-                const percent = (this.target / aData.volatility) * 100;
-                const unitPercent = percent / this.marketSize;
-                const result = (this.totalInvestmentPrice * unitPercent) / 100;
+                const result = (this.target / aData.volatility / this.marketSize) *
+                    this.totalInvestmentPrice;
                 return Object.assign(Object.assign({}, aData), { order_price: Math.round(result) });
             }
             return Object.assign({}, aData);

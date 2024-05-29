@@ -3,7 +3,7 @@
   // app/scripts/components/backtest/volatility.ts
   function getDaliyVolatility(aData) {
     const result = (aData.high_price - aData.low_price) / aData.opening_price * 100;
-    return Number(result.toFixed(2));
+    return result;
   }
 
   // dev/scripts/pages/backtest4/TradeStrategy.js

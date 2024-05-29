@@ -20,23 +20,10 @@ function checkDailyMovingAverageBacktest(markets, period = 3, initialCapital, da
     });
 }
 exports.checkDailyMovingAverageBacktest = checkDailyMovingAverageBacktest;
-function logResults(results, period) {
-    console.log(`\n🔔 일 캔들 ${period}일 이동평균 backtest\n`);
-    results.forEach((result) => {
-        console.log(`📈 [${result.market}]`);
-        console.log(`첫째 날: ${result.firstDate}`);
-        console.log(`마지막 날: ${result.lastDate}`);
-        console.log(`Total Trades: ${result.trades}번`);
-        console.log(`Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원`);
-        console.log(`Performance: ${result.performance.toFixed(2)}%`);
-        console.log(`MDD: ${result.mdd.toFixed(2)}%`);
-        console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
-        console.log("");
-    });
-}
 function backtestMarket(market, period, initialCapital, apiCounts) {
     return __awaiter(this, void 0, void 0, function* () {
-        const candles = yield (0, api_1.fetchDailyCandles)(market, apiCounts.toString());
+        const adjustedApiCounts = (0, utils_1.adjustApiCounts)(apiCounts, period);
+        const candles = yield (0, api_1.fetchDailyCandles)(market, adjustedApiCounts.toString());
         const movingAverages = (0, utils_1.calculateMovingAverage)(candles);
         let capital = initialCapital;
         let position = 0;
@@ -48,7 +35,7 @@ function backtestMarket(market, period, initialCapital, apiCounts) {
         let tradeData = [];
         let mddPrices = [];
         candles.slice(period).forEach((candle, index) => {
-            var _a, _b;
+            var _a, _b, _c, _d;
             if (index === 0)
                 firstDate = candle.date_time;
             if (index === candles.length - period - 1) {
@@ -56,13 +43,14 @@ function backtestMarket(market, period, initialCapital, apiCounts) {
             }
             const currentPrice = candle.trade_price;
             const movingAverage = movingAverages[index];
+            let thisTradeData = {};
             if (currentPrice > movingAverage && capital > 0) {
                 buyPrice = currentPrice;
                 position = capital / currentPrice;
-                tradeData.push({
+                thisTradeData = {
                     capital,
                     signal: "Buy",
-                });
+                };
                 mddPrices.push(candle.trade_price);
                 capital = 0;
             }
@@ -75,29 +63,40 @@ function backtestMarket(market, period, initialCapital, apiCounts) {
                 if (profit > 0) {
                     wins++;
                 }
-                tradeData.push({
+                thisTradeData = {
                     capital,
                     signal: "Sell",
                     profit,
-                });
+                };
                 mddPrices.push(candle.trade_price);
             }
             else {
-                tradeData.push({
+                thisTradeData = {
                     signal: "",
-                });
+                };
                 if (position > 0) {
                     mddPrices.push(candle.trade_price);
                 }
             }
+            tradeData.push({
+                date: candle.date_time.slice(0, 10),
+                price: currentPrice,
+                movingAverage: movingAverage.toFixed(2),
+                signal: thisTradeData.signal,
+                position: position.toFixed(2),
+                profit: Math.ceil((_a = thisTradeData.profit) !== null && _a !== void 0 ? _a : 0).toLocaleString(),
+                capital: Math.ceil((_b = thisTradeData.capital) !== null && _b !== void 0 ? _b : 0).toLocaleString(),
+                trades,
+                wins,
+            });
             tradeData[index] = {
                 date: candle.date_time.slice(0, 10),
                 price: currentPrice,
                 movingAverage: movingAverage.toFixed(2),
                 signal: tradeData[index].signal,
                 position: position.toFixed(2),
-                profit: Math.ceil((_a = tradeData[index].profit) !== null && _a !== void 0 ? _a : 0).toLocaleString(),
-                capital: Math.ceil((_b = tradeData[index].capital) !== null && _b !== void 0 ? _b : 0).toLocaleString(),
+                profit: Math.ceil((_c = tradeData[index].profit) !== null && _c !== void 0 ? _c : 0).toLocaleString(),
+                capital: Math.ceil((_d = tradeData[index].capital) !== null && _d !== void 0 ? _d : 0).toLocaleString(),
                 trades,
                 wins,
             };
@@ -116,5 +115,19 @@ function backtestMarket(market, period, initialCapital, apiCounts) {
             performance,
             winRate,
         };
+    });
+}
+function logResults(results, period) {
+    console.log(`\n🔔 일 캔들 ${period}일 이동평균 backtest\n`);
+    results.forEach((result) => {
+        console.log(`📈 [${result.market}]`);
+        console.log(`첫째 날: ${result.firstDate}`);
+        console.log(`마지막 날: ${result.lastDate}`);
+        console.log(`Total Trades: ${result.trades}번`);
+        console.log(`Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원`);
+        console.log(`Performance: ${result.performance.toFixed(2)}%`);
+        console.log(`MDD: ${result.mdd.toFixed(2)}%`);
+        console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
+        console.log("");
     });
 }
