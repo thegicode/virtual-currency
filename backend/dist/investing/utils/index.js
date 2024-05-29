@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateAverageNoise = exports.formatPrice = exports.calculateBollingerBands = exports.isAboveAllMovingAverages = exports.calculateVolume = exports.calculateVolatility = exports.calculateRiskAdjustedCapital = exports.calculateMovingAverage = exports.calculateInvestmentAmount = exports.calculateCandleReturnRate = exports.calculateAllMovingAverages = exports.formatTimeString = exports.formatDateString = exports.retryFetch = void 0;
+exports.calculateAverageNoise = exports.formatPrice = exports.calculateMDD = exports.calculateBollingerBands = exports.isAboveAllMovingAverages = exports.calculateVolume = exports.calculateVolatility = exports.calculateRiskAdjustedCapital = exports.calculateMovingAverage = exports.calculateInvestmentAmount = exports.calculateCandleReturnRate = exports.calculateAllMovingAverages = exports.formatTimeString = exports.formatDateString = exports.retryFetch = void 0;
 const ApiUtils_1 = require("./ApiUtils");
 Object.defineProperty(exports, "retryFetch", { enumerable: true, get: function () { return ApiUtils_1.retryFetch; } });
 const DateUtils_1 = require("./DateUtils");
@@ -17,6 +17,7 @@ Object.defineProperty(exports, "calculateVolume", { enumerable: true, get: funct
 Object.defineProperty(exports, "isAboveAllMovingAverages", { enumerable: true, get: function () { return FinancialUtils_1.isAboveAllMovingAverages; } });
 const InvestmentUtils_1 = require("./InvestmentUtils");
 Object.defineProperty(exports, "calculateBollingerBands", { enumerable: true, get: function () { return InvestmentUtils_1.calculateBollingerBands; } });
+Object.defineProperty(exports, "calculateMDD", { enumerable: true, get: function () { return InvestmentUtils_1.calculateMDD; } });
 const PriceUtils_1 = require("./PriceUtils");
 Object.defineProperty(exports, "formatPrice", { enumerable: true, get: function () { return PriceUtils_1.formatPrice; } });
 const TradingUtils_1 = require("./TradingUtils");

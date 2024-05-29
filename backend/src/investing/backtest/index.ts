@@ -41,24 +41,11 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             apiCounts
         );
 
-        console.log("-----------------------------------------");
-
-        // checkMinutesMovingAverage
-        /* await checkMinutesMovingAverageBacktest(
-            markets,
-            240, // candleUnit, 인터벌 시간 단위
-            10, //  movingAveragePeriod, 이동평균 단위
-            initialCapital, // 초기 자본
-            apiCounts
-        ); */
-
-        // console.log("-----------------------------------------");
-
         // checkMinutesMovingAverage
         await checkMinutesMovingAverageBacktest(
             markets,
             240, // candleUnit, 인터벌 시간 단위
-            5, //  movingAveragePeriod, 이동평균 단위
+            10, //  movingAveragePeriod, 이동평균 단위
             initialCapital, // 초기 자본
             apiCounts
         );
@@ -66,7 +53,6 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         console.log("-----------------------------------------");
 
         // checkDailyMovingAverage
-        // KRW-BTC, "KRW-SBD",  "KRW-CTC", "KRW-ZRX", "KRW-BTG", "KRW-THETA",
         await checkDailyMovingAverageBacktest(
             markets, // markets
             5, // period
@@ -87,13 +73,12 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         console.log("-----------------------------------------");
 
         // afternoonRiseMorningInvestmentBacktest
-        // KRW-DOGE,  "KRW-SBD",
-        await afternoonRiseMorningInvestmentBacktest(
+        /*  await afternoonRiseMorningInvestmentBacktest(
             markets,
             initialCapital,
-            apiCounts
-            // 2 // targetVolatility = 2
-        );
+            apiCounts,
+            2 // targetVolatility = 2
+        ); */
     } catch (error) {
         console.error("Error during backtesting: ", error);
     }

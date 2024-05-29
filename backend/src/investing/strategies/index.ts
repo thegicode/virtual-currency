@@ -12,23 +12,23 @@ export {
 
 (async () => {
     const markets = [
-        "KRW-BTC",
-        "KRW-ETH",
-        "KRW-SOL",
-        "KRW-XRP",
+        // "KRW-BTC",
+        // "KRW-ETH",
+        // "KRW-SOL",
+        // "KRW-XRP",
         "KRW-DOGE",
         // "KRW-SBD",
 
-        /*  "KRW-BCH",
+        "KRW-BCH",
         "KRW-AVAX",
-        "KRW-SHIB",
-        "KRW-NEAR",
+        "KRW-THETA",
+        // "KRW-GRS",
 
-        "KRW-GRS",
-        "KRW-CTC",
-        "KRW-ZRX",
-        "KRW-BTG",
-        "KRW-THETA", */
+        "KRW-SHIB",
+        // "KRW-NEAR",
+
+        // "KRW-ZRX",
+        // "KRW-BTG",
     ];
 
     const initialCapital = 1000000;
@@ -40,16 +40,16 @@ export {
     await checkMinutesMovingAverage(
         markets,
         60, // candleUnit minute(단위 분)
-        10, // movingAveragePeriod
+        5, // movingAveragePeriod
         (message) => console.log(message)
     );
 
-    await checkMinutesMovingAverage(
+    /*   await checkMinutesMovingAverage(
         markets,
         240, // candleUnit minute(단위 분)
         10, // movingAveragePeriod
         (message) => console.log(message)
-    );
+    ); */
 
     console.log("---------------------------------------------------");
 

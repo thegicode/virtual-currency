@@ -10,7 +10,7 @@ import {
     calculateVolume,
     isAboveAllMovingAverages,
 } from "./FinancialUtils";
-import { calculateBollingerBands } from "./InvestmentUtils";
+import { calculateBollingerBands, calculateMDD } from "./InvestmentUtils";
 import { formatPrice } from "./PriceUtils";
 import { calculateAverageNoise } from "./TradingUtils";
 
@@ -34,6 +34,7 @@ export {
 
     // investmentUtils
     calculateBollingerBands,
+    calculateMDD,
 
     // movingAverageUtils
 

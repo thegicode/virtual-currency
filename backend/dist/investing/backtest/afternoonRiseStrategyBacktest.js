@@ -75,7 +75,6 @@ function backtest(markets, market, period, targetVolatility, initialCapital, tra
                     capital,
                     position,
                     currentPrice,
-                    buyPrice,
                     volatility,
                     trades,
                     wins,
@@ -192,7 +191,6 @@ function calculateMaxDrawdown(capital, position, currentPrice, peakCapital, maxD
 function createMessage(results) {
     const title = `\n🔔 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절 backtest\n`;
     const messages = results.map((result) => {
-        console.table(result.tradeData);
         return `📈 [${result.market}]
 첫째 날: ${result.tradeData[0].currentDate}
 마지막 날: ${result.tradeData[result.tradeData.length - 1].currentDate}

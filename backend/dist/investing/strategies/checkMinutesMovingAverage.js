@@ -40,6 +40,7 @@ function executeAndNotify(movingAveragePeriod, executionCount, markets, candleUn
     return __awaiter(this, void 0, void 0, function* () {
         const tradeInfos = yield getTradeInfos(markets, movingAveragePeriod, candleUnit);
         const message = createMessage(tradeInfos, executionCount, candleUnit, movingAveragePeriod);
+        (0, notifications_1.sendTelegramMessageToChatId)(message);
         return message;
     });
 }

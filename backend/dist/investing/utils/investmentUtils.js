@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateBollingerBands = void 0;
+exports.calculateMDD = exports.calculateBollingerBands = void 0;
 function calculateBollingerBands(candles, period = 20) {
     const middleBand = [];
     const upperBand = [];
@@ -19,3 +19,20 @@ function calculateBollingerBands(candles, period = 20) {
     return { middleBand, upperBand, lowerBand };
 }
 exports.calculateBollingerBands = calculateBollingerBands;
+function calculateMDD(prices) {
+    let peak = prices[0];
+    let maxDrawdown = 0;
+    for (let price of prices) {
+        if (price > peak) {
+            peak = price;
+        }
+        else {
+            const drawdown = ((peak - price) / peak) * 100;
+            if (drawdown > maxDrawdown) {
+                maxDrawdown = drawdown;
+            }
+        }
+    }
+    return maxDrawdown;
+}
+exports.calculateMDD = calculateMDD;

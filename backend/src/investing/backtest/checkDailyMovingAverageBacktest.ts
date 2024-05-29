@@ -6,7 +6,7 @@
  */
 
 import { fetchDailyCandles } from "../../services/api";
-import { calculateMovingAverage } from "../utils";
+import { calculateMovingAverage, calculateMDD } from "../utils";
 
 export async function checkDailyMovingAverageBacktest(
     markets: string[],
@@ -21,6 +21,12 @@ export async function checkDailyMovingAverageBacktest(
         )
     );
 
+    logResults(results, period);
+
+    return results;
+}
+
+function logResults(results: any[], period: number) {
     console.log(`\n🔔 일 캔들 ${period}일 이동평균 backtest\n`);
 
     results.forEach((result) => {
@@ -39,8 +45,6 @@ export async function checkDailyMovingAverageBacktest(
         // console.log("Trade Log:", result.log.join("\n"));
         console.log("");
     });
-
-    return results;
 }
 
 async function backtestMarket(
@@ -59,12 +63,11 @@ async function backtestMarket(
     let position = 0;
     let trades = 0;
     let wins = 0;
-    let peak = initialCapital;
-    let mdd = 0;
     let buyPrice = 0;
     let firstDate;
     let lastDate;
-    const log: string[] = [];
+    let tradeData: any[] = [];
+    let mddPrices: number[] = [];
 
     candles.slice(period).forEach((candle, index) => {
         if (index === 0) firstDate = candle.date_time;
@@ -79,13 +82,13 @@ async function backtestMarket(
             // Buy
             buyPrice = currentPrice;
             position = capital / currentPrice;
+
+            tradeData.push({
+                capital,
+                signal: "Buy",
+            });
+            mddPrices.push(candle.trade_price);
             capital = 0;
-            trades++;
-            log.push(
-                `${index} [${
-                    candle.date_time
-                }] Buy Price  ${currentPrice} | position ${position.toFixed(2)}`
-            );
         } else if (currentPrice < movingAverage && position > 0) {
             // Sell
             const sellPrice = currentPrice;
@@ -96,23 +99,39 @@ async function backtestMarket(
             if (profit > 0) {
                 wins++;
             }
-            log.push(
-                `${index} [${candle.date_time}] Sell Price ${currentPrice} | capital ${capital}`
-            );
+
+            tradeData.push({
+                capital,
+                signal: "Sell",
+                profit,
+            });
+
+            mddPrices.push(candle.trade_price);
+        } else {
+            tradeData.push({
+                signal: "",
+            });
+
+            if (position > 0) {
+                mddPrices.push(candle.trade_price);
+            }
         }
 
-        // Calculate current total value
-        const currentValue = capital + position * currentPrice;
-
-        // Update peak and MDD
-        if (currentValue > peak) {
-            peak = currentValue;
-        }
-        const drawdown = ((peak - currentValue) / peak) * 100;
-        if (drawdown > mdd) {
-            mdd = drawdown;
-        }
+        tradeData[index] = {
+            date: candle.date_time.slice(0, 10),
+            price: currentPrice,
+            movingAverage: movingAverage.toFixed(2),
+            signal: tradeData[index].signal,
+            position: position.toFixed(2),
+            profit: Math.ceil(tradeData[index].profit ?? 0).toLocaleString(),
+            capital: Math.ceil(tradeData[index].capital ?? 0).toLocaleString(),
+            trades,
+            wins,
+        };
     });
+
+    // mdd
+    const maxDrawdown = calculateMDD(mddPrices);
 
     // Final capital calculation
     const finalCapital =
@@ -120,14 +139,15 @@ async function backtestMarket(
     const performance = (finalCapital / initialCapital - 1) * 100;
     const winRate = trades > 0 ? (wins / trades) * 100 : 0;
 
+    console.table(tradeData);
+
     return {
         market,
         firstDate,
         lastDate,
         finalCapital,
         trades,
-        log,
-        mdd,
+        mdd: maxDrawdown,
         performance,
         winRate,
     };

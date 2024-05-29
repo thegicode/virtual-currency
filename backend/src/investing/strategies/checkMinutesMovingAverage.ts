@@ -84,7 +84,7 @@ async function executeAndNotify(
 
     // send telegram message
     // sendMessagesToUsers(message, chatIds);
-    // sendTelegramMessageToChatId(message);
+    sendTelegramMessageToChatId(message);
 
     return message;
 }

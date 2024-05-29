@@ -34,6 +34,25 @@ export function calculateBollingerBands(
 
     return { middleBand, upperBand, lowerBand };
 }
+
+export function calculateMDD(prices: number[]): number {
+    let peak = prices[0];
+    let maxDrawdown = 0;
+
+    for (let price of prices) {
+        if (price > peak) {
+            peak = price;
+        } else {
+            const drawdown = ((peak - price) / peak) * 100;
+            if (drawdown > maxDrawdown) {
+                maxDrawdown = drawdown;
+            }
+        }
+    }
+
+    return maxDrawdown;
+}
+
 /* 
 export function calculatePortfolioReturns(
     holdings: { [symbol: string]: number },

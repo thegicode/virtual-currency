@@ -1,16 +1,8 @@
 // afternoonRiseMorningInvestment
 
-import { fetchMinutesCandles } from "../../services/api";
-import {
-    calculateCandleReturnRate,
-    calculateInvestmentAmount,
-    calculateVolatility,
-    calculateVolume,
-    formatPrice,
-} from "../utils";
-
 /**
  * 투자전략  : 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
+ * 오전 천국, 오후 지옥 전략
  * 투자전략 :
  *      - 오전 0시에 가상화폐의 전일 오후(12시 ~ 24시) 수익률과 거래량 체크
  *      - 매수: 전일 오후 수익률 > 0, 전일 오후 거래량 > 오전 거래량
@@ -19,6 +11,15 @@ import {
  * 하루 두 번 자정, 정오에 매수하는 전략도 ?
  * 2018년 하락장에서도 이더리움은 수익
  */
+
+import { fetchMinutesCandles } from "../../services/api";
+import {
+    calculateCandleReturnRate,
+    calculateInvestmentAmount,
+    calculateVolatility,
+    calculateVolume,
+    formatPrice,
+} from "../utils";
 
 export async function afternoonRiseMorningInvestment(
     markets: string[],

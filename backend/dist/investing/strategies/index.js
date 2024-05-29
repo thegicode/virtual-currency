@@ -19,18 +19,17 @@ const movingAverageAndVolatility_1 = require("./movingAverageAndVolatility");
 Object.defineProperty(exports, "executeMovingAverageAndVolatility", { enumerable: true, get: function () { return movingAverageAndVolatility_1.executeMovingAverageAndVolatility; } });
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const markets = [
-        "KRW-BTC",
-        "KRW-ETH",
-        "KRW-SOL",
-        "KRW-XRP",
         "KRW-DOGE",
+        "KRW-BCH",
+        "KRW-AVAX",
+        "KRW-THETA",
+        "KRW-SHIB",
     ];
     const initialCapital = 1000000;
     console.log("---------------------------------------------------");
     console.log("*** initialCapital: ", initialCapital.toLocaleString() + "원");
     console.log("---------------------------------------------------");
-    yield (0, checkMinutesMovingAverage_1.checkMinutesMovingAverage)(markets, 60, 10, (message) => console.log(message));
-    yield (0, checkMinutesMovingAverage_1.checkMinutesMovingAverage)(markets, 240, 10, (message) => console.log(message));
+    yield (0, checkMinutesMovingAverage_1.checkMinutesMovingAverage)(markets, 60, 5, (message) => console.log(message));
     console.log("---------------------------------------------------");
     const result1 = yield (0, checkDailyMovingAverage_1.checkDailyMovingAverage)(markets, 5);
     console.log(result1);
