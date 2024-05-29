@@ -1,7 +1,7 @@
-// backend/investing/backtest/movingAverageTradeBacktest.ts
+// checkMinutesMovingAverageBacktest.ts
 
 import { fetchMinutesCandles } from "../../services/api";
-import { calculateMovingAverage } from "../utils";
+import { calculateMDD, calculateMovingAverage } from "../utils";
 
 export async function checkMinutesMovingAverageBacktest(
     markets: string[],
@@ -51,16 +51,18 @@ async function backtestMarket(
 ) {
     const candles = await fetchMinutesCandles(market, candleUnit, apiCounts);
     const movingAverages = calculateMovingAverage(candles);
-    const trades: IMinutesMovingAverageBacktestTrade[] = [];
+
+    const tradesData: any[] = [];
     let capital = initialCapital;
     let position = 0;
-    let maxCapital = initialCapital;
-    let maxDrawdown = 0;
+    // let maxCapital = initialCapital;
+    // let maxDrawdown = 0;
     let winCount = 0;
-    let totalTrades = 0;
+    let tradeCount = 0;
     let buyPrice = 0;
     let firstTime;
     let lastTime;
+    let mddPrices: number[] = [];
 
     candles
         .slice(movingAveragePeriod)
@@ -70,8 +72,9 @@ async function backtestMarket(
                 lastTime = candle.date_time;
 
             const currentPrice = candle.trade_price;
-            const movingAverage = movingAverages[index - movingAveragePeriod];
-            let action = "유보";
+            // const movingAverage = movingAverages[index - movingAveragePeriod];
+            const movingAverage = movingAverages[index];
+            let signal = "";
             let profit = 0;
 
             if (currentPrice > movingAverage && capital > 0) {
@@ -79,55 +82,62 @@ async function backtestMarket(
                 buyPrice = currentPrice;
                 position = capital / currentPrice;
                 capital = 0;
-                action = "매수";
+                signal = "Buy";
             } else if (currentPrice < movingAverage && position > 0) {
                 // 매도
                 capital = position * currentPrice;
-                // profit = capital - trades[trades.length - 1]?.capital!;
                 profit = (currentPrice - buyPrice) * position;
                 position = 0;
-                action = "매도";
+                tradeCount++;
+                signal = "Sell";
+                if (profit > 0) {
+                    winCount++;
+                }
+            } else if (currentPrice > movingAverage && position > 0) {
+                signal = "Hold";
             }
 
             const currentCapital = capital + position * currentPrice;
 
-            trades.push({
-                date: candle.date_time,
-                action,
+            tradesData.push({
+                date: candle.date_time.slice(0, 10),
                 price: currentPrice,
-                capital: currentCapital,
-                position,
-                profit,
+                movingAverage: movingAverage.toFixed(5),
+                signal,
+                position: position.toFixed(2),
+                profit: Math.ceil(profit ?? 0).toLocaleString(),
+                capital: Math.ceil(currentCapital ?? 0).toLocaleString(),
+                tradeCount,
+                winCount,
             });
 
-            if (action === "매도") {
-                totalTrades++;
-                if (profit > 0) {
-                    winCount++;
-                }
-            }
-
-            if (currentCapital > maxCapital) {
+            /* if (currentCapital > maxCapital) {
                 maxCapital = currentCapital;
             }
 
             const drawdown = ((maxCapital - currentCapital) / maxCapital) * 100;
             if (drawdown > maxDrawdown) {
                 maxDrawdown = drawdown;
-            }
+            } */
+
+            if (signal !== "") mddPrices.push(candle.trade_price);
         });
 
+    // Final capital calculation
     const finalCapital =
         capital + position * candles[candles.length - 1].trade_price;
     const performance = (finalCapital / initialCapital - 1) * 100;
-    const tradeCount = trades.filter((trade) => trade.action !== "유보").length;
-    const winRate = totalTrades > 0 ? (winCount / totalTrades) * 100 : 0;
+    const winRate = tradeCount > 0 ? (winCount / tradeCount) * 100 : 0;
+
+    // maxDrawdown
+    const maxDrawdown = calculateMDD(mddPrices);
+
+    // console.table(tradesData);
 
     return {
         market,
         firstTime,
         lastTime,
-        trades,
         finalCapital,
         tradeCount,
         performance,

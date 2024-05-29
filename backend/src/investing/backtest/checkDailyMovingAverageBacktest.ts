@@ -139,7 +139,7 @@ async function backtestMarket(
     const performance = (finalCapital / initialCapital - 1) * 100;
     const winRate = trades > 0 ? (wins / trades) * 100 : 0;
 
-    console.table(tradeData);
+    // console.table(tradeData);
 
     return {
         market,

@@ -16,13 +16,14 @@ const checkMinutesMovingAverageBacktest_1 = require("./checkMinutesMovingAverage
 const movingAverageAndVolatilityBacktest_1 = require("./movingAverageAndVolatilityBacktest");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const initialCapital = 1000000;
+        const initialCapital = 100000;
         const markets = [
-            "KRW-DOGE",
+            "KRW-SHIB",
         ];
-        const apiCounts = 100;
+        const apiCounts = 200;
         console.log("-----------------------------------------");
         console.log("initialCapital : ", initialCapital);
+        console.log("apiCounts : ", apiCounts);
         console.log("-----------------------------------------");
         yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 60, 5, initialCapital, apiCounts);
         yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 240, 10, initialCapital, apiCounts);

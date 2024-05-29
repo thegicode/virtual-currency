@@ -34,15 +34,6 @@ interface IMinutesCandleRSI extends ICandle {
     capital?: number;
 }
 
-interface IMinutesMovingAverageBacktestTrade {
-    date: string;
-    action: string;
-    price: number;
-    capital: number;
-    position: number;
-    profit?: number;
-}
-
 interface IMovingAverageAndVolatilityResult {
     market: string;
     currentPrice: number;

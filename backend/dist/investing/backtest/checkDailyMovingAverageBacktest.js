@@ -106,7 +106,6 @@ function backtestMarket(market, period, initialCapital, apiCounts) {
         const finalCapital = capital + position * candles[candles.length - 1].trade_price;
         const performance = (finalCapital / initialCapital - 1) * 100;
         const winRate = trades > 0 ? (wins / trades) * 100 : 0;
-        console.table(tradeData);
         return {
             market,
             firstDate,

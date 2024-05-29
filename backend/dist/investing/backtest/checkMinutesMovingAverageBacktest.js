@@ -33,16 +33,15 @@ function backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital,
     return __awaiter(this, void 0, void 0, function* () {
         const candles = yield (0, api_1.fetchMinutesCandles)(market, candleUnit, apiCounts);
         const movingAverages = (0, utils_1.calculateMovingAverage)(candles);
-        const trades = [];
+        const tradesData = [];
         let capital = initialCapital;
         let position = 0;
-        let maxCapital = initialCapital;
-        let maxDrawdown = 0;
         let winCount = 0;
-        let totalTrades = 0;
+        let tradeCount = 0;
         let buyPrice = 0;
         let firstTime;
         let lastTime;
+        let mddPrices = [];
         candles
             .slice(movingAveragePeriod)
             .forEach((candle, index) => {
@@ -51,53 +50,51 @@ function backtestMarket(market, candleUnit, movingAveragePeriod, initialCapital,
             if (index === candles.length - movingAveragePeriod - 1)
                 lastTime = candle.date_time;
             const currentPrice = candle.trade_price;
-            const movingAverage = movingAverages[index - movingAveragePeriod];
-            let action = "유보";
+            const movingAverage = movingAverages[index];
+            let signal = "";
             let profit = 0;
             if (currentPrice > movingAverage && capital > 0) {
                 buyPrice = currentPrice;
                 position = capital / currentPrice;
                 capital = 0;
-                action = "매수";
+                signal = "Buy";
             }
             else if (currentPrice < movingAverage && position > 0) {
                 capital = position * currentPrice;
                 profit = (currentPrice - buyPrice) * position;
                 position = 0;
-                action = "매도";
-            }
-            const currentCapital = capital + position * currentPrice;
-            trades.push({
-                date: candle.date_time,
-                action,
-                price: currentPrice,
-                capital: currentCapital,
-                position,
-                profit,
-            });
-            if (action === "매도") {
-                totalTrades++;
+                tradeCount++;
+                signal = "Sell";
                 if (profit > 0) {
                     winCount++;
                 }
             }
-            if (currentCapital > maxCapital) {
-                maxCapital = currentCapital;
+            else if (currentPrice > movingAverage && position > 0) {
+                signal = "Hold";
             }
-            const drawdown = ((maxCapital - currentCapital) / maxCapital) * 100;
-            if (drawdown > maxDrawdown) {
-                maxDrawdown = drawdown;
-            }
+            const currentCapital = capital + position * currentPrice;
+            tradesData.push({
+                date: candle.date_time.slice(0, 10),
+                price: currentPrice,
+                movingAverage: movingAverage.toFixed(5),
+                signal,
+                position: position.toFixed(2),
+                profit: Math.ceil(profit !== null && profit !== void 0 ? profit : 0).toLocaleString(),
+                capital: Math.ceil(currentCapital !== null && currentCapital !== void 0 ? currentCapital : 0).toLocaleString(),
+                tradeCount,
+                winCount,
+            });
+            if (signal !== "")
+                mddPrices.push(candle.trade_price);
         });
         const finalCapital = capital + position * candles[candles.length - 1].trade_price;
         const performance = (finalCapital / initialCapital - 1) * 100;
-        const tradeCount = trades.filter((trade) => trade.action !== "유보").length;
-        const winRate = totalTrades > 0 ? (winCount / totalTrades) * 100 : 0;
+        const winRate = tradeCount > 0 ? (winCount / tradeCount) * 100 : 0;
+        const maxDrawdown = (0, utils_1.calculateMDD)(mddPrices);
         return {
             market,
             firstTime,
             lastTime,
-            trades,
             finalCapital,
             tradeCount,
             performance,
