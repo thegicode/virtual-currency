@@ -9,22 +9,23 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
     try {
         const initialCapital = 100000; // 초기 자본
         const markets = [
-            // "KRW-BTC",
+            "KRW-BTC",
             // "KRW-ETH",
             // "KRW-SOL",
             // "KRW-AVAX",
-            "KRW-DOGE",
+            // "KRW-DOGE",
+            //
             // "KRW-BCH",
-            // "KRW-ZRX",
+            // "KRW-ZRX", // daily, afternoon
             // "KRW-THETA",
-            // "KRW-CTC",
             // "KRW-NEAR",
             // "KRW-BTG",
-            // "KRW-AVAX",
             // "KRW-SHIB",
+            //
+            // wiil deleted
             // "KRW-SBD",
         ];
-        const resultCounts = 100;
+        const resultCounts = 200;
 
         console.log("-----------------------------------------");
 
@@ -34,10 +35,18 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         console.log("-----------------------------------------");
 
         // checkMinutesMovingAverage;
-        await checkMinutesMovingAverageBacktest(
+        /* await checkMinutesMovingAverageBacktest(
             markets,
             60, // candleUnit, 인터벌 시간 단위
             5, //  movingAveragePeriod, 이동평균 단위
+            initialCapital, // 초기 자본
+            resultCounts
+        ); */
+
+        await checkMinutesMovingAverageBacktest(
+            markets,
+            60, // candleUnit, 인터벌 시간 단위
+            10, //  movingAveragePeriod, 이동평균 단위
             initialCapital, // 초기 자본
             resultCounts
         );
@@ -46,14 +55,24 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         await checkMinutesMovingAverageBacktest(
             markets,
             240, // candleUnit, 인터벌 시간 단위
-            10, //  movingAveragePeriod, 이동평균 단위
+            5, //  movingAveragePeriod, 이동평균 단위
             initialCapital, // 초기 자본
             resultCounts
         );
 
+        // checkMinutesMovingAverage
+        /* await checkMinutesMovingAverageBacktest(
+            markets,
+            240, // candleUnit, 인터벌 시간 단위
+            10, //  movingAveragePeriod, 이동평균 단위
+            initialCapital, // 초기 자본
+            resultCounts
+        ); */
+
         console.log("-----------------------------------------");
 
         // checkDailyMovingAverage
+        // "KRW-AVAX", "KRW-BCH", "KRW-ZRX", "KRW-THETA", "KRW-NEAR", "KRW-BTG",  "KRW-SHIB",
         await checkDailyMovingAverageBacktest(
             markets, // markets
             5, // period
@@ -74,6 +93,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         console.log("-----------------------------------------");
 
         // afternoonRiseMorningInvestmentBacktest
+        // "KRW-BTC", "KRW-ETH", "KRW-SOL", "KRW-DOGE", "KRW-SBD",
         await afternoonRiseMorningInvestmentBacktest(
             markets,
             initialCapital,

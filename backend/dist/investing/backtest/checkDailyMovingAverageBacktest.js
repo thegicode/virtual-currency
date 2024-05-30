@@ -35,7 +35,7 @@ function backtestMarket(market, period, initialCapital, apiCounts) {
         let tradeData = [];
         let mddPrices = [];
         candles.slice(period).forEach((candle, index) => {
-            var _a, _b, _c, _d;
+            var _a, _b;
             if (index === 0)
                 firstDate = candle.date_time;
             if (index === candles.length - period - 1) {
@@ -89,17 +89,6 @@ function backtestMarket(market, period, initialCapital, apiCounts) {
                 trades,
                 wins,
             });
-            tradeData[index] = {
-                date: candle.date_time.slice(0, 10),
-                price: currentPrice,
-                movingAverage: movingAverage.toFixed(2),
-                signal: tradeData[index].signal,
-                position: position.toFixed(2),
-                profit: Math.ceil((_c = tradeData[index].profit) !== null && _c !== void 0 ? _c : 0).toLocaleString(),
-                capital: Math.ceil((_d = tradeData[index].capital) !== null && _d !== void 0 ? _d : 0).toLocaleString(),
-                trades,
-                wins,
-            };
         });
         const maxDrawdown = (0, utils_1.calculateMDD)(mddPrices);
         const finalCapital = capital + position * candles[candles.length - 1].trade_price;

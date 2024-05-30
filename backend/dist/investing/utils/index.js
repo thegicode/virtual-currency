@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateAverageNoise = exports.formatPrice = exports.calculateMDD = exports.calculateBollingerBands = exports.isAboveAllMovingAverages = exports.calculateVolume = exports.calculateVolatility = exports.calculateRiskAdjustedCapital = exports.calculateMovingAverage = exports.calculateInvestmentAmount = exports.calculateCandleReturnRate = exports.calculateAllMovingAverages = exports.formatTimeString = exports.formatDateString = exports.retryFetch = exports.adjustApiCounts = void 0;
+exports.calculateAverageNoise = exports.formatPrice = exports.calculateMDD = exports.calculateBollingerBands = exports.isAboveAllMovingAverages = exports.calculateVolume = exports.calculateVolatility = exports.calculateRiskAdjustedCapital = exports.calculateMovingAverage = exports.calculateCandleReturnRate = exports.calculateAllMovingAverages = exports.formatTimeString = exports.formatDateString = exports.retryFetch = exports.adjustApiCounts = void 0;
 const ApiUtils_1 = require("./ApiUtils");
 Object.defineProperty(exports, "adjustApiCounts", { enumerable: true, get: function () { return ApiUtils_1.adjustApiCounts; } });
 Object.defineProperty(exports, "retryFetch", { enumerable: true, get: function () { return ApiUtils_1.retryFetch; } });
@@ -10,7 +10,6 @@ Object.defineProperty(exports, "formatTimeString", { enumerable: true, get: func
 const FinancialUtils_1 = require("./FinancialUtils");
 Object.defineProperty(exports, "calculateAllMovingAverages", { enumerable: true, get: function () { return FinancialUtils_1.calculateAllMovingAverages; } });
 Object.defineProperty(exports, "calculateCandleReturnRate", { enumerable: true, get: function () { return FinancialUtils_1.calculateCandleReturnRate; } });
-Object.defineProperty(exports, "calculateInvestmentAmount", { enumerable: true, get: function () { return FinancialUtils_1.calculateInvestmentAmount; } });
 Object.defineProperty(exports, "calculateMovingAverage", { enumerable: true, get: function () { return FinancialUtils_1.calculateMovingAverage; } });
 Object.defineProperty(exports, "calculateRiskAdjustedCapital", { enumerable: true, get: function () { return FinancialUtils_1.calculateRiskAdjustedCapital; } });
 Object.defineProperty(exports, "calculateVolatility", { enumerable: true, get: function () { return FinancialUtils_1.calculateVolatility; } });

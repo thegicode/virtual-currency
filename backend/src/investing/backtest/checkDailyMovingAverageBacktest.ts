@@ -115,18 +115,6 @@ async function backtestMarket(
             trades,
             wins,
         });
-
-        tradeData[index] = {
-            date: candle.date_time.slice(0, 10),
-            price: currentPrice,
-            movingAverage: movingAverage.toFixed(2),
-            signal: tradeData[index].signal,
-            position: position.toFixed(2),
-            profit: Math.ceil(tradeData[index].profit ?? 0).toLocaleString(),
-            capital: Math.ceil(tradeData[index].capital ?? 0).toLocaleString(),
-            trades,
-            wins,
-        };
     });
 
     // mdd

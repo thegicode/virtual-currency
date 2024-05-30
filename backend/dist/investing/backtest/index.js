@@ -19,15 +19,15 @@ const movingAverageAndVolatilityBacktest_1 = require("./movingAverageAndVolatili
     try {
         const initialCapital = 100000;
         const markets = [
-            "KRW-DOGE",
+            "KRW-BTC",
         ];
-        const resultCounts = 100;
+        const resultCounts = 200;
         console.log("-----------------------------------------");
         console.log("initialCapital : ", initialCapital);
         console.log("resultCounts : ", resultCounts);
         console.log("-----------------------------------------");
-        yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 60, 5, initialCapital, resultCounts);
-        yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 240, 10, initialCapital, resultCounts);
+        yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 60, 10, initialCapital, resultCounts);
+        yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 240, 5, initialCapital, resultCounts);
         console.log("-----------------------------------------");
         yield (0, checkDailyMovingAverageBacktest_1.checkDailyMovingAverageBacktest)(markets, 5, initialCapital, resultCounts);
         console.log("-----------------------------------------");

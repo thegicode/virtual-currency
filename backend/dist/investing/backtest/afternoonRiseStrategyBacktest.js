@@ -14,7 +14,7 @@ const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
 function afternoonRiseMorningInvestmentBacktest(markets, initialCapital, period, targetVolatility = 2) {
     return __awaiter(this, void 0, void 0, function* () {
-        const transactionFee = 0.001;
+        const transactionFee = 0;
         const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () {
             return yield backtest(markets, market, period, targetVolatility, initialCapital, transactionFee);
         })));
@@ -24,71 +24,88 @@ function afternoonRiseMorningInvestmentBacktest(markets, initialCapital, period,
 }
 exports.afternoonRiseMorningInvestmentBacktest = afternoonRiseMorningInvestmentBacktest;
 function backtest(markets, market, period, targetVolatility, initialCapital, transactionFee) {
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         let capital = initialCapital;
         let position = 0;
-        let trades = 0;
-        let tradeData = [];
-        let wins = 0;
-        let peakCapital = initialCapital;
-        let maxDrawdown = 0;
+        let tradeCount = 0;
+        let tradesData = [];
+        let winCount = 0;
         let buyPrice = 0;
         let currentPrice = 0;
-        let candles = [];
+        let mddPrices = [];
         for (let day = 1; day <= period; day++) {
             const currentDate = `${getToDate(day, period)}+09:00`;
-            const { morningCandles, afternoonCandles, allCandles } = yield fetchAndSplitDailyCandles(market, currentDate);
-            candles = allCandles;
+            const { morningCandles, afternoonCandles } = yield fetchAndSplitDailyCandles(market, currentDate);
             const { afternoonReturnRate, morningVolume, afternoonVolume, volatility, } = calculateDailyMetrics(afternoonCandles, morningCandles);
-            const shouldBuy = shouldBuyBasedOnMetrics(afternoonReturnRate, afternoonVolume, morningVolume);
-            let investment, signal;
-            if (shouldBuy) {
-                ({
-                    capital,
-                    position,
-                    currentPrice,
-                    buyPrice,
-                    trades,
-                    investment,
-                    signal,
-                } = executeBuy(markets, afternoonCandles, targetVolatility, volatility, capital, position, trades, initialCapital));
-                tradeData.push({
-                    day,
-                    currentDate,
-                    signal,
-                    capital,
-                    position,
-                    currentPrice,
-                    buyPrice,
+            let signalData = {};
+            const shouldBuy = afternoonReturnRate > 0 && afternoonVolume > morningVolume;
+            currentPrice =
+                afternoonCandles[afternoonCandles.length - 1].trade_price;
+            if (shouldBuy && buyPrice === 0) {
+                let investmentAmount = (0, utils_1.calculateRiskAdjustedCapital)(targetVolatility, volatility, markets.length, capital);
+                if (capital <= investmentAmount) {
+                    investmentAmount = capital;
+                }
+                buyPrice = currentPrice;
+                position += investmentAmount / currentPrice;
+                capital -= investmentAmount;
+                signalData = {
+                    signal: "Buy",
                     volatility,
-                    trades,
-                    investment,
-                });
+                    investment: investmentAmount,
+                };
             }
-            else {
-                ({ capital, position, currentPrice, trades, wins, signal } =
-                    yield executeSell(market, currentDate, position, capital, transactionFee, buyPrice, trades, wins));
-                tradeData.push({
-                    day,
-                    currentDate,
-                    signal,
-                    capital,
-                    position,
-                    currentPrice,
-                    volatility,
-                    trades,
-                    wins,
-                });
+            else if (!shouldBuy && position > 0) {
+                const atNoonTime = currentDate.slice(0, 11) + "04:00:00";
+                const ticker = yield (0, api_1.fetchMinutesCandles)(market, 60, 1, atNoonTime);
+                const sellPrice = ticker[0].trade_price;
+                const profit = (sellPrice - buyPrice) * position;
+                capital += position * sellPrice * (1 - transactionFee);
+                if (profit > 0)
+                    winCount++;
+                tradeCount++;
+                position = 0;
+                buyPrice = 0;
+                signalData = {
+                    signal: "Sell",
+                    profit,
+                };
             }
-            ({ peakCapital, maxDrawdown } = calculateMaxDrawdown(capital, position, currentPrice, peakCapital, maxDrawdown));
+            else if (shouldBuy && buyPrice !== 0) {
+                signalData = {
+                    signal: "Hold",
+                };
+            }
+            signalData = Object.assign(Object.assign({}, signalData), { date: currentDate, price: currentPrice, capital,
+                position,
+                tradeCount,
+                winCount, investment: (_a = signalData.investment) !== null && _a !== void 0 ? _a : 0, profit: (_b = signalData.profit) !== null && _b !== void 0 ? _b : 0, volatility: volatility !== null && volatility !== void 0 ? volatility : 0 });
+            tradesData.push(Object.assign({}, signalData));
+            if (signalData.signal !== "")
+                mddPrices.push(currentPrice);
         }
-        const finalCapital = tradeData[tradeData.length - 1].capital;
+        const lastTradeData = tradesData[tradesData.length - 1];
+        const finalCapital = ["Buy", "Hold"].includes(lastTradeData.signal)
+            ? capital + position * lastTradeData.price
+            : lastTradeData.capital;
         const performance = (finalCapital / initialCapital - 1) * 100;
-        const winRate = trades > 0 ? (wins / trades) * 100 : 0;
-        tradeData = tradeData.map((aData) => {
-            return Object.assign(Object.assign({}, aData), { currentDate: aData.currentDate.slice(0, 10), capital: Math.round(aData.capital).toLocaleString(), position: aData.position > 0 ? aData.position.toFixed(2) : "", volatility: aData.volatility.toFixed(2), investment: aData.investment
-                    ? Math.round(aData.investment).toLocaleString()
-                    : "" });
+        const winRate = tradeCount > 0 ? (winCount / tradeCount) * 100 : 0;
+        const maxDrawdown = (0, utils_1.calculateMDD)(mddPrices);
+        tradesData = tradesData.map((aData) => {
+            var _a;
+            return {
+                date: aData.date.slice(0, 10),
+                price: aData.price,
+                signal: (_a = aData.signal) !== null && _a !== void 0 ? _a : "",
+                volatility: aData.volatility && aData.volatility.toFixed(2),
+                position: aData.position === 0 ? 0 : aData.position.toFixed(5),
+                investment: Math.round(aData.investment).toLocaleString(),
+                profit: Math.round(aData.profit).toLocaleString(),
+                capital: Math.round(aData.capital).toLocaleString(),
+                tradeCount: aData.tradeCount,
+                winCount: aData.winCount,
+            };
         });
         return {
             market,
@@ -96,9 +113,9 @@ function backtest(markets, market, period, targetVolatility, initialCapital, tra
             performance,
             winRate,
             maxDrawdown,
-            trades,
-            wins,
-            tradeData,
+            tradeCount,
+            winCount,
+            tradesData,
         };
     });
 }
@@ -128,73 +145,13 @@ function calculateDailyMetrics(afternoonCandles, morningCandles) {
     const volatility = (0, utils_1.calculateVolatility)(afternoonCandles);
     return { afternoonReturnRate, morningVolume, afternoonVolume, volatility };
 }
-function shouldBuyBasedOnMetrics(afternoonReturnRate, afternoonVolume, morningVolume) {
-    return afternoonReturnRate > 0 && afternoonVolume > morningVolume;
-}
-function executeBuy(markets, afternoonCandles, targetVolatility, volatility, capital, position, trades, initialCapital) {
-    const tradePrice = afternoonCandles[afternoonCandles.length - 1].trade_price;
-    const buyPrice = tradePrice;
-    const investment = (0, utils_1.calculateInvestmentAmount)(targetVolatility, volatility, markets.length, initialCapital);
-    let signal = "";
-    const amountToBuy = investment / tradePrice;
-    if (capital >= investment) {
-        capital -= investment;
-        position += amountToBuy;
-        trades++;
-        signal = "매수";
-    }
-    return {
-        capital,
-        position,
-        currentPrice: tradePrice,
-        buyPrice,
-        trades,
-        investment,
-        signal,
-    };
-}
-function executeSell(market, currentDate, position, capital, transactionFee, buyPrice, trades, wins) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const atNoonTime = currentDate.slice(0, 11) + "04:00:00";
-        const ticker = yield (0, api_1.fetchMinutesCandles)(market, 60, 1, atNoonTime);
-        const currentPrice = ticker[0].trade_price;
-        let signal = "";
-        if (position > 0) {
-            capital += position * currentPrice * (1 - transactionFee);
-            if (currentPrice > buyPrice)
-                wins++;
-            position = 0;
-            trades++;
-            signal = "매도";
-        }
-        return {
-            capital,
-            position,
-            currentPrice,
-            trades,
-            wins,
-            signal,
-        };
-    });
-}
-function calculateMaxDrawdown(capital, position, currentPrice, peakCapital, maxDrawdown) {
-    const currentTotal = capital + position * currentPrice;
-    if (currentTotal > peakCapital) {
-        peakCapital = currentTotal;
-    }
-    const drawdown = ((peakCapital - currentTotal) / peakCapital) * 100;
-    if (drawdown > maxDrawdown) {
-        maxDrawdown = drawdown;
-    }
-    return { peakCapital, maxDrawdown };
-}
 function createMessage(results) {
     const title = `\n🔔 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절 backtest\n`;
     const messages = results.map((result) => {
         return `📈 [${result.market}]
-첫째 날: ${result.tradeData[0].currentDate}
-마지막 날: ${result.tradeData[result.tradeData.length - 1].currentDate}
-Total Trades: ${result.trades}번
+첫째 날: ${result.tradesData[0].date}
+마지막 날: ${result.tradesData[result.tradesData.length - 1].date}
+Total Trades: ${result.tradeCount}번
 Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원
 Performance: ${result.performance.toFixed(2)}%
 MDD: ${result.maxDrawdown.toFixed(2)}%

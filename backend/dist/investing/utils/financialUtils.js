@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isAboveAllMovingAverages = exports.calculateVolume = exports.calculateVolatility = exports.calculateRiskAdjustedCapital = exports.calculateMovingAverage = exports.calculateInvestmentAmount = exports.calculateCandleReturnRate = exports.calculateAllMovingAverages = void 0;
+exports.isAboveAllMovingAverages = exports.calculateVolume = exports.calculateVolatility = exports.calculateRiskAdjustedCapital = exports.calculateMovingAverage = exports.calculateCandleReturnRate = exports.calculateAllMovingAverages = void 0;
 function calculateAllMovingAverages(candles, periods) {
     const movingAverages = {};
     periods.forEach((period) => {
@@ -15,11 +15,6 @@ function calculateCandleReturnRate(candles) {
     return (closePrice - openPrice) / openPrice;
 }
 exports.calculateCandleReturnRate = calculateCandleReturnRate;
-function calculateInvestmentAmount(targetVolatility, volatility, size, initialCapital) {
-    const percent = targetVolatility / volatility / size;
-    return (percent * initialCapital) / 100;
-}
-exports.calculateInvestmentAmount = calculateInvestmentAmount;
 function calculateMovingAverage(data, period = 3) {
     const movingAverages = [];
     for (let i = 0; i <= data.length - period; i++) {

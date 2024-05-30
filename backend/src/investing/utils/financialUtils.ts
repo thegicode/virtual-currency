@@ -34,16 +34,6 @@ export function calculateCandleReturnRate(candles: ICandle[]): number {
     return (closePrice - openPrice) / openPrice;
 }
 
-export function calculateInvestmentAmount(
-    targetVolatility: number,
-    volatility: number,
-    size: number,
-    initialCapital: number
-) {
-    const percent = targetVolatility / volatility / size;
-    return (percent * initialCapital) / 100;
-}
-
 // 이동평균선을 계산하는 함수
 export function calculateMovingAverage(
     data: ICandle[],
@@ -79,7 +69,6 @@ export function calculateRiskAdjustedCapital(
 }
 
 export function calculateVolatility(candles: ICandle[]) {
-    // console.log(candles);
     const volatilities = candles.map(
         (candle) =>
             ((candle.high_price - candle.low_price) / candle.opening_price) *

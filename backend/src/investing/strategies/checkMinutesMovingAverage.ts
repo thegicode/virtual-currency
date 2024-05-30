@@ -1,9 +1,9 @@
 // checkMinutesMovingAverage
-import {
-    getChatIds,
-    sendMessagesToUsers,
-    sendTelegramMessageToChatId,
-} from "../../notifications";
+// import {
+//     getChatIds,
+//     // sendMessagesToUsers,
+//     // sendTelegramMessageToChatId,
+// } from "../../notifications";
 import { fetchMinutesCandles, fetchTicker } from "../../services/api";
 import {
     calculateMovingAverage,
@@ -24,7 +24,7 @@ export async function checkMinutesMovingAverage(
     callback: (message: string) => void
 ) {
     let executionCount = 0;
-    const chatIds = (await getChatIds()) as number[];
+    // const chatIds = (await getChatIds()) as number[];
 
     // 첫 번째 실행이후 candleUnit분 간격 실행
     await executeAndNotifyInterval();
@@ -44,8 +44,8 @@ export async function checkMinutesMovingAverage(
                 movingAveragePeriod,
                 executionCount,
                 markets,
-                candleUnit,
-                chatIds
+                candleUnit
+                // chatIds
             );
             callback(message);
             executionCount++;
@@ -66,8 +66,8 @@ async function executeAndNotify(
     movingAveragePeriod: number,
     executionCount: number,
     markets: string[],
-    candleUnit: TCandleUnit,
-    chatIds: number[]
+    candleUnit: TCandleUnit
+    // chatIds: number[]
 ) {
     const tradeInfos = await getTradeInfos(
         markets,
@@ -84,7 +84,7 @@ async function executeAndNotify(
 
     // send telegram message
     // sendMessagesToUsers(message, chatIds);
-    sendTelegramMessageToChatId(message);
+    // sendTelegramMessageToChatId(message);
 
     return message;
 }

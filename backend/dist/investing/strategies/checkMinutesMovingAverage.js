@@ -10,18 +10,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkMinutesMovingAverage = void 0;
-const notifications_1 = require("../../notifications");
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
 function checkMinutesMovingAverage(markets, candleUnit, movingAveragePeriod, callback) {
     return __awaiter(this, void 0, void 0, function* () {
         let executionCount = 0;
-        const chatIds = (yield (0, notifications_1.getChatIds)());
         yield executeAndNotifyInterval();
         function executeAndNotifyInterval() {
             return __awaiter(this, void 0, void 0, function* () {
                 try {
-                    const message = yield executeAndNotify(movingAveragePeriod, executionCount, markets, candleUnit, chatIds);
+                    const message = yield executeAndNotify(movingAveragePeriod, executionCount, markets, candleUnit);
                     callback(message);
                     executionCount++;
                 }
@@ -36,11 +34,10 @@ function checkMinutesMovingAverage(markets, candleUnit, movingAveragePeriod, cal
     });
 }
 exports.checkMinutesMovingAverage = checkMinutesMovingAverage;
-function executeAndNotify(movingAveragePeriod, executionCount, markets, candleUnit, chatIds) {
+function executeAndNotify(movingAveragePeriod, executionCount, markets, candleUnit) {
     return __awaiter(this, void 0, void 0, function* () {
         const tradeInfos = yield getTradeInfos(markets, movingAveragePeriod, candleUnit);
         const message = createMessage(tradeInfos, executionCount, candleUnit, movingAveragePeriod);
-        (0, notifications_1.sendTelegramMessageToChatId)(message);
         return message;
     });
 }

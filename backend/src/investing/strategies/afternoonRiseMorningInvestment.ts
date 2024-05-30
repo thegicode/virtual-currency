@@ -15,7 +15,7 @@
 import { fetchMinutesCandles } from "../../services/api";
 import {
     calculateCandleReturnRate,
-    calculateInvestmentAmount,
+    calculateRiskAdjustedCapital,
     calculateVolatility,
     calculateVolume,
     formatPrice,
@@ -69,28 +69,30 @@ async function generateMarketTradeSignal(
     const { afternoonReturnRate, morningVolume, afternoonVolume, volatility } =
         calculateDailyMetrics(afternoonCandles, morningCandles);
 
-    // console.log("\nmarket: ", market);
-    // console.log("afternoonReturnRate", (afternoonReturnRate * 100).toFixed(2));
-    // console.log("morningVolume", morningVolume.toLocaleString());
-    // console.log("afternoonVolume", afternoonVolume.toLocaleString());
-    // console.log("volatility", market, volatility.toFixed(2));
-
-    // 2. 매수 판단: 전일 오후 수익률 > 0, 전일 오후 거래량 > 오전 거래량
-    const tradeSignal = generateTradeSignal(
-        afternoonReturnRate,
-        afternoonVolume,
-        morningVolume,
-        targetVolatility,
-        volatility,
-        initialCapital,
-        size
-    );
+    let signData: { signal: string; investment?: number } | null = null;
+    if (afternoonReturnRate > 0 && afternoonVolume > morningVolume) {
+        signData = {
+            signal: "Buy or Hold",
+            investment: calculateRiskAdjustedCapital(
+                targetVolatility,
+                volatility,
+                size,
+                initialCapital
+            ),
+        };
+    } else {
+        signData = {
+            signal: "Sell or Resolve",
+        };
+    }
 
     return {
         market,
         date: currentDate,
         volatility,
-        ...tradeSignal,
+        signal: signData.signal,
+        price: candles[candles.length - 1].trade_price,
+        investment: signData.investment ?? 0,
     };
 }
 
@@ -159,59 +161,32 @@ function calculateDailyMetrics(
     return { afternoonReturnRate, morningVolume, afternoonVolume, volatility };
 }
 
-/**
- * 매수 또는 매도 신호를 생성
- */
-function generateTradeSignal(
-    afternoonReturnRate: number,
-    afternoonVolume: number,
-    morningVolume: number,
-    targetVolatility: number,
-    volatility: number,
-    initialCapital: number,
-    size: number
-) {
-    if (afternoonReturnRate > 0 && afternoonVolume > morningVolume) {
-        const investment = calculateInvestmentAmount(
-            targetVolatility,
-            volatility,
-            size,
-            initialCapital
-        );
-
-        return {
-            signal: "매수 또는 유지",
-            investment,
-        };
-    } else {
-        return {
-            signal: "매도 또는 유보",
-        };
-    }
-}
-
 interface IResult {
     market: string;
     date: string;
     signal: string;
+    price: number;
     volatility: number;
-    investment?: number;
+    investment: number;
 }
+
 function createMessage(results: IResult[]) {
     const title = `\n 🔔 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절\n`;
     const memo = `- 매일 자정에 확인, 매도는 다음 날 정오\n\n`;
 
     const message = results
         .map((result) => {
-            const investmentMessage = result.investment
-                ? `매수금액 : ${formatPrice(Math.round(result.investment))}원`
-                : "";
+            const isBuy = result.signal === "Buy or Hold";
+            const investmentMessage = `매수금액 : ${formatPrice(
+                Math.round(result.investment)
+            )}원`;
 
             return `📈 [${result.market}] 
 날    짜 : ${result.date.slice(0, 10)}
-신    호 : ${result.signal}
-volatility : ${result.volatility.toFixed(2)}
-${investmentMessage}`;
+신    호 : ${isBuy ? "매수 또는 유지" : "매도 또는 유보"}
+가    격 : ${formatPrice(result.price)}원
+변 동 성 : ${result.volatility.toFixed(2)}
+${isBuy ? investmentMessage : ""}`;
         })
         .join("\n\n");
     return `${title}${memo}${message}\n`;

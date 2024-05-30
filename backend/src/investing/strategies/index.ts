@@ -1,4 +1,4 @@
-// import { sendTelegramMessageToChatId } from "../../notifications";
+import { sendTelegramMessageToChatId } from "../../notifications";
 import { afternoonRiseMorningInvestment } from "./afternoonRiseMorningInvestment";
 import { checkDailyMovingAverage } from "./checkDailyMovingAverage";
 import { checkMinutesMovingAverage } from "./checkMinutesMovingAverage";
@@ -15,23 +15,21 @@ export {
         // "KRW-BTC",
         // "KRW-ETH",
         // "KRW-SOL",
-        // "KRW-XRP",
-        "KRW-DOGE",
+        // "KRW-DOGE",
         // "KRW-SBD",
-
-        "KRW-BCH",
-        "KRW-AVAX",
-        "KRW-THETA",
-        // "KRW-GRS",
-
+        //
+        // "KRW-BCH",
+        // "KRW-AVAX",
+        // "KRW-THETA",
         "KRW-SHIB",
         // "KRW-NEAR",
-
+        //
         // "KRW-ZRX",
         // "KRW-BTG",
+        // "KRW-TRX",
     ];
 
-    const initialCapital = 1000000;
+    const initialCapital = 100000;
     console.log("---------------------------------------------------");
     console.log("*** initialCapital: ", initialCapital.toLocaleString() + "원");
     console.log("---------------------------------------------------");
@@ -40,16 +38,22 @@ export {
     await checkMinutesMovingAverage(
         markets,
         60, // candleUnit minute(단위 분)
-        5, // movingAveragePeriod
-        (message) => console.log(message)
+        10, // movingAveragePeriod
+        (message) => {
+            console.log(message);
+            sendTelegramMessageToChatId(message);
+        }
     );
 
-    /*   await checkMinutesMovingAverage(
+    await checkMinutesMovingAverage(
         markets,
         240, // candleUnit minute(단위 분)
-        10, // movingAveragePeriod
-        (message) => console.log(message)
-    ); */
+        5, // movingAveragePeriod
+        (message) => {
+            console.log(message);
+            sendTelegramMessageToChatId(message);
+        }
+    );
 
     console.log("---------------------------------------------------");
 
@@ -73,8 +77,8 @@ export {
     // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
     const results3 = await afternoonRiseMorningInvestment(
         markets,
-        initialCapital
-        // 2 // targetVolatility
+        initialCapital,
+        2 // targetVolatility
     );
     console.log(results3);
 })();

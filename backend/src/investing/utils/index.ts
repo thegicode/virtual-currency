@@ -3,7 +3,6 @@ import { formatDateString, formatTimeString } from "./DateUtils";
 import {
     calculateAllMovingAverages,
     calculateCandleReturnRate,
-    calculateInvestmentAmount,
     calculateMovingAverage,
     calculateRiskAdjustedCapital,
     calculateVolatility,
@@ -15,33 +14,30 @@ import { formatPrice } from "./PriceUtils";
 import { calculateAverageNoise } from "./TradingUtils";
 
 export {
-    // apiUtils
+    // ApiUtils
     adjustApiCounts,
     retryFetch,
 
-    // dateUtils
+    // DateUtils
     formatDateString,
     formatTimeString,
 
-    // financialUtils
+    // FinancialUtils
     calculateAllMovingAverages,
     calculateCandleReturnRate,
-    calculateInvestmentAmount,
     calculateMovingAverage,
     calculateRiskAdjustedCapital,
     calculateVolatility,
     calculateVolume,
     isAboveAllMovingAverages,
 
-    // investmentUtils
+    // InvestmentUtils
     calculateBollingerBands,
     calculateMDD,
 
-    // movingAverageUtils
-
-    // priceUtils
+    // PriceUtils
     formatPrice,
 
-    // tradingUtils
+    // TradingUtils
     calculateAverageNoise,
 };

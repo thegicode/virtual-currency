@@ -14,15 +14,36 @@
  *
  * 하루 두 번 자정, 정오에 매수하는 전략도 ?
  * 2018년 하락장에서도 이더리움은 수익
- *
- *
- * 캔들 오류 => 계산 수정 할 것
  */
+
+interface ITradeData {
+    date: string;
+    signal: string;
+    volatility: number;
+    price: number;
+    capital: number;
+    position: number;
+    investment: number;
+    profit: number;
+    tradeCount: number;
+    winCount: number;
+}
+
+interface IResult {
+    market: string;
+    tradesData: ITradeData[];
+    tradeCount: number;
+    finalCapital: number;
+    performance: number;
+    maxDrawdown: number;
+    winRate: number;
+}
 
 import { fetchMinutesCandles } from "../../services/api";
 import {
     calculateCandleReturnRate,
-    calculateInvestmentAmount,
+    calculateMDD,
+    calculateRiskAdjustedCapital,
     calculateVolatility,
     calculateVolume,
 } from "../utils";
@@ -33,7 +54,8 @@ export async function afternoonRiseMorningInvestmentBacktest(
     period: number,
     targetVolatility: number = 2 // 타깃 변동성
 ) {
-    const transactionFee = 0.001; // 거래 비용 0.1%
+    // const transactionFee = 0.001; // 거래 비용 0.1%
+    const transactionFee = 0;
 
     const results = await Promise.all(
         markets.map(
@@ -65,28 +87,22 @@ async function backtest(
 
     let capital = initialCapital;
     let position = 0;
-    let trades = 0;
-    let tradeData = [];
-    let wins = 0;
-    let peakCapital = initialCapital;
-    let maxDrawdown = 0;
+    let tradeCount = 0;
+    let tradesData: any = [];
+    let winCount = 0;
     let buyPrice = 0;
     let currentPrice = 0;
-    let candles: ICandle[] = [];
+    let mddPrices: number[] = [];
 
     for (let day = 1; day <= period; day++) {
         // console.log("\n Day", day);
 
         const currentDate = `${getToDate(day, period)}+09:00`;
-        // console.log("currentDate: ", currentDate);
+        // console.log("\n currentDate", currentDate);
 
         // 0. get data
-        const { morningCandles, afternoonCandles, allCandles } =
+        const { morningCandles, afternoonCandles } =
             await fetchAndSplitDailyCandles(market, currentDate);
-        candles = allCandles;
-
-        // console.log("morningCandles: ", morningCandles);
-        // console.log("afternoonCandles: ", afternoonCandles);
 
         // 1. 전일 수익률과 거래량, 변동성
         const {
@@ -96,105 +112,110 @@ async function backtest(
             volatility,
         } = calculateDailyMetrics(afternoonCandles, morningCandles);
 
-        // console.log("volatility", market, volatility.toFixed(2));
+        // 2. 매수 판단 : 전일 오후 수익률 > 0, 전일 오후 거래량 > 오전 거래량
+        let signalData: Partial<ITradeData> = {};
 
-        // 2. 매수 판단
-        const shouldBuy = shouldBuyBasedOnMetrics(
-            afternoonReturnRate,
-            afternoonVolume,
-            morningVolume
-        );
+        const shouldBuy =
+            afternoonReturnRate > 0 && afternoonVolume > morningVolume;
 
-        let investment, signal;
+        currentPrice =
+            afternoonCandles[afternoonCandles.length - 1].trade_price;
 
-        // 4. 매수 / 매도
-        if (shouldBuy) {
-            ({
-                capital,
-                position,
-                currentPrice,
-                buyPrice,
-                trades,
-                investment,
-                signal,
-            } = executeBuy(
-                markets,
-                afternoonCandles,
+        if (shouldBuy && buyPrice === 0) {
+            // 매수 자금 : 가상화폐별 투입 금액은 (타깃 변동성 / 특정 화폐의 전일 오후 변동성) / 투자대상 화폐수
+            let investmentAmount = calculateRiskAdjustedCapital(
                 targetVolatility,
                 volatility,
-                capital,
-                position,
-                trades,
-                initialCapital
-            ));
+                markets.length,
+                capital
+            );
 
-            tradeData.push({
-                day,
-                currentDate,
-                signal,
-                capital,
-                position,
-                currentPrice,
-                buyPrice,
-                volatility,
-                trades,
-                investment,
-            });
-        } else {
-            ({ capital, position, currentPrice, trades, wins, signal } =
-                await executeSell(
-                    market,
-                    currentDate,
-                    position,
-                    capital,
-                    transactionFee,
-                    buyPrice,
-                    trades,
-                    wins
-                ));
+            if (capital <= investmentAmount) {
+                investmentAmount = capital;
+            }
 
-            tradeData.push({
-                day,
-                currentDate,
-                signal,
-                capital,
-                position,
-                currentPrice,
-                // buyPrice,
+            buyPrice = currentPrice;
+            position += investmentAmount / currentPrice;
+            capital -= investmentAmount;
+            signalData = {
+                signal: "Buy",
                 volatility,
-                trades,
-                wins,
-            });
+                investment: investmentAmount,
+            };
+            // console.log("shouldBuy : capital", capital);
+            // console.log("shouldBuy : investmentAmount", investmentAmount);
+        } else if (!shouldBuy && position > 0) {
+            // 매도 : 정오 -> 정오 데이터 가져오기
+            const atNoonTime = currentDate.slice(0, 11) + "04:00:00";
+            const ticker = await fetchMinutesCandles(market, 60, 1, atNoonTime);
+            const sellPrice = ticker[0].trade_price;
+            const profit = (sellPrice - buyPrice) * position;
+            capital += position * sellPrice * (1 - transactionFee);
+            if (profit > 0) winCount++;
+
+            tradeCount++;
+            position = 0;
+            buyPrice = 0;
+
+            signalData = {
+                signal: "Sell",
+                profit,
+            };
+        } else if (shouldBuy && buyPrice !== 0) {
+            signalData = {
+                signal: "Hold",
+            };
         }
 
-        // 최대 낙폭 계산
-        ({ peakCapital, maxDrawdown } = calculateMaxDrawdown(
+        signalData = {
+            ...signalData,
+            date: currentDate,
+            price: currentPrice,
             capital,
             position,
-            currentPrice,
-            peakCapital,
-            maxDrawdown
-        ));
+            tradeCount,
+            winCount,
+            investment: signalData.investment ?? 0,
+            profit: signalData.profit ?? 0,
+            volatility: volatility ?? 0,
+        };
+
+        // console.log("signalData", signalData);
+
+        tradesData.push({
+            ...signalData,
+        });
+
+        if (signalData.signal !== "") mddPrices.push(currentPrice);
     }
 
-    // const finalCapital =
-    //     capital + position * candles[candles.length - 1].trade_price;
-    const finalCapital = tradeData[tradeData.length - 1].capital;
-    const performance = (finalCapital / initialCapital - 1) * 100;
-    const winRate = trades > 0 ? (wins / trades) * 100 : 0;
+    const lastTradeData = tradesData[tradesData.length - 1];
 
-    tradeData = tradeData.map((aData) => {
+    const finalCapital = ["Buy", "Hold"].includes(lastTradeData.signal)
+        ? capital + position * lastTradeData.price
+        : lastTradeData.capital;
+    const performance = (finalCapital / initialCapital - 1) * 100;
+    const winRate = tradeCount > 0 ? (winCount / tradeCount) * 100 : 0;
+
+    // mdd
+    const maxDrawdown = calculateMDD(mddPrices);
+
+    tradesData = tradesData.map((aData: ITradeData) => {
         return {
-            ...aData,
-            currentDate: aData.currentDate.slice(0, 10),
+            date: aData.date.slice(0, 10),
+            price: aData.price,
+            signal: aData.signal ?? "",
+            volatility: aData.volatility && aData.volatility.toFixed(2),
+            position: aData.position === 0 ? 0 : aData.position.toFixed(5),
+            investment: Math.round(aData.investment).toLocaleString(),
+            profit: Math.round(aData.profit).toLocaleString(),
             capital: Math.round(aData.capital).toLocaleString(),
-            position: aData.position > 0 ? aData.position.toFixed(2) : "",
-            volatility: aData.volatility.toFixed(2),
-            investment: aData.investment
-                ? Math.round(aData.investment).toLocaleString()
-                : "",
+            tradeCount: aData.tradeCount,
+            winCount: aData.winCount,
         };
     });
+
+    // console.table(tradesData);
 
     return {
         market,
@@ -202,9 +223,9 @@ async function backtest(
         performance,
         winRate,
         maxDrawdown,
-        trades,
-        wins,
-        tradeData,
+        tradeCount,
+        winCount,
+        tradesData,
     };
 }
 
@@ -253,131 +274,15 @@ function calculateDailyMetrics(
     return { afternoonReturnRate, morningVolume, afternoonVolume, volatility };
 }
 
-function shouldBuyBasedOnMetrics(
-    afternoonReturnRate: number,
-    afternoonVolume: number,
-    morningVolume: number
-) {
-    // 매수 판단: 전일 오후 수익률 > 0, 전일 오후 거래량 > 오전 거래량
-    return afternoonReturnRate > 0 && afternoonVolume > morningVolume;
-}
-
-function executeBuy(
-    markets: string[],
-    afternoonCandles: ICandle[],
-    targetVolatility: number,
-    volatility: number,
-    capital: number,
-    position: number,
-    trades: number,
-    initialCapital: number
-) {
-    // 매수 자금 : 가상화폐별 투입 금액은 (타깃 변동성 / 특정 화폐의 전일 오후 변동성) / 투자대상 화폐수
-    const tradePrice =
-        afternoonCandles[afternoonCandles.length - 1].trade_price;
-    const buyPrice = tradePrice;
-    const investment = calculateInvestmentAmount(
-        targetVolatility,
-        volatility,
-        markets.length,
-        initialCapital
-    );
-
-    let signal = "";
-
-    const amountToBuy = investment / tradePrice;
-    if (capital >= investment) {
-        capital -= investment;
-        position += amountToBuy;
-        trades++;
-        signal = "매수";
-
-        // console.log("Buy: ");
-        // console.log("trades", trades);
-        // console.log("currentPrice ", tradePrice);
-        // console.log("amountToBuy ", amountToBuy);
-        // console.log("investment ", investment);
-        // console.log("capital ", capital);
-    }
-    return {
-        capital,
-        position,
-        currentPrice: tradePrice,
-        buyPrice,
-        trades,
-        investment,
-        signal,
-    };
-}
-
-async function executeSell(
-    market: string,
-    currentDate: string,
-    position: number,
-    capital: number,
-    transactionFee: number,
-    buyPrice: number,
-    trades: number,
-    wins: number
-) {
-    // 매도 : 정오 -> 정오 데이터 가져오기
-    const atNoonTime = currentDate.slice(0, 11) + "04:00:00";
-    const ticker = await fetchMinutesCandles(market, 60, 1, atNoonTime);
-    const currentPrice = ticker[0].trade_price;
-    let signal = "";
-
-    if (position > 0) {
-        capital += position * currentPrice * (1 - transactionFee);
-        if (currentPrice > buyPrice) wins++;
-        position = 0;
-        trades++;
-        signal = "매도";
-        // console.log("Sell: ");
-        // console.log("trades", trades);
-        // console.log("currentPrice ", currentPrice);
-        // console.log("capital ", capital);
-    }
-
-    return {
-        capital,
-        position,
-        currentPrice,
-        trades,
-        wins,
-        signal,
-    };
-}
-
-function calculateMaxDrawdown(
-    capital: number,
-    position: number,
-    currentPrice: number,
-    peakCapital: number,
-    maxDrawdown: number
-) {
-    // 최대 낙폭 계산
-    const currentTotal = capital + position * currentPrice;
-    // console.log("currentTotal: ", currentTotal);
-    if (currentTotal > peakCapital) {
-        peakCapital = currentTotal;
-    }
-    const drawdown = ((peakCapital - currentTotal) / peakCapital) * 100;
-    if (drawdown > maxDrawdown) {
-        maxDrawdown = drawdown;
-    }
-
-    return { peakCapital, maxDrawdown };
-}
-
-function createMessage(results: any[]) {
+function createMessage(results: IResult[]) {
     const title = `\n🔔 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절 backtest\n`;
     const messages = results.map((result) => {
-        // console.table(result.tradeData);
+        // console.table(result.tradesData);
 
         return `📈 [${result.market}]
-첫째 날: ${result.tradeData[0].currentDate}
-마지막 날: ${result.tradeData[result.tradeData.length - 1].currentDate}
-Total Trades: ${result.trades}번
+첫째 날: ${result.tradesData[0].date}
+마지막 날: ${result.tradesData[result.tradesData.length - 1].date}
+Total Trades: ${result.tradeCount}번
 Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원
 Performance: ${result.performance.toFixed(2)}%
 MDD: ${result.maxDrawdown.toFixed(2)}%

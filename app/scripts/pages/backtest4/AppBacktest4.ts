@@ -46,7 +46,7 @@ export default class AppBacktest4 extends HTMLElement {
 
         this.tradeData = [];
         this.market = "";
-        this.count = 100;
+        this.count = 30;
         this.marketSize = 5;
         this.totalInvestmentPrice = 1000000;
         this.investmentPrice = this.totalInvestmentPrice / this.marketSize;

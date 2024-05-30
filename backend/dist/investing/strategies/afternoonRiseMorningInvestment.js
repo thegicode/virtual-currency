@@ -28,13 +28,32 @@ function afternoonRiseMorningInvestment(markets, initialCapital, targetVolatilit
 }
 exports.afternoonRiseMorningInvestment = afternoonRiseMorningInvestment;
 function generateMarketTradeSignal(market, targetVolatility, initialCapital, size) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const currentDate = getDate();
         const candles = yield fetchData(market, currentDate);
         const { morningCandles, afternoonCandles } = splitDayCandles(candles);
         const { afternoonReturnRate, morningVolume, afternoonVolume, volatility } = calculateDailyMetrics(afternoonCandles, morningCandles);
-        const tradeSignal = generateTradeSignal(afternoonReturnRate, afternoonVolume, morningVolume, targetVolatility, volatility, initialCapital, size);
-        return Object.assign({ market, date: currentDate, volatility }, tradeSignal);
+        let signData = null;
+        if (afternoonReturnRate > 0 && afternoonVolume > morningVolume) {
+            signData = {
+                signal: "Buy or Hold",
+                investment: (0, utils_1.calculateRiskAdjustedCapital)(targetVolatility, volatility, size, initialCapital),
+            };
+        }
+        else {
+            signData = {
+                signal: "Sell or Resolve",
+            };
+        }
+        return {
+            market,
+            date: currentDate,
+            volatility,
+            signal: signData.signal,
+            price: candles[candles.length - 1].trade_price,
+            investment: (_a = signData.investment) !== null && _a !== void 0 ? _a : 0,
+        };
     });
 }
 function getDate() {
@@ -71,33 +90,19 @@ function calculateDailyMetrics(afternoonCandles, morningCandles) {
     const volatility = (0, utils_1.calculateVolatility)(afternoonCandles);
     return { afternoonReturnRate, morningVolume, afternoonVolume, volatility };
 }
-function generateTradeSignal(afternoonReturnRate, afternoonVolume, morningVolume, targetVolatility, volatility, initialCapital, size) {
-    if (afternoonReturnRate > 0 && afternoonVolume > morningVolume) {
-        const investment = (0, utils_1.calculateInvestmentAmount)(targetVolatility, volatility, size, initialCapital);
-        return {
-            signal: "매수 또는 유지",
-            investment,
-        };
-    }
-    else {
-        return {
-            signal: "매도 또는 유보",
-        };
-    }
-}
 function createMessage(results) {
     const title = `\n 🔔 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절\n`;
     const memo = `- 매일 자정에 확인, 매도는 다음 날 정오\n\n`;
     const message = results
         .map((result) => {
-        const investmentMessage = result.investment
-            ? `매수금액 : ${(0, utils_1.formatPrice)(Math.round(result.investment))}원`
-            : "";
+        const isBuy = result.signal === "Buy or Hold";
+        const investmentMessage = `매수금액 : ${(0, utils_1.formatPrice)(Math.round(result.investment))}원`;
         return `📈 [${result.market}] 
 날    짜 : ${result.date.slice(0, 10)}
-신    호 : ${result.signal}
-volatility : ${result.volatility.toFixed(2)}
-${investmentMessage}`;
+신    호 : ${isBuy ? "매수 또는 유지" : "매도 또는 유보"}
+가    격 : ${(0, utils_1.formatPrice)(result.price)}원
+변 동 성 : ${result.volatility.toFixed(2)}
+${isBuy ? investmentMessage : ""}`;
     })
         .join("\n\n");
     return `${title}${memo}${message}\n`;
