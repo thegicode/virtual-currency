@@ -7,13 +7,13 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
 
 (async () => {
     try {
-        const initialCapital = 100000; // 초기 자본
+        const initialCapital = 1000000; // 초기 자본
         const markets = [
             "KRW-BTC",
-            // "KRW-ETH",
-            // "KRW-SOL",
-            // "KRW-AVAX",
-            // "KRW-DOGE",
+            "KRW-ETH",
+            "KRW-SOL",
+            "KRW-AVAX",
+            "KRW-DOGE",
             //
             // "KRW-BCH",
             // "KRW-ZRX", // daily, afternoon
@@ -25,7 +25,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             // wiil deleted
             // "KRW-SBD",
         ];
-        const resultCounts = 200;
+        const resultCounts = 100;
 
         console.log("-----------------------------------------");
 

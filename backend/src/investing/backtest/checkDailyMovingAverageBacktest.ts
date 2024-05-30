@@ -18,10 +18,11 @@ export async function checkDailyMovingAverageBacktest(
     initialCapital: number,
     days: number
 ) {
+    const capital = initialCapital / markets.length;
     const results = await Promise.all(
         markets.map(
             async (market: string) =>
-                await backtestMarket(market, period, initialCapital, days)
+                await backtestMarket(market, period, capital, days)
         )
     );
 

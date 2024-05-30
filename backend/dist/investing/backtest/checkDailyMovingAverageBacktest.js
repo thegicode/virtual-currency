@@ -14,7 +14,8 @@ const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
 function checkDailyMovingAverageBacktest(markets, period = 3, initialCapital, days) {
     return __awaiter(this, void 0, void 0, function* () {
-        const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () { return yield backtestMarket(market, period, initialCapital, days); })));
+        const capital = initialCapital / markets.length;
+        const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () { return yield backtestMarket(market, period, capital, days); })));
         logResults(results, period);
         return results;
     });

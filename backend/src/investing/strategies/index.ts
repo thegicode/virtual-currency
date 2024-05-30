@@ -21,12 +21,24 @@ export {
         // "KRW-BCH",
         // "KRW-AVAX",
         // "KRW-THETA",
-        "KRW-SHIB",
+        // "KRW-SHIB",
         // "KRW-NEAR",
         //
         // "KRW-ZRX",
         // "KRW-BTG",
         // "KRW-TRX",
+
+        // checkDailyMovingAverage
+        "KRW-AVAX",
+        "KRW-BCH",
+        "KRW-ZRX",
+        "KRW-THETA",
+        "KRW-NEAR",
+        "KRW-BTG",
+        "KRW-SHIB",
+
+        // afternoonRiseMorningInvestmentBacktest
+        // "KRW-BTC", "KRW-ETH", "KRW-SOL", "KRW-DOGE", "KRW-SBD",
     ];
 
     const initialCapital = 100000;
@@ -35,7 +47,7 @@ export {
     console.log("---------------------------------------------------");
 
     // 분캔들 기준 이동평균 확인 - interval
-    await checkMinutesMovingAverage(
+    /* await checkMinutesMovingAverage(
         markets,
         60, // candleUnit minute(단위 분)
         10, // movingAveragePeriod
@@ -54,7 +66,7 @@ export {
             sendTelegramMessageToChatId(message);
         }
     );
-
+ */
     console.log("---------------------------------------------------");
 
     // 일캔들 기준 5일 이동평균 확인
@@ -65,20 +77,20 @@ export {
     console.log("---------------------------------------------------");
 
     // 슈퍼상승장(3, 5, 10, 20일 이동평균) + 변동성 조절
-    const results2 = await executeMovingAverageAndVolatility(
+    /*  const results2 = await executeMovingAverageAndVolatility(
         markets,
         initialCapital,
         2
     );
-    console.log(results2);
+    console.log(results2); */
 
     console.log("---------------------------------------------------");
 
     // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
-    const results3 = await afternoonRiseMorningInvestment(
+    /* const results3 = await afternoonRiseMorningInvestment(
         markets,
         initialCapital,
         2 // targetVolatility
     );
-    console.log(results3);
+    console.log(results3); */
 })();

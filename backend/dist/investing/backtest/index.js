@@ -17,11 +17,15 @@ const checkMinutesMovingAverageBacktest_1 = require("./checkMinutesMovingAverage
 const movingAverageAndVolatilityBacktest_1 = require("./movingAverageAndVolatilityBacktest");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const initialCapital = 100000;
+        const initialCapital = 1000000;
         const markets = [
             "KRW-BTC",
+            "KRW-ETH",
+            "KRW-SOL",
+            "KRW-AVAX",
+            "KRW-DOGE",
         ];
-        const resultCounts = 200;
+        const resultCounts = 100;
         console.log("-----------------------------------------");
         console.log("initialCapital : ", initialCapital);
         console.log("resultCounts : ", resultCounts);
