@@ -70,15 +70,20 @@ async function generateMarketTradeSignal(
         calculateDailyMetrics(afternoonCandles, morningCandles);
 
     let signData: { signal: string; investment?: number } | null = null;
+    const investmentAmount = calculateRiskAdjustedCapital(
+        targetVolatility,
+        volatility,
+        size,
+        initialCapital
+    );
+
     if (afternoonReturnRate > 0 && afternoonVolume > morningVolume) {
         signData = {
             signal: "Buy or Hold",
-            investment: calculateRiskAdjustedCapital(
-                targetVolatility,
-                volatility,
-                size,
-                initialCapital
-            ),
+            investment:
+                investmentAmount >= initialCapital
+                    ? initialCapital
+                    : investmentAmount,
         };
     } else {
         signData = {

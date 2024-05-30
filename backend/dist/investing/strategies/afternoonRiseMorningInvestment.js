@@ -35,10 +35,13 @@ function generateMarketTradeSignal(market, targetVolatility, initialCapital, siz
         const { morningCandles, afternoonCandles } = splitDayCandles(candles);
         const { afternoonReturnRate, morningVolume, afternoonVolume, volatility } = calculateDailyMetrics(afternoonCandles, morningCandles);
         let signData = null;
+        const investmentAmount = (0, utils_1.calculateRiskAdjustedCapital)(targetVolatility, volatility, size, initialCapital);
         if (afternoonReturnRate > 0 && afternoonVolume > morningVolume) {
             signData = {
                 signal: "Buy or Hold",
-                investment: (0, utils_1.calculateRiskAdjustedCapital)(targetVolatility, volatility, size, initialCapital),
+                investment: investmentAmount >= initialCapital
+                    ? initialCapital
+                    : investmentAmount,
             };
         }
         else {
