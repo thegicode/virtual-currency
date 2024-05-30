@@ -20,10 +20,6 @@ const movingAverageAndVolatilityBacktest_1 = require("./movingAverageAndVolatili
         const initialCapital = 1000000;
         const markets = [
             "KRW-BTC",
-            "KRW-ETH",
-            "KRW-SOL",
-            "KRW-AVAX",
-            "KRW-DOGE",
         ];
         const resultCounts = 100;
         console.log("-----------------------------------------");

@@ -10,10 +10,10 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         const initialCapital = 1000000; // 초기 자본
         const markets = [
             "KRW-BTC",
-            "KRW-ETH",
-            "KRW-SOL",
-            "KRW-AVAX",
-            "KRW-DOGE",
+            // "KRW-ETH",
+            // "KRW-SOL",
+            // "KRW-AVAX",
+            // "KRW-DOGE",
             //
             // "KRW-BCH",
             // "KRW-ZRX", // daily, afternoon
@@ -21,6 +21,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             // "KRW-NEAR",
             // "KRW-BTG",
             // "KRW-SHIB",
+            // "KRW-TFUEL",
             //
             // wiil deleted
             // "KRW-SBD",
@@ -83,6 +84,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         console.log("-----------------------------------------");
 
         // movingAverageAndVolatility
+        // "KRW-BTC",
         await movingAverageAndVolatilityBacktest(
             markets,
             initialCapital,
@@ -93,7 +95,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
         console.log("-----------------------------------------");
 
         // afternoonRiseMorningInvestmentBacktest
-        // "KRW-BTC", "KRW-ETH", "KRW-SOL", "KRW-DOGE", "KRW-SBD",
+        // "KRW-ETH", "KRW-SOL", "KRW-DOGE", "KRW-TFUEL", "KRW-SBD"
         await afternoonRiseMorningInvestmentBacktest(
             markets,
             initialCapital,

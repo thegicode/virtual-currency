@@ -11,7 +11,6 @@
  */
 
 import { fetchDailyCandles } from "../../services/api";
-import { determineInvestmentAction } from "../strategies/movingAverageAndVolatility";
 import {
     adjustApiCounts,
     calculateAllMovingAverages,
@@ -158,10 +157,7 @@ async function backtestMarket(
     // mdd
     const maxDrawdown = calculateMDD(mddPrices);
 
-    // Final capital calculation
-    // const finalCapital =
-    //     capital + position * candles[candles.length - 1].trade_price;
-
+    // lastTradeData
     const lastTradeData = tradesData[tradesData.length - 1];
     const finalCapital = ["Buy", "Hold"].includes(lastTradeData.signal)
         ? capital + position * lastTradeData.price

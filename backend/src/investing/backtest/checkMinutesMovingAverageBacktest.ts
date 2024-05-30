@@ -95,7 +95,7 @@ async function backtestMarket(
             const currentCapital = capital + position * currentPrice;
 
             tradesData.push({
-                date: candle.date_time.slice(0, 10),
+                date: candle.date_time,
                 price: currentPrice,
                 movingAverage: movingAverage.toFixed(5),
                 signal,

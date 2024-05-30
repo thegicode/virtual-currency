@@ -91,18 +91,28 @@ export function determineInvestmentAction(
 function createMessage(results: IMovingAverageAndVolatilityResult[]) {
     const title = `\n 🔔 슈퍼 상승장(3, 5, 10, 20 이동평균) + 변동성 조절\n\n`;
     const message = results
-        .map(
-            (result) =>
-                `📈 [${result.market && result.market}] 
+        .map((result) => {
+            const isBuy = result.signal === "Buy";
+
+            const defaultMessage = `📈 [${result.market && result.market}] 
+신호: ${isBuy ? "매수" : "매도"}
 현재 가격: ${formatPrice(result.currentPrice)}원
 변동성: ${result.volatility.toFixed(2)}%
-투자 금액: ${Math.round(result.capitalAllocation).toLocaleString()}원
-매수 수량: ${result.position}
-신호: ${result.signal}`
-        )
+`;
+            const buyMessage = `투자 금액: ${Math.round(
+                result.capitalAllocation
+            ).toLocaleString()}원
+매수 수량: ${result.position}`;
+
+            const messages = isBuy
+                ? `${defaultMessage}${buyMessage}`
+                : defaultMessage;
+
+            return messages;
+        })
         .join("\n\n");
 
-    return `${title}${message}\n`;
+    return `${title}${message}`;
 }
 
 // (async () => {

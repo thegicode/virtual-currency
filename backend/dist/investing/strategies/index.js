@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.executeMovingAverageAndVolatility = exports.checkMinutesMovingAverage = exports.checkDailyMovingAverage = void 0;
+const afternoonRiseMorningInvestment_1 = require("./afternoonRiseMorningInvestment");
 const checkDailyMovingAverage_1 = require("./checkDailyMovingAverage");
 Object.defineProperty(exports, "checkDailyMovingAverage", { enumerable: true, get: function () { return checkDailyMovingAverage_1.checkDailyMovingAverage; } });
 const checkMinutesMovingAverage_1 = require("./checkMinutesMovingAverage");
@@ -18,21 +19,25 @@ const movingAverageAndVolatility_1 = require("./movingAverageAndVolatility");
 Object.defineProperty(exports, "executeMovingAverageAndVolatility", { enumerable: true, get: function () { return movingAverageAndVolatility_1.executeMovingAverageAndVolatility; } });
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const markets = [
-        "KRW-AVAX",
-        "KRW-BCH",
-        "KRW-ZRX",
-        "KRW-THETA",
-        "KRW-NEAR",
-        "KRW-BTG",
-        "KRW-SHIB",
+        "KRW-BTC",
     ];
     const initialCapital = 100000;
     console.log("---------------------------------------------------");
     console.log("*** initialCapital: ", initialCapital.toLocaleString() + "원");
     console.log("---------------------------------------------------");
+    yield (0, checkMinutesMovingAverage_1.checkMinutesMovingAverage)(markets, 60, 10, (message) => {
+        console.log(message);
+    });
+    yield (0, checkMinutesMovingAverage_1.checkMinutesMovingAverage)(markets, 240, 5, (message) => {
+        console.log(message);
+    });
     console.log("---------------------------------------------------");
     const result1 = yield (0, checkDailyMovingAverage_1.checkDailyMovingAverage)(markets, 5);
     console.log(result1);
     console.log("---------------------------------------------------");
+    const results2 = yield (0, movingAverageAndVolatility_1.executeMovingAverageAndVolatility)(markets, initialCapital, 2);
+    console.log(results2);
     console.log("---------------------------------------------------");
+    const results3 = yield (0, afternoonRiseMorningInvestment_1.afternoonRiseMorningInvestment)(markets, initialCapital, 2);
+    console.log(results3);
 }))();
