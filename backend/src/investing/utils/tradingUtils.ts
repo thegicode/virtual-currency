@@ -21,6 +21,16 @@ export function calculateAverageNoise(candles: ICandle[]) {
     return totalNoise / noiseValues.length;
 }
 
+// 돌파 확인
+export function checkBreakout(candle: ICandle, range: number, k: number) {
+    return candle.trade_price > candle.opening_price + range * k;
+}
+
+// candle 레인지 계산
+export function calculateRange(candle: ICandle) {
+    return candle.high_price - candle.low_price;
+}
+
 // 노이즈 값이 가장 작은 n개 선정
 /* export function selectLowNoiseCryptos(cryptos: ICrypto[], n: number) {
     const cryptowithNoise = cryptos.map((crypto) => {

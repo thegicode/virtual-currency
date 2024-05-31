@@ -103,7 +103,8 @@ function logResults(results, candleUnit, movingAveragePeriod) {
         console.log(`Trade Count: ${result.tradeCount}번`);
         console.log(`Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원`);
         console.log(`Performance: ${result.performance.toFixed(2)}%`);
+        console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
         console.log(`MDD: ${result.mdd.toFixed(2)}%`);
-        console.log(`Win Rate: ${result.winRate.toFixed(2)}%\n\n`);
+        console.log("");
     });
 }

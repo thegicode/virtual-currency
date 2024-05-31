@@ -107,7 +107,8 @@ async function generateMarketTradeSignal(
 function getDate() {
     // 2024-05-27T00:00:00+09:00
     const date = new Date();
-    if (date.getHours() < 24) date.setDate(date.getDate() - 1);
+    // if (date.getHours() < 24) date.setDate(date.getDate() - 1);
+    // console.log("date.getHours()", date.getHours());
     date.setHours(9, 0, 0, 0);
     const newDate = date.toISOString().slice(0, 19);
     return `${newDate}+09:00`;

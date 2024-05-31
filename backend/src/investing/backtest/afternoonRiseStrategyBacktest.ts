@@ -275,7 +275,7 @@ function calculateDailyMetrics(
 }
 
 function createMessage(results: IResult[]) {
-    const title = `\n🔔 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절 backtest\n`;
+    const title = `\n🔔 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절 backtest\n\n`;
     const messages = results.map((result) => {
         // console.table(result.tradesData);
 
@@ -285,8 +285,8 @@ function createMessage(results: IResult[]) {
 Total Trades: ${result.tradeCount}번
 Final Capital: ${Math.round(result.finalCapital).toLocaleString()}원
 Performance: ${result.performance.toFixed(2)}%
-MDD: ${result.maxDrawdown.toFixed(2)}%
-Win Rate: ${result.winRate.toFixed(2)}%\n\n`;
+Win Rate: ${result.winRate.toFixed(2)}%
+MDD: ${result.maxDrawdown.toFixed(2)}%\n\n`;
     });
 
     return `${title}${messages}`;

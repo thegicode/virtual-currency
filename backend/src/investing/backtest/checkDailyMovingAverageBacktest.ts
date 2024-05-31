@@ -155,8 +155,8 @@ function logResults(results: any[], period: number) {
             ).toLocaleString()}원`
         );
         console.log(`Performance: ${result.performance.toFixed(2)}%`);
-        console.log(`MDD: ${result.mdd.toFixed(2)}%`);
         console.log(`Win Rate: ${result.winRate.toFixed(2)}%`);
+        console.log(`MDD: ${result.mdd.toFixed(2)}%`);
         // console.log("Trade Log:", result.log.join("\n"));
         console.log("");
     });

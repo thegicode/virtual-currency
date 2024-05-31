@@ -2,6 +2,7 @@ import { afternoonRiseMorningInvestmentBacktest } from "./afternoonRiseStrategyB
 import { checkDailyMovingAverageBacktest } from "./checkDailyMovingAverageBacktest";
 import { checkMinutesMovingAverageBacktest } from "./checkMinutesMovingAverageBacktest";
 import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatilityBacktest";
+import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
 
 // Run backtest
 
@@ -9,24 +10,29 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
     try {
         const initialCapital = 1000000; // 초기 자본
         const markets = [
-            "KRW-BTC",
-            // "KRW-ETH",
-            // "KRW-SOL",
-            // "KRW-AVAX",
-            // "KRW-DOGE",
-            //
-            // "KRW-BCH",
-            // "KRW-ZRX", // daily, afternoon
-            // "KRW-THETA",
-            // "KRW-NEAR",
-            // "KRW-BTG",
-            // "KRW-SHIB",
-            // "KRW-TFUEL",
-            //
-            // wiil deleted
-            // "KRW-SBD",
+            // 일캔들 기준 5일 이동평균 확인
+            // checkDailyMovingAverage
+            // 오전 9시 확인
+            "KRW-SOL", // 45.56%, 75.88%
+            // "KRW-AVAX", // 18.59%, 72.79%, 2차 volatilityBreakoutBacktest
+            // "KRW-BCH", // 119.70%, 118.73%, 2차 volatilityBreakoutBacktest
+            // "KRW-ZRX", //  183.73%, 137.09%, 2차 volatilityBreakoutBacktest
+            // "KRW-THETA", // 115.00%, 88.69%
+            // "KRW-NEAR", // 38.32%, 98.25%, 2차 afternoonRiseMorningInvestmentBacktest  60.27%
+            // "KRW-BTG", //  100.36%, 215.95%, 2차  다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절 backtest
+            // "KRW-SHIB", // 222.17%, 165.98%, 2차  3, 5, 10, 20일 이동평균 + 변동성 조절 backtest
+
+            // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
+            // afternoonRiseMorningInvestment
+            // 밤 12시에 확인
+            // "KRW-BTC", // 22.85%, 63.98%
+            // "KRW-ETH", // 30.44%, 60.26%
+
+            // "KRW-DOGE", // 168.27%, 147.72%
+            // "KRW-TFUEL", // 157.41%, 171.73%
+            "KRW-SBD", //  -0.36%, 16.59%
         ];
-        const resultCounts = 100;
+        const resultCounts = 200;
 
         console.log("-----------------------------------------");
 
@@ -35,7 +41,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
 
         console.log("-----------------------------------------");
 
-        // checkMinutesMovingAverage;
+        // 분캔들 기준 이동평균 확인 - interval
         /* await checkMinutesMovingAverageBacktest(
             markets,
             60, // candleUnit, 인터벌 시간 단위
@@ -44,15 +50,14 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             resultCounts
         ); */
 
-        await checkMinutesMovingAverageBacktest(
+        /* await checkMinutesMovingAverageBacktest(
             markets,
             60, // candleUnit, 인터벌 시간 단위
             10, //  movingAveragePeriod, 이동평균 단위
             initialCapital, // 초기 자본
             resultCounts
-        );
+        ); */
 
-        // checkMinutesMovingAverage
         await checkMinutesMovingAverageBacktest(
             markets,
             240, // candleUnit, 인터벌 시간 단위
@@ -61,7 +66,6 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
             resultCounts
         );
 
-        // checkMinutesMovingAverage
         /* await checkMinutesMovingAverageBacktest(
             markets,
             240, // candleUnit, 인터벌 시간 단위
@@ -72,7 +76,7 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
 
         console.log("-----------------------------------------");
 
-        // checkDailyMovingAverage
+        // 일캔들 기준 5일 이동평균 확인
         // "KRW-AVAX", "KRW-BCH", "KRW-ZRX", "KRW-THETA", "KRW-NEAR", "KRW-BTG",  "KRW-SHIB",
         await checkDailyMovingAverageBacktest(
             markets, // markets
@@ -83,8 +87,8 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
 
         console.log("-----------------------------------------");
 
-        // movingAverageAndVolatility
-        // "KRW-BTC",
+        // 슈퍼상승장(3, 5, 10, 20일 이동평균) + 변동성 조절
+        //
         await movingAverageAndVolatilityBacktest(
             markets,
             initialCapital,
@@ -94,13 +98,22 @@ import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatility
 
         console.log("-----------------------------------------");
 
-        // afternoonRiseMorningInvestmentBacktest
-        // "KRW-ETH", "KRW-SOL", "KRW-DOGE", "KRW-TFUEL", "KRW-SBD"
+        // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
+        // "KRW-BTC",, "KRW-ETH", "KRW-SOL", "KRW-DOGE", "KRW-TFUEL", "KRW-SBD"
         await afternoonRiseMorningInvestmentBacktest(
             markets,
             initialCapital,
             resultCounts,
             2 // targetVolatility = 2
+        );
+
+        // 다자 가상화폐 + 변동성 돌파
+        await volatilityBreakoutBacktest(
+            markets,
+            initialCapital,
+            resultCounts
+            // k: number = 0.5,
+            // transactionFee: number = 0.002 // 0.2%
         );
     } catch (error) {
         console.error("Error during backtesting: ", error);

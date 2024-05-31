@@ -11,7 +11,11 @@ import {
 } from "./FinancialUtils";
 import { calculateBollingerBands, calculateMDD } from "./InvestmentUtils";
 import { formatPrice } from "./PriceUtils";
-import { calculateAverageNoise } from "./TradingUtils";
+import {
+    calculateAverageNoise,
+    calculateRange,
+    checkBreakout,
+} from "./TradingUtils";
 
 export {
     // ApiUtils
@@ -40,4 +44,6 @@ export {
 
     // TradingUtils
     calculateAverageNoise,
+    checkBreakout,
+    calculateRange,
 };

@@ -30,8 +30,8 @@ exports.volatilityBreakoutStrategy = volatilityBreakoutStrategy;
 function generateSignal(market, initialCapital, k, size) {
     return __awaiter(this, void 0, void 0, function* () {
         const candles = yield (0, api_1.fetchDailyCandles)(market, "2");
-        const range = yield calculateRange(candles[0]);
-        const isBreakOut = checkBreakout(candles, range, k);
+        const range = yield (0, utils_1.calculateRange)(candles[0]);
+        const isBreakOut = (0, utils_1.checkBreakout)(candles[1], range, k);
         const signal = isBreakOut ? "Buy" : "Sell";
         return {
             market,
@@ -43,17 +43,9 @@ function generateSignal(market, initialCapital, k, size) {
         };
     });
 }
-function calculateRange(candle) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return candle.high_price - candle.low_price;
-    });
-}
-function checkBreakout(candles, range, k) {
-    return candles[1].trade_price > candles[1].opening_price + range * k;
-}
 function createMessage(results) {
     const title = `\n 🔔 다자 가상화폐 + 변동성 돌파\n`;
-    const memo = `- 데이터 시가 시간 9시 \n\n`;
+    const memo = `- 오전 9시 확인 \n\n`;
     const message = results
         .map((result) => {
         const isBuy = result.signal === "Buy";
@@ -62,8 +54,8 @@ function createMessage(results) {
 날      짜 : ${result.date}
 신      호 : ${isBuy ? "매수 또는 유지" : "매도 또는 유보"}
 가      격 : ${(0, utils_1.formatPrice)(result.price)}원
-매  수  금 : ${(0, utils_1.formatPrice)(result.investment)}원
 레  인  지 : ${(0, utils_1.formatPrice)(result.range)}원
+매  수  금 : ${(0, utils_1.formatPrice)(result.investment)}원
 `;
     })
         .join("\n");

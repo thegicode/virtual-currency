@@ -23,7 +23,7 @@
  */
 
 import { fetchDailyCandles } from "../../services/api";
-import { formatPrice } from "../utils";
+import { calculateRange, checkBreakout, formatPrice } from "../utils";
 
 interface IResult {
     market: string;
@@ -71,7 +71,7 @@ async function generateSignal(
     const range = await calculateRange(candles[0]);
 
     // 매수 : 실시간 가격 > 당일 시가 + (레인지 * k)
-    const isBreakOut = checkBreakout(candles, range, k);
+    const isBreakOut = checkBreakout(candles[1], range, k);
 
     const signal = isBreakOut ? "Buy" : "Sell";
 
@@ -85,17 +85,9 @@ async function generateSignal(
     };
 }
 
-async function calculateRange(candle: ICandle): Promise<number> {
-    return candle.high_price - candle.low_price;
-}
-
-function checkBreakout(candles: ICandle[], range: number, k: number) {
-    return candles[1].trade_price > candles[1].opening_price + range * k;
-}
-
 function createMessage(results: IResult[]) {
     const title = `\n 🔔 다자 가상화폐 + 변동성 돌파\n`;
-    const memo = `- 데이터 시가 시간 9시 \n\n`;
+    const memo = `- 오전 9시 확인 \n\n`;
 
     const message = results
         .map((result) => {
@@ -105,8 +97,8 @@ function createMessage(results: IResult[]) {
 날      짜 : ${result.date}
 신      호 : ${isBuy ? "매수 또는 유지" : "매도 또는 유보"}
 가      격 : ${formatPrice(result.price)}원
-매  수  금 : ${formatPrice(result.investment)}원
 레  인  지 : ${formatPrice(result.range)}원
+매  수  금 : ${formatPrice(result.investment)}원
 `;
         })
         .join("\n");

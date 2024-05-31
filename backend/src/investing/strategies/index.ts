@@ -14,37 +14,23 @@ export {
 
 (async () => {
     const markets = [
-        "KRW-BTC",
-        // "KRW-ETH",
-        // "KRW-SOL",
-        // "KRW-DOGE",
-        // "KRW-SBD",
-        //
-        // "KRW-BCH",
-        // "KRW-AVAX",
-        // "KRW-THETA",
-        "KRW-SHIB",
-        // "KRW-NEAR",
-        //
-        // "KRW-ZRX",
-        // "KRW-BTG",
-        // "KRW-TRX",
-
         // checkDailyMovingAverage
-        // "KRW-AVAX",
-        // "KRW-BCH",
-        // "KRW-ZRX",
-        // "KRW-THETA",
-        // "KRW-NEAR",
-        // "KRW-BTG",
-        // "KRW-SHIB",
+        // 일캔들 기준 5일 이동평균 확인
+        // 오전 9시 확인
+        "KRW-SOL",
+        "KRW-AVAX",
+        "KRW-BCH",
+        "KRW-ZRX",
+        "KRW-THETA",
+        "KRW-NEAR",
+        "KRW-BTG",
+        "KRW-SHIB",
 
-        // executeMovingAverageAndVolatility
+        // afternoonRiseMorningInvestment
+        // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
+        // 밤 12시에 확인
         // "KRW-BTC",
-
-        // afternoonRiseMorningInvestmentBacktest
         // "KRW-ETH",
-        // "KRW-SOL",
         // "KRW-DOGE",
         // "KRW-TFUEL",
         // "KRW-SBD",
@@ -108,8 +94,8 @@ export {
     // 다자 가상화폐 + 변동성 돌파
     const results4 = await volatilityBreakoutStrategy(
         markets,
-        initialCapital,
-        2 // targetVolatility
+        initialCapital
+        // k = 0.5
     );
     console.log(results4);
 })();

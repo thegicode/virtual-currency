@@ -61,8 +61,6 @@ function generateMarketTradeSignal(market, targetVolatility, initialCapital, siz
 }
 function getDate() {
     const date = new Date();
-    if (date.getHours() < 24)
-        date.setDate(date.getDate() - 1);
     date.setHours(9, 0, 0, 0);
     const newDate = date.toISOString().slice(0, 19);
     return `${newDate}+09:00`;
