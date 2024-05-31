@@ -1,8 +1,10 @@
+// strategies
 import { sendTelegramMessageToChatId } from "../../notifications";
 import { afternoonRiseMorningInvestment } from "./afternoonRiseMorningInvestment";
 import { checkDailyMovingAverage } from "./checkDailyMovingAverage";
 import { checkMinutesMovingAverage } from "./checkMinutesMovingAverage";
 import { executeMovingAverageAndVolatility } from "./movingAverageAndVolatility";
+import { volatilityBreakoutStrategy } from "./volatilityBreakoutStrategy";
 
 export {
     checkDailyMovingAverage,
@@ -12,7 +14,7 @@ export {
 
 (async () => {
     const markets = [
-        // "KRW-BTC",
+        "KRW-BTC",
         // "KRW-ETH",
         // "KRW-SOL",
         // "KRW-DOGE",
@@ -21,7 +23,7 @@ export {
         // "KRW-BCH",
         // "KRW-AVAX",
         // "KRW-THETA",
-        // "KRW-SHIB",
+        "KRW-SHIB",
         // "KRW-NEAR",
         //
         // "KRW-ZRX",
@@ -29,16 +31,16 @@ export {
         // "KRW-TRX",
 
         // checkDailyMovingAverage
-        /*  "KRW-AVAX",
-        "KRW-BCH",
-        "KRW-ZRX",
-        "KRW-THETA",
-        "KRW-NEAR",
-        "KRW-BTG",
-        "KRW-SHIB", */
+        // "KRW-AVAX",
+        // "KRW-BCH",
+        // "KRW-ZRX",
+        // "KRW-THETA",
+        // "KRW-NEAR",
+        // "KRW-BTG",
+        // "KRW-SHIB",
 
         // executeMovingAverageAndVolatility
-        "KRW-BTC",
+        // "KRW-BTC",
 
         // afternoonRiseMorningInvestmentBacktest
         // "KRW-ETH",
@@ -100,4 +102,14 @@ export {
         2 // targetVolatility
     );
     console.log(results3);
+
+    console.log("---------------------------------------------------");
+
+    // 다자 가상화폐 + 변동성 돌파
+    const results4 = await volatilityBreakoutStrategy(
+        markets,
+        initialCapital,
+        2 // targetVolatility
+    );
+    console.log(results4);
 })();

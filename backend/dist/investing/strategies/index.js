@@ -17,9 +17,11 @@ const checkMinutesMovingAverage_1 = require("./checkMinutesMovingAverage");
 Object.defineProperty(exports, "checkMinutesMovingAverage", { enumerable: true, get: function () { return checkMinutesMovingAverage_1.checkMinutesMovingAverage; } });
 const movingAverageAndVolatility_1 = require("./movingAverageAndVolatility");
 Object.defineProperty(exports, "executeMovingAverageAndVolatility", { enumerable: true, get: function () { return movingAverageAndVolatility_1.executeMovingAverageAndVolatility; } });
+const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const markets = [
         "KRW-BTC",
+        "KRW-SHIB",
     ];
     const initialCapital = 100000;
     console.log("---------------------------------------------------");
@@ -40,4 +42,7 @@ Object.defineProperty(exports, "executeMovingAverageAndVolatility", { enumerable
     console.log("---------------------------------------------------");
     const results3 = yield (0, afternoonRiseMorningInvestment_1.afternoonRiseMorningInvestment)(markets, initialCapital, 2);
     console.log(results3);
+    console.log("---------------------------------------------------");
+    const results4 = yield (0, volatilityBreakoutStrategy_1.volatilityBreakoutStrategy)(markets, initialCapital, 2);
+    console.log(results4);
 }))();
