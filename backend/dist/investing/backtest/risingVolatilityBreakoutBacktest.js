@@ -18,10 +18,10 @@ function risingVolatilityBreakoutBacktest(markets, initialCapital, period, k = 0
             const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () {
                 return yield backtest(market, initialCapital, period, k, transactionFee, markets.length);
             })));
-            const messages = logResult(results);
+            logResult(results);
         }
         catch (error) {
-            console.error("Error volatilityBreakoutStrategy: ", error);
+            console.error("Error risingVolatilityBreakoutBacktest: ", error);
             return "Error in executing the strategy.";
         }
     });
@@ -62,21 +62,6 @@ function backtest(market, initialCapital, period, k, transactionFee, size) {
             winRate,
             mdd: maxDrawdown,
         };
-    });
-}
-function getRealPrices(candles) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield Promise.all(candles.map((candle) => __awaiter(this, void 0, void 0, function* () {
-            const date = candle.date_time;
-            const toDate = date.replace("T09:00:00", "T13:00:00+09:00");
-            const response = yield (0, api_1.fetchMinutesCandles)(candle.market, 60, 1, toDate);
-            const price = response[0].opening_price;
-            return {
-                date,
-                toDate,
-                price,
-            };
-        })));
     });
 }
 function runStrategies(market, candles, initialCapital, k, size, avragePeriod) {

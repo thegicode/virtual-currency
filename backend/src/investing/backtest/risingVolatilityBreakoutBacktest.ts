@@ -14,7 +14,7 @@
  * 매도 : 다음날 시가
  */
 
-import { fetchDailyCandles, fetchMinutesCandles } from "../../services/api";
+import { fetchDailyCandles } from "../../services/api";
 import {
     adjustApiCounts,
     calculateMDD,
@@ -60,11 +60,9 @@ export async function risingVolatilityBreakoutBacktest(
             )
         );
 
-        // console.log(results);
-
-        const messages = logResult(results);
+        logResult(results);
     } catch (error) {
-        console.error("Error volatilityBreakoutStrategy: ", error);
+        console.error("Error risingVolatilityBreakoutBacktest: ", error);
         return "Error in executing the strategy.";
     }
 }
@@ -77,7 +75,6 @@ async function backtest(
     transactionFee: number,
     size: number
 ) {
-    // console.log("\nmarket", market);
     const avragePeriod = 5;
 
     const adjustedApiCounts = adjustApiCounts(period, avragePeriod);
@@ -135,29 +132,8 @@ async function backtest(
         tradeCount,
         winRate,
         mdd: maxDrawdown,
+        // tradesData: results,
     };
-}
-
-async function getRealPrices(candles: ICandle[]) {
-    return await Promise.all(
-        candles.map(async (candle) => {
-            const date = candle.date_time;
-            const toDate = date.replace("T09:00:00", "T13:00:00+09:00"); //  '2024-05-31T10:00:00',
-            const response = await fetchMinutesCandles(
-                candle.market,
-                60,
-                1,
-                toDate
-            );
-            const price = response[0].opening_price;
-
-            return {
-                date,
-                toDate,
-                price,
-            };
-        })
-    );
 }
 
 function runStrategies(

@@ -57,7 +57,7 @@ export {
         10, // movingAveragePeriod
         (message) => {
             console.log(message);
-            sendTelegramMessageToChatId(message);
+            // sendTelegramMessageToChatId(message);
         }
     );
 
@@ -67,7 +67,7 @@ export {
         5, // movingAveragePeriod
         (message) => {
             console.log(message);
-            sendTelegramMessageToChatId(message);
+            // sendTelegramMessageToChatId(message);
         }
     );
 
