@@ -23,10 +23,29 @@ export async function fetchMarketsAndBacktest(
     initialCapital: number,
     days: number = 31 // 과거 days간의 데이터 사용
 ) {
-    const markets = await fetchMarketAll();
-    const selectedMarkets = markets
-        .slice(40, 50)
-        .map((market: IMarket) => market.market);
+    // const markets = await fetchMarketAll();
+    // const selectedMarkets = markets
+    // .slice(40, 50)
+    // .map((market: IMarket) => market.market);
+    const selectedMarkets = [
+        "KRW-SOL",
+        "KRW-AVAX",
+        "KRW-BCH",
+        "KRW-ZRX",
+        "KRW-THETA",
+        "KRW-NEAR",
+        "KRW-BTG",
+        "KRW-SHIB",
+        "KRW-LINK",
+        "KRW-BTC",
+        "KRW-ETH",
+        "KRW-DOGE",
+        "KRW-TFUEL",
+        "KRW-SBD",
+        "KRW-CHZ",
+        "KRW-1INCH",
+        "KRW-DOT",
+    ];
     console.log(selectedMarkets);
     return momentumStrategyBacktest(selectedMarkets, initialCapital, days);
 }

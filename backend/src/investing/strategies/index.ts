@@ -4,6 +4,7 @@ import { afternoonRiseMorningInvestment } from "./afternoonRiseMorningInvestment
 import { checkDailyMovingAverage } from "./checkDailyMovingAverage";
 import { checkMinutesMovingAverage } from "./checkMinutesMovingAverage";
 import { executeMovingAverageAndVolatility } from "./movingAverageAndVolatility";
+import { risingVolatilityBreakoutStrategy } from "./risingVolatilityBreakoutStrategy";
 import { volatilityBreakoutStrategy } from "./volatilityBreakoutStrategy";
 
 export {
@@ -17,15 +18,16 @@ export {
         // checkDailyMovingAverage
         // 일캔들 기준 5일 이동평균 확인
         // 오전 9시 확인
-        "KRW-SOL",
-        "KRW-AVAX",
-        "KRW-BCH",
-        "KRW-ZRX",
-        "KRW-THETA",
-        "KRW-NEAR",
-        "KRW-BTG",
-        "KRW-SHIB",
-
+        // "KRW-SOL",
+        // "KRW-AVAX",
+        // "KRW-BCH",
+        // "KRW-ZRX",
+        // "KRW-THETA",
+        // "KRW-NEAR",
+        // "KRW-BTG",
+        // "KRW-SHIB",
+        // "KRW-LINK",
+        //
         // afternoonRiseMorningInvestment
         // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
         // 밤 12시에 확인
@@ -34,6 +36,13 @@ export {
         // "KRW-DOGE",
         // "KRW-TFUEL",
         // "KRW-SBD",
+        // "KRW-CHZ",
+        // "KRW-1INCH",
+        //
+        // 다자 가상화폐 + 변동성 돌파
+        // volatilityBreakoutStrategy
+        // 오전 9시 확인
+        "KRW-DOT",
     ];
 
     const initialCapital = 100000;
@@ -98,4 +107,12 @@ export {
         // k = 0.5
     );
     console.log(results4);
+
+    // 다자 가상화폐 + 상승장 + 변동성 돌파
+    const results5 = await risingVolatilityBreakoutStrategy(
+        markets,
+        initialCapital
+        // k = 0.5
+    );
+    console.log(results5);
 })();

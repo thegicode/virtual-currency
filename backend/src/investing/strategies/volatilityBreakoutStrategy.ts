@@ -45,9 +45,8 @@ export async function volatilityBreakoutStrategy(
                 async (market: string) =>
                     await generateSignal(
                         market,
-                        initialCapital,
-                        k,
-                        markets.length
+                        initialCapital / markets.length,
+                        k
                     )
             )
         );
@@ -62,8 +61,7 @@ export async function volatilityBreakoutStrategy(
 async function generateSignal(
     market: string,
     initialCapital: number,
-    k: number,
-    size: number
+    k: number
 ) {
     const candles = await fetchDailyCandles(market, "2");
 
@@ -80,7 +78,7 @@ async function generateSignal(
         date: candles[1].date_time,
         signal,
         price: candles[1].trade_price,
-        investment: initialCapital / size,
+        investment: isBreakOut ? initialCapital : 0,
         range,
     };
 }

@@ -1,14 +1,5 @@
 //  volatilityBreakoutBacktest
 
-import { fetchDailyCandles, fetchMinutesCandles } from "../../services/api";
-import {
-    adjustApiCounts,
-    calculateMDD,
-    calculateRange,
-    checkBreakout,
-    formatPrice,
-} from "../utils";
-
 /**
  * 투자전략 : 다자 가상화폐 + 변동성 돌파
  * 투자대상 : 아무 가상화폐 몇 개 선택
@@ -30,16 +21,27 @@ import {
     - k는 0.5 ~ 1 (0.5 추천)
 3. 매도 기준
     - 그 날 종가에 판다.
- */
-// (async () => {
-//     const markets = ["KRW-ETH", "KRW-DOGE"];
-//     await volatilityBreakoutBacktest(markets, 100000, 200);
-// })();
+
+에) 12월 25일 15시 가격 + (12월 24일 15시 ~ 12월 25일 15시 고점 - 저점) * 0.5
+
+// 실시간 가격 기준을 언제로 할 것인가? 9시 30분 
+// 매수 9시 30분, 매도 다음날 9시 30분 매도
+*/
+
+import { fetchDailyCandles, fetchMinutesCandles } from "../../services/api";
+import {
+    adjustApiCounts,
+    calculateMDD,
+    calculateRange,
+    checkBreakout,
+    formatPrice,
+} from "../utils";
 
 interface ITradeData {
     date: string;
     range: number;
     price: number;
+    signal: string;
     sellPrice: number;
     position: number;
     investment: number;
@@ -116,11 +118,13 @@ async function backtest(
     const results = tradesData.map((aData) => {
         return {
             date: aData.date.slice(0, 10),
+            price: formatPrice(aData.price),
             range: aData.range ? formatPrice(aData.range) : 0,
-            buyPrice: aData.price ? formatPrice(aData.price) : 0,
             sellPrice: aData.sellPrice ? formatPrice(aData.sellPrice) : 0,
             position: aData.position ? formatPrice(aData.position) : 0,
-            investment: aData.investment ? formatPrice(aData.investment) : 0,
+            investment: aData.investment
+                ? formatPrice(Math.round(aData.investment))
+                : 0,
             profit: aData.profit
                 ? Math.round(aData.profit).toLocaleString()
                 : 0,
@@ -130,6 +134,7 @@ async function backtest(
             winCount: aData.winCount,
         };
     });
+
     // console.table(results);
 
     return {
@@ -202,7 +207,6 @@ function runStrategies(
             // const buyCapital = realCapital;
 
             // 메도
-
             const sellPrice = nextCandle.trade_price;
             const profit = (sellPrice - buyPrice) * position;
             realCapital += position * sellPrice;
@@ -216,7 +220,6 @@ function runStrategies(
                 profit,
                 position,
                 investment,
-                price: buyPrice,
                 sellPrice,
             };
         }
@@ -224,6 +227,7 @@ function runStrategies(
         tradesData.push({
             ...thisData,
             date: currentDate,
+            price: tradePrice,
             range: range,
             capital: realCapital,
             tradeCount,
@@ -277,3 +281,8 @@ function logResult(results: any[]) {
         console.log(`MDD: ${result.mdd.toFixed(2)}%\n`);
     });
 }
+
+// (async () => {
+//     const markets = ["KRW-ETH", "KRW-DOGE"];
+//     await volatilityBreakoutBacktest(markets, 100000, 200);
+// })();

@@ -13,10 +13,25 @@ exports.fetchMarketsAndBacktest = void 0;
 const api_1 = require("../../services/api");
 function fetchMarketsAndBacktest(initialCapital, days = 31) {
     return __awaiter(this, void 0, void 0, function* () {
-        const markets = yield (0, api_1.fetchMarketAll)();
-        const selectedMarkets = markets
-            .slice(40, 50)
-            .map((market) => market.market);
+        const selectedMarkets = [
+            "KRW-SOL",
+            "KRW-AVAX",
+            "KRW-BCH",
+            "KRW-ZRX",
+            "KRW-THETA",
+            "KRW-NEAR",
+            "KRW-BTG",
+            "KRW-SHIB",
+            "KRW-LINK",
+            "KRW-BTC",
+            "KRW-ETH",
+            "KRW-DOGE",
+            "KRW-TFUEL",
+            "KRW-SBD",
+            "KRW-CHZ",
+            "KRW-1INCH",
+            "KRW-DOT",
+        ];
         console.log(selectedMarkets);
         return momentumStrategyBacktest(selectedMarkets, initialCapital, days);
     });

@@ -17,17 +17,11 @@ const checkMinutesMovingAverage_1 = require("./checkMinutesMovingAverage");
 Object.defineProperty(exports, "checkMinutesMovingAverage", { enumerable: true, get: function () { return checkMinutesMovingAverage_1.checkMinutesMovingAverage; } });
 const movingAverageAndVolatility_1 = require("./movingAverageAndVolatility");
 Object.defineProperty(exports, "executeMovingAverageAndVolatility", { enumerable: true, get: function () { return movingAverageAndVolatility_1.executeMovingAverageAndVolatility; } });
+const risingVolatilityBreakoutStrategy_1 = require("./risingVolatilityBreakoutStrategy");
 const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const markets = [
-        "KRW-SOL",
-        "KRW-AVAX",
-        "KRW-BCH",
-        "KRW-ZRX",
-        "KRW-THETA",
-        "KRW-NEAR",
-        "KRW-BTG",
-        "KRW-SHIB",
+        "KRW-DOT",
     ];
     const initialCapital = 100000;
     console.log("---------------------------------------------------");
@@ -51,4 +45,6 @@ const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
     console.log("---------------------------------------------------");
     const results4 = yield (0, volatilityBreakoutStrategy_1.volatilityBreakoutStrategy)(markets, initialCapital);
     console.log(results4);
+    const results5 = yield (0, risingVolatilityBreakoutStrategy_1.risingVolatilityBreakoutStrategy)(markets, initialCapital);
+    console.log(results5);
 }))();

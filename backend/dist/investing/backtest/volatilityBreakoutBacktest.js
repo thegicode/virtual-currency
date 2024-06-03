@@ -36,11 +36,13 @@ function backtest(market, initialCapital, period, k, transactionFee, size) {
         const results = tradesData.map((aData) => {
             return {
                 date: aData.date.slice(0, 10),
+                price: (0, utils_1.formatPrice)(aData.price),
                 range: aData.range ? (0, utils_1.formatPrice)(aData.range) : 0,
-                buyPrice: aData.price ? (0, utils_1.formatPrice)(aData.price) : 0,
                 sellPrice: aData.sellPrice ? (0, utils_1.formatPrice)(aData.sellPrice) : 0,
                 position: aData.position ? (0, utils_1.formatPrice)(aData.position) : 0,
-                investment: aData.investment ? (0, utils_1.formatPrice)(aData.investment) : 0,
+                investment: aData.investment
+                    ? (0, utils_1.formatPrice)(Math.round(aData.investment))
+                    : 0,
                 profit: aData.profit
                     ? Math.round(aData.profit).toLocaleString()
                     : 0,
@@ -106,11 +108,10 @@ function runStrategies(market, candles, initialCapital, k, size) {
                 profit,
                 position,
                 investment,
-                price: buyPrice,
                 sellPrice,
             };
         }
-        tradesData.push(Object.assign(Object.assign({}, thisData), { date: currentDate, range: range, capital: realCapital, tradeCount,
+        tradesData.push(Object.assign(Object.assign({}, thisData), { date: currentDate, price: tradePrice, range: range, capital: realCapital, tradeCount,
             winCount }));
     });
     const maxDrawdown = (0, utils_1.calculateMDD)(mddPrices);

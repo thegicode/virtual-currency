@@ -113,7 +113,7 @@ function createMessage(results: IMovingAverageAndVolatilityResult[]) {
         })
         .join("\n\n");
 
-    return `${title}${message}`;
+    return `${title}${message}\n`;
 }
 
 // (async () => {

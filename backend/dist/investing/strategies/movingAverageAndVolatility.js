@@ -62,5 +62,5 @@ function createMessage(results) {
         return messages;
     })
         .join("\n\n");
-    return `${title}${message}`;
+    return `${title}${message}\n`;
 }
