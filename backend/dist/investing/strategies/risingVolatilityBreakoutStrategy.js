@@ -35,7 +35,7 @@ function generateSignal(market, capital, k) {
         const period = 5;
         const candles = yield (0, api_1.fetchDailyCandles)(market, period.toString());
         const currentCandle = candles[candles.length - 1];
-        const range = yield (0, utils_1.calculateRange)(candles[period - 2]);
+        const range = (0, utils_1.calculateRange)(candles[period - 2]);
         const movingAverage = (0, utils_1.calculateMovingAverage)(candles, period)[0];
         const isOverMovingAverage = currentCandle.trade_price > movingAverage;
         const isBreakOut = (0, utils_1.checkBreakout)(currentCandle, range, k);

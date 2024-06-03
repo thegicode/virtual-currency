@@ -15,11 +15,13 @@ const checkDailyMovingAverageBacktest_1 = require("./checkDailyMovingAverageBack
 Object.defineProperty(exports, "checkDailyMovingAverageBacktest", { enumerable: true, get: function () { return checkDailyMovingAverageBacktest_1.checkDailyMovingAverageBacktest; } });
 const checkMinutesMovingAverageBacktest_1 = require("./checkMinutesMovingAverageBacktest");
 const movingAverageAndVolatilityBacktest_1 = require("./movingAverageAndVolatilityBacktest");
+const risingVolatilityBreakoutBacktest_1 = require("./risingVolatilityBreakoutBacktest");
 const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const initialCapital = 1000000;
         const markets = [
+            "KRW-LINK",
             "KRW-DOT",
         ];
         const resultCounts = 100;
@@ -28,7 +30,7 @@ const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
         console.log("resultCounts : ", resultCounts);
         console.log("-----------------------------------------");
         yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 60, 10, initialCapital, resultCounts);
-        yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 240, 5, initialCapital, resultCounts);
+        yield (0, checkMinutesMovingAverageBacktest_1.checkMinutesMovingAverageBacktest)(markets, 240, 10, initialCapital, resultCounts);
         console.log("-----------------------------------------");
         yield (0, checkDailyMovingAverageBacktest_1.checkDailyMovingAverageBacktest)(markets, 5, initialCapital, resultCounts);
         console.log("-----------------------------------------");
@@ -36,6 +38,7 @@ const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
         console.log("-----------------------------------------");
         yield (0, afternoonRiseStrategyBacktest_1.afternoonRiseMorningInvestmentBacktest)(markets, initialCapital, resultCounts, 2);
         yield (0, volatilityBreakoutBacktest_1.volatilityBreakoutBacktest)(markets, initialCapital, resultCounts);
+        yield (0, risingVolatilityBreakoutBacktest_1.risingVolatilityBreakoutBacktest)(markets, initialCapital, resultCounts);
     }
     catch (error) {
         console.error("Error during backtesting: ", error);

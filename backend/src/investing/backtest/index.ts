@@ -2,6 +2,7 @@ import { afternoonRiseMorningInvestmentBacktest } from "./afternoonRiseStrategyB
 import { checkDailyMovingAverageBacktest } from "./checkDailyMovingAverageBacktest";
 import { checkMinutesMovingAverageBacktest } from "./checkMinutesMovingAverageBacktest";
 import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatilityBacktest";
+import { risingVolatilityBreakoutBacktest } from "./risingVolatilityBreakoutBacktest";
 import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
 
 // Run backtest
@@ -21,7 +22,7 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
             // "KRW-NEAR", // 38.32%, 98.25%, 2차 afternoonRiseMorningInvestmentBacktest  60.27%
             // "KRW-BTG", //  100.36%, 215.95%, 2차  다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절 backtest
             // "KRW-SHIB", // 222.17%, 165.98%, 2차  3, 5, 10, 20일 이동평균 + 변동성 조절 backtest
-            // "KRW-LINK",
+            "KRW-LINK",
 
             //
             // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
@@ -35,17 +36,15 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
             // "KRW-CHZ",
             // "KRW-1INCH",
 
-            // 다자 가상화폐 + 변동성 돌파
-            // volatilityBreakoutBacktest
+            // 다자 가상화폐 + 상승장 + 변동성 돌파
+            // risingVolatilityBreakoutBacktest,
             "KRW-DOT",
         ];
         const resultCounts = 100;
 
         console.log("-----------------------------------------");
-
         console.log("initialCapital : ", initialCapital);
         console.log("resultCounts : ", resultCounts);
-
         console.log("-----------------------------------------");
 
         // 분캔들 기준 이동평균 확인 - interval
@@ -65,21 +64,21 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
             resultCounts
         );
 
-        await checkMinutesMovingAverageBacktest(
+        /* await checkMinutesMovingAverageBacktest(
             markets,
             240, // candleUnit, 인터벌 시간 단위
             5, //  movingAveragePeriod, 이동평균 단위
             initialCapital, // 초기 자본
             resultCounts
-        );
+        ); */
 
-        /* await checkMinutesMovingAverageBacktest(
+        await checkMinutesMovingAverageBacktest(
             markets,
             240, // candleUnit, 인터벌 시간 단위
             10, //  movingAveragePeriod, 이동평균 단위
             initialCapital, // 초기 자본
             resultCounts
-        ); */
+        );
 
         console.log("-----------------------------------------");
 
@@ -114,6 +113,15 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
 
         // 다자 가상화폐 + 변동성 돌파
         await volatilityBreakoutBacktest(
+            markets,
+            initialCapital,
+            resultCounts
+            // k: number = 0.5,
+            // transactionFee: number = 0.002 // 0.2%
+        );
+
+        // 다자 가상화폐 + 상승장 + 변동성 돌파
+        await risingVolatilityBreakoutBacktest(
             markets,
             initialCapital,
             resultCounts

@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.volatilityBreakoutBacktest = void 0;
+exports.risingVolatilityBreakoutBacktest = void 0;
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
-function volatilityBreakoutBacktest(markets, initialCapital, period, k = 0.5, transactionFee = 0.002) {
+function risingVolatilityBreakoutBacktest(markets, initialCapital, period, k = 0.5, transactionFee = 0.002) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () {
@@ -26,12 +26,13 @@ function volatilityBreakoutBacktest(markets, initialCapital, period, k = 0.5, tr
         }
     });
 }
-exports.volatilityBreakoutBacktest = volatilityBreakoutBacktest;
+exports.risingVolatilityBreakoutBacktest = risingVolatilityBreakoutBacktest;
 function backtest(market, initialCapital, period, k, transactionFee, size) {
     return __awaiter(this, void 0, void 0, function* () {
-        const adjustedApiCounts = (0, utils_1.adjustApiCounts)(period, 1);
+        const avragePeriod = 5;
+        const adjustedApiCounts = (0, utils_1.adjustApiCounts)(period, avragePeriod);
         const candles = yield (0, api_1.fetchDailyCandles)(market, adjustedApiCounts.toString());
-        const { tradesData, maxDrawdown } = runStrategies(market, candles, initialCapital, k, size);
+        const { tradesData, maxDrawdown } = runStrategies(market, candles, initialCapital, k, size, avragePeriod);
         const { firstDate, lastDate, finalCapital, performance, tradeCount, winRate, } = calculateFinalMetrics(tradesData, initialCapital / size);
         const results = tradesData.map((aData) => {
             return {
@@ -78,21 +79,22 @@ function getRealPrices(candles) {
         })));
     });
 }
-function runStrategies(market, candles, initialCapital, k, size) {
+function runStrategies(market, candles, initialCapital, k, size, avragePeriod) {
     let tradesData = [];
     let mddPrices = [];
     let realCapital = initialCapital / size;
     let tradeCount = 0;
     let winCount = 0;
-    candles.slice(1).forEach((candle, index) => {
-        const prevCandle = candles[index];
-        const nextCandle = candles[index + 2] || candle;
+    const movingAverages = (0, utils_1.calculateMovingAverage)(candles, avragePeriod).slice(1);
+    candles.slice(avragePeriod).forEach((candle, index) => {
+        const prevCandle = candles[index + avragePeriod - 1];
+        const nextCandle = candles[index + avragePeriod + 1] || candle;
         const tradePrice = candle.trade_price;
-        const currentDate = candle.date_time;
         const range = (0, utils_1.calculateRange)(prevCandle);
+        const isOverMovingAverage = candle.trade_price > movingAverages[index];
         const isBreakOut = (0, utils_1.checkBreakout)(candle, range, k);
         let thisData = {};
-        if (isBreakOut) {
+        if (isOverMovingAverage && isBreakOut) {
             const buyPrice = tradePrice;
             const position = realCapital / tradePrice;
             const investment = tradePrice * position;
@@ -105,13 +107,13 @@ function runStrategies(market, candles, initialCapital, k, size) {
                 winCount++;
             mddPrices.push(tradePrice);
             thisData = {
-                profit,
+                sellPrice,
                 position,
                 investment,
-                sellPrice,
+                profit,
             };
         }
-        tradesData.push(Object.assign(Object.assign({}, thisData), { date: currentDate, price: tradePrice, range: range, capital: realCapital, tradeCount,
+        tradesData.push(Object.assign(Object.assign({}, thisData), { date: candle.date_time, price: tradePrice, range: range, capital: realCapital, tradeCount,
             winCount }));
     });
     const maxDrawdown = (0, utils_1.calculateMDD)(mddPrices);
@@ -134,7 +136,7 @@ function calculateFinalMetrics(tradesData, initialCapital) {
     };
 }
 function logResult(results) {
-    console.log(`\n🔔 다자 가상화폐 + 변동성 돌파 backtest\n`);
+    console.log(`\n🔔 다자 가상화폐 + 상승장 + 변동성 돌파 Backtest\n`);
     results.forEach((result) => {
         console.log(`📈 [${result.market}]`);
         console.log(`첫째 날: ${result.firstDate}`);

@@ -26,7 +26,7 @@ export {
         // "KRW-NEAR",
         // "KRW-BTG",
         // "KRW-SHIB",
-        // "KRW-LINK",
+        "KRW-LINK",
         //
         // afternoonRiseMorningInvestment
         // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
@@ -39,8 +39,8 @@ export {
         // "KRW-CHZ",
         // "KRW-1INCH",
         //
-        // 다자 가상화폐 + 변동성 돌파
-        // volatilityBreakoutStrategy
+        // 다자 가상화폐 + 상승장 + 변동성 돌파
+        // risingVolatilityBreakoutStrategy
         // 오전 9시 확인
         "KRW-DOT",
     ];
@@ -57,7 +57,7 @@ export {
         10, // movingAveragePeriod
         (message) => {
             console.log(message);
-            // sendTelegramMessageToChatId(message);
+            sendTelegramMessageToChatId(message);
         }
     );
 
@@ -67,7 +67,7 @@ export {
         5, // movingAveragePeriod
         (message) => {
             console.log(message);
-            // sendTelegramMessageToChatId(message);
+            sendTelegramMessageToChatId(message);
         }
     );
 

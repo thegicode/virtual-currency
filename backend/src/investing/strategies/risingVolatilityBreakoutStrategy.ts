@@ -65,7 +65,7 @@ async function generateSignal(market: string, capital: number, k: number) {
     const currentCandle = candles[candles.length - 1];
 
     // 각 화폐의 레인지 계산 (전일 고가 - 저가)
-    const range = await calculateRange(candles[period - 2]);
+    const range = calculateRange(candles[period - 2]);
 
     // 각 화폐의 가격이 5일 이동 평균보다 높은지 여부 파악
     const movingAverage = calculateMovingAverage(candles, period)[0];

@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.executeMovingAverageAndVolatility = exports.checkMinutesMovingAverage = exports.checkDailyMovingAverage = void 0;
+const notifications_1 = require("../../notifications");
 const afternoonRiseMorningInvestment_1 = require("./afternoonRiseMorningInvestment");
 const checkDailyMovingAverage_1 = require("./checkDailyMovingAverage");
 Object.defineProperty(exports, "checkDailyMovingAverage", { enumerable: true, get: function () { return checkDailyMovingAverage_1.checkDailyMovingAverage; } });
@@ -21,6 +22,7 @@ const risingVolatilityBreakoutStrategy_1 = require("./risingVolatilityBreakoutSt
 const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const markets = [
+        "KRW-LINK",
         "KRW-DOT",
     ];
     const initialCapital = 100000;
@@ -29,9 +31,11 @@ const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
     console.log("---------------------------------------------------");
     yield (0, checkMinutesMovingAverage_1.checkMinutesMovingAverage)(markets, 60, 10, (message) => {
         console.log(message);
+        (0, notifications_1.sendTelegramMessageToChatId)(message);
     });
     yield (0, checkMinutesMovingAverage_1.checkMinutesMovingAverage)(markets, 240, 5, (message) => {
         console.log(message);
+        (0, notifications_1.sendTelegramMessageToChatId)(message);
     });
     console.log("---------------------------------------------------");
     const result1 = yield (0, checkDailyMovingAverage_1.checkDailyMovingAverage)(markets, 5);

@@ -1,37 +1,24 @@
-//  volatilityBreakoutBacktest
-
+// risingVolatilityBreakoutBacktest
 /**
- * 투자전략 : 다자 가상화폐 + 변동성 돌파
+ * 투자전략 : 다자 가상화폐 + 상승장 + 변동성 돌파
  * 투자대상 : 아무 가상화폐 몇 개 선택
  * 거래비용  : 0.2% 적용
  * 투자전략 :
  *      - 각 화폐의 레인지 계산 (전일 고가 - 저가)
+ *      - 각 화폐의 가격이 5일 이동 평균보다 높은지 여부 파악
+ *          - 낮을 경우 투자 대상에서 제외
  *      - 매수 : 실시간 가격 > 당일 시가 + (레인지 * k)
  *          - 필자들은 k=0.5 추천
  *      - 돌파에 성공한 가상화폐에 자산의 n분의 1 투입
+ *          - 이 전략에 2개 화폐를 투입한다면 자산의 2분의 1 투입
  * 매도 : 다음날 시가
- * 
- ## 변동성 돌파 전략의 핵심
-
-1. range 계산
-    - 원하는 가상화폐의 전일 고가 - 전일 저가
-    - 하루 안에 가상화폐가 움직인 최대폭
-2. 매수 기준
-    - 시가 기준으로 가격이 'range * k' 이상 상승하면 해당 가격에 매수
-    - k는 0.5 ~ 1 (0.5 추천)
-3. 매도 기준
-    - 그 날 종가에 판다.
-
-에) 12월 25일 15시 가격 + (12월 24일 15시 ~ 12월 25일 15시 고점 - 저점) * 0.5
-
-// 실시간 가격 기준을 언제로 할 것인가? 9시 30분 
-// 매수 9시 30분, 매도 다음날 9시 30분 매도
-*/
+ */
 
 import { fetchDailyCandles, fetchMinutesCandles } from "../../services/api";
 import {
     adjustApiCounts,
     calculateMDD,
+    calculateMovingAverage,
     calculateRange,
     checkBreakout,
     formatPrice,
@@ -51,7 +38,7 @@ interface ITradeData {
     winCount: number;
 }
 
-export async function volatilityBreakoutBacktest(
+export async function risingVolatilityBreakoutBacktest(
     markets: string[],
     initialCapital: number,
     period: number,
@@ -91,8 +78,9 @@ async function backtest(
     size: number
 ) {
     // console.log("\nmarket", market);
+    const avragePeriod = 5;
 
-    const adjustedApiCounts = adjustApiCounts(period, 1);
+    const adjustedApiCounts = adjustApiCounts(period, avragePeriod);
     const candles: ICandle[] = await fetchDailyCandles(
         market,
         adjustedApiCounts.toString()
@@ -103,7 +91,8 @@ async function backtest(
         candles,
         initialCapital,
         k,
-        size
+        size,
+        avragePeriod
     );
 
     const {
@@ -176,7 +165,8 @@ function runStrategies(
     candles: ICandle[],
     initialCapital: number,
     k: number,
-    size: number
+    size: number,
+    avragePeriod: number
 ) {
     let tradesData: ITradeData[] = [];
     let mddPrices: number[] = [];
@@ -184,27 +174,32 @@ function runStrategies(
     let tradeCount = 0;
     let winCount = 0;
 
-    candles.slice(1).forEach((candle, index) => {
-        const prevCandle = candles[index];
-        const nextCandle = candles[index + 2] || candle;
+    const movingAverages = calculateMovingAverage(candles, avragePeriod).slice(
+        1
+    );
+
+    candles.slice(avragePeriod).forEach((candle, index) => {
+        const prevCandle = candles[index + avragePeriod - 1];
+        const nextCandle = candles[index + avragePeriod + 1] || candle;
         const tradePrice = candle.trade_price;
-        const currentDate = candle.date_time;
 
         // 각 화폐의 레인지 계산 (전일 고가 - 저가)
         const range = calculateRange(prevCandle);
+
+        // 각 화폐의 가격이 5일 이동 평균보다 높은지 여부 파악
+        const isOverMovingAverage = candle.trade_price > movingAverages[index];
 
         // 매수 : 실시간 가격 > 당일 시가 + (레인지 * k)
         const isBreakOut = checkBreakout(candle, range, k);
 
         let thisData: any = {};
 
-        if (isBreakOut) {
+        if (isOverMovingAverage && isBreakOut) {
             // 매수
             const buyPrice = tradePrice;
             const position = realCapital / tradePrice;
             const investment = tradePrice * position;
             realCapital -= investment;
-            // const buyCapital = realCapital;
 
             // 메도
             const sellPrice = nextCandle.trade_price;
@@ -214,19 +209,20 @@ function runStrategies(
             // 통계
             tradeCount++;
             if (profit > 0) winCount++;
+
             mddPrices.push(tradePrice);
 
             thisData = {
-                profit,
+                sellPrice,
                 position,
                 investment,
-                sellPrice,
+                profit,
             };
         }
 
         tradesData.push({
             ...thisData,
-            date: currentDate,
+            date: candle.date_time,
             price: tradePrice,
             range: range,
             capital: realCapital,
@@ -264,7 +260,7 @@ function calculateFinalMetrics(
 }
 
 function logResult(results: any[]) {
-    console.log(`\n🔔 다자 가상화폐 + 변동성 돌파 backtest\n`);
+    console.log(`\n🔔 다자 가상화폐 + 상승장 + 변동성 돌파 Backtest\n`);
 
     results.forEach((result) => {
         console.log(`📈 [${result.market}]`);
@@ -282,7 +278,8 @@ function logResult(results: any[]) {
     });
 }
 
-// (async () => {
-//     const markets = ["KRW-ETH", "KRW-DOGE"];
-//     await volatilityBreakoutBacktest(markets, 100000, 200);
-// })();
+/* (async () => {
+    const markets = ["KRW-DOT"];
+    await volatilityBreakoutBacktest(markets, 100000, 30);
+})();
+ */
