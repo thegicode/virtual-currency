@@ -19,6 +19,7 @@ const movingAverageAndVolatility_1 = require("./movingAverageAndVolatility");
 Object.defineProperty(exports, "executeMovingAverageAndVolatility", { enumerable: true, get: function () { return movingAverageAndVolatility_1.executeMovingAverageAndVolatility; } });
 const risingVolatilityBreakoutStrategy_1 = require("./risingVolatilityBreakoutStrategy");
 const risingVolatilityBreakoutWithAdjustment_1 = require("./risingVolatilityBreakoutWithAdjustment");
+const superRisingVolatilityBreakoutWithAdjustment_1 = require("./superRisingVolatilityBreakoutWithAdjustment");
 const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const markets = [
@@ -52,4 +53,7 @@ const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
     console.log("---------------------------------------------------");
     const results6 = yield (0, risingVolatilityBreakoutWithAdjustment_1.risingVolatilityBreakoutWithAdjustment)(markets, initialCapital);
     console.log(results6);
+    console.log("---------------------------------------------------");
+    const results7 = yield (0, superRisingVolatilityBreakoutWithAdjustment_1.superRisingVolatilityBreakoutWithAdjustment)(markets, initialCapital);
+    console.log(results7);
 }))();

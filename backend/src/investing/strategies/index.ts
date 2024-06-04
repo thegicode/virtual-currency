@@ -6,6 +6,7 @@ import { checkMinutesMovingAverage } from "./checkMinutesMovingAverage";
 import { executeMovingAverageAndVolatility } from "./movingAverageAndVolatility";
 import { risingVolatilityBreakoutStrategy } from "./risingVolatilityBreakoutStrategy";
 import { risingVolatilityBreakoutWithAdjustment } from "./risingVolatilityBreakoutWithAdjustment";
+import { superRisingVolatilityBreakoutWithAdjustment } from "./superRisingVolatilityBreakoutWithAdjustment";
 import { volatilityBreakoutStrategy } from "./volatilityBreakoutStrategy";
 
 export {
@@ -127,6 +128,18 @@ export {
         markets,
         initialCapital
         // k = 0.5
+        // targetRate = 0.02
     );
     console.log(results6);
+
+    console.log("---------------------------------------------------");
+
+    // 수퍼상승장 + 변동성 돌파 + 변동성 조절
+    const results7 = await superRisingVolatilityBreakoutWithAdjustment(
+        markets,
+        initialCapital
+        // k = 0.5
+        // targetRate = 0.02
+    );
+    console.log(results7);
 })();
