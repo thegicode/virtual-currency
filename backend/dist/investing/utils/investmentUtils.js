@@ -1,6 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateMDD = exports.calculateBollingerBands = void 0;
+exports.calculateMDD = exports.calculateBollingerBands = exports.calculateAdjustedInvestment = void 0;
+function calculateAdjustedInvestment(range, candle, targetRate, size, capital) {
+    const prevVolatilityRate = range / candle.opening_price;
+    const investmentRate = targetRate / prevVolatilityRate / size;
+    const investment = investmentRate * capital;
+    return {
+        investment,
+        prevVolatilityRate,
+    };
+}
+exports.calculateAdjustedInvestment = calculateAdjustedInvestment;
 function calculateBollingerBands(candles, period = 20) {
     const middleBand = [];
     const upperBand = [];

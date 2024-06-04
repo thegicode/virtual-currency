@@ -9,6 +9,22 @@
  *
  */
 
+export function calculateAdjustedInvestment(
+    range: number,
+    candle: ICandle,
+    targetRate: number,
+    size: number,
+    capital: number
+) {
+    const prevVolatilityRate = range / candle.opening_price;
+    const investmentRate = targetRate / prevVolatilityRate / size;
+    const investment = investmentRate * capital;
+    return {
+        investment,
+        prevVolatilityRate,
+    };
+}
+
 export function calculateBollingerBands(
     candles: ICandle[],
     period: number = 20

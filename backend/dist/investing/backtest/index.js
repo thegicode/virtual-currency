@@ -16,12 +16,12 @@ Object.defineProperty(exports, "checkDailyMovingAverageBacktest", { enumerable: 
 const checkMinutesMovingAverageBacktest_1 = require("./checkMinutesMovingAverageBacktest");
 const movingAverageAndVolatilityBacktest_1 = require("./movingAverageAndVolatilityBacktest");
 const risingVolatilityBreakoutBacktest_1 = require("./risingVolatilityBreakoutBacktest");
+const risingVolatilityBreakoutWithAdjustmentBacktest_1 = require("./risingVolatilityBreakoutWithAdjustmentBacktest");
 const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const initialCapital = 1000000;
         const markets = [
-            "KRW-LINK",
             "KRW-DOT",
         ];
         const resultCounts = 100;
@@ -39,6 +39,7 @@ const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
         yield (0, afternoonRiseStrategyBacktest_1.afternoonRiseMorningInvestmentBacktest)(markets, initialCapital, resultCounts, 2);
         yield (0, volatilityBreakoutBacktest_1.volatilityBreakoutBacktest)(markets, initialCapital, resultCounts);
         yield (0, risingVolatilityBreakoutBacktest_1.risingVolatilityBreakoutBacktest)(markets, initialCapital, resultCounts);
+        yield (0, risingVolatilityBreakoutWithAdjustmentBacktest_1.risingVolatilityBreakoutWithAdjustmentBacktest)(markets, initialCapital, resultCounts);
     }
     catch (error) {
         console.error("Error during backtesting: ", error);

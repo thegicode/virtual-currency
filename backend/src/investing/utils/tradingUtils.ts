@@ -31,6 +31,9 @@ export function calculateRange(candle: ICandle) {
     return candle.high_price - candle.low_price;
 }
 
+// 변동성
+// const prevVolatilityRate = (range / prevCandle.opening_price) * 100;
+
 // 노이즈 값이 가장 작은 n개 선정
 /* export function selectLowNoiseCryptos(cryptos: ICrypto[], n: number) {
     const cryptowithNoise = cryptos.map((crypto) => {

@@ -3,6 +3,7 @@ import { checkDailyMovingAverageBacktest } from "./checkDailyMovingAverageBackte
 import { checkMinutesMovingAverageBacktest } from "./checkMinutesMovingAverageBacktest";
 import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatilityBacktest";
 import { risingVolatilityBreakoutBacktest } from "./risingVolatilityBreakoutBacktest";
+import { risingVolatilityBreakoutWithAdjustmentBacktest } from "./risingVolatilityBreakoutWithAdjustmentBacktest";
 import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
 
 // Run backtest
@@ -22,7 +23,7 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
             // "KRW-NEAR", // 38.32%, 98.25%, 2차 afternoonRiseMorningInvestmentBacktest  60.27%
             // "KRW-BTG", //  100.36%, 215.95%, 2차  다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절 backtest
             // "KRW-SHIB", // 222.17%, 165.98%, 2차  3, 5, 10, 20일 이동평균 + 변동성 조절 backtest
-            "KRW-LINK",
+            // "KRW-LINK",
 
             //
             // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
@@ -126,6 +127,16 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
             initialCapital,
             resultCounts
             // k: number = 0.5,
+            // transactionFee: number = 0.002 // 0.2%
+        );
+
+        // 상승장 + 변동성 돌파 + 변동성 조절
+        await risingVolatilityBreakoutWithAdjustmentBacktest(
+            markets,
+            initialCapital,
+            resultCounts
+            // k: number = 0.5,
+            // targetRate: number = 0.02
             // transactionFee: number = 0.002 // 0.2%
         );
     } catch (error) {
