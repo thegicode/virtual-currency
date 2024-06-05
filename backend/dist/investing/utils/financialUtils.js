@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isAboveAllMovingAverages = exports.calculateVolume = exports.calculateVolatility = exports.calculateRiskAdjustedCapital = exports.calculateMovingAverage = exports.calculateCandleReturnRate = exports.calculateAllMovingAverages = void 0;
+exports.isAboveAllMovingAverages = exports.calculateVolumeAverage = exports.calculateVolume = exports.calculateVolatility = exports.calculateRiskAdjustedCapital = exports.calculateMovingAverage = exports.calculateCandleReturnRate = exports.calculateAllMovingAverages = void 0;
 function calculateAllMovingAverages(candles, periods) {
     const movingAverages = {};
     periods.forEach((period) => {
@@ -42,6 +42,10 @@ function calculateVolume(candles) {
     return candles.reduce((acc, cur) => acc + cur.candle_acc_trade_volume, 0);
 }
 exports.calculateVolume = calculateVolume;
+function calculateVolumeAverage(candles) {
+    return (candles.reduce((acc, candle) => acc + candle.candle_acc_trade_volume, 0) / candles.length);
+}
+exports.calculateVolumeAverage = calculateVolumeAverage;
 function isAboveAllMovingAverages(currentPrice, movingAverages) {
     return (currentPrice > movingAverages.ma3 &&
         currentPrice > movingAverages.ma5 &&

@@ -24,7 +24,11 @@ const superRisingVolatilityBreakoutWithAdjustment_1 = require("./superRisingVola
 const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const markets = [
-        "KRW-DOT",
+        "KRW-BTC",
+        "KRW-ETH",
+        "KRW-DOGE",
+        "KRW-TFUEL",
+        "KRW-CHZ",
     ];
     const initialCapital = 100000;
     console.log("---------------------------------------------------");

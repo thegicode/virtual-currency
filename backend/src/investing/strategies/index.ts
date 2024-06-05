@@ -34,18 +34,18 @@ export {
         // afternoonRiseMorningInvestment
         // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
         // 밤 12시에 확인
-        // "KRW-BTC",
-        // "KRW-ETH",
-        // "KRW-DOGE",
-        // "KRW-TFUEL",
-        // "KRW-CHZ",
+        "KRW-BTC",
+        "KRW-ETH",
+        "KRW-DOGE",
+        "KRW-TFUEL",
+        "KRW-CHZ",
         // "KRW-1INCH",
         // "KRW-SBD",
         //
         // 다자 가상화폐 + 상승장 + 변동성 돌파
         // risingVolatilityBreakoutStrategy
         // 오전 9시 확인
-        "KRW-DOT",
+        // "KRW-DOT",
     ];
 
     const initialCapital = 100000;

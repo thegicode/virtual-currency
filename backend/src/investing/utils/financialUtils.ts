@@ -43,7 +43,15 @@ export function calculateMovingAverage(
 
     for (let i = 0; i <= data.length - period; i++) {
         const slice = data.slice(i, i + period);
+
+        // console.log(
+        //     "calculateMovingAverage",
+        //     i,
+        //     data[i + period - 1].date_time
+        // );
+
         const sum = slice.reduce((acc, cur) => acc + cur.trade_price, 0);
+
         movingAverages.push(sum / period);
         // console.log(
         //     i,
@@ -52,7 +60,7 @@ export function calculateMovingAverage(
         // );
     }
 
-    // console.log("calculateMovingAverage", data, period, movingAverages);
+    // console.log(movingAverages);
 
     return movingAverages;
 }
@@ -85,6 +93,16 @@ export function calculateVolume(candles: ICandle[]): number {
     return candles.reduce(
         (acc: number, cur: ICandle) => acc + cur.candle_acc_trade_volume,
         0
+    );
+}
+
+export function calculateVolumeAverage(candles: ICandle[]): number {
+    return (
+        candles.reduce(
+            (acc: number, candle: ICandle) =>
+                acc + candle.candle_acc_trade_volume,
+            0
+        ) / candles.length
     );
 }
 

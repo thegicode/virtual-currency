@@ -14,6 +14,7 @@ const afternoonRiseStrategyBacktest_1 = require("./afternoonRiseStrategyBacktest
 const checkDailyMovingAverageBacktest_1 = require("./checkDailyMovingAverageBacktest");
 Object.defineProperty(exports, "checkDailyMovingAverageBacktest", { enumerable: true, get: function () { return checkDailyMovingAverageBacktest_1.checkDailyMovingAverageBacktest; } });
 const checkMinutesMovingAverageBacktest_1 = require("./checkMinutesMovingAverageBacktest");
+const fiveDayVolumeMA_VolatilityBreakoutBactest_1 = require("./fiveDayVolumeMA_VolatilityBreakoutBactest");
 const movingAverageAndVolatilityBacktest_1 = require("./movingAverageAndVolatilityBacktest");
 const risingVolatilityBreakoutBacktest_1 = require("./risingVolatilityBreakoutBacktest");
 const risingVolatilityBreakoutWithAdjustmentBacktest_1 = require("./risingVolatilityBreakoutWithAdjustmentBacktest");
@@ -23,9 +24,9 @@ const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
     try {
         const initialCapital = 1000000;
         const markets = [
-            "KRW-ETH",
+            "KRW-SOL",
         ];
-        const resultCounts = 200;
+        const resultCounts = 100;
         console.log("-----------------------------------------");
         console.log("initialCapital : ", initialCapital);
         console.log("resultCounts : ", resultCounts);
@@ -42,6 +43,7 @@ const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
         yield (0, risingVolatilityBreakoutBacktest_1.risingVolatilityBreakoutBacktest)(markets, initialCapital, resultCounts);
         yield (0, risingVolatilityBreakoutWithAdjustmentBacktest_1.risingVolatilityBreakoutWithAdjustmentBacktest)(markets, initialCapital, resultCounts);
         yield (0, superRisingVolatilityBreakoutWithAdjustmentBacktest_1.superRisingVolatilityBreakoutWithAdjustmentBacktest)(markets, initialCapital, resultCounts);
+        yield (0, fiveDayVolumeMA_VolatilityBreakoutBactest_1.fiveDayVolumeMA_VolatilityBreakoutBactest)(markets, initialCapital, resultCounts);
     }
     catch (error) {
         console.error("Error during backtesting: ", error);

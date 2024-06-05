@@ -1,6 +1,7 @@
 import { afternoonRiseMorningInvestmentBacktest } from "./afternoonRiseStrategyBacktest";
 import { checkDailyMovingAverageBacktest } from "./checkDailyMovingAverageBacktest";
 import { checkMinutesMovingAverageBacktest } from "./checkMinutesMovingAverageBacktest";
+import { fiveDayVolumeMA_VolatilityBreakoutBactest } from "./fiveDayVolumeMA_VolatilityBreakoutBactest";
 import { movingAverageAndVolatilityBacktest } from "./movingAverageAndVolatilityBacktest";
 import { risingVolatilityBreakoutBacktest } from "./risingVolatilityBreakoutBacktest";
 import { risingVolatilityBreakoutWithAdjustmentBacktest } from "./risingVolatilityBreakoutWithAdjustmentBacktest";
@@ -16,7 +17,7 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
             // 일캔들 기준 5일 이동평균 확인
             // checkDailyMovingAverage
             // 오전 9시 확인
-            // "KRW-SOL", // 45.56%, 75.88%
+            "KRW-SOL", // 45.56%, 75.88%
             // "KRW-AVAX", // 18.59%, 72.79%, 2차 volatilityBreakoutBacktest
             // "KRW-BCH", // 119.70%, 118.73%, 2차 volatilityBreakoutBacktest
             // "KRW-ZRX", //  183.73%, 137.09%, 2차 volatilityBreakoutBacktest
@@ -31,7 +32,7 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
             // afternoonRiseMorningInvestment
             // 밤 12시에 확인
             // "KRW-BTC", // 22.85%, 63.98%
-            "KRW-ETH", // 30.44%, 60.26%
+            // "KRW-ETH", // 30.44%, 60.26%
             // "KRW-DOGE", // 168.27%, 147.72%
             // "KRW-TFUEL", // 157.41%, 171.73%
             // "KRW-SBD", //  -0.36%, 16.59%
@@ -42,7 +43,7 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
             // risingVolatilityBreakoutBacktest,
             // "KRW-DOT",
         ];
-        const resultCounts = 200;
+        const resultCounts = 100;
 
         console.log("-----------------------------------------");
         console.log("initialCapital : ", initialCapital);
@@ -143,6 +144,16 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
 
         // 상승장 + 변동성 돌파 + 변동성 조절
         await superRisingVolatilityBreakoutWithAdjustmentBacktest(
+            markets,
+            initialCapital,
+            resultCounts
+            // k: number = 0.5,
+            // targetRate: number = 0.02
+            // transactionFee: number = 0.002 // 0.2%
+        );
+
+        // 5일 이동평균 & 5일 거래량 상승장 + 변동성 돌파 + 변동성 조절
+        await fiveDayVolumeMA_VolatilityBreakoutBactest(
             markets,
             initialCapital,
             resultCounts

@@ -42,29 +42,17 @@ export async function checkDailyMovingAverage(
 
 async function checkMovingAverage(market: string, period: number) {
     try {
-        const fetchedData = await fetchDailyCandles(
-            market,
-            (period + 1).toString()
-        );
+        const fetchedData = await fetchDailyCandles(market, period.toString());
+
         const movingAverages = calculateMovingAverage(fetchedData, period);
 
-        const prevPrice = fetchedData[fetchedData.length - 2].trade_price;
         const currentPrice = (await fetchTicker(market))[0].trade_price;
-        const prevMovingAverage = movingAverages[movingAverages.length - 2];
         const latestMovingAverage = movingAverages[movingAverages.length - 1];
 
-        // const isPrevBuy = prevPrice > prevMovingAverage;
         const signal =
             currentPrice > latestMovingAverage
                 ? "매수 또는 유지"
                 : "매도 또는 유보";
-
-        // let signal;
-        // if (isPrevBuy) {
-        //     signal = currentPrice > latestMovingAverage ? "매수 유지" : "매도";
-        // } else {
-        //     signal = currentPrice > latestMovingAverage ? "매수" : "유보";
-        // }
 
         return {
             market,
@@ -96,3 +84,12 @@ function createMessage(data: IDailyMovingAverageResult[], period: number) {
 
     // sendTelegramMessageToChatId(messages);
 }
+
+/* (async () => {
+    const markets = ["KRW-DOGE"];
+
+    const initialCapital = 100000;
+    const result1 = await checkDailyMovingAverage(markets, 5);
+    console.log(result1);
+})();
+ */

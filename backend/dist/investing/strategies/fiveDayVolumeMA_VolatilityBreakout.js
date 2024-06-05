@@ -37,7 +37,7 @@ function generateSignal(market, capital, k, targetRate, size) {
         const range = (0, utils_1.calculateRange)(prevCandle);
         const movingAverage = (0, utils_1.calculateMovingAverage)(candles, period)[0];
         const isOverMovingAverage = currentCandle.trade_price > movingAverage;
-        const volumeAverage = candles.reduce((acc, candle) => acc + candle.candle_acc_trade_volume, 0) / candles.length;
+        const volumeAverage = (0, utils_1.calculateVolumeAverage)(candles);
         const isOverVolumeAverage = prevCandle.candle_acc_trade_volume > volumeAverage;
         const isBreakOut = (0, utils_1.checkBreakout)(currentCandle, range, k);
         const isBuySign = isOverMovingAverage && isOverVolumeAverage && isBreakOut ? true : false;

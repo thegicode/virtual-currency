@@ -7,6 +7,7 @@ import {
     calculateRiskAdjustedCapital,
     calculateVolatility,
     calculateVolume,
+    calculateVolumeAverage,
     isAboveAllMovingAverages,
 } from "./FinancialUtils";
 import {
@@ -37,6 +38,7 @@ export {
     calculateRiskAdjustedCapital,
     calculateVolatility,
     calculateVolume,
+    calculateVolumeAverage,
     isAboveAllMovingAverages,
 
     // InvestmentUtils

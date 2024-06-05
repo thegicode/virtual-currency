@@ -20,6 +20,7 @@ import {
     calculateAdjustedInvestment,
     calculateMovingAverage,
     calculateRange,
+    calculateVolumeAverage,
     checkBreakout,
     formatPrice,
 } from "../utils";
@@ -86,12 +87,7 @@ async function generateSignal(
     const isOverMovingAverage = currentCandle.trade_price > movingAverage;
 
     // 각 화폐의 전일 거래량이 5일 거래량 이동평균보다 많은지 여부 파악
-    const volumeAverage =
-        candles.reduce(
-            (acc: number, candle: ICandle) =>
-                acc + candle.candle_acc_trade_volume,
-            0
-        ) / candles.length;
+    const volumeAverage = calculateVolumeAverage(candles);
     const isOverVolumeAverage =
         prevCandle.candle_acc_trade_volume > volumeAverage;
 
@@ -143,10 +139,7 @@ function createMessage(results: IResult[]) {
 
 /* (async () => {
     const markets = ["KRW-THETA"];
-    const result = await fiveDayVolumeMA_VolatilityBreakout(
-        markets,
-        100000
-    );
+    const result = await fiveDayVolumeMA_VolatilityBreakout(markets, 100000);
     console.log(result);
 })();
  */
