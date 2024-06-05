@@ -3,6 +3,7 @@ import { sendTelegramMessageToChatId } from "../../notifications";
 import { afternoonRiseMorningInvestment } from "./afternoonRiseMorningInvestment";
 import { checkDailyMovingAverage } from "./checkDailyMovingAverage";
 import { checkMinutesMovingAverage } from "./checkMinutesMovingAverage";
+import { fiveDayVolumeMA_VolatilityBreakout } from "./fiveDayVolumeMA_VolatilityBreakout";
 import { executeMovingAverageAndVolatility } from "./movingAverageAndVolatility";
 import { risingVolatilityBreakoutStrategy } from "./risingVolatilityBreakoutStrategy";
 import { risingVolatilityBreakoutWithAdjustment } from "./risingVolatilityBreakoutWithAdjustment";
@@ -38,13 +39,13 @@ export {
         // "KRW-DOGE",
         // "KRW-TFUEL",
         // "KRW-CHZ",
-        "KRW-1INCH",
-        "KRW-SBD",
+        // "KRW-1INCH",
+        // "KRW-SBD",
         //
         // 다자 가상화폐 + 상승장 + 변동성 돌파
         // risingVolatilityBreakoutStrategy
         // 오전 9시 확인
-        // "KRW-DOT",
+        "KRW-DOT",
     ];
 
     const initialCapital = 100000;
@@ -142,4 +143,13 @@ export {
         // targetRate = 0.02
     );
     console.log(results7);
+
+    // 5일 이동평균 & 5일 거래량 상승장 + 변동성 돌파 + 변동성 조절
+    const results8 = await fiveDayVolumeMA_VolatilityBreakout(
+        markets,
+        initialCapital
+        // k = 0.5
+        // targetRate = 0.02
+    );
+    console.log(results8);
 })();

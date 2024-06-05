@@ -15,6 +15,7 @@ const checkDailyMovingAverage_1 = require("./checkDailyMovingAverage");
 Object.defineProperty(exports, "checkDailyMovingAverage", { enumerable: true, get: function () { return checkDailyMovingAverage_1.checkDailyMovingAverage; } });
 const checkMinutesMovingAverage_1 = require("./checkMinutesMovingAverage");
 Object.defineProperty(exports, "checkMinutesMovingAverage", { enumerable: true, get: function () { return checkMinutesMovingAverage_1.checkMinutesMovingAverage; } });
+const fiveDayVolumeMA_VolatilityBreakout_1 = require("./fiveDayVolumeMA_VolatilityBreakout");
 const movingAverageAndVolatility_1 = require("./movingAverageAndVolatility");
 Object.defineProperty(exports, "executeMovingAverageAndVolatility", { enumerable: true, get: function () { return movingAverageAndVolatility_1.executeMovingAverageAndVolatility; } });
 const risingVolatilityBreakoutStrategy_1 = require("./risingVolatilityBreakoutStrategy");
@@ -23,8 +24,7 @@ const superRisingVolatilityBreakoutWithAdjustment_1 = require("./superRisingVola
 const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const markets = [
-        "KRW-1INCH",
-        "KRW-SBD",
+        "KRW-DOT",
     ];
     const initialCapital = 100000;
     console.log("---------------------------------------------------");
@@ -57,4 +57,6 @@ const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
     console.log("---------------------------------------------------");
     const results7 = yield (0, superRisingVolatilityBreakoutWithAdjustment_1.superRisingVolatilityBreakoutWithAdjustment)(markets, initialCapital);
     console.log(results7);
+    const results8 = yield (0, fiveDayVolumeMA_VolatilityBreakout_1.fiveDayVolumeMA_VolatilityBreakout)(markets, initialCapital);
+    console.log(results8);
 }))();

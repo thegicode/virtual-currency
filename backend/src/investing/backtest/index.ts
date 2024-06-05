@@ -16,7 +16,7 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
             // 일캔들 기준 5일 이동평균 확인
             // checkDailyMovingAverage
             // 오전 9시 확인
-            "KRW-SOL", // 45.56%, 75.88%
+            // "KRW-SOL", // 45.56%, 75.88%
             // "KRW-AVAX", // 18.59%, 72.79%, 2차 volatilityBreakoutBacktest
             // "KRW-BCH", // 119.70%, 118.73%, 2차 volatilityBreakoutBacktest
             // "KRW-ZRX", //  183.73%, 137.09%, 2차 volatilityBreakoutBacktest
@@ -31,7 +31,7 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
             // afternoonRiseMorningInvestment
             // 밤 12시에 확인
             // "KRW-BTC", // 22.85%, 63.98%
-            // "KRW-ETH", // 30.44%, 60.26%
+            "KRW-ETH", // 30.44%, 60.26%
             // "KRW-DOGE", // 168.27%, 147.72%
             // "KRW-TFUEL", // 157.41%, 171.73%
             // "KRW-SBD", //  -0.36%, 16.59%
@@ -41,10 +41,8 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
             // 다자 가상화폐 + 상승장 + 변동성 돌파
             // risingVolatilityBreakoutBacktest,
             // "KRW-DOT",
-
-            // "KRW-XRP",
         ];
-        const resultCounts = 100;
+        const resultCounts = 200;
 
         console.log("-----------------------------------------");
         console.log("initialCapital : ", initialCapital);

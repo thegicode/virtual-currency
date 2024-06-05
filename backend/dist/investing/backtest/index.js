@@ -23,9 +23,9 @@ const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
     try {
         const initialCapital = 1000000;
         const markets = [
-            "KRW-SOL",
+            "KRW-ETH",
         ];
-        const resultCounts = 100;
+        const resultCounts = 200;
         console.log("-----------------------------------------");
         console.log("initialCapital : ", initialCapital);
         console.log("resultCounts : ", resultCounts);
