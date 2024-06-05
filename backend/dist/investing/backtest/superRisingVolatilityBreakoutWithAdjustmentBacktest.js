@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.risingVolatilityBreakoutWithAdjustmentBacktest = void 0;
+exports.superRisingVolatilityBreakoutWithAdjustmentBacktest = void 0;
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
-function risingVolatilityBreakoutWithAdjustmentBacktest(markets, initialCapital, resultCounts, k = 0.5, targetRate = 0.02, transactionFee = 0.002) {
+function superRisingVolatilityBreakoutWithAdjustmentBacktest(markets, initialCapital, resultCounts, k = 0.5, targetRate = 0.02, transactionFee = 0.002) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () {
@@ -21,15 +21,15 @@ function risingVolatilityBreakoutWithAdjustmentBacktest(markets, initialCapital,
             logResult(results);
         }
         catch (error) {
-            console.error("Error risingVolatilityBreakoutWithAdjustmentBacktest: ", error);
+            console.error("Error superRisingVolatilityBreakoutWithAdjustmentBacktest: ", error);
             return "Error in executing the strategy.";
         }
     });
 }
-exports.risingVolatilityBreakoutWithAdjustmentBacktest = risingVolatilityBreakoutWithAdjustmentBacktest;
+exports.superRisingVolatilityBreakoutWithAdjustmentBacktest = superRisingVolatilityBreakoutWithAdjustmentBacktest;
 function backtest(market, initialCapital, resultCounts, k, targetRate, transactionFee, size) {
     return __awaiter(this, void 0, void 0, function* () {
-        const avragePeriod = 5;
+        const avragePeriod = 20;
         const adjustedApiCounts = (0, utils_1.adjustApiCounts)(resultCounts, avragePeriod);
         const candles = yield (0, api_1.fetchDailyCandles)(market, adjustedApiCounts.toString());
         const { tradesData, maxDrawdown } = runStrategies(market, candles, initialCapital, k, targetRate, size, avragePeriod);
@@ -70,13 +70,14 @@ function runStrategies(market, candles, initialCapital, k, targetRate, size, avr
     let realCapital = initialCapital / size;
     let tradeCount = 0;
     let winCount = 0;
-    const movingAverages = (0, utils_1.calculateMovingAverage)(candles, avragePeriod).slice(1);
+    const movingAverages = (0, utils_1.calculateAllMovingAverages)(candles, [3, 5, 10, 20]);
     candles.slice(avragePeriod).forEach((candle, index) => {
         const prevCandle = candles[index + avragePeriod - 1];
         const nextCandle = candles[index + avragePeriod + 1] || candle;
         const tradePrice = candle.trade_price;
         const range = (0, utils_1.calculateRange)(prevCandle);
-        const isOverMovingAverage = candle.trade_price > movingAverages[index];
+        const movingAverages = (0, utils_1.calculateAllMovingAverages)(candles.slice(index, index + avragePeriod), [3, 5, 10, 20]);
+        const isOverMovingAverage = (0, utils_1.isAboveAllMovingAverages)(candle.trade_price, movingAverages);
         const isBreakOut = (0, utils_1.checkBreakout)(candle, range, k);
         let thisData = {};
         if (isOverMovingAverage && isBreakOut) {
@@ -121,7 +122,7 @@ function calculateFinalMetrics(tradesData, initialCapital) {
     };
 }
 function logResult(results) {
-    console.log(`\n🔔 상승장 + 변동성 돌파 + 변동성 조절 Backtest\n`);
+    console.log(`\n🔔 슈퍼 상승장(4개 이동평균 상승장) + 변동성 돌파 + 변동성 조절 Backtest\n`);
     results.forEach((result) => {
         console.log(`📈 [${result.market}]`);
         console.log(`첫째 날: ${result.firstDate}`);

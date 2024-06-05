@@ -1,12 +1,12 @@
-// risingVolatilityBreakoutWithAdjustmentBacktest
+// superRisingVolatilityBreakoutWithAdjustmentBacktest
 
 /**
- * 투자전략 : *** 상승장 + 변동성 돌파 + 변동성 조절
+ * 투자전략 : 슈퍼 상승장(4개 이동평균 상승장) + 변동성 돌파 + 변동성 조절
  * 투자대상 : 아무 가상화폐 몇 개 선택
  * 거래비용  : 0.2% 적용
  * 투자전략 :
  *      - 각 화폐의 레인지 계산 (전일 고가 - 저가)
- *      - 각 화폐의 가격이 5일 이동 평균보다 높은지 여부 파악
+ *      - 각 화폐의 가격이 3, 5, 10, 20일 이동 평균보다 높은지 여부 파악
  *          - 낮을 경우 투자 대상에서 제외
  *      - 매수 : 실시간 가격 > 당일 시가 + (레인지 * k)
  *          - 필자들은 k=0.5 추천
@@ -18,11 +18,12 @@ import { fetchDailyCandles } from "../../services/api";
 import {
     adjustApiCounts,
     calculateAdjustedInvestment,
+    calculateAllMovingAverages,
     calculateMDD,
-    calculateMovingAverage,
     calculateRange,
     checkBreakout,
     formatPrice,
+    isAboveAllMovingAverages,
 } from "../utils";
 
 interface ITradeData {
@@ -39,7 +40,7 @@ interface ITradeData {
     winCount: number;
 }
 
-export async function risingVolatilityBreakoutWithAdjustmentBacktest(
+export async function superRisingVolatilityBreakoutWithAdjustmentBacktest(
     markets: string[],
     initialCapital: number,
     resultCounts: number,
@@ -66,7 +67,7 @@ export async function risingVolatilityBreakoutWithAdjustmentBacktest(
         logResult(results);
     } catch (error) {
         console.error(
-            "Error risingVolatilityBreakoutWithAdjustmentBacktest: ",
+            "Error superRisingVolatilityBreakoutWithAdjustmentBacktest: ",
             error
         );
         return "Error in executing the strategy.";
@@ -82,7 +83,7 @@ async function backtest(
     transactionFee: number,
     size: number
 ) {
-    const avragePeriod = 5;
+    const avragePeriod = 20;
 
     const adjustedApiCounts = adjustApiCounts(resultCounts, avragePeriod);
     const candles: ICandle[] = await fetchDailyCandles(
@@ -158,9 +159,9 @@ function runStrategies(
     let tradeCount = 0;
     let winCount = 0;
 
-    const movingAverages = calculateMovingAverage(candles, avragePeriod).slice(
-        1
-    );
+    const movingAverages = calculateAllMovingAverages(candles, [3, 5, 10, 20]);
+
+    // console.log("candles", candles.length);
 
     candles.slice(avragePeriod).forEach((candle, index) => {
         const prevCandle = candles[index + avragePeriod - 1];
@@ -170,8 +171,15 @@ function runStrategies(
         // 각 화폐의 레인지 계산 (전일 고가 - 저가)
         const range = calculateRange(prevCandle);
 
-        // 각 화폐의 가격이 5일 이동 평균보다 높은지 여부 파악
-        const isOverMovingAverage = candle.trade_price > movingAverages[index];
+        // 각 화폐의 가격이 3, 5, 10, 20일 이동 평균보다 높은지 여부 파악
+        const movingAverages = calculateAllMovingAverages(
+            candles.slice(index, index + avragePeriod),
+            [3, 5, 10, 20]
+        );
+        const isOverMovingAverage = isAboveAllMovingAverages(
+            candle.trade_price,
+            movingAverages
+        );
 
         // 매수 : 실시간 가격 > 당일 시가 + (레인지 * k)
         const isBreakOut = checkBreakout(candle, range, k);
@@ -251,7 +259,9 @@ function calculateFinalMetrics(
 }
 
 function logResult(results: any[]) {
-    console.log(`\n🔔 상승장 + 변동성 돌파 + 변동성 조절 Backtest\n`);
+    console.log(
+        `\n🔔 슈퍼 상승장(4개 이동평균 상승장) + 변동성 돌파 + 변동성 조절 Backtest\n`
+    );
 
     results.forEach((result) => {
         console.log(`📈 [${result.market}]`);
@@ -271,6 +281,6 @@ function logResult(results: any[]) {
 
 /* (async () => {
     const markets = ["KRW-DOT"];
-    await volatilityBreakoutBacktest(markets, 100000, 30);
+    await superRisingVolatilityBreakoutWithAdjustmentBacktest(markets, 100000, 200);
 })();
  */

@@ -52,6 +52,8 @@ export function calculateMovingAverage(
         // );
     }
 
+    // console.log("calculateMovingAverage", data, period, movingAverages);
+
     return movingAverages;
 }
 

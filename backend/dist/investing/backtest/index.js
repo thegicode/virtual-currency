@@ -17,12 +17,13 @@ const checkMinutesMovingAverageBacktest_1 = require("./checkMinutesMovingAverage
 const movingAverageAndVolatilityBacktest_1 = require("./movingAverageAndVolatilityBacktest");
 const risingVolatilityBreakoutBacktest_1 = require("./risingVolatilityBreakoutBacktest");
 const risingVolatilityBreakoutWithAdjustmentBacktest_1 = require("./risingVolatilityBreakoutWithAdjustmentBacktest");
+const superRisingVolatilityBreakoutWithAdjustmentBacktest_1 = require("./superRisingVolatilityBreakoutWithAdjustmentBacktest");
 const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const initialCapital = 1000000;
         const markets = [
-            "KRW-DOT",
+            "KRW-SOL",
         ];
         const resultCounts = 100;
         console.log("-----------------------------------------");
@@ -40,6 +41,7 @@ const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
         yield (0, volatilityBreakoutBacktest_1.volatilityBreakoutBacktest)(markets, initialCapital, resultCounts);
         yield (0, risingVolatilityBreakoutBacktest_1.risingVolatilityBreakoutBacktest)(markets, initialCapital, resultCounts);
         yield (0, risingVolatilityBreakoutWithAdjustmentBacktest_1.risingVolatilityBreakoutWithAdjustmentBacktest)(markets, initialCapital, resultCounts);
+        yield (0, superRisingVolatilityBreakoutWithAdjustmentBacktest_1.superRisingVolatilityBreakoutWithAdjustmentBacktest)(markets, initialCapital, resultCounts);
     }
     catch (error) {
         console.error("Error during backtesting: ", error);

@@ -38,13 +38,13 @@ export {
         // "KRW-DOGE",
         // "KRW-TFUEL",
         // "KRW-CHZ",
-        // "KRW-1INCH",
-        // "KRW-SBD",
+        "KRW-1INCH",
+        "KRW-SBD",
         //
         // 다자 가상화폐 + 상승장 + 변동성 돌파
         // risingVolatilityBreakoutStrategy
         // 오전 9시 확인
-        "KRW-DOT",
+        // "KRW-DOT",
     ];
 
     const initialCapital = 100000;

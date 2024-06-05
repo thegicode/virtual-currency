@@ -18,7 +18,6 @@ import { fetchDailyCandles } from "../../services/api";
 import {
     calculateAdjustedInvestment,
     calculateAllMovingAverages,
-    calculateMovingAverage,
     calculateRange,
     checkBreakout,
     formatPrice,
@@ -74,7 +73,6 @@ async function generateSignal(
     size: number
 ) {
     const period = 20;
-    // const targetRate = 0.02;
 
     // fetch data
     const candles = await fetchDailyCandles(market, period.toString());
