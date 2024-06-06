@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.fiveDayVolumeMA_VolatilityBreakoutBactest = void 0;
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
-function fiveDayVolumeMA_VolatilityBreakoutBactest(markets, initialCapital, resultCounts, k = 0.5, targetRate = 0.02, transactionFee = 0.002) {
+function fiveDayVolumeMA_VolatilityBreakoutBactest(markets, initialCapital, resultCounts, k = 0.7, targetRate = 0.02, transactionFee = 0.002) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const results = yield Promise.all(markets.map((market) => __awaiter(this, void 0, void 0, function* () {
@@ -29,10 +29,13 @@ function fiveDayVolumeMA_VolatilityBreakoutBactest(markets, initialCapital, resu
 exports.fiveDayVolumeMA_VolatilityBreakoutBactest = fiveDayVolumeMA_VolatilityBreakoutBactest;
 function backtest(market, initialCapital, resultCounts, k, targetRate, transactionFee, size) {
     return __awaiter(this, void 0, void 0, function* () {
-        const avragePeriod = 5;
-        const adjustedApiCounts = (0, utils_1.adjustApiCounts)(resultCounts, avragePeriod);
+        const averagePeriod = 5;
+        const adjustedApiCounts = (0, utils_1.adjustApiCounts)(resultCounts, averagePeriod);
         const candles = yield (0, api_1.fetchDailyCandles)(market, adjustedApiCounts.toString());
-        const { tradesData, maxDrawdown } = runStrategies(market, candles, initialCapital, k, targetRate, size, avragePeriod);
+        if (candles.length < resultCounts) {
+            throw new Error(`Not enough data for ${market}`);
+        }
+        const { tradesData, maxDrawdown } = runStrategies(market, candles, initialCapital, k, targetRate, size, averagePeriod);
         const { firstDate, lastDate, finalCapital, performance, tradeCount, winRate, } = calculateFinalMetrics(tradesData, initialCapital / size);
         const results = tradesData.map((aData) => {
             return {
@@ -64,27 +67,27 @@ function backtest(market, initialCapital, resultCounts, k, targetRate, transacti
         };
     });
 }
-function runStrategies(market, candles, initialCapital, k, targetRate, size, avragePeriod) {
+function runStrategies(market, candles, initialCapital, k, targetRate, size, averagePeriod) {
     let tradesData = [];
     let mddPrices = [];
     let realCapital = initialCapital / size;
     let tradeCount = 0;
     let winCount = 0;
-    const movingAverages = (0, utils_1.calculateMovingAverage)(candles, avragePeriod).slice(1);
-    candles.slice(avragePeriod).forEach((candle, index) => {
-        const prevCandle = candles[index + avragePeriod - 1];
-        const nextCandle = candles[index + avragePeriod + 1] || candle;
-        const tradePrice = candle.trade_price;
+    const movingAverages = (0, utils_1.calculateMovingAverages)(candles, averagePeriod);
+    candles.slice(averagePeriod).forEach((candle, index) => {
+        const prevCandle = candles[index + averagePeriod - 1];
+        const nextCandle = candles[index + averagePeriod + 1] || candle;
+        const last5Candles = candles.slice(index, index + averagePeriod);
         const range = (0, utils_1.calculateRange)(prevCandle);
-        const isOverMovingAverage = candle.trade_price > movingAverages[index];
-        const volumeAverage = (0, utils_1.calculateVolumeAverage)(candles.slice(index + 1, index + avragePeriod + 1));
+        const isOverMovingAverage = prevCandle.trade_price > movingAverages[index].price;
+        const volumeAverage = (0, utils_1.calculateVolumeAverage)(last5Candles);
         const isOverVolumeAverage = prevCandle.candle_acc_trade_volume > volumeAverage;
         const isBreakOut = (0, utils_1.checkBreakout)(candle, range, k);
         let thisData = {};
         if (isOverMovingAverage && isOverVolumeAverage && isBreakOut) {
-            const buyPrice = tradePrice;
+            const buyPrice = nextCandle.opening_price;
             const { investment, prevVolatilityRate } = (0, utils_1.calculateAdjustedInvestment)(range, prevCandle, targetRate, size, realCapital);
-            const position = investment / tradePrice;
+            const position = investment / buyPrice;
             realCapital -= investment;
             const sellPrice = nextCandle.trade_price;
             const profit = (sellPrice - buyPrice) * position;
@@ -92,7 +95,7 @@ function runStrategies(market, candles, initialCapital, k, targetRate, size, avr
             tradeCount++;
             if (profit > 0)
                 winCount++;
-            mddPrices.push(tradePrice);
+            mddPrices.push(candle.trade_price);
             thisData = {
                 sellPrice,
                 position,
@@ -100,7 +103,7 @@ function runStrategies(market, candles, initialCapital, k, targetRate, size, avr
                 profit,
             };
         }
-        tradesData.push(Object.assign(Object.assign({}, thisData), { date: candle.date_time, price: tradePrice, range: range, capital: realCapital, tradeCount,
+        tradesData.push(Object.assign(Object.assign({}, thisData), { date: candle.date_time, price: candle.trade_price, range: range, capital: realCapital, tradeCount,
             winCount }));
     });
     const maxDrawdown = (0, utils_1.calculateMDD)(mddPrices);

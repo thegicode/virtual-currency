@@ -35,6 +35,43 @@ export function calculateCandleReturnRate(candles: ICandle[]): number {
 }
 
 // 이동평균선을 계산하는 함수
+interface IMovingAverageWithDate {
+    date_time: string;
+    price: number;
+}
+export function calculateMovingAverages(
+    data: ICandle[],
+    period: number = 3
+): IMovingAverageWithDate[] {
+    const movingAverages: IMovingAverageWithDate[] = [];
+
+    for (let i = 0; i <= data.length - period; i++) {
+        const slice = data.slice(i, i + period);
+
+        // console.log(
+        //     "calculateMovingAverages",
+        //     i,
+        //     data[i + period - 1].date_time
+        // );
+
+        const sum = slice.reduce((acc, cur) => acc + cur.trade_price, 0);
+
+        movingAverages.push({
+            date_time: data[i + period - 1].date_time,
+            price: sum / period,
+        });
+        // console.log(
+        //     i,
+        //     slice[slice.length - 1].candle_date_time_kst,
+        //     sum / period
+        // );
+    }
+
+    // console.log(movingAverages);
+
+    return movingAverages;
+}
+
 export function calculateMovingAverage(
     data: ICandle[],
     period: number = 3
@@ -63,6 +100,20 @@ export function calculateMovingAverage(
     // console.log(movingAverages);
 
     return movingAverages;
+}
+
+export function calculateMovingAverage2(
+    data: ICandle[],
+    period: number = 5
+): number {
+    if (data.length < period) {
+        throw new Error("Not enough data to calculate moving average");
+    }
+
+    const sum = data
+        .slice(-period)
+        .reduce((acc, cur) => acc + cur.trade_price, 0);
+    return sum / period;
 }
 
 export function calculateRiskAdjustedCapital(

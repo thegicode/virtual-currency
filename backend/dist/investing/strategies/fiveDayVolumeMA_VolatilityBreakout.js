@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.fiveDayVolumeMA_VolatilityBreakout = void 0;
 const api_1 = require("../../services/api");
 const utils_1 = require("../utils");
-function fiveDayVolumeMA_VolatilityBreakout(markets, initialCapital, k = 0.5, targetRate = 0.02) {
+function fiveDayVolumeMA_VolatilityBreakout(markets, initialCapital, k = 0.7, targetRate = 0.02) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const capital = initialCapital / markets.length;
@@ -31,16 +31,20 @@ exports.fiveDayVolumeMA_VolatilityBreakout = fiveDayVolumeMA_VolatilityBreakout;
 function generateSignal(market, capital, k, targetRate, size) {
     return __awaiter(this, void 0, void 0, function* () {
         const period = 5;
-        const candles = yield (0, api_1.fetchDailyCandles)(market, period.toString());
+        const candles = yield (0, api_1.fetchDailyCandles)(market, (period + 1).toString());
+        if (candles.length < 6) {
+            console.warn(`Not enough data for ${market}`);
+        }
+        const prevCandle = candles[candles.length - 2];
         const currentCandle = candles[candles.length - 1];
-        const prevCandle = candles[period - 2];
+        const last5Candles = candles.slice(-6, -1);
         const range = (0, utils_1.calculateRange)(prevCandle);
-        const movingAverage = (0, utils_1.calculateMovingAverage)(candles, period)[0];
-        const isOverMovingAverage = currentCandle.trade_price > movingAverage;
-        const volumeAverage = (0, utils_1.calculateVolumeAverage)(candles);
+        const priceMovingAverage = (0, utils_1.calculateMovingAverage2)(last5Candles, period);
+        const isOverPriceAverage = currentCandle.trade_price > priceMovingAverage;
+        const volumeAverage = (0, utils_1.calculateVolumeAverage)(last5Candles);
         const isOverVolumeAverage = prevCandle.candle_acc_trade_volume > volumeAverage;
         const isBreakOut = (0, utils_1.checkBreakout)(currentCandle, range, k);
-        const isBuySign = isOverMovingAverage && isOverVolumeAverage && isBreakOut ? true : false;
+        const isBuySign = isOverPriceAverage && isOverVolumeAverage && isBreakOut ? true : false;
         const { investment, prevVolatilityRate } = (0, utils_1.calculateAdjustedInvestment)(range, prevCandle, targetRate, size, capital);
         return {
             market,
@@ -70,3 +74,8 @@ function createMessage(results) {
         .join("\n");
     return `${title}${memo}${message}`;
 }
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    const markets = ["KRW-THETA"];
+    const result = yield fiveDayVolumeMA_VolatilityBreakout(markets, 100000);
+    console.log(result);
+}))();

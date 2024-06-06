@@ -29,23 +29,24 @@ export {
         // "KRW-NEAR",
         // "KRW-BTG",
         // "KRW-SHIB",
-        // "KRW-LINK",
         //
         // afternoonRiseMorningInvestment
         // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
         // 밤 12시에 확인
-        "KRW-BTC",
-        "KRW-ETH",
-        "KRW-DOGE",
-        "KRW-TFUEL",
-        "KRW-CHZ",
+        // "KRW-BTC",
+        // "KRW-ETH",
+        // "KRW-DOGE",
+        // "KRW-TFUEL",
         // "KRW-1INCH",
         // "KRW-SBD",
+
         //
         // 다자 가상화폐 + 상승장 + 변동성 돌파
         // risingVolatilityBreakoutStrategy
         // 오전 9시 확인
         // "KRW-DOT",
+        // "KRW-POLYX",
+        "KRW-STX",
     ];
 
     const initialCapital = 100000;
@@ -148,7 +149,7 @@ export {
     const results8 = await fiveDayVolumeMA_VolatilityBreakout(
         markets,
         initialCapital
-        // k = 0.5
+        // k = 0.7
         // targetRate = 0.02
     );
     console.log(results8);

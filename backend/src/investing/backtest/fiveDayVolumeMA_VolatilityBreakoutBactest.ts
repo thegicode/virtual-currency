@@ -13,6 +13,8 @@
  *          - 필자들은 k=0.7 추천
  *      - 자금관리 : 가상화폐별 투입 금액은 (타깃 변동성 / 전일 변동성)/투자 대상 가상화폐 수
  * 매도 : 다음날 시가
+ *
+ * 맞는 건지 확신이 안든다.
  */
 
 import { fetchDailyCandles } from "../../services/api";
@@ -20,7 +22,7 @@ import {
     adjustApiCounts,
     calculateAdjustedInvestment,
     calculateMDD,
-    calculateMovingAverage,
+    calculateMovingAverages,
     calculateRange,
     calculateVolumeAverage,
     checkBreakout,
@@ -45,7 +47,7 @@ export async function fiveDayVolumeMA_VolatilityBreakoutBactest(
     markets: string[],
     initialCapital: number,
     resultCounts: number,
-    k: number = 0.5,
+    k: number = 0.7,
     targetRate: number = 0.02,
     transactionFee: number = 0.002 // 0.2%
 ) {
@@ -84,13 +86,19 @@ async function backtest(
     transactionFee: number,
     size: number
 ) {
-    const avragePeriod = 5;
+    const averagePeriod = 5;
 
-    const adjustedApiCounts = adjustApiCounts(resultCounts, avragePeriod);
+    const adjustedApiCounts = adjustApiCounts(resultCounts, averagePeriod);
     const candles: ICandle[] = await fetchDailyCandles(
         market,
         adjustedApiCounts.toString()
     );
+
+    // console.log("candles", candles);
+
+    if (candles.length < resultCounts) {
+        throw new Error(`Not enough data for ${market}`);
+    }
 
     const { tradesData, maxDrawdown } = runStrategies(
         market,
@@ -99,7 +107,7 @@ async function backtest(
         k,
         targetRate,
         size,
-        avragePeriod
+        averagePeriod
     );
 
     const {
@@ -152,7 +160,7 @@ function runStrategies(
     k: number,
     targetRate: number,
     size: number,
-    avragePeriod: number
+    averagePeriod: number
 ) {
     let tradesData: ITradeData[] = [];
     let mddPrices: number[] = [];
@@ -160,34 +168,31 @@ function runStrategies(
     let tradeCount = 0;
     let winCount = 0;
 
-    const movingAverages = calculateMovingAverage(candles, avragePeriod).slice(
-        1
-    );
+    const movingAverages = calculateMovingAverages(candles, averagePeriod);
 
-    // console.log("movingAverages", movingAverages.length);
-    // console.log("candle", candles.slice(avragePeriod));
+    // console.log("movingAverages", movingAverages);
 
-    candles.slice(avragePeriod).forEach((candle, index) => {
-        // console.log(candle.date_time);
-        const prevCandle = candles[index + avragePeriod - 1];
-        const nextCandle = candles[index + avragePeriod + 1] || candle;
-        const tradePrice = candle.trade_price;
+    candles.slice(averagePeriod).forEach((candle, index) => {
+        const prevCandle = candles[index + averagePeriod - 1];
+        const nextCandle = candles[index + averagePeriod + 1] || candle;
+        const last5Candles = candles.slice(index, index + averagePeriod);
+
+        // console.log("prevCandle", prevCandle.date_time);
+        // console.log("last5Candles", last5Candles);
 
         // 각 화폐의 레인지 계산 (전일 고가 - 저가)
         const range = calculateRange(prevCandle);
 
         // 각 화폐의 가격이 5일 이동 평균보다 높은지 여부 파악
-        const isOverMovingAverage = candle.trade_price > movingAverages[index];
+        const isOverMovingAverage =
+            prevCandle.trade_price > movingAverages[index].price;
+        // console.log(
+        //     "check",
+        //     prevCandle.date_time === movingAverages[index].date_time
+        // );
 
         // 각 화폐의 전일 거래량이 5일 거래량 이동평균보다 많은지 여부 파악
-        // console.log(
-        //     "slcie",
-        //     index,
-        //     candles.slice(index + 1, index + avragePeriod + 1)
-        // );
-        const volumeAverage = calculateVolumeAverage(
-            candles.slice(index + 1, index + avragePeriod + 1)
-        );
+        const volumeAverage = calculateVolumeAverage(last5Candles);
         const isOverVolumeAverage =
             prevCandle.candle_acc_trade_volume > volumeAverage;
 
@@ -196,9 +201,13 @@ function runStrategies(
 
         let thisData: any = {};
 
+        // console.log("isOverMovingAverage", isOverMovingAverage);
+        // console.log("isOverVolumeAverage", isOverVolumeAverage);
+        // console.log("isBreakOut", isBreakOut);
+
         if (isOverMovingAverage && isOverVolumeAverage && isBreakOut) {
             // 매수
-            const buyPrice = tradePrice;
+            const buyPrice = nextCandle.opening_price;
             const { investment, prevVolatilityRate } =
                 calculateAdjustedInvestment(
                     range,
@@ -207,7 +216,7 @@ function runStrategies(
                     size,
                     realCapital
                 );
-            const position = investment / tradePrice;
+            const position = investment / buyPrice;
             realCapital -= investment;
 
             // 메도
@@ -219,7 +228,7 @@ function runStrategies(
             tradeCount++;
             if (profit > 0) winCount++;
 
-            mddPrices.push(tradePrice);
+            mddPrices.push(candle.trade_price);
 
             thisData = {
                 sellPrice,
@@ -232,7 +241,7 @@ function runStrategies(
         tradesData.push({
             ...thisData,
             date: candle.date_time,
-            price: tradePrice,
+            price: candle.trade_price,
             range: range,
             capital: realCapital,
             tradeCount,
@@ -290,7 +299,7 @@ function logResult(results: any[]) {
 }
 
 /* (async () => {
-    const markets = ["KRW-DOT"];
+    const markets = ["KRW-NEAR"];
     await fiveDayVolumeMA_VolatilityBreakoutBactest(markets, 100000, 200);
 })();
  */

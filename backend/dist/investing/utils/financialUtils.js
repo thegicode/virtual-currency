@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isAboveAllMovingAverages = exports.calculateVolumeAverage = exports.calculateVolume = exports.calculateVolatility = exports.calculateRiskAdjustedCapital = exports.calculateMovingAverage = exports.calculateCandleReturnRate = exports.calculateAllMovingAverages = void 0;
+exports.isAboveAllMovingAverages = exports.calculateVolumeAverage = exports.calculateVolume = exports.calculateVolatility = exports.calculateRiskAdjustedCapital = exports.calculateMovingAverage2 = exports.calculateMovingAverage = exports.calculateMovingAverages = exports.calculateCandleReturnRate = exports.calculateAllMovingAverages = void 0;
 function calculateAllMovingAverages(candles, periods) {
     const movingAverages = {};
     periods.forEach((period) => {
@@ -15,6 +15,19 @@ function calculateCandleReturnRate(candles) {
     return (closePrice - openPrice) / openPrice;
 }
 exports.calculateCandleReturnRate = calculateCandleReturnRate;
+function calculateMovingAverages(data, period = 3) {
+    const movingAverages = [];
+    for (let i = 0; i <= data.length - period; i++) {
+        const slice = data.slice(i, i + period);
+        const sum = slice.reduce((acc, cur) => acc + cur.trade_price, 0);
+        movingAverages.push({
+            date_time: data[i + period - 1].date_time,
+            price: sum / period,
+        });
+    }
+    return movingAverages;
+}
+exports.calculateMovingAverages = calculateMovingAverages;
 function calculateMovingAverage(data, period = 3) {
     const movingAverages = [];
     for (let i = 0; i <= data.length - period; i++) {
@@ -25,6 +38,16 @@ function calculateMovingAverage(data, period = 3) {
     return movingAverages;
 }
 exports.calculateMovingAverage = calculateMovingAverage;
+function calculateMovingAverage2(data, period = 5) {
+    if (data.length < period) {
+        throw new Error("Not enough data to calculate moving average");
+    }
+    const sum = data
+        .slice(-period)
+        .reduce((acc, cur) => acc + cur.trade_price, 0);
+    return sum / period;
+}
+exports.calculateMovingAverage2 = calculateMovingAverage2;
 function calculateRiskAdjustedCapital(targetVolatility, volatility, size, initialCapital) {
     if (volatility === 0 || size === 0) {
         return 0;

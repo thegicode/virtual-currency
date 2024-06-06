@@ -19,6 +19,7 @@ import { fetchDailyCandles } from "../../services/api";
 import {
     calculateAdjustedInvestment,
     calculateMovingAverage,
+    calculateMovingAverage2,
     calculateRange,
     calculateVolumeAverage,
     checkBreakout,
@@ -38,7 +39,7 @@ interface IResult {
 export async function fiveDayVolumeMA_VolatilityBreakout(
     markets: string[],
     initialCapital: number,
-    k: number = 0.5,
+    k: number = 0.7,
     targetRate: number = 0.02
 ) {
     try {
@@ -71,23 +72,32 @@ async function generateSignal(
     size: number
 ) {
     const period = 5;
-    // const targetRate = 0.02;
 
     // fetch data
-    const candles = await fetchDailyCandles(market, period.toString());
+    const candles = await fetchDailyCandles(market, (period + 1).toString());
 
+    if (candles.length < 6) {
+        console.warn(`Not enough data for ${market}`);
+        // return { market, signal: "No Data" };
+    }
+
+    const prevCandle = candles[candles.length - 2];
     const currentCandle = candles[candles.length - 1];
-    const prevCandle = candles[period - 2];
+    const last5Candles = candles.slice(-6, -1);
+
+    // console.log("prevCandle", prevCandle); // 5
+    // console.log("currentCandle", currentCandle); // 6
+    // console.log("last5Candles", last5Candles); // 1-5
 
     // 각 화폐의 레인지 계산 (전일 고가 - 저가)
     const range = calculateRange(prevCandle);
 
     // 각 화폐의 가격이 5일 이동 평균보다 높은지 여부 파악
-    const movingAverage = calculateMovingAverage(candles, period)[0];
-    const isOverMovingAverage = currentCandle.trade_price > movingAverage;
+    const priceMovingAverage = calculateMovingAverage2(last5Candles, period);
+    const isOverPriceAverage = currentCandle.trade_price > priceMovingAverage;
 
     // 각 화폐의 전일 거래량이 5일 거래량 이동평균보다 많은지 여부 파악
-    const volumeAverage = calculateVolumeAverage(candles);
+    const volumeAverage = calculateVolumeAverage(last5Candles);
     const isOverVolumeAverage =
         prevCandle.candle_acc_trade_volume > volumeAverage;
 
@@ -96,7 +106,7 @@ async function generateSignal(
 
     // 매수 신호 확인
     const isBuySign =
-        isOverMovingAverage && isOverVolumeAverage && isBreakOut ? true : false;
+        isOverPriceAverage && isOverVolumeAverage && isBreakOut ? true : false;
 
     // 투자 금액
     const { investment, prevVolatilityRate } = calculateAdjustedInvestment(
@@ -137,9 +147,8 @@ function createMessage(results: IResult[]) {
     return `${title}${memo}${message}`;
 }
 
-/* (async () => {
+(async () => {
     const markets = ["KRW-THETA"];
     const result = await fiveDayVolumeMA_VolatilityBreakout(markets, 100000);
     console.log(result);
 })();
- */

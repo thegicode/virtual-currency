@@ -23,10 +23,10 @@ const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const initialCapital = 1000000;
+        const resultCounts = 200;
         const markets = [
-            "KRW-SOL",
+            "KRW-DOT",
         ];
-        const resultCounts = 100;
         console.log("-----------------------------------------");
         console.log("initialCapital : ", initialCapital);
         console.log("resultCounts : ", resultCounts);
