@@ -24,9 +24,7 @@ export async function fetchMarketsAndBacktest(
     days: number = 31 // 과거 days간의 데이터 사용
 ) {
     // const markets = await fetchMarketAll();
-    // const selectedMarkets = markets
-    // .slice(40, 50)
-    // .map((market: IMarket) => market.market);
+    // const selectedMarkets = markets.map((market: IMarket) => market.market);
     const selectedMarkets = [
         "KRW-SOL",
         "KRW-AVAX",
@@ -36,17 +34,14 @@ export async function fetchMarketsAndBacktest(
         "KRW-NEAR",
         "KRW-BTG",
         "KRW-SHIB",
-        "KRW-LINK",
         "KRW-BTC",
         "KRW-ETH",
         "KRW-DOGE",
         "KRW-TFUEL",
-        "KRW-SBD",
-        "KRW-CHZ",
         "KRW-1INCH",
         "KRW-DOT",
+        "KRW-POLYX",
     ];
-    console.log(selectedMarkets);
     return momentumStrategyBacktest(selectedMarkets, initialCapital, days);
 }
 
@@ -97,7 +92,7 @@ async function momentumStrategyBacktest(
             (result) => result.returnRate < 0
         );
 
-        if (day === 42) console.log("topMarkets", topMarkets);
+        console.log("topMarkets", topMarkets);
 
         // if (allNegative) {
         //     // 모든 가상화폐의 30일 수익률이 마이너스인 경우

@@ -22,17 +22,14 @@ function fetchMarketsAndBacktest(initialCapital, days = 31) {
             "KRW-NEAR",
             "KRW-BTG",
             "KRW-SHIB",
-            "KRW-LINK",
             "KRW-BTC",
             "KRW-ETH",
             "KRW-DOGE",
             "KRW-TFUEL",
-            "KRW-SBD",
-            "KRW-CHZ",
             "KRW-1INCH",
             "KRW-DOT",
+            "KRW-POLYX",
         ];
-        console.log(selectedMarkets);
         return momentumStrategyBacktest(selectedMarkets, initialCapital, days);
     });
 }
@@ -70,8 +67,7 @@ function momentumStrategyBacktest(markets, initialCapital, days) {
                 .filter((result) => result.returnRate > 0)
                 .slice(0, 5);
             const allNegative = sortedResults.every((result) => result.returnRate < 0);
-            if (day === 42)
-                console.log("topMarkets", topMarkets);
+            console.log("topMarkets", topMarkets);
             const newPositions = {};
             topMarkets.forEach((result) => {
                 const market = result.market;
