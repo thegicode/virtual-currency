@@ -9,10 +9,6 @@ const {
     fetchMarketAll,
 } = require("./index");
 
-const {
-    handleDailyMABacktest,
-} = require("../backend/dist/controllers/dailyMovingAverageBacktestController");
-
 const setupApiEndpoints = (app) => {
     app.get("/fetchAccounts", fetchAccounts);
     app.get("/fetchCancel", fetchCancel);
@@ -23,7 +19,6 @@ const setupApiEndpoints = (app) => {
     app.get("/fetchOrders", fetchOrders);
     app.get("/fetchMarketAll", fetchMarketAll);
     // app.get("/fetchChance", fetchChance);
-    app.get("/fetchDailyMABacktest", handleDailyMABacktest);
 };
 
 module.exports = setupApiEndpoints;
