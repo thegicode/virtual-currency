@@ -6,7 +6,11 @@ function calculateNoise(candle) {
     const body = candle.opening_price - candle.trade_price;
     return 1 - Math.abs(body) / range;
 }
-function calculateAverageNoise(candles) {
+function calculateAverageNoise(candles, market) {
+    if (!candles) {
+        console.warn("no candles in ", market);
+        return;
+    }
     const noiseValues = candles.map(calculateNoise);
     const totalNoise = noiseValues.reduce((sum, noise) => sum + noise, 0);
     return totalNoise / noiseValues.length;

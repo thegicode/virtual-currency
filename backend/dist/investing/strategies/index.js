@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.executeMovingAverageAndVolatility = exports.checkMinutesMovingAverage = exports.checkDailyMovingAverage = void 0;
 const afternoonRiseMorningInvestment_1 = require("./afternoonRiseMorningInvestment");
+const averageNoiseRatioSignalCheck_1 = require("./averageNoiseRatioSignalCheck");
 const checkDailyMovingAverage_1 = require("./checkDailyMovingAverage");
 Object.defineProperty(exports, "checkDailyMovingAverage", { enumerable: true, get: function () { return checkDailyMovingAverage_1.checkDailyMovingAverage; } });
 const checkMinutesMovingAverage_1 = require("./checkMinutesMovingAverage");
@@ -24,6 +25,16 @@ const superRisingVolatilityBreakoutWithAdjustment_1 = require("./superRisingVola
 const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const markets = [
+        "KRW-SOL",
+        "KRW-AVAX",
+        "KRW-BCH",
+        "KRW-ZRX",
+        "KRW-THETA",
+        "KRW-NEAR",
+        "KRW-BTG",
+        "KRW-SHIB",
+        "KRW-DOT",
+        "KRW-POLYX",
         "KRW-STX",
     ];
     const initialCapital = 100000;
@@ -59,4 +70,6 @@ const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
     console.log(results7);
     const results8 = yield (0, fiveDayVolumeMA_VolatilityBreakout_1.fiveDayVolumeMA_VolatilityBreakout)(markets, initialCapital);
     console.log(results8);
+    const results9 = yield (0, averageNoiseRatioSignalCheck_1.averageNoiseRatioSignalCheck)(markets, initialCapital);
+    console.log(results9);
 }))();

@@ -15,7 +15,11 @@ function calculateNoise(candle: ICandle) {
 }
 
 // 노이즈 평균 계산하기
-export function calculateAverageNoise(candles: ICandle[]) {
+export function calculateAverageNoise(candles: ICandle[], market: string) {
+    if (!candles) {
+        console.warn("no candles in ", market);
+        return;
+    }
     const noiseValues = candles.map(calculateNoise);
     const totalNoise = noiseValues.reduce((sum, noise) => sum + noise, 0);
     return totalNoise / noiseValues.length;

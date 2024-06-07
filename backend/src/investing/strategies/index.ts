@@ -1,6 +1,7 @@
 // strategies
 import { sendTelegramMessageToChatId } from "../../notifications";
 import { afternoonRiseMorningInvestment } from "./afternoonRiseMorningInvestment";
+import { averageNoiseRatioSignalCheck } from "./averageNoiseRatioSignalCheck";
 import { checkDailyMovingAverage } from "./checkDailyMovingAverage";
 import { checkMinutesMovingAverage } from "./checkMinutesMovingAverage";
 import { fiveDayVolumeMA_VolatilityBreakout } from "./fiveDayVolumeMA_VolatilityBreakout";
@@ -21,14 +22,14 @@ export {
         // checkDailyMovingAverage
         // 일캔들 기준 5일 이동평균 확인
         // 오전 9시 확인
-        // "KRW-SOL",
-        // "KRW-AVAX",
-        // "KRW-BCH",
-        // "KRW-ZRX",
-        // "KRW-THETA",
-        // "KRW-NEAR",
-        // "KRW-BTG",
-        // "KRW-SHIB",
+        "KRW-SOL",
+        "KRW-AVAX",
+        "KRW-BCH",
+        "KRW-ZRX",
+        "KRW-THETA",
+        "KRW-NEAR",
+        "KRW-BTG",
+        "KRW-SHIB",
         //
         // afternoonRiseMorningInvestment
         // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
@@ -39,13 +40,12 @@ export {
         // "KRW-TFUEL",
         // "KRW-1INCH",
         // "KRW-SBD",
-
         //
         // 다자 가상화폐 + 상승장 + 변동성 돌파
         // risingVolatilityBreakoutStrategy
         // 오전 9시 확인
-        // "KRW-DOT",
-        // "KRW-POLYX",
+        "KRW-DOT",
+        "KRW-POLYX",
         "KRW-STX",
     ];
 
@@ -125,7 +125,7 @@ export {
 
     console.log("---------------------------------------------------");
 
-    // 상승장 + 변동성 돌파 + 변동성 조절
+    // *** 상승장 + 변동성 돌파 + 변동성 조절
     const results6 = await risingVolatilityBreakoutWithAdjustment(
         markets,
         initialCapital
@@ -153,4 +153,13 @@ export {
         // targetRate = 0.02
     );
     console.log(results8);
+
+    // 다자 가상화폐 + 평균 노이즈 비율 : 변동성 돌파에 유리한 종목을 노이즈 비율로 걸러낸다.
+    const results9 = await averageNoiseRatioSignalCheck(
+        markets,
+        initialCapital
+        // k = 0.5
+        // targetRate = 0.01
+    );
+    console.log(results9);
 })();
