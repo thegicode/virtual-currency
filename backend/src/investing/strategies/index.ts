@@ -22,14 +22,8 @@ export {
         // checkDailyMovingAverage
         // 일캔들 기준 5일 이동평균 확인
         // 오전 9시 확인
-        "KRW-SOL",
-        "KRW-AVAX",
-        "KRW-BCH",
-        "KRW-ZRX",
-        "KRW-THETA",
-        "KRW-NEAR",
-        "KRW-BTG",
-        "KRW-SHIB",
+        // "KRW-AVAX",
+        // "KRW-BTG",
         //
         // afternoonRiseMorningInvestment
         // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
@@ -37,16 +31,22 @@ export {
         // "KRW-BTC",
         // "KRW-ETH",
         // "KRW-DOGE",
+        // "KRW-SOL",
+        // "KRW-BCH",
         // "KRW-TFUEL",
         // "KRW-1INCH",
-        // "KRW-SBD",
+        // "KRW-THETA",
+        // "KRW-NEAR",
         //
         // 다자 가상화폐 + 상승장 + 변동성 돌파
         // risingVolatilityBreakoutStrategy
-        // 오전 9시 확인
+        // 낮 12시 확인?
         "KRW-DOT",
         "KRW-POLYX",
         "KRW-STX",
+        "KRW-ZRX",
+        "KRW-SHIB",
+        "KRW-AERGO",
     ];
 
     const initialCapital = 100000;
@@ -119,7 +119,6 @@ export {
         markets,
         initialCapital
         // k = 0.5
-        // targetRate = 0.02
     );
     console.log(results5);
 

@@ -74,8 +74,3 @@ function createMessage(results) {
         .join("\n");
     return `${title}${memo}${message}`;
 }
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    const markets = ["KRW-THETA"];
-    const result = yield fiveDayVolumeMA_VolatilityBreakout(markets, 100000);
-    console.log(result);
-}))();

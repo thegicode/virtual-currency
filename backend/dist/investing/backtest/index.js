@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkDailyMovingAverageBacktest = void 0;
 const afternoonRiseStrategyBacktest_1 = require("./afternoonRiseStrategyBacktest");
+const averageNoiseRatioSignalCheckBacktest_1 = require("./averageNoiseRatioSignalCheckBacktest");
 const checkDailyMovingAverageBacktest_1 = require("./checkDailyMovingAverageBacktest");
 Object.defineProperty(exports, "checkDailyMovingAverageBacktest", { enumerable: true, get: function () { return checkDailyMovingAverageBacktest_1.checkDailyMovingAverageBacktest; } });
 const checkMinutesMovingAverageBacktest_1 = require("./checkMinutesMovingAverageBacktest");
@@ -23,11 +24,9 @@ const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const initialCapital = 1000000;
-        const resultCounts = 100;
+        const resultCounts = 200;
         const markets = [
-            "KRW-BCH",
-            "KRW-NEAR",
-            "KRW-BTG",
+            "KRW-POLYX",
         ];
         console.log("-----------------------------------------");
         console.log("initialCapital : ", initialCapital);
@@ -46,6 +45,7 @@ const volatilityBreakoutBacktest_1 = require("./volatilityBreakoutBacktest");
         yield (0, risingVolatilityBreakoutWithAdjustmentBacktest_1.risingVolatilityBreakoutWithAdjustmentBacktest)(markets, initialCapital, resultCounts);
         yield (0, superRisingVolatilityBreakoutWithAdjustmentBacktest_1.superRisingVolatilityBreakoutWithAdjustmentBacktest)(markets, initialCapital, resultCounts);
         yield (0, fiveDayVolumeMA_VolatilityBreakoutBactest_1.fiveDayVolumeMA_VolatilityBreakoutBactest)(markets, initialCapital, resultCounts);
+        yield (0, averageNoiseRatioSignalCheckBacktest_1.averageNoiseRatioSignalCheckBacktest)(markets, initialCapital, resultCounts);
     }
     catch (error) {
         console.error("Error during backtesting: ", error);

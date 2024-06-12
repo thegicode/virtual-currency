@@ -69,10 +69,11 @@ export async function averageNoiseRatioSignalCheck(
 }
 
 async function getNoiseAverages(market: string) {
-    const candles = await fetchDailyCandles(market, (31).toString());
+    const candles = await fetchDailyCandles(market, (30).toString());
 
     // 각 종목의 30일 평균 노이즈 값 산출
-    const noiseAverage = calculateAverageNoise(candles, market) ?? 0;
+    // 마지막 30일은 오늘인가? 어제인가? - 일단 오늘로
+    const noiseAverage = calculateAverageNoise(candles, market);
 
     return {
         market,
@@ -159,15 +160,33 @@ function createMessage(results: IResult[]) {
     return `${title}${memo}${message}`;
 }
 
-// (async () => {
-//     const markets = [
-//         "KRW-BTC",
-//         "KRW-ETH",
-//         "KRW-DOGE",
-//         "KRW-TFUEL",
-//         "KRW-1INCH",
-//         "KRW-SBD",
-//     ];
-//     const result = await averageNoiseRatioSignalCheck(markets, 100000);
-//     console.log(result);
-// })();
+(async () => {
+    const markets = [
+        "KRW-AVAX",
+        "KRW-BTG",
+        "KRW-BTC",
+        "KRW-ETH",
+        "KRW-DOGE",
+        "KRW-SOL",
+        "KRW-BCH",
+        "KRW-TFUEL",
+        "KRW-1INCH",
+        "KRW-THETA",
+        "KRW-NEAR",
+        "KRW-SHIB",
+        "KRW-SBD",
+        "KRW-DOT",
+        "KRW-POLYX",
+        "KRW-STX",
+        "KRW-ZRX",
+        "KRW-SHIB",
+    ];
+
+    // const markets = await fetchMarketAll();
+
+    const result = await averageNoiseRatioSignalCheck(
+        markets.slice(0, 10),
+        100000
+    );
+    console.log(result);
+})();

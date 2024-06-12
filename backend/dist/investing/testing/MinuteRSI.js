@@ -15,7 +15,7 @@ const RSI_PERIOD = 14;
 const OVERBOUGHT_THRESHOLD = 70;
 const OVERSOLD_THRESHOLD = 30;
 const INITIAL_CAPITAL = 10000;
-const MARKETS = ["KRW-SBD"];
+const MARKETS = ["KRW-KNC"];
 runBacktests().catch((error) => console.error(error));
 setInterval(runBacktests, 60 * 1000);
 function runBacktests() {

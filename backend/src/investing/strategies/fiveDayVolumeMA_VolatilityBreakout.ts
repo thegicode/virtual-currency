@@ -146,9 +146,10 @@ function createMessage(results: IResult[]) {
         .join("\n");
     return `${title}${memo}${message}`;
 }
-
+/* 
 (async () => {
     const markets = ["KRW-THETA"];
     const result = await fiveDayVolumeMA_VolatilityBreakout(markets, 100000);
     console.log(result);
 })();
+ */

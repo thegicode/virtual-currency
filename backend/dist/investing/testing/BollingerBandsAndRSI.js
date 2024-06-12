@@ -13,7 +13,7 @@ const api_1 = require("../../services/api");
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     function fetchData() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield (0, api_1.fetchDailyCandles)("KRW-SBD", "200");
+            return yield (0, api_1.fetchDailyCandles)("KRW-SOL", "200");
         });
     }
     const data = yield fetchData();

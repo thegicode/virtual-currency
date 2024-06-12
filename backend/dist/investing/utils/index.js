@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateRange = exports.checkBreakout = exports.calculateAverageNoise = exports.formatPrice = exports.calculateMDD = exports.calculateBollingerBands = exports.calculateAdjustedInvestment = exports.isAboveAllMovingAverages = exports.calculateVolumeAverage = exports.calculateVolume = exports.calculateVolatility = exports.calculateRiskAdjustedCapital = exports.calculateMovingAverages = exports.calculateMovingAverage2 = exports.calculateMovingAverage = exports.calculateCandleReturnRate = exports.calculateAllMovingAverages = exports.formatTimeString = exports.formatDateString = exports.retryFetch = exports.adjustApiCounts = void 0;
+exports.calculateRange = exports.checkBreakout2 = exports.checkBreakout = exports.calculateAverageNoise = exports.formatPrice = exports.calculateMDD = exports.calculateBollingerBands = exports.calculateAdjustedInvestment = exports.isAboveAllMovingAverages = exports.calculateVolumeAverage = exports.calculateVolume = exports.calculateVolatility = exports.calculateRiskAdjustedCapital = exports.calculateMovingAverages = exports.calculateMovingAverage2 = exports.calculateMovingAverage = exports.calculateCandleReturnRate = exports.calculateAllMovingAverages = exports.formatTimeString = exports.formatDateString = exports.retryFetch = exports.adjustApiCounts = void 0;
 const ApiUtils_1 = require("./ApiUtils");
 Object.defineProperty(exports, "adjustApiCounts", { enumerable: true, get: function () { return ApiUtils_1.adjustApiCounts; } });
 Object.defineProperty(exports, "retryFetch", { enumerable: true, get: function () { return ApiUtils_1.retryFetch; } });
@@ -28,3 +28,4 @@ const TradingUtils_1 = require("./TradingUtils");
 Object.defineProperty(exports, "calculateAverageNoise", { enumerable: true, get: function () { return TradingUtils_1.calculateAverageNoise; } });
 Object.defineProperty(exports, "calculateRange", { enumerable: true, get: function () { return TradingUtils_1.calculateRange; } });
 Object.defineProperty(exports, "checkBreakout", { enumerable: true, get: function () { return TradingUtils_1.checkBreakout; } });
+Object.defineProperty(exports, "checkBreakout2", { enumerable: true, get: function () { return TradingUtils_1.checkBreakout2; } });

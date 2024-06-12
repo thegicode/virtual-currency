@@ -69,7 +69,7 @@ function bollingerBandsBacktest(market, initialCapital, days = 200, period = 20)
 }
 exports.bollingerBandsBacktest = bollingerBandsBacktest;
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const market = "KRW-SBD";
+    const market = "KRW-AVAX";
     const initialCapital = 1000000;
     const days = 100;
     const backtestResult = yield bollingerBandsBacktest(market, initialCapital, days);

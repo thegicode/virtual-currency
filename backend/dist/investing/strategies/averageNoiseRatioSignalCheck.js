@@ -28,10 +28,9 @@ function averageNoiseRatioSignalCheck(markets, initialCapital, k = 0.5, targetRa
 }
 exports.averageNoiseRatioSignalCheck = averageNoiseRatioSignalCheck;
 function getNoiseAverages(market) {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const candles = yield (0, api_1.fetchDailyCandles)(market, (31).toString());
-        const noiseAverage = (_a = (0, utils_1.calculateAverageNoise)(candles, market)) !== null && _a !== void 0 ? _a : 0;
+        const candles = yield (0, api_1.fetchDailyCandles)(market, (30).toString());
+        const noiseAverage = (0, utils_1.calculateAverageNoise)(candles, market);
         return {
             market,
             candles,
@@ -83,3 +82,27 @@ function createMessage(results) {
         .join("\n");
     return `${title}${memo}${message}`;
 }
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    const markets = [
+        "KRW-AVAX",
+        "KRW-BTG",
+        "KRW-BTC",
+        "KRW-ETH",
+        "KRW-DOGE",
+        "KRW-SOL",
+        "KRW-BCH",
+        "KRW-TFUEL",
+        "KRW-1INCH",
+        "KRW-THETA",
+        "KRW-NEAR",
+        "KRW-SHIB",
+        "KRW-SBD",
+        "KRW-DOT",
+        "KRW-POLYX",
+        "KRW-STX",
+        "KRW-ZRX",
+        "KRW-SHIB",
+    ];
+    const result = yield averageNoiseRatioSignalCheck(markets.slice(0, 10), 100000);
+    console.log(result);
+}))();

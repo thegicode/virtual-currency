@@ -18,7 +18,7 @@ function calculateNoise(candle: ICandle) {
 export function calculateAverageNoise(candles: ICandle[], market: string) {
     if (!candles) {
         console.warn("no candles in ", market);
-        return;
+        return 0;
     }
     const noiseValues = candles.map(calculateNoise);
     const totalNoise = noiseValues.reduce((sum, noise) => sum + noise, 0);
@@ -28,6 +28,15 @@ export function calculateAverageNoise(candles: ICandle[], market: string) {
 // 돌파 확인
 export function checkBreakout(candle: ICandle, range: number, k: number) {
     return candle.trade_price > candle.opening_price + range * k;
+}
+
+export function checkBreakout2(
+    realPrice: number,
+    candle: ICandle,
+    range: number,
+    k: number
+) {
+    return realPrice > candle.opening_price + range * k;
 }
 
 // candle 레인지 계산

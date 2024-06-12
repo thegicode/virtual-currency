@@ -5,7 +5,7 @@ const RSI_PERIOD = 14; // RSI 기간
 const OVERBOUGHT_THRESHOLD = 70; // 과매수 기준
 const OVERSOLD_THRESHOLD = 30; //  과매도 기준
 const INITIAL_CAPITAL = 10000; // 초기 자본
-const MARKETS = ["KRW-SBD"]; // 대상 코인 목록
+const MARKETS = ["KRW-KNC"]; // 대상 코인 목록
 
 // 초기 실행
 runBacktests().catch((error) => console.error(error));

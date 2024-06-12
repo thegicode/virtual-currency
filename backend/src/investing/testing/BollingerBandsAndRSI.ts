@@ -4,7 +4,7 @@ const start = async () => {
     //  볼린저 밴드와 RSI 결합 전략
 
     async function fetchData() {
-        return await fetchDailyCandles("KRW-SBD", "200");
+        return await fetchDailyCandles("KRW-SOL", "200");
     }
 
     const data = await fetchData();
