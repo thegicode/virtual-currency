@@ -12,9 +12,6 @@
  *      6. 선정된 n개 종목의 돌파 전략 수익 곡선에 n분의 1 자금 투입
  *      7. 30일 평균 노이즈 값이 가장 작으면서, 노이즈 값이 특정 역치 이하인 경우만 진입
  *      8. 매도 : 다음 날 시가
- *
- * 일봉 계산으로 정확하지 않다.
- * 분캔들로 작업 수정
  */
 
 import { fetchDailyCandles } from "../../services/api";
@@ -22,7 +19,6 @@ import {
     adjustApiCounts,
     calculateAdjustedInvestment,
     calculateAverageNoise,
-    calculateMDD,
     calculateMovingAverage2,
     calculateRange,
     checkBreakout,
@@ -96,7 +92,7 @@ export async function averageNoiseRatioSignalCheckBacktest(
         const filterdData = filterAndSortMarketsByNoise(dateNoiseData);
 
         // Run backtest
-        const results = await runBacktest(
+        const { results, tradeData } = await runBacktest(
             marketsCandles,
             filterdData,
             initialCapital,
@@ -106,6 +102,8 @@ export async function averageNoiseRatioSignalCheckBacktest(
             transactionFee,
             markets.length
         );
+
+        // console.table(tradeData);
 
         // Log the results
         logResult(results);
@@ -218,13 +216,14 @@ async function runBacktest(
         };
     });
 
-    console.table(tradeData);
-
     const finalMetrics = calculateFinalMetrics(signalData, initialCapital);
 
     return {
-        ...finalMetrics,
-        maxDrawdown,
+        results: {
+            ...finalMetrics,
+            maxDrawdown,
+        },
+        tradeData,
     };
 }
 

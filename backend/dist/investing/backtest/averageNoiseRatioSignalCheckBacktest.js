@@ -18,7 +18,7 @@ function averageNoiseRatioSignalCheckBacktest(markets, initialCapital, resultCou
             const marketsCandles = yield Promise.all(markets.map((market) => getCandles(market, resultCounts)));
             const dateNoiseData = generateDateNoiseData(marketsCandles, resultCounts);
             const filterdData = filterAndSortMarketsByNoise(dateNoiseData);
-            const results = yield runBacktest(marketsCandles, filterdData, initialCapital, resultCounts, k, targetRate, transactionFee, markets.length);
+            const { results, tradeData } = yield runBacktest(marketsCandles, filterdData, initialCapital, resultCounts, k, targetRate, transactionFee, markets.length);
             logResult(results);
         }
         catch (error) {
@@ -95,9 +95,11 @@ function runBacktest(marketsCandles, dateNoiseData, initialCapital, resultCounts
                 winCount: aData.winCount,
             };
         });
-        console.table(tradeData);
         const finalMetrics = calculateFinalMetrics(signalData, initialCapital);
-        return Object.assign(Object.assign({}, finalMetrics), { maxDrawdown });
+        return {
+            results: Object.assign(Object.assign({}, finalMetrics), { maxDrawdown }),
+            tradeData,
+        };
     });
 }
 function runStrategies(marketsCandles, dateNoiseData, capital, resultCounts, k, targetRate, transactionFee, size) {
