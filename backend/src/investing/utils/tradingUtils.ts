@@ -30,15 +30,6 @@ export function checkBreakout(candle: ICandle, range: number, k: number) {
     return candle.trade_price > candle.opening_price + range * k;
 }
 
-export function checkBreakout2(
-    realPrice: number,
-    candle: ICandle,
-    range: number,
-    k: number
-) {
-    return realPrice > candle.opening_price + range * k;
-}
-
 // candle 레인지 계산
 export function calculateRange(candle: ICandle) {
     return candle.high_price - candle.low_price;

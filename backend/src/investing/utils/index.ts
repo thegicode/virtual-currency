@@ -22,7 +22,6 @@ import {
     calculateAverageNoise,
     calculateRange,
     checkBreakout,
-    checkBreakout2,
 } from "./TradingUtils";
 
 export {
@@ -57,6 +56,5 @@ export {
     // TradingUtils
     calculateAverageNoise,
     checkBreakout,
-    checkBreakout2,
     calculateRange,
 };

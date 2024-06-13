@@ -17,7 +17,7 @@
  * 분캔들로 작업 수정
  */
 
-import { fetchDailyCandles, fetchMinutesCandles } from "../../services/api";
+import { fetchDailyCandles } from "../../services/api";
 import {
     adjustApiCounts,
     calculateAdjustedInvestment,
@@ -26,32 +26,11 @@ import {
     calculateMovingAverage2,
     calculateRange,
     checkBreakout,
-    checkBreakout2,
 } from "../utils";
-
-interface ITradeData {
-    date: string;
-    range: number;
-    price: number;
-    signal: string;
-    sellPrice: number;
-    position: number;
-    investment: number;
-    profit: number;
-    capital: number;
-    tradeCount: number;
-    winCount: number;
-}
-
-interface INoiseAverage {
-    date_time: string;
-    noiseAverage: number;
-}
 
 interface IMaretksCandles {
     market: string;
     candles: ICandle[];
-    // noiseAverages: INoiseAverage[];
 }
 
 interface INoiseData {
@@ -64,32 +43,23 @@ interface IDateNoiseData {
     noises: INoiseData[];
 }
 
-interface IBuySignalData {
-    market: string;
-    noiseAverage: number;
-    isBuySign: boolean;
-    investment: number;
-    prevLastDate: string;
-    currentCandle: ICandle;
-}
-
-interface ISingal {
+interface ISignal {
     date_time: string;
     market: string;
-    buyPrice: number;
     range: number;
     capital: number;
     tradeCount: number;
     winCount: number;
-    sellPrice: number;
-    position: number;
-    investment: number;
-    profit: number;
+    buyPrice?: number;
+    sellPrice?: number;
+    position?: number;
+    investment?: number;
+    profit?: number;
 }
 
 interface ISignalData {
     date_time: string;
-    signals: ISingal[];
+    signals: ISignal[];
 }
 
 interface IResult {
@@ -111,21 +81,21 @@ export async function averageNoiseRatioSignalCheckBacktest(
     transactionFee: number = 0.002 // 0.2%
 ) {
     try {
-        // get markets candles
+        // Get market candles data
         const marketsCandles = await Promise.all(
             markets.map((market) => getCandles(market, resultCounts))
         );
 
-        // 날짜와 코인별 noise 데이터 만들기
+        // Generate noise data for each date
         const dateNoiseData = generateDateNoiseData(
             marketsCandles,
             resultCounts
         );
 
-        // 절대 모멘텀, 상대 모멘텀으로 filter
+        // Filter and sort markets by noise
         const filterdData = filterAndSortMarketsByNoise(dateNoiseData);
 
-        // backtest
+        // Run backtest
         const results = await runBacktest(
             marketsCandles,
             filterdData,
@@ -137,6 +107,7 @@ export async function averageNoiseRatioSignalCheckBacktest(
             markets.length
         );
 
+        // Log the results
         logResult(results);
     } catch (error) {
         console.error("Error averageNoiseRatioSignalCheckBacktest: ", error);
@@ -162,7 +133,7 @@ function generateDateNoiseData(
     marketsCandles: IMaretksCandles[],
     resultCounts: number
 ) {
-    let result = [];
+    let result: IDateNoiseData[] = [];
     for (let day = 0; day <= resultCounts; day++) {
         let dailyNoiseData: IDateNoiseData = {
             date_time: "",
@@ -192,7 +163,7 @@ function generateDateNoiseData(
 }
 
 function filterAndSortMarketsByNoise(dateNoiseData: IDateNoiseData[]) {
-    const reesult = dateNoiseData.map((aNoiseData) => {
+    return dateNoiseData.map((aNoiseData) => {
         const { date_time, noises } = aNoiseData;
 
         // 노이즈 0.55 이하 : 절대 모멘텀
@@ -206,8 +177,6 @@ function filterAndSortMarketsByNoise(dateNoiseData: IDateNoiseData[]) {
             noises: sorted.slice(0, 4),
         };
     });
-
-    return reesult;
 }
 
 async function runBacktest(
@@ -231,35 +200,25 @@ async function runBacktest(
         size
     );
 
-    const tradeData = signalData.map((s) => s.signals);
+    const signalsData = signalData.flatMap((s) => s.signals);
 
-    const tableData1: ISingal[] = [];
-    tradeData.forEach((td) => {
-        td.forEach((aTd: ISingal) => {
-            tableData1.push(aTd);
-        });
-    });
-
-    const tableData = tableData1.map((aData) => {
-        const position = aData.position ?? 0;
-        const profit = aData.profit ?? 0;
-        const investment = aData.investment ?? 0;
+    const tradeData = signalsData.map((aData) => {
         return {
             date: aData.date_time,
             market: aData.market,
             range: aData.range.toFixed(2),
             buyPrice: aData.buyPrice ?? 0,
             sellPrice: aData.sellPrice ?? 0,
-            position: position.toFixed(2),
-            investment: Math.round(investment).toLocaleString() ?? 0,
+            investment: Math.round(aData.investment ?? 0).toLocaleString() ?? 0,
+            position: (aData.position ?? 0).toFixed(2),
+            profit: Math.round(aData.profit ?? 0).toLocaleString(),
             capital: Math.round(aData.capital).toLocaleString(),
-            profit: Math.round(profit).toLocaleString(),
             tradeCount: aData.tradeCount,
             winCount: aData.winCount,
         };
     });
 
-    // console.table(tableData);
+    console.table(tradeData);
 
     const finalMetrics = calculateFinalMetrics(signalData, initialCapital);
 
@@ -279,29 +238,35 @@ async function runStrategies(
     transactionFee: number,
     size: number
 ) {
-    let mddPrices: number[] = [];
     let tradeCount = 0;
     let winCount = 0;
 
-    const signalData = await Promise.all(
+    let peakCapital = capital;
+    let maxDrawdown = 0;
+
+    const signalData: ISignalData[] = await Promise.all(
         dateNoiseData.map(async (aNoiseData, index) => {
-            // nextCandle이 아닌 실시간 가격이 필요
             const date_time = aNoiseData.date_time;
             // console.log("\n\n *** aNoiseData date_time", date_time); // curent Date
 
-            const signals = await Promise.all(
+            const signals: ISignal[] = await Promise.all(
                 aNoiseData.noises.map(async (aNoise, idx) => {
-                    const market = aNoise.market;
-                    const candles = marketsCandles.filter(
+                    const market: string = aNoise.market;
+                    const marketCandles = marketsCandles.find(
                         (mc) => mc.market === market
-                    )[0].candles;
+                    );
+                    if (!marketCandles) return {} as ISignal;
 
-                    const currentCandle = candles[29 + index];
-                    const nextCandle = candles[29 + index + 1] || currentCandle;
-                    const prevCandle = candles[29 + index - 1];
+                    const candles = marketCandles.candles;
+                    const currentCandle = candles.find(
+                        (c) => c.date_time === date_time
+                    ) as ICandle;
+                    const currentCandleIndex = candles.indexOf(currentCandle);
+
+                    const prevCandle = candles[currentCandleIndex - 1];
                     const last5Candles = candles.slice(
-                        29 + index - 4,
-                        29 + index + 1
+                        currentCandleIndex - 5,
+                        currentCandleIndex
                     );
 
                     // 각 화폐의 가격이 5일 이동 평균보다 높은지 여부 파악
@@ -309,57 +274,37 @@ async function runStrategies(
                         last5Candles,
                         5
                     );
-
                     const isOverPriceAverage =
                         prevCandle.trade_price > priceMovingAverage;
 
                     // 각 화폐의 레인지 계산 (전일 고가 - 저가)
                     const range = await calculateRange(prevCandle);
 
-                    // 실시간 가격 가져오기, 낮 1시 데이터
-                    /* const realDateP = new Date(date_time);
-                    realDateP.setDate(realDateP.getDate() + 1);
-                    realDateP.setHours(11, 0, 0, 0);
-                    const realDate = realDateP.toISOString().slice(0, 19);
-
-                    const realCandle = await fetchMinutesCandles(
-                        market,
-                        240,
-                        6,
-                        realDate
-                    );
-                    const realOpenPrice = realCandle[0].opening_price; */
-
                     // 매수 : 실시간 가격 > 당일 시가 + (레인지 * k)
-                    /*  const isBreakOut = checkBreakout2(
-                        realOpenPrice,
-                        currentCandle,
-                        range,
-                        k
-                    ); */
                     const isBreakOut = checkBreakout(currentCandle, range, k);
 
                     // 매수 신호 확인
-                    const isBuySign =
-                        isOverPriceAverage && isBreakOut ? true : false;
+                    const isBuySign = isOverPriceAverage && isBreakOut;
 
-                    let thisData: any = {};
+                    let thisData: Partial<ISignal> = {};
                     if (isBuySign) {
                         // 매수
                         // const buyPrice = realOpenPrice;
-                        const buyPrice = nextCandle.opening_price;
-                        const { investment, prevVolatilityRate } =
-                            calculateAdjustedInvestment(
-                                range,
-                                prevCandle,
-                                targetRate,
-                                size,
-                                capital
-                            );
+                        const buyPrice = currentCandle.trade_price;
+                        const { investment } = calculateAdjustedInvestment(
+                            range,
+                            prevCandle,
+                            targetRate,
+                            size,
+                            capital
+                        );
                         const position = investment / buyPrice;
                         capital -= investment;
 
                         // 메도
+                        const nextCandle =
+                            candles[currentCandleIndex + 1] || currentCandle;
+
                         // const sellPrice =
                         //     realCandle[realCandle.length - 1].trade_price;
                         const sellPrice = nextCandle.trade_price;
@@ -370,7 +315,10 @@ async function runStrategies(
                         tradeCount++;
                         if (profit > 0) winCount++;
 
-                        mddPrices.push(currentCandle.trade_price);
+                        peakCapital = Math.max(peakCapital, capital);
+                        const drawdown =
+                            ((peakCapital - capital) / peakCapital) * 100;
+                        maxDrawdown = Math.max(maxDrawdown, drawdown);
 
                         thisData = {
                             buyPrice,
@@ -378,14 +326,14 @@ async function runStrategies(
                             position,
                             investment,
                             profit,
-                        };
+                        } as ISignal;
                     }
 
                     return {
                         ...thisData,
                         date_time: idx === 0 ? date_time : "",
                         market,
-                        range: range,
+                        range,
                         capital,
                         tradeCount,
                         winCount,
@@ -399,9 +347,6 @@ async function runStrategies(
             };
         })
     );
-
-    //  mdd
-    const maxDrawdown = calculateMDD(mddPrices);
 
     return { signalData, maxDrawdown };
 }
@@ -446,7 +391,7 @@ function logResult(result: IResult) {
     console.log(`maxDrawdown: ${result.maxDrawdown.toFixed(2)}%\n`);
 }
 
-/* (async () => {
+(async () => {
     const markets = ["KRW-AVAX", "KRW-BTG", "KRW-BTC", "KRW-ETH", "KRW-DOGE"];
-    await averageNoiseRatioSignalCheckBacktest(markets, 100000, 100);
-})(); */
+    await averageNoiseRatioSignalCheckBacktest(markets, 100000, 30);
+})();

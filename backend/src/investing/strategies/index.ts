@@ -33,8 +33,8 @@ export {
         // "KRW-DOGE",
         // "KRW-SOL",
         // "KRW-BCH",
-        // "KRW-TFUEL",
-        // "KRW-1INCH",
+        // "KRW-TFUEL", // 정리
+        // "KRW-1INCH", // 정리
         // "KRW-THETA",
         // "KRW-NEAR",
         //

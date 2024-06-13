@@ -3,7 +3,7 @@ import { fetchDailyCandles } from "../../services/api";
 (async () => {
     // 이동 평균 교차 전략
 
-    const data = await fetchDailyCandles("KRW-SOL", "100");
+    const data = await fetchDailyCandles("KRW-AVAX", "200");
 
     interface DataPoint {
         market: string;
@@ -95,8 +95,8 @@ import { fetchDailyCandles } from "../../services/api";
 
     // 이동 평균 교차 전략 백테스트
     const initialCapital = 10000; // 초기 자본
-    const shortPeriod = 12; // 단기 이동 평균 기간
-    const longPeriod = 26; // 장기 이동 평균 기간
+    const shortPeriod = 5; // 단기 이동 평균 기간
+    const longPeriod = 10; // 장기 이동 평균 기간
 
     calculateMovingAverageCrossover(data, shortPeriod, longPeriod);
     const { data: movingAverageCrossoverResult, tradeCount } =

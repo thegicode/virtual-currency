@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const api_1 = require("../../services/api");
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const data = yield (0, api_1.fetchDailyCandles)("KRW-SOL", "100");
+    const data = yield (0, api_1.fetchDailyCandles)("KRW-AVAX", "200");
     function calculateMovingAverages(data, shortPeriod, longPeriod) {
         data.forEach((row, index) => {
             if (index >= shortPeriod - 1) {
@@ -73,8 +73,8 @@ const api_1 = require("../../services/api");
         return { data, tradeCount };
     }
     const initialCapital = 10000;
-    const shortPeriod = 12;
-    const longPeriod = 26;
+    const shortPeriod = 5;
+    const longPeriod = 10;
     calculateMovingAverageCrossover(data, shortPeriod, longPeriod);
     const { data: movingAverageCrossoverResult, tradeCount } = backtestMovingAverageCrossover(data, initialCapital);
     const finalCapitalMovingAverageCrossover = movingAverageCrossoverResult[movingAverageCrossoverResult.length - 1]
