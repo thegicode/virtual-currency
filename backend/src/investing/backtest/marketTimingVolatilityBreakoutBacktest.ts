@@ -23,22 +23,10 @@ import {
     calculateAverageNoise,
     calculateRange,
     checkBreakout,
-    calculateAdjustedInvestment,
-    calculateMDD,
     formatPrice,
 } from "../utils";
 
-interface ICandle {
-    market: string;
-    date_time: string;
-    opening_price: number;
-    trade_price: number;
-    high_price: number;
-    low_price: number;
-    candle_acc_trade_volume: number;
-}
-
-interface IResult {
+interface ITradeData {
     market: string;
     date: string;
     noiseAverage: number;
@@ -52,16 +40,21 @@ interface IResult {
     maxDrawdown: number;
 }
 
-interface ISignalData {
+interface IResult {
     market: string;
-    date: string;
-    price: number;
-    signal: string;
-    investment: number;
-    capital: number;
+    tradeData: ITradeData[];
+    finalMetrics: IFinalResult;
+}
+
+interface IFinalResult {
+    market: string;
+    firstDate: string;
+    lastDate: string;
     tradeCount: number;
-    winCount: number;
-    mdd: number;
+    finalCapital: number;
+    performance: number;
+    winRate: number;
+    maxDrawdown: number;
 }
 
 export async function marketTimingVolatilityBreakoutBacktest(
@@ -73,32 +66,11 @@ export async function marketTimingVolatilityBreakoutBacktest(
     try {
         const results = await Promise.all(
             markets.map((market: string) =>
-                backtestMarket(
-                    market,
-                    initialCapital,
-                    days,
-                    targetRate,
-                    markets.length
-                )
+                backtestMarket(market, initialCapital, days, targetRate)
             )
         );
 
-        results.forEach((r) => {
-            const rrr = r.tradeData.map((d) => ({
-                market: d.market,
-                date: d.date.slice(0, 10),
-                price: formatPrice(d.price),
-                prevRange: formatPrice(d.prevRange),
-                noiseAverage: d.noiseAverage.toFixed(2),
-                singal: d.signal,
-                investment: Math.round(d.investment).toLocaleString(),
-                capital: Math.round(d.capital).toLocaleString(),
-                tradeCount: d.tradeCount,
-                winCount: d.winCount,
-                maxDrawdown: d.maxDrawdown,
-            }));
-            // console.table(rrr);
-        });
+        displayTradeTable(results);
 
         const allFinalMetrics = results.map((r) => r.finalMetrics);
         logResult(allFinalMetrics);
@@ -112,8 +84,7 @@ async function backtestMarket(
     market: string,
     initialCapital: number,
     days: number,
-    targetRate: number,
-    marketsSize: number
+    targetRate: number
 ) {
     const tradeData = await runStrategies(
         market,
@@ -139,7 +110,7 @@ async function runStrategies(
     initialCapital: number,
     days: number,
     targetRate: number
-): Promise<IResult[]> {
+): Promise<ITradeData[]> {
     // console.log("\n market", market);
 
     const candles = await fetchDailyCandles(market, (days + 20).toString());
@@ -150,7 +121,7 @@ async function runStrategies(
     let peakCapital = initialCapital;
     let maxDrawdown = 0;
 
-    const results: IResult[] = [];
+    const results: ITradeData[] = [];
 
     for (let i = 20; i < candles.length - 1; i++) {
         const currentCandle = candles[i];
@@ -203,7 +174,7 @@ async function runStrategies(
             price: currentCandle.trade_price,
             prevRange: range,
             noiseAverage,
-            signal: isBreakOut ? "매수 또는 보유" : "매도 또는 유보",
+            signal: isBreakOut ? "OK" : "",
             investment,
             capital,
             tradeCount,
@@ -216,10 +187,9 @@ async function runStrategies(
     return results;
 }
 
-function calculateMetrics(results: IResult[], initialCapital: number) {
+function calculateMetrics(results: ITradeData[], initialCapital: number) {
     const finalResult = results[results.length - 1];
     const finalCapital = finalResult.capital;
-    console.log(finalCapital, initialCapital);
     const performance = (finalCapital / initialCapital - 1) * 100;
     const winRate =
         finalResult.tradeCount > 0
@@ -237,7 +207,29 @@ function calculateMetrics(results: IResult[], initialCapital: number) {
     };
 }
 
-function logResult(results: any[]) {
+function displayTradeTable(results: IResult[]) {
+    results.forEach((r) => {
+        console.log(r.market);
+
+        const result = r.tradeData.map((d) => {
+            return {
+                date: d.date.slice(0, 10),
+                price: formatPrice(d.price),
+                prevRange: formatPrice(d.prevRange),
+                noiseAverage: d.noiseAverage.toFixed(2),
+                singal: d.signal,
+                investment: Math.round(d.investment).toLocaleString(),
+                capital: Math.round(d.capital).toLocaleString(),
+                tradeCount: d.tradeCount,
+                winCount: d.winCount,
+                maxDrawdown: d.maxDrawdown,
+            };
+        });
+        console.table(result);
+    });
+}
+
+function logResult(results: IFinalResult[]) {
     console.log(`\n🔔 평균 노이즈 비율 + 마켓 타이밍 + 변동성 돌파\n`);
     results.forEach((result) => {
         console.log(`📈 [${result.market}]`);
@@ -257,9 +249,9 @@ function logResult(results: any[]) {
 
 // 실행 예제
 (async () => {
-    const markets = ["KRW-ETH", "KRW-BTC"];
+    const markets = ["KRW-BTC", "KRW-ETH"];
     const initialCapital = 1000000;
-    const days = 100;
+    const days = 200;
 
     const results = await marketTimingVolatilityBreakoutBacktest(
         markets,

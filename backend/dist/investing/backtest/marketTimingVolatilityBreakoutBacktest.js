@@ -15,22 +15,8 @@ const utils_1 = require("../utils");
 function marketTimingVolatilityBreakoutBacktest(markets, initialCapital, days, targetRate = 0.02) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const results = yield Promise.all(markets.map((market) => backtestMarket(market, initialCapital, days, targetRate, markets.length)));
-            results.forEach((r) => {
-                const rrr = r.tradeData.map((d) => ({
-                    market: d.market,
-                    date: d.date.slice(0, 10),
-                    price: (0, utils_1.formatPrice)(d.price),
-                    prevRange: (0, utils_1.formatPrice)(d.prevRange),
-                    noiseAverage: d.noiseAverage.toFixed(2),
-                    singal: d.signal,
-                    investment: Math.round(d.investment).toLocaleString(),
-                    capital: Math.round(d.capital).toLocaleString(),
-                    tradeCount: d.tradeCount,
-                    winCount: d.winCount,
-                    maxDrawdown: d.maxDrawdown,
-                }));
-            });
+            const results = yield Promise.all(markets.map((market) => backtestMarket(market, initialCapital, days, targetRate)));
+            displayTradeTable(results);
             const allFinalMetrics = results.map((r) => r.finalMetrics);
             logResult(allFinalMetrics);
         }
@@ -41,7 +27,7 @@ function marketTimingVolatilityBreakoutBacktest(markets, initialCapital, days, t
     });
 }
 exports.marketTimingVolatilityBreakoutBacktest = marketTimingVolatilityBreakoutBacktest;
-function backtestMarket(market, initialCapital, days, targetRate, marketsSize) {
+function backtestMarket(market, initialCapital, days, targetRate) {
     return __awaiter(this, void 0, void 0, function* () {
         const tradeData = yield runStrategies(market, initialCapital, days, targetRate);
         const finalMetrics = calculateMetrics(tradeData, initialCapital);
@@ -92,7 +78,7 @@ function runStrategies(market, initialCapital, days, targetRate) {
                 price: currentCandle.trade_price,
                 prevRange: range,
                 noiseAverage,
-                signal: isBreakOut ? "매수 또는 보유" : "매도 또는 유보",
+                signal: isBreakOut ? "OK" : "",
                 investment,
                 capital,
                 tradeCount,
@@ -106,7 +92,6 @@ function runStrategies(market, initialCapital, days, targetRate) {
 function calculateMetrics(results, initialCapital) {
     const finalResult = results[results.length - 1];
     const finalCapital = finalResult.capital;
-    console.log(finalCapital, initialCapital);
     const performance = (finalCapital / initialCapital - 1) * 100;
     const winRate = finalResult.tradeCount > 0
         ? (finalResult.winCount / finalResult.tradeCount) * 100
@@ -120,6 +105,26 @@ function calculateMetrics(results, initialCapital) {
         winRate,
         maxDrawdown: finalResult.maxDrawdown,
     };
+}
+function displayTradeTable(results) {
+    results.forEach((r) => {
+        console.log(r.market);
+        const result = r.tradeData.map((d) => {
+            return {
+                date: d.date.slice(0, 10),
+                price: (0, utils_1.formatPrice)(d.price),
+                prevRange: (0, utils_1.formatPrice)(d.prevRange),
+                noiseAverage: d.noiseAverage.toFixed(2),
+                singal: d.signal,
+                investment: Math.round(d.investment).toLocaleString(),
+                capital: Math.round(d.capital).toLocaleString(),
+                tradeCount: d.tradeCount,
+                winCount: d.winCount,
+                maxDrawdown: d.maxDrawdown,
+            };
+        });
+        console.table(result);
+    });
 }
 function logResult(results) {
     console.log(`\n🔔 평균 노이즈 비율 + 마켓 타이밍 + 변동성 돌파\n`);
@@ -135,8 +140,8 @@ function logResult(results) {
     });
 }
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const markets = ["KRW-ETH", "KRW-BTC"];
+    const markets = ["KRW-BTC", "KRW-ETH"];
     const initialCapital = 1000000;
-    const days = 100;
+    const days = 200;
     const results = yield marketTimingVolatilityBreakoutBacktest(markets, initialCapital, days);
 }))();
