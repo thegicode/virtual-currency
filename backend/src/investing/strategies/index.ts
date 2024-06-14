@@ -166,8 +166,8 @@ export {
 
     const results10 = await marketTimingVolatilityBreakout(
         markets,
-        initialCapital
-        // targetRate = 0.02
+        initialCapital,
+        0.03 // targetRate = 0.02
     );
     console.log(results10);
 })();

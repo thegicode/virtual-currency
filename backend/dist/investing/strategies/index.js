@@ -67,6 +67,6 @@ const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
     console.log(results8);
     const results9 = yield (0, averageNoiseRatioSignalCheck_1.averageNoiseRatioSignalCheck)(markets, initialCapital);
     console.log(results9);
-    const results10 = yield (0, marketTimingVolatilityBreakout_1.marketTimingVolatilityBreakout)(markets, initialCapital);
+    const results10 = yield (0, marketTimingVolatilityBreakout_1.marketTimingVolatilityBreakout)(markets, initialCapital, 0.03);
     console.log(results10);
 }))();

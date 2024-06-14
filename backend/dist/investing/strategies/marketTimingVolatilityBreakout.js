@@ -35,18 +35,12 @@ function generateSignal(market, capital, targetRate) {
         const noiseAverage = (0, utils_1.calculateAverageNoise)(candles.slice(0, currentCandleIndex), market);
         const range = yield (0, utils_1.calculateRange)(prevCandle);
         const isBreakOut = (0, utils_1.checkBreakout)(currentCandle, range, noiseAverage);
-        let buySignal = {
-            investment: 0,
-        };
+        let investment = 0;
         if (isBreakOut) {
             const movingAverages = (0, utils_1.calculateAllMovingAverages)(candles.slice(0, currentCandleIndex), [3, 5, 10, 20]);
-            const score = Object.values(movingAverages).reduce((a, b) => a + (currentCandle.trade_price > b ? 1 : 0), 0);
-            const capitalScroed = (capital * score) / 4;
+            const score = Object.values(movingAverages).reduce((a, b) => a + (currentCandle.trade_price > b ? 1 : 0), 0) / 4;
             const prevVolatility = range / prevCandle.trade_price;
-            const investment = (targetRate / prevVolatility) * capitalScroed;
-            buySignal = {
-                investment,
-            };
+            investment = capital * score * (targetRate / prevVolatility);
         }
         return {
             market,
@@ -55,7 +49,7 @@ function generateSignal(market, capital, targetRate) {
             prevRange: range,
             noiseAverage,
             signal: isBreakOut ? "매수 또는 보유" : "매도 또는 유보",
-            investment: buySignal.investment,
+            investment,
         };
     });
 }
@@ -74,3 +68,10 @@ function createMessage(results) {
         .join("\n");
     return `${title}${message}`;
 }
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    const markets = [
+        "KRW-HPO",
+    ];
+    const result = yield marketTimingVolatilityBreakout(markets, 100000);
+    console.log(result);
+}))();
