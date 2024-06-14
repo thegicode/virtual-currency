@@ -14,7 +14,7 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
 (async () => {
     try {
         const initialCapital = 1000000; // 초기 자본
-        const resultCounts = 200;
+        const resultCounts = 100;
         const markets = [
             // 분캔들
             // checkMinutesMovingAverageBacktest
@@ -43,7 +43,7 @@ import { volatilityBreakoutBacktest } from "./volatilityBreakoutBacktest";
             // risingVolatilityBreakoutBacktest,
             // "KRW-DOT",
             "KRW-POLYX",
-            // "KRW-STX",
+            "KRW-STX",
             // "KRW-ZRX", // 68.53%
             // "KRW-SHIB", // 30 ->
 
