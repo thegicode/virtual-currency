@@ -103,6 +103,6 @@ function createMessage(results) {
         "KRW-ZRX",
         "KRW-SHIB",
     ];
-    const result = yield averageNoiseRatioSignalCheck(markets.slice(0, 10), 100000);
+    const result = yield averageNoiseRatioSignalCheck(markets, 100000);
     console.log(result);
 }))();

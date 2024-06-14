@@ -38,6 +38,7 @@ interface IResult {
     price: number;
     investment: number;
 }
+
 export async function averageNoiseRatioSignalCheck(
     markets: string[],
     initialCapital: number,
@@ -184,9 +185,6 @@ function createMessage(results: IResult[]) {
 
     // const markets = await fetchMarketAll();
 
-    const result = await averageNoiseRatioSignalCheck(
-        markets.slice(0, 10),
-        100000
-    );
+    const result = await averageNoiseRatioSignalCheck(markets, 100000);
     console.log(result);
 })();

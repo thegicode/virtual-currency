@@ -17,6 +17,7 @@ Object.defineProperty(exports, "checkDailyMovingAverage", { enumerable: true, ge
 const checkMinutesMovingAverage_1 = require("./checkMinutesMovingAverage");
 Object.defineProperty(exports, "checkMinutesMovingAverage", { enumerable: true, get: function () { return checkMinutesMovingAverage_1.checkMinutesMovingAverage; } });
 const fiveDayVolumeMA_VolatilityBreakout_1 = require("./fiveDayVolumeMA_VolatilityBreakout");
+const marketTimingVolatilityBreakout_1 = require("./marketTimingVolatilityBreakout");
 const movingAverageAndVolatility_1 = require("./movingAverageAndVolatility");
 Object.defineProperty(exports, "executeMovingAverageAndVolatility", { enumerable: true, get: function () { return movingAverageAndVolatility_1.executeMovingAverageAndVolatility; } });
 const risingVolatilityBreakoutStrategy_1 = require("./risingVolatilityBreakoutStrategy");
@@ -30,7 +31,6 @@ const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
         "KRW-STX",
         "KRW-ZRX",
         "KRW-SHIB",
-        "KRW-AERGO",
     ];
     const initialCapital = 100000;
     console.log("---------------------------------------------------");
@@ -67,4 +67,6 @@ const volatilityBreakoutStrategy_1 = require("./volatilityBreakoutStrategy");
     console.log(results8);
     const results9 = yield (0, averageNoiseRatioSignalCheck_1.averageNoiseRatioSignalCheck)(markets, initialCapital);
     console.log(results9);
+    const results10 = yield (0, marketTimingVolatilityBreakout_1.marketTimingVolatilityBreakout)(markets, initialCapital);
+    console.log(results10);
 }))();

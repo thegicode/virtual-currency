@@ -5,6 +5,7 @@ import { averageNoiseRatioSignalCheck } from "./averageNoiseRatioSignalCheck";
 import { checkDailyMovingAverage } from "./checkDailyMovingAverage";
 import { checkMinutesMovingAverage } from "./checkMinutesMovingAverage";
 import { fiveDayVolumeMA_VolatilityBreakout } from "./fiveDayVolumeMA_VolatilityBreakout";
+import { marketTimingVolatilityBreakout } from "./marketTimingVolatilityBreakout";
 import { executeMovingAverageAndVolatility } from "./movingAverageAndVolatility";
 import { risingVolatilityBreakoutStrategy } from "./risingVolatilityBreakoutStrategy";
 import { risingVolatilityBreakoutWithAdjustment } from "./risingVolatilityBreakoutWithAdjustment";
@@ -27,16 +28,16 @@ export {
         //
         // afternoonRiseMorningInvestment
         // 다자 가상화폐 + 전일 오후 상승 시 오전 투자 + 변동성 조절
-        // 밤 12시에 확인
+        // // 밤 12시에 확인
         // "KRW-BTC",
         // "KRW-ETH",
         // "KRW-DOGE",
         // "KRW-SOL",
         // "KRW-BCH",
-        // "KRW-TFUEL", // 정리
-        // "KRW-1INCH", // 정리
         // "KRW-THETA",
         // "KRW-NEAR",
+        // "KRW-TFUEL", // 정리
+        // "KRW-1INCH", // 정리
         //
         // 다자 가상화폐 + 상승장 + 변동성 돌파
         // risingVolatilityBreakoutStrategy
@@ -46,7 +47,6 @@ export {
         "KRW-STX",
         "KRW-ZRX",
         "KRW-SHIB",
-        "KRW-AERGO",
     ];
 
     const initialCapital = 100000;
@@ -161,4 +161,13 @@ export {
         // targetRate = 0.01
     );
     console.log(results9);
+
+    // 평균 노이즈 비율 + 마켓 타이밍 + 변동성 돌파
+
+    const results10 = await marketTimingVolatilityBreakout(
+        markets,
+        initialCapital
+        // targetRate = 0.02
+    );
+    console.log(results10);
 })();
